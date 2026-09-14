@@ -106,12 +106,24 @@ export default function FocusPage() {
   }
 
   return (
-    <div className="focus-session">
-      <FocusScene
-        elapsedMs={elapsed}
-        demoMode={demoMode}
-        plannedMs={planned}
-      />
+    <div className={cn("focus-session", !room && "focus-session-stage")}>
+      {room ? (
+        <FocusScene
+          elapsedMs={elapsed}
+          demoMode={demoMode}
+          plannedMs={planned}
+        />
+      ) : (
+        <div className="focus-quiet-stage">
+          <Spark
+            mood={mood}
+            taskId={session.taskId}
+            subject={session.subjectId}
+            hint={sessionHint(session)}
+            size={248}
+          />
+        </div>
+      )}
       <FocusHud
         time={formatElapsed(elapsed)}
         progress={sessionProgress}
@@ -119,16 +131,6 @@ export default function FocusPage() {
       />
 
       <div className={cn("focus-session-panel", room && "focus-session-panel-glass")}>
-        {!room ? (
-          <Spark
-            mood={mood}
-            taskId={session.taskId}
-            subject={session.subjectId}
-            hint={sessionHint(session)}
-            size={72}
-            className="mb-3"
-          />
-        ) : null}
         <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
           Focus session
         </p>
