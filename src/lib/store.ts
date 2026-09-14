@@ -782,7 +782,7 @@ export function equipAppearance(kind: AppearanceKind, id: string) {
 }
 
 export function resetDemo() {
-  if (typeof window === "undefined" && storageAccountId) {
+  if (typeof window !== "undefined" && storageAccountId) {
     window.localStorage.removeItem(accountStorageKey(storageAccountId));
   }
   state = { ...defaultState, hydrated: true };
