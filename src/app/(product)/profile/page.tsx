@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppSelect } from "@/components/app-select";
+import { CoreSubjects } from "@/components/core-subjects";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -157,14 +158,7 @@ export default function ProfilePage() {
         />
       </div>
 
-      <div className="rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-white/6">
-        <p className="text-xs tracking-[0.16em] text-primary uppercase">
-          Core · always on
-        </p>
-        <p className="mt-1 text-foreground">
-          Theory of Knowledge · Extended Essay
-        </p>
-      </div>
+      <CoreSubjects />
 
       <p className="text-sm text-muted-foreground">
         {preview.ok

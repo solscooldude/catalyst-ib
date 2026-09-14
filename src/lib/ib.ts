@@ -86,10 +86,14 @@ export const IB_SUBJECTS: IbSubject[] = [
   ...course("dance", "Dance", 6, "visual-arts"),
 ];
 
+export const CORE_DIPLOMA = [
+  { id: "tok" as const, label: "Theory of Knowledge", statId: "tok" as SubjectId },
+  { id: "ee" as const, label: "Extended Essay", statId: "ee" as SubjectId },
+];
+
 export const CORE_STUDY = [
-  { id: "tok", label: "Theory of Knowledge", statId: "tok" as SubjectId },
-  { id: "ee", label: "Extended Essay", statId: "ee" as SubjectId },
-  { id: "cas", label: "CAS", statId: "cas" as SubjectId },
+  ...CORE_DIPLOMA,
+  { id: "cas" as const, label: "CAS", statId: "cas" as SubjectId },
 ];
 
 export const CLASS_YEARS = [2026, 2027, 2028, 2029, 2030, 2031, 2032] as const;
@@ -107,12 +111,14 @@ export type ProfileState = {
   complete: boolean;
   classYear: number | null;
   subjects: string[];
+  core: Array<(typeof CORE_DIPLOMA)[number]["id"]>;
 };
 
 export const defaultProfile: ProfileState = {
   complete: false,
   classYear: null,
   subjects: [],
+  core: ["tok", "ee"],
 };
 
 export type MotivationState = {
@@ -161,6 +167,7 @@ export function normalizeProfile(
   return {
     classYear,
     subjects,
+    core: ["tok", "ee"],
     complete: check.ok,
   };
 }
@@ -227,29 +234,34 @@ export function validateDiploma(
   return { ok: true };
 }
 
-export function studySubjectOptions(profile: ProfileState) {
-  const diploma = profile.subjects
+export function diplomaSubjectList(profile: ProfileState) {
+  const groups = profile.subjects
     .map((id) => getIbSubject(id))
-    .filter(Boolean) as IbSubject[];
-  const core = CORE_STUDY.filter((row) => row.id === "tok" || row.id === "ee").map(
-    (row) => ({
+    .filter((row): row is IbSubject => Boolean(row));
+  return {
+    core: CORE_DIPLOMA.map((row) => ({
       id: row.statId,
       label: row.label,
       statId: row.statId,
-    }),
-  );
+    })),
+    groups: groups.map((row) => ({
+      id: row.id,
+      label: row.label,
+      statId: row.statId,
+      level: row.level,
+    })),
+  };
+}
+
+export function studySubjectOptions(profile: ProfileState) {
+  const { core, groups } = diplomaSubjectList(profile);
   const cas = CORE_STUDY.filter((row) => row.id === "cas").map((row) => ({
     id: row.statId,
     label: row.label,
     statId: row.statId,
   }));
-  const mapped = diploma.map((row) => ({
-    id: row.id,
-    label: row.label,
-    statId: row.statId,
-  }));
   const seen = new Set<string>();
-  return [...core, ...mapped, ...cas].filter((row) => {
+  return [...core, ...groups, ...cas].filter((row) => {
     const key = `${row.statId}:${row.label}`;
     if (seen.has(key)) return false;
     seen.add(key);

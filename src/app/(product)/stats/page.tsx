@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CoreSubjects } from "@/components/core-subjects";
 import { Spark } from "@/components/spark";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudyCalendar } from "@/components/study-calendar";
@@ -71,6 +72,8 @@ export default function StatsPage() {
           className="hidden shrink-0 sm:block"
         />
       </div>
+
+      <CoreSubjects compact />
 
       <StudyCalendar logs={state.logs} now={now} />
 

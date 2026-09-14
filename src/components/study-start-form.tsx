@@ -7,7 +7,7 @@ import { AppSelect } from "@/components/app-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SUBJECTS, type SubjectId } from "@/lib/constants";
+import { type SubjectId } from "@/lib/constants";
 import { studySubjectOptions } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { startStudySession, useCatalyst } from "@/lib/store";
@@ -17,13 +17,7 @@ const BLOCKS = [15, 25, 45, 60];
 export function StudyStartForm() {
   const router = useRouter();
   const state = useCatalyst();
-  const options = state.profile.complete
-    ? studySubjectOptions(state.profile)
-    : SUBJECTS.map((row) => ({
-        id: row.id,
-        label: row.label,
-        statId: row.id,
-      }));
+  const options = studySubjectOptions(state.profile);
   const [subjectId, setSubjectId] = useState<SubjectId>(
     (options[0]?.statId ?? "biology") as SubjectId,
   );

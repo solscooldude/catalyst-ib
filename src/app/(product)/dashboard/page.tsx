@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Spark } from "@/components/spark";
+import { CoreSubjects } from "@/components/core-subjects";
 import { ScheduleStatus } from "@/components/schedule-status";
 import { StudyCalendar } from "@/components/study-calendar";
 import { TokenChip } from "@/components/token-chip";
@@ -120,6 +121,8 @@ export default function DashboardPage() {
         </div>
       )}
 
+      <CoreSubjects compact />
+
       <ScheduleStatus />
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -129,8 +132,11 @@ export default function DashboardPage() {
           </p>
           <p className="mt-2 text-sm text-foreground">
             {state.profile.complete
-              ? `Class of ${state.profile.classYear} · ${state.profile.subjects.length} DP subjects · TOK & EE`
-              : "Add your class year and diploma subjects."}
+              ? `Class of ${state.profile.classYear} · ${state.profile.subjects.length} group subjects`
+              : "Add your class year and six group subjects."}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            TOK and EE are already on this diploma.
           </p>
           <Button asChild variant="outline" className="mt-4 h-10 rounded-full">
             <Link href={ROUTES.profile}>
