@@ -32,8 +32,8 @@ npm run build
 7. `/session` — timer. Mark the ManageBac task done, then complete the session.
 8. `/unlocks` — spend tokens (Notes 2 / YouTube 4 / nemesis 8 per 10 minutes). Repeat buys stack time on one timer.
 9. `/stats` — study calendar, subject stack (week / month), monthly roundup, and recent sessions. Official task completion adds +5 tokens; study blocks earn time tokens only.
-10. `/appearance` — spend tokens on accent color, background, spark tint, and a few accessories. Mint / void / bare spark stay free for new accounts.
-11. `/profile` — graduating class and six DP subjects (Groups 1–5 required; Group 6 optional with an extra from another group). Required on first visit.
+10. `/appearance` — spend tokens on accent color, background, spark tint, and spark gear (pink bow, black glasses, red scarf, graduation cap). Mint / void / bare spark stay free for new accounts.
+11. `/profile` — graduating class and six DP subjects with HL or SL on each (Groups 1–5 required; Group 6 optional with an extra from another group). TOK and EE are always on the diploma. Required on first visit.
 12. `/motivation` — dream colleges, course, and why it matters. A short reminder appears on the lock screen.
 13. Study blocks (from Focus or Stats) lock the phone for the chosen duration. Time tokens only — no +5. Retroactive “log past study” is gone.
 14. `/schedule` — recurring lock hours. The simulated phone greys during a window. The schedule itself awards no tokens.

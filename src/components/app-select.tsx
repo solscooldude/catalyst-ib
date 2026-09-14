@@ -78,7 +78,7 @@ export function AppSelect({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-zinc-200 bg-white py-1 text-sm text-zinc-900 shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)]"
+          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-zinc-200 bg-white py-1 text-sm text-zinc-900 shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)]"
         >
           {groups
             ? groups.map((group) => (

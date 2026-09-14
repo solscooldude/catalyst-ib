@@ -93,10 +93,10 @@ export const SPARK_TINTS = [
 
 export const SPARK_GEAR = [
   { id: "none", name: "Bare", cost: 0, blurb: "Just the spark." },
-  { id: "bow", name: "Tiny bow", cost: 10, blurb: "A soft knot on the crown." },
-  { id: "glasses", name: "Round glasses", cost: 12, blurb: "Study frames." },
-  { id: "scarf", name: "Soft scarf", cost: 12, blurb: "A wrap at the neck." },
-  { id: "cap", name: "Study cap", cost: 14, blurb: "A little brim, slightly tilted." },
+  { id: "bow", name: "Tiny bow", cost: 10, blurb: "A pink knot on the crown." },
+  { id: "glasses", name: "Round glasses", cost: 12, blurb: "Black study frames." },
+  { id: "scarf", name: "Soft scarf", cost: 12, blurb: "A red wrap at the neck." },
+  { id: "cap", name: "Graduation cap", cost: 14, blurb: "A dark mortarboard." },
 ] as const;
 
 export type AccentId = (typeof ACCENTS)[number]["id"];

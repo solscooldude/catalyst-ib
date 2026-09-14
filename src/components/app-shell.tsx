@@ -1,41 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
 import { TokenChip } from "@/components/token-chip";
 import { DemoBadge } from "@/components/demo-badge";
+import { NavMenus } from "@/components/nav-menus";
 import { Button } from "@/components/ui/button";
 import { logOut, useAuth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
 import { resetDemo, useCatalyst } from "@/lib/store";
-import { cn } from "@/lib/utils";
-
-const NAV = [
-  { href: ROUTES.home, label: "Home" },
-  { href: ROUTES.focus, label: "Focus" },
-  { href: ROUTES.schedule, label: "Schedule" },
-  { href: ROUTES.stats, label: "Stats" },
-  { href: ROUTES.unlocks, label: "Unlocks" },
-  { href: ROUTES.appearance, label: "Appearance" },
-  { href: ROUTES.motivation, label: "Motivation" },
-  { href: ROUTES.setup, label: "Setup" },
-];
-
-function isActive(pathname: string, href: string) {
-  if (href === ROUTES.home) return pathname === ROUTES.home;
-  if (href === ROUTES.focus) {
-    return (
-      pathname === ROUTES.focus ||
-      pathname === ROUTES.lock ||
-      pathname === ROUTES.session
-    );
-  }
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const router = useRouter();
   const state = useCatalyst();
   const auth = useAuth();
@@ -55,24 +30,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-white/6 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
           <Wordmark href={ROUTES.home} />
-          <nav className="hidden items-center gap-1 lg:flex">
-            {NAV.map((item) => {
-              const active = isActive(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "rounded-full px-3 py-1.5 text-sm transition-colors",
-                    active
-                      ? "bg-white/6 text-foreground"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="hidden lg:block">
+            <NavMenus />
           </nav>
           <div className="flex items-center gap-2">
             <TokenChip tokens={state.tokens} />
@@ -94,24 +53,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
         </div>
-        <div className="flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden">
-          {NAV.map((item) => {
-            const active = isActive(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs",
-                  active
-                    ? "bg-white/6 text-foreground"
-                    : "text-muted-foreground",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+        <div className="px-4 pb-2 lg:hidden">
+          <NavMenus compact />
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8 sm:py-12">

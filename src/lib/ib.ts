@@ -2,70 +2,88 @@ import type { SubjectId } from "@/lib/constants";
 
 export const IB_GROUPS = [1, 2, 3, 4, 5, 6] as const;
 export type IbGroup = (typeof IB_GROUPS)[number];
+export type IbLevel = "HL" | "SL";
 
 export type IbSubject = {
   id: string;
+  course: string;
   label: string;
   group: IbGroup;
   statId: SubjectId;
+  level: IbLevel;
 };
 
+function course(
+  courseId: string,
+  name: string,
+  group: IbGroup,
+  statId: SubjectId,
+  levels: IbLevel[] = ["HL", "SL"],
+): IbSubject[] {
+  return levels.map((level) => ({
+    id: `${courseId}-${level.toLowerCase()}`,
+    course: courseId,
+    label: `${name} ${level}`,
+    group,
+    statId,
+    level,
+  }));
+}
+
 export const IB_SUBJECTS: IbSubject[] = [
-  { id: "eng-a-langlit", label: "English A Language & Literature", group: 1, statId: "english" },
-  { id: "eng-a-lit", label: "English A Literature", group: 1, statId: "english" },
-  { id: "spa-a-langlit", label: "Spanish A Language & Literature", group: 1, statId: "language-b" },
-  { id: "spa-a-lit", label: "Spanish A Literature", group: 1, statId: "language-b" },
-  { id: "fre-a-langlit", label: "French A Language & Literature", group: 1, statId: "language-b" },
-  { id: "fre-a-lit", label: "French A Literature", group: 1, statId: "language-b" },
-  { id: "ita-a-langlit", label: "Italian A Language & Literature", group: 1, statId: "language-b" },
-  { id: "ita-a-lit", label: "Italian A Literature", group: 1, statId: "language-b" },
-  { id: "ger-a-langlit", label: "German A Language & Literature", group: 1, statId: "language-b" },
-  { id: "ger-a-lit", label: "German A Literature", group: 1, statId: "language-b" },
-  { id: "chi-a-langlit", label: "Chinese A Language & Literature", group: 1, statId: "language-b" },
-  { id: "chi-a-lit", label: "Chinese A Literature", group: 1, statId: "language-b" },
-  { id: "por-a-lit", label: "Portuguese A Literature", group: 1, statId: "language-b" },
-  { id: "jpn-a-lit", label: "Japanese A Literature", group: 1, statId: "language-b" },
-  { id: "ara-a-lit", label: "Arabic A Literature", group: 1, statId: "language-b" },
-  { id: "self-taught-a", label: "Language A self-taught", group: 1, statId: "language-b" },
-  { id: "spanish-b", label: "Spanish B", group: 2, statId: "language-b" },
-  { id: "french-b", label: "French B", group: 2, statId: "language-b" },
-  { id: "italian-b", label: "Italian B", group: 2, statId: "language-b" },
-  { id: "german-b", label: "German B", group: 2, statId: "language-b" },
-  { id: "mandarin-b", label: "Mandarin B", group: 2, statId: "language-b" },
-  { id: "english-b", label: "English B", group: 2, statId: "english" },
-  { id: "japanese-b", label: "Japanese B", group: 2, statId: "language-b" },
-  { id: "portuguese-b", label: "Portuguese B", group: 2, statId: "language-b" },
-  { id: "latin", label: "Latin", group: 2, statId: "language-b" },
-  { id: "spanish-ab", label: "Spanish Ab initio", group: 2, statId: "language-b" },
-  { id: "french-ab", label: "French Ab initio", group: 2, statId: "language-b" },
-  { id: "italian-ab", label: "Italian Ab initio", group: 2, statId: "language-b" },
-  { id: "german-ab", label: "German Ab initio", group: 2, statId: "language-b" },
-  { id: "mandarin-ab", label: "Mandarin Ab initio", group: 2, statId: "language-b" },
-  { id: "japanese-ab", label: "Japanese Ab initio", group: 2, statId: "language-b" },
-  { id: "history", label: "History", group: 3, statId: "history" },
-  { id: "geography", label: "Geography", group: 3, statId: "geography" },
-  { id: "economics", label: "Economics", group: 3, statId: "economics" },
-  { id: "psychology", label: "Psychology", group: 3, statId: "psychology" },
-  { id: "business", label: "Business Management", group: 3, statId: "economics" },
-  { id: "global-politics", label: "Global Politics", group: 3, statId: "history" },
-  { id: "digital-societies", label: "Digital Societies", group: 3, statId: "digital-societies" },
-  { id: "philosophy", label: "Philosophy", group: 3, statId: "history" },
-  { id: "biology", label: "Biology", group: 4, statId: "biology" },
-  { id: "chemistry", label: "Chemistry", group: 4, statId: "chemistry" },
-  { id: "physics", label: "Physics", group: 4, statId: "physics" },
-  { id: "cs", label: "Computer Science", group: 4, statId: "cs" },
-  { id: "ess", label: "ESS", group: 4, statId: "biology" },
-  { id: "sehs", label: "Sports, Exercise & Health", group: 4, statId: "cas" },
-  { id: "design-tech", label: "Design Technology", group: 4, statId: "cs" },
-  { id: "math-aa-hl", label: "Mathematics AA HL", group: 5, statId: "math-aa" },
-  { id: "math-aa-sl", label: "Mathematics AA SL", group: 5, statId: "math-aa" },
-  { id: "math-ai-hl", label: "Mathematics AI HL", group: 5, statId: "math-aa" },
-  { id: "math-ai-sl", label: "Mathematics AI SL", group: 5, statId: "math-aa" },
-  { id: "visual-arts", label: "Visual Arts", group: 6, statId: "visual-arts" },
-  { id: "music", label: "Music", group: 6, statId: "music" },
-  { id: "theatre", label: "Theatre", group: 6, statId: "visual-arts" },
-  { id: "film", label: "Film", group: 6, statId: "visual-arts" },
-  { id: "dance", label: "Dance", group: 6, statId: "visual-arts" },
+  ...course("eng-a-langlit", "English A Language & Literature", 1, "english"),
+  ...course("eng-a-lit", "English A Literature", 1, "english"),
+  ...course("spa-a-langlit", "Spanish A Language & Literature", 1, "language-b"),
+  ...course("spa-a-lit", "Spanish A Literature", 1, "language-b"),
+  ...course("fre-a-langlit", "French A Language & Literature", 1, "language-b"),
+  ...course("fre-a-lit", "French A Literature", 1, "language-b"),
+  ...course("ita-a-langlit", "Italian A Language & Literature", 1, "language-b"),
+  ...course("ita-a-lit", "Italian A Literature", 1, "language-b"),
+  ...course("ger-a-langlit", "German A Language & Literature", 1, "language-b"),
+  ...course("ger-a-lit", "German A Literature", 1, "language-b"),
+  ...course("chi-a-langlit", "Chinese A Language & Literature", 1, "language-b"),
+  ...course("chi-a-lit", "Chinese A Literature", 1, "language-b"),
+  ...course("por-a-lit", "Portuguese A Literature", 1, "language-b"),
+  ...course("jpn-a-lit", "Japanese A Literature", 1, "language-b"),
+  ...course("ara-a-lit", "Arabic A Literature", 1, "language-b"),
+  ...course("self-taught-a", "Language A self-taught", 1, "language-b", ["SL"]),
+  ...course("spanish-b", "Spanish B", 2, "language-b"),
+  ...course("french-b", "French B", 2, "language-b"),
+  ...course("italian-b", "Italian B", 2, "language-b"),
+  ...course("german-b", "German B", 2, "language-b"),
+  ...course("mandarin-b", "Mandarin B", 2, "language-b"),
+  ...course("english-b", "English B", 2, "english"),
+  ...course("japanese-b", "Japanese B", 2, "language-b"),
+  ...course("portuguese-b", "Portuguese B", 2, "language-b"),
+  ...course("latin", "Latin", 2, "language-b"),
+  ...course("spanish-ab", "Spanish Ab initio", 2, "language-b", ["SL"]),
+  ...course("french-ab", "French Ab initio", 2, "language-b", ["SL"]),
+  ...course("italian-ab", "Italian Ab initio", 2, "language-b", ["SL"]),
+  ...course("german-ab", "German Ab initio", 2, "language-b", ["SL"]),
+  ...course("mandarin-ab", "Mandarin Ab initio", 2, "language-b", ["SL"]),
+  ...course("japanese-ab", "Japanese Ab initio", 2, "language-b", ["SL"]),
+  ...course("history", "History", 3, "history"),
+  ...course("geography", "Geography", 3, "geography"),
+  ...course("economics", "Economics", 3, "economics"),
+  ...course("psychology", "Psychology", 3, "psychology"),
+  ...course("business", "Business Management", 3, "economics"),
+  ...course("global-politics", "Global Politics", 3, "history"),
+  ...course("digital-societies", "Digital Societies", 3, "digital-societies"),
+  ...course("philosophy", "Philosophy", 3, "history"),
+  ...course("biology", "Biology", 4, "biology"),
+  ...course("chemistry", "Chemistry", 4, "chemistry"),
+  ...course("physics", "Physics", 4, "physics"),
+  ...course("cs", "Computer Science", 4, "cs"),
+  ...course("ess", "ESS", 4, "biology"),
+  ...course("sehs", "Sports, Exercise & Health", 4, "cas"),
+  ...course("design-tech", "Design Technology", 4, "cs"),
+  ...course("math-aa", "Mathematics AA", 5, "math-aa"),
+  ...course("math-ai", "Mathematics AI", 5, "math-aa"),
+  ...course("visual-arts", "Visual Arts", 6, "visual-arts"),
+  ...course("music", "Music", 6, "music"),
+  ...course("theatre", "Theatre", 6, "visual-arts"),
+  ...course("film", "Film", 6, "visual-arts"),
+  ...course("dance", "Dance", 6, "visual-arts"),
 ];
 
 export const CORE_STUDY = [
@@ -121,6 +139,14 @@ export function subjectsInGroup(group: IbGroup) {
   return IB_SUBJECTS.filter((row) => row.group === group);
 }
 
+export function takenCourses(subjectIds: string[]) {
+  return new Set(
+    subjectIds
+      .map((id) => getIbSubject(id)?.course)
+      .filter((courseId): courseId is string => Boolean(courseId)),
+  );
+}
+
 export function normalizeProfile(
   raw?: Partial<ProfileState> | null,
 ): ProfileState {
@@ -167,6 +193,12 @@ export function validateDiploma(
   if (rows.length !== 6) {
     return { ok: false, reason: "One of those subjects is not on the IB list." };
   }
+  if (rows.some((row) => !row.level)) {
+    return { ok: false, reason: "Every subject needs HL or SL." };
+  }
+  if (takenCourses(subjects).size !== 6) {
+    return { ok: false, reason: "Each subject can only be taken once." };
+  }
   const byGroup = new Map<IbGroup, number>();
   for (const row of rows) {
     byGroup.set(row.group, (byGroup.get(row.group) ?? 0) + 1);
@@ -199,18 +231,25 @@ export function studySubjectOptions(profile: ProfileState) {
   const diploma = profile.subjects
     .map((id) => getIbSubject(id))
     .filter(Boolean) as IbSubject[];
-  const core = CORE_STUDY.map((row) => ({
+  const core = CORE_STUDY.filter((row) => row.id === "tok" || row.id === "ee").map(
+    (row) => ({
+      id: row.statId,
+      label: row.label,
+      statId: row.statId,
+    }),
+  );
+  const cas = CORE_STUDY.filter((row) => row.id === "cas").map((row) => ({
     id: row.statId,
     label: row.label,
     statId: row.statId,
   }));
   const mapped = diploma.map((row) => ({
-    id: row.statId,
+    id: row.id,
     label: row.label,
     statId: row.statId,
   }));
   const seen = new Set<string>();
-  return [...mapped, ...core].filter((row) => {
+  return [...core, ...mapped, ...cas].filter((row) => {
     const key = `${row.statId}:${row.label}`;
     if (seen.has(key)) return false;
     seen.add(key);
