@@ -240,6 +240,13 @@ export const SPARK_TRAILS = [
     collection: "gold" as const,
     blurb: "Rare metal dust. One trail at a time.",
   },
+  {
+    id: "week",
+    name: "Seven-day flare",
+    cost: 0,
+    collection: "gold" as const,
+    blurb: "Login seven days in a row. Warm gold motes.",
+  },
 ] as const;
 
 export const FOCUS_THEMES = [

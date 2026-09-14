@@ -53,7 +53,8 @@ export default function DashboardPage() {
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             Spark is {sparkEvolutionLabel(evo.stage)} ·{" "}
-            {formatHours(verifiedStudyMs(state.logs))} official
+            {formatHours(verifiedStudyMs(state.logs))} official · streak{" "}
+            {state.streakDays}
           </p>
           <Button asChild variant="ghost" size="sm" className="mt-3 h-8 px-0 text-muted-foreground">
             <Link href={ROUTES.sprite}>Open My Sprite</Link>
