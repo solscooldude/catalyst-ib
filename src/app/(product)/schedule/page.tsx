@@ -117,14 +117,14 @@ export default function SchedulePage() {
             <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
               <p className="text-sm text-foreground">No lock hours yet.</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Add a window below, or start with weeknights 7–10pm.
+                Add a window below, or start with weeknights 7\u201310pm.
               </p>
               <Button
                 className="mt-4 h-10 rounded-full"
                 variant="outline"
                 onClick={addWeeknights}
               >
-                Add weeknights 7–10pm
+                Add weeknights 7\u201310pm
               </Button>
             </div>
           ) : (
@@ -184,7 +184,7 @@ export default function SchedulePage() {
         <section className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
           <h2 className="text-lg text-foreground">Add a window</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Overnight is fine — 22:00 to 07:00 counts as one window.
+            Overnight is fine \u2014 22:00 to 07:00 counts as one window.
           </p>
 
           <div className="mt-5 space-y-4">
@@ -255,7 +255,7 @@ export default function SchedulePage() {
 
       <div className="flex flex-col items-center lg:pt-16">
         <PhoneLock
-          nemesis={state.nemesis}
+          nemeses={state.nemeses}
           unlocks={state.unlocks}
           locked={Boolean(current)}
           compact

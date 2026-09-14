@@ -108,7 +108,8 @@ export default function DashboardPage() {
         <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
           <p className="text-sm text-foreground">Finish setup to start focus.</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Pick a nemesis app and connect the mock ManageBac list.
+            Pick the apps that steal the block and connect the mock ManageBac
+            list.
           </p>
           <Button asChild className="mt-4 h-10 rounded-full">
             <Link href={ROUTES.setup}>
@@ -188,7 +189,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MiniStat label="Time" value={formatHours(roundup.durationMs)} />
-          <MiniStat label="Top subject" value={roundup.topSubject?.label ?? "—"} />
+          <MiniStat label="Top subject" value={roundup.topSubject?.label ?? "\u2014"} />
           <MiniStat label="Sessions" value={String(roundup.sessions)} />
           <MiniStat
             label="Tokens earned"
