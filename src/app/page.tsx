@@ -46,12 +46,15 @@ export default function LandingPage() {
               For IB Diploma Programme students
             </p>
             <h1 className="mt-5 max-w-xl text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-              The phone pulls you off ManageBac. Catalyst makes it wait.
+              Apps pull you off ManageBac. You unlock them after the work is
+              done.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
-              Name the apps that steal the block. Work on the laptop until the
-              task is marked done. Tokens come from those minutes — then you
-              buy a short unlock. Not a streak. Not a pep talk.
+              TikTok, Instagram, and the rest sit next to the IA, TOK essay, or
+              EE. Catalyst greys the apps you name. You stay on the laptop
+              until a task is marked done or a study block finishes. Tokens
+              come from those minutes — verified focus, not a quote. Then you
+              buy a short unlock.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
@@ -83,18 +86,20 @@ export default function LandingPage() {
                 The problem
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                You sat down to write. Then you opened TikTok.
+                The phone takes the hour you needed for the IA.
               </h2>
             </div>
             <div className="self-end space-y-4 text-base leading-7 text-muted-foreground">
               <p>
-                IAs, TOK, and the EE live on ManageBac. The apps live on the
-                same desk. A five-minute check becomes the hour you needed.
+                ManageBac work is on the laptop. The distracting apps are on
+                the phone beside it. A five-minute check becomes the block you
+                meant for TOK or the EE.
               </p>
               <p>
-                Catalyst greys the apps you pick as nemesis. You get them back
-                only after a session that ran — tokens from verified focus,
-                plus a bonus when an official task is marked complete.
+                You get those apps back only after a session that actually ran.
+                Tokens come from focus time, plus a bonus when an official
+                ManageBac task is marked complete. No unlock without that
+                proof.
               </p>
             </div>
           </div>
@@ -105,7 +110,7 @@ export default function LandingPage() {
             How it works
           </p>
           <h2 className="mt-3 max-w-xl text-4xl text-foreground sm:text-5xl">
-            Lock the apps. Finish the work. Spend what you earned.
+            What happens in a session
           </h2>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {STEPS.map((step) => (
