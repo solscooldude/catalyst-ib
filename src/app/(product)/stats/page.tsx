@@ -69,6 +69,7 @@ export default function StatsPage() {
             SUBJECTS.find((row) => row.id === recent[0]?.subjectId)?.label
           }
           size={88}
+          pettable
           className="hidden shrink-0 sm:block"
         />
       </div>

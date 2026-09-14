@@ -179,6 +179,7 @@ function UnlockInner() {
             taskId={lastSession?.taskId}
             subject={lastSession?.subjectId}
             size={64}
+            pettable
           />
         </div>
         <PhoneLock nemesis={state.nemesis} unlocks={state.unlocks} />

@@ -38,12 +38,12 @@ export default function AppearancePage() {
             Spend tokens on the room and the spark.
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Accents change buttons and highlights. Backgrounds stay quiet.
-            Spark tints and accessories are just for the mascot. Mint is free
-            for every new account.
+            Accents change buttons and highlights. Quiet tints stay cheap.
+            Stars and Aurora are night-sky layers. Spark tints and accessories
+            are just for the mascot. Mint is free for every new account.
           </p>
         </div>
-        <Spark mood="idle" size={104} className="hidden shrink-0 sm:block" />
+        <Spark mood="idle" size={104} pettable className="hidden shrink-0 sm:block" />
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
@@ -78,7 +78,7 @@ export default function AppearancePage() {
 
       <ShopSection
         title="Background"
-        copy="A faint shift in the page. Nothing loud."
+        copy="Quiet tints, plus night-sky layers that sit behind the dashboard."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {BACKGROUNDS.map((item) => {
@@ -101,6 +101,10 @@ export default function AppearancePage() {
                     item.id === "dusk" && "bg-[#1b1524]",
                     item.id === "mist" && "bg-[#171c24]",
                     item.id === "grove" && "bg-[#141c18]",
+                    item.id === "stars" &&
+                      "bg-[#07080d] shadow-[inset_1px_1px_0_#fff8,inset_-8px_-10px_0_-6px_#fff5]",
+                    item.id === "aurora" &&
+                      "bg-[linear-gradient(135deg,#0a1a16_0%,#14241c_40%,#1a1430_100%)]",
                   )}
                 />
               </ShopCard>

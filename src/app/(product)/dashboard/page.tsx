@@ -60,6 +60,7 @@ export default function DashboardPage() {
                 SUBJECTS.find((row) => row.id === stacks[0]?.id)?.label)
           }
           size={112}
+          pettable
           className="shrink-0"
         />
       </div>
