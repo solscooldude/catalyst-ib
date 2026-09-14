@@ -46,7 +46,7 @@ export function TokenAmount({
   return (
     <span
       className={cn(
-        "token-amount inline-flex items-center gap-1 font-mono text-[#F4EFE4]",
+        "token-amount inline-flex items-center gap-1 rounded-full border border-[#C9B896] bg-[#F4EFE4] px-1.5 py-0.5 font-mono text-[13px] font-semibold text-[#2A2420]",
         className,
       )}
     >
