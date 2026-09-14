@@ -1,0 +1,45 @@
+name: Assemble focus-room plates
+
+on:
+  push:
+    paths:
+      - tmp/plate-parts/**
+      - .github/workflows/assemble-focus-plates.yml
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Concatenate ready plate parts and commit exact files
+        env:
+          CAT_SHA: 0dbab2924087fa26fd8aca9303e53e39e07a79d4ed495a6fcc375150a5e3c552
+          DESK_SHA: 504fa097e313fc695d711b7476991a8d8c2b28d2320fe81f16e950e2a8cf1797
+          LIBRARY_SHA: ff14dc1284a8f8666c8de9f1adfe82e620213a7389a60cf6e2d515cd7c0a0f03
+        run: |
+          set -euo pipefail
+          git config user.name "solscooldude"
+          git config user.email "solaia@atamas.com"
+          assemble() {
+            local name="$1" expected="$2" dest="src/lib/focus-plates-${name}.ts" dir="tmp/plate-parts/${name}"
+            if [ ! -f "${dir}/READY" ]; then
+              echo "skip ${name}: no READY marker"
+              return 0
+            fi
+            cat $(find "$dir" -name '*.txt' | sort) > "$dest"
+            echo "${expected}  ${dest}" | sha256sum -c
+            git add "$dest"
+            if ! git diff --cached --quiet -- "$dest"; then
+              git commit -m "Add ${name} focus-room JPEG plates"
+            fi
+          }
+          assemble cat "$CAT_SHA"
+          assemble desk "$DESK_SHA"
+          assemble library "$LIBRARY_SHA"
+          if ! git diff --quiet HEAD origin/main 2>/dev/null; then
+            git push
+          fi
+          git status --short
