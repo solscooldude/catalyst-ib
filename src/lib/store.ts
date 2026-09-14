@@ -36,6 +36,12 @@ import {
   type MotivationState,
   type ProfileState,
 } from "@/lib/ib";
+import {
+  normalizeSchedule,
+  normalizeWindow,
+  validateWindow,
+  type LockWindow,
+} from "@/lib/schedule";
 
 export type TaskState = {
   id: TaskId;
@@ -102,6 +108,7 @@ export type CatalystState = {
   appearance: AppearanceState;
   profile: ProfileState;
   motivation: MotivationState;
+  schedule: LockWindow[];
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -123,6 +130,7 @@ export const defaultState: CatalystState = {
   appearance: defaultAppearance,
   profile: defaultProfile,
   motivation: defaultMotivation,
+  schedule: [],
 };
 
 type Listener = () => void;
@@ -208,6 +216,7 @@ export function hydrateStore(userId: string | null = null) {
       appearance: normalizeAppearance(parsed.appearance),
       profile: normalizeProfile(parsed.profile),
       motivation: normalizeMotivation(parsed.motivation),
+      schedule: normalizeSchedule(parsed.schedule),
       session: normalizeSession(parsed.session ?? null),
       hydrated: true,
     };
@@ -473,6 +482,63 @@ export function saveMotivation(input: MotivationState) {
   }
   setState((current) => ({ ...current, motivation }));
   return { ok: true as const, motivation };
+}
+
+export function saveSchedule(windows: LockWindow[]) {
+  const schedule = normalizeSchedule(windows);
+  if (windows.length > 8) {
+    return { ok: false as const, reason: "Eight windows is enough." };
+  }
+  for (const window of windows) {
+    const check = validateWindow(window);
+    if (!check.ok) return { ok: false as const, reason: check.reason };
+  }
+  setState((current) => ({ ...current, schedule }));
+  return { ok: true as const, schedule };
+}
+
+export function addLockWindow(input: Omit<LockWindow, "id">) {
+  const check = validateWindow(input);
+  if (!check.ok) return { ok: false as const, reason: check.reason };
+  if (state.schedule.length >= 8) {
+    return { ok: false as const, reason: "Eight windows is enough." };
+  }
+  const window = normalizeSchedule([
+    {
+      ...input,
+      id: crypto.randomUUID(),
+    },
+  ])[0];
+  if (!window) {
+    return { ok: false as const, reason: "Could not save that window." };
+  }
+  setState((current) => ({
+    ...current,
+    schedule: [...current.schedule, window],
+  }));
+  return { ok: true as const, window };
+}
+
+export function updateLockWindow(
+  id: string,
+  patch: Partial<Omit<LockWindow, "id">>,
+) {
+  const existing = state.schedule.find((row) => row.id === id);
+  if (!existing) return { ok: false as const, reason: "Window not found." };
+  const next = normalizeWindow({ ...existing, ...patch, id });
+  if (!next) return { ok: false as const, reason: "Could not update that window." };
+  setState((current) => ({
+    ...current,
+    schedule: current.schedule.map((row) => (row.id === id ? next : row)),
+  }));
+  return { ok: true as const };
+}
+
+export function removeLockWindow(id: string) {
+  setState((current) => ({
+    ...current,
+    schedule: current.schedule.filter((row) => row.id !== id),
+  }));
 }
 
 export function clearSession() {
