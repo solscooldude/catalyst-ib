@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   getSparkTint,
   type SparkGearId,
@@ -27,6 +27,8 @@ type SparkProps = {
   gear?: SparkGearId;
   size?: number;
   className?: string;
+  pettable?: boolean;
+  flourish?: "loop" | "now";
 };
 
 function OpenEyes({
@@ -61,6 +63,28 @@ function OpenEyes({
         fill="#fff"
         fillOpacity="0.88"
       />
+    </g>
+  );
+}
+
+function Heart() {
+  return (
+    <path d="M8 3.2C6.6.8 3.2.6 1.8 2.7-.1 5.4 1.6 8.6 8 13.4c6.4-4.8 8.1-8 6.2-10.7C12.8.6 9.4.8 8 3.2Z" />
+  );
+}
+
+function PetHearts() {
+  return (
+    <g className="spark-hearts" fill="#F9A8D4">
+      <g className="spark-heart spark-heart-a" transform="translate(6 18) scale(1.05)">
+        <Heart />
+      </g>
+      <g className="spark-heart spark-heart-b" transform="translate(78 12) scale(0.85)">
+        <Heart />
+      </g>
+      <g className="spark-heart spark-heart-c" transform="translate(86 48) scale(0.7)">
+        <Heart />
+      </g>
     </g>
   );
 }
@@ -443,6 +467,8 @@ export function Spark({
   gear,
   size = 72,
   className,
+  pettable = false,
+  flourish = "loop",
 }: SparkProps) {
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
@@ -458,14 +484,35 @@ export function Spark({
       subjectId: subject ?? (taskId ? TASK_SUBJECT[taskId] : undefined),
       text: hint ?? sparkHintFromTask(taskId),
     });
-  const canGlance = mood === "idle" || mood === "locked";
+  const busy = mood === "locked" || mood === "earning";
+  const canPet = pettable && !busy;
+  const [petted, setPetted] = useState(false);
+  const petTimer = useRef<number>(0);
 
-  return (
-    <div
-      className={cn("spark-float pointer-events-none relative", className)}
-      style={{ width: size, height: size, color: palette.lo }}
-      aria-hidden
-    >
+  useEffect(() => {
+    return () => window.clearTimeout(petTimer.current);
+  }, []);
+
+  function pet() {
+    if (!canPet) return;
+    setPetted(true);
+    window.clearTimeout(petTimer.current);
+    petTimer.current = window.setTimeout(() => setPetted(false), 1800);
+  }
+
+  const shownMood: SparkMood = petted ? "done" : mood;
+  const canGlance = !petted && (mood === "idle" || mood === "locked");
+  const frameClass = cn(
+    "spark-float relative",
+    canPet ? "cursor-pointer border-0 bg-transparent p-0" : "pointer-events-none",
+    petted && "spark-petted",
+    flourish === "now" && "spark-idle-pop",
+    className,
+  );
+  const frameStyle = { width: size, height: size, color: palette.lo };
+
+  const body = (
+    <>
       <span className="spark-halo absolute inset-[-28%] rounded-full" />
       <svg
         viewBox="-22 -18 144 150"
@@ -499,9 +546,11 @@ export function Spark({
           <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
           <Gear id={gearId} />
           <g className={canGlance ? "spark-glance" : undefined}>
-            <Eyes mood={mood} fill="#0B0B0F" />
+            <Eyes mood={shownMood} fill="#0B0B0F" />
           </g>
         </g>
+
+        {petted ? <PetHearts /> : null}
 
         {mood === "earning" ? (
           <g className="spark-particles" fill="currentColor">
@@ -514,6 +563,26 @@ export function Spark({
 
         {mood !== "tempted" ? <SubjectFlourish flavor={resolved} /> : null}
       </svg>
+    </>
+  );
+
+  if (canPet) {
+    return (
+      <button
+        type="button"
+        onClick={pet}
+        aria-label="Pet the spark"
+        className={frameClass}
+        style={frameStyle}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return (
+    <div aria-hidden className={frameClass} style={frameStyle}>
+      {body}
     </div>
   );
 }
