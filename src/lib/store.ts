@@ -27,6 +27,15 @@ import {
   type TaskId,
   type UnlockCatalogId,
 } from "@/lib/constants";
+import {
+  defaultMotivation,
+  defaultProfile,
+  normalizeMotivation,
+  normalizeProfile,
+  validateDiploma,
+  type MotivationState,
+  type ProfileState,
+} from "@/lib/ib";
 
 export type TaskState = {
   id: TaskId;
@@ -35,10 +44,16 @@ export type TaskState = {
 
 export type SessionStatus = "locked" | "focus" | "completed";
 
+export type SessionKind = "verified" | "study";
+
 export type Session = {
   id: string;
-  taskId: TaskId;
+  kind: SessionKind;
+  taskId?: TaskId;
+  subjectId: SubjectId;
+  title: string;
   goal: string;
+  plannedMinutes: number | null;
   demoMode: boolean;
   status: SessionStatus;
   lockedAt: number;
@@ -85,6 +100,8 @@ export type CatalystState = {
   unlocks: Unlock[];
   logs: SessionLog[];
   appearance: AppearanceState;
+  profile: ProfileState;
+  motivation: MotivationState;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -104,6 +121,8 @@ export const defaultState: CatalystState = {
   unlocks: [],
   logs: [],
   appearance: defaultAppearance,
+  profile: defaultProfile,
+  motivation: defaultMotivation,
 };
 
 type Listener = () => void;
@@ -187,6 +206,9 @@ export function hydrateStore(userId: string | null = null) {
       unlocks: coalesceUnlocks(parsed.unlocks ?? []),
       logs: parsed.logs ?? [],
       appearance: normalizeAppearance(parsed.appearance),
+      profile: normalizeProfile(parsed.profile),
+      motivation: normalizeMotivation(parsed.motivation),
+      session: normalizeSession(parsed.session ?? null),
       hydrated: true,
     };
   } catch {
@@ -225,11 +247,52 @@ export function setDemoMode(demoMode: boolean) {
   setState((current) => ({ ...current, demoMode }));
 }
 
+function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) {
+  if (!raw) return null;
+  if (raw.kind && raw.subjectId && raw.title) return raw;
+  const legacy = raw as Session & { taskId?: TaskId };
+  const taskId = legacy.taskId;
+  if (!taskId) return null;
+  const task = MOCK_TASKS.find((row) => row.id === taskId);
+  return {
+    ...legacy,
+    kind: "verified" as const,
+    taskId,
+    subjectId: TASK_SUBJECT[taskId],
+    title: task?.title ?? "Focus session",
+    plannedMinutes: legacy.plannedMinutes ?? null,
+  };
+}
+
+export function sessionTitle(session: Session) {
+  return session.title;
+}
+
+export function sessionHint(session: Session) {
+  const subject =
+    SUBJECTS.find((row) => row.id === session.subjectId)?.label ??
+    session.subjectId;
+  return `${session.title} ${subject} ${session.goal}`;
+}
+
+export function plannedLockMs(session: Session) {
+  if (!session.plannedMinutes) return null;
+  const realMs = session.plannedMinutes * 60 * 1000;
+  return session.demoMode
+    ? Math.round(realMs * (DEMO_TOKEN_MS / REAL_TOKEN_MS))
+    : realMs;
+}
+
 export function startSession(input: { taskId: TaskId; goal: string }) {
+  const task = MOCK_TASKS.find((row) => row.id === input.taskId);
   const session: Session = {
     id: crypto.randomUUID(),
+    kind: "verified",
     taskId: input.taskId,
+    subjectId: TASK_SUBJECT[input.taskId],
+    title: task?.title ?? "Official task",
     goal: input.goal.trim(),
+    plannedMinutes: null,
     demoMode: state.demoMode,
     status: "locked",
     lockedAt: Date.now(),
@@ -241,6 +304,48 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     completionTokens: 0,
   };
   setState((current) => ({ ...current, session }));
+}
+
+export function startStudySession(input: {
+  subjectId: SubjectId;
+  title: string;
+  minutes: number;
+}) {
+  const minutes = Math.floor(input.minutes);
+  const title = input.title.trim();
+  if (title.length < 3) {
+    return { ok: false as const, reason: "Say what you are studying." };
+  }
+  if (!Number.isFinite(minutes) || minutes < 5) {
+    return { ok: false as const, reason: "Pick at least a 5-minute block." };
+  }
+  const subject = SUBJECTS.find((row) => row.id === input.subjectId);
+  if (!subject) {
+    return { ok: false as const, reason: "Pick a subject." };
+  }
+  if (state.session?.status === "locked" || state.session?.status === "focus") {
+    return { ok: false as const, reason: "Finish the session already running." };
+  }
+
+  const session: Session = {
+    id: crypto.randomUUID(),
+    kind: "study",
+    subjectId: subject.id,
+    title,
+    goal: title,
+    plannedMinutes: minutes,
+    demoMode: state.demoMode,
+    status: "locked",
+    lockedAt: Date.now(),
+    focusStartedAt: null,
+    completedAt: null,
+    taskMarkedDone: false,
+    tokensEarned: 0,
+    timeTokens: 0,
+    completionTokens: 0,
+  };
+  setState((current) => ({ ...current, session }));
+  return { ok: true as const, session };
 }
 
 export function enterFocus() {
@@ -273,33 +378,42 @@ export function tokensFromElapsed(elapsedMs: number, demoMode: boolean) {
 }
 
 export function completeSession(tokensEarned: number) {
-  if (!state.session || !state.session.taskMarkedDone) {
+  const session = state.session;
+  if (!session) {
+    return { ok: false as const, reason: "No session to complete." };
+  }
+  if (session.kind === "verified" && !session.taskMarkedDone) {
     return { ok: false as const, reason: "Mark the ManageBac task done first." };
+  }
+  const startedAt = session.focusStartedAt ?? session.lockedAt;
+  const elapsed = Date.now() - startedAt;
+  const needed = plannedLockMs(session);
+  if (needed && elapsed < needed) {
+    return {
+      ok: false as const,
+      reason: "Stay until this study block ends. No credit for leaving early.",
+    };
   }
   if (tokensEarned < 1) {
     return {
       ok: false as const,
-      reason: state.session.demoMode
+      reason: session.demoMode
         ? "Stay focused for 30 seconds to earn your first token."
         : "Stay focused for 5 minutes to earn your first token.",
     };
   }
 
-  const taskId = state.session.taskId;
   const timeTokens = tokensEarned;
-  const completionTokens = COMPLETION_BONUS;
+  const completionTokens = session.kind === "verified" ? COMPLETION_BONUS : 0;
   const totalTokens = timeTokens + completionTokens;
   const endedAt = Date.now();
-  const startedAt =
-    state.session.focusStartedAt ?? state.session.lockedAt;
-  const subjectId = TASK_SUBJECT[taskId];
+  const subjectId = session.subjectId;
   const subjectLabel =
     SUBJECTS.find((subject) => subject.id === subjectId)?.label ??
-    getTask(taskId)?.subject ??
-    "Other";
+    session.title;
   const log: SessionLog = {
-    id: state.session.id,
-    kind: "verified",
+    id: session.id,
+    kind: session.kind === "verified" ? "verified" : "manual",
     subjectId,
     subjectLabel,
     startedAt,
@@ -307,16 +421,19 @@ export function completeSession(tokensEarned: number) {
     durationMs: Math.max(0, endedAt - startedAt),
     timeTokens,
     completionTokens,
-    note: state.session.goal || undefined,
-    taskId,
+    note: session.goal || undefined,
+    taskId: session.taskId,
   };
 
   setState((current) => ({
     ...current,
     tokens: current.tokens + totalTokens,
-    tasks: current.tasks.map((task) =>
-      task.id === taskId ? { ...task, done: true } : task,
-    ),
+    tasks:
+      session.kind === "verified" && session.taskId
+        ? current.tasks.map((task) =>
+            task.id === session.taskId ? { ...task, done: true } : task,
+          )
+        : current.tasks,
     logs: [...current.logs, log],
     session: current.session
       ? {
@@ -332,43 +449,30 @@ export function completeSession(tokensEarned: number) {
   return { ok: true as const, timeTokens, completionTokens, totalTokens };
 }
 
-export function addManualSession(input: {
-  subjectId: SubjectId;
-  minutes: number;
-  note: string;
-}) {
-  const minutes = Math.floor(input.minutes);
-  if (!Number.isFinite(minutes) || minutes < 1) {
-    return { ok: false as const, reason: "Enter at least 1 minute." };
+export function saveProfile(input: { classYear: number; subjects: string[] }) {
+  const check = validateDiploma(input.subjects, input.classYear);
+  if (!check.ok) {
+    return { ok: false as const, reason: check.reason };
   }
-  const subject = SUBJECTS.find((row) => row.id === input.subjectId);
-  if (!subject) {
-    return { ok: false as const, reason: "Pick a subject." };
+  const profile = normalizeProfile({
+    classYear: input.classYear,
+    subjects: input.subjects,
+    complete: true,
+  });
+  setState((current) => ({ ...current, profile }));
+  return { ok: true as const, profile };
+}
+
+export function saveMotivation(input: MotivationState) {
+  const motivation = normalizeMotivation(input);
+  if (!motivation.colleges || !motivation.course || !motivation.why) {
+    return {
+      ok: false as const,
+      reason: "Colleges, course, and why it matters are required.",
+    };
   }
-
-  const durationMs = minutes * 60 * 1000;
-  const timeTokens = tokensFromElapsed(durationMs, false);
-  const endedAt = Date.now();
-  const log: SessionLog = {
-    id: crypto.randomUUID(),
-    kind: "manual",
-    subjectId: subject.id,
-    subjectLabel: subject.label,
-    startedAt: endedAt - durationMs,
-    endedAt,
-    durationMs,
-    timeTokens,
-    completionTokens: 0,
-    note: input.note.trim() || undefined,
-  };
-
-  setState((current) => ({
-    ...current,
-    tokens: current.tokens + timeTokens,
-    logs: [...current.logs, log],
-  }));
-
-  return { ok: true as const, timeTokens, log };
+  setState((current) => ({ ...current, motivation }));
+  return { ok: true as const, motivation };
 }
 
 export function clearSession() {
