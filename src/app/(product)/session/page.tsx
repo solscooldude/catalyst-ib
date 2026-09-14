@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
+import { FocusHud } from "@/components/focus-hud";
 import { FocusScene } from "@/components/focus-scene";
 import { TokenAmount } from "@/components/mint-chip";
 import { Spark, type SparkMood } from "@/components/spark";
-import { rocketProgress, rocketStageLabel } from "@/lib/focus-scene";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
+import { isRoomFocusTheme } from "@/lib/focus-scene";
 import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
@@ -20,6 +21,7 @@ import {
   tokensFromElapsed,
   useCatalyst,
 } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 function formatElapsed(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -63,19 +65,17 @@ export default function FocusPage() {
   const demoMode = session?.demoMode ?? state.demoMode;
   const interval = demoMode ? DEMO_TOKEN_MS : REAL_TOKEN_MS;
   const earned = tokensFromElapsed(elapsed, demoMode);
-  const progress = Math.min(1, (elapsed % interval) / interval);
+  const tokenProgress = Math.min(1, (elapsed % interval) / interval);
   const title = session ? sessionTitle(session) : "";
   const planned = session ? plannedLockMs(session) : null;
   const remaining = planned ? Math.max(0, planned - elapsed) : 0;
-
-  const ring = useMemo(() => {
-    const radius = 86;
-    const circ = 2 * Math.PI * radius;
-    return { radius, circ, dash: circ * progress };
-  }, [progress]);
+  const sessionProgress = planned
+    ? Math.min(1, elapsed / planned)
+    : tokenProgress;
+  const room = isRoomFocusTheme(state.appearance.focusTheme);
 
   const taskMarkedDone = session?.taskMarkedDone ?? false;
-  const justEarned = earned >= 1 && progress < 0.12;
+  const justEarned = earned >= 1 && tokenProgress < 0.12;
   const mood: SparkMood =
     session?.kind === "study"
       ? remaining === 0
@@ -89,7 +89,10 @@ export default function FocusPage() {
           ? "earning"
           : "locked";
 
-  const scene = rocketProgress(elapsed, demoMode);
+  const liveTokens =
+    state.tokens +
+    earned +
+    (session?.kind === "verified" && taskMarkedDone ? COMPLETION_BONUS : 0);
 
   if (!session || session.status !== "focus") return null;
 
@@ -103,92 +106,46 @@ export default function FocusPage() {
   }
 
   return (
-    <div className="relative mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[1fr_1fr]">
-      <FocusScene elapsedMs={elapsed} demoMode={demoMode} />
-      <div className="flex flex-col items-center">
-        <Spark
-          mood={mood}
-          taskId={session.taskId}
-          subject={session.subjectId}
-          hint={sessionHint(session)}
-          size={96}
-          className="mb-2"
-        />
-        <div className="relative size-64">
-          <svg viewBox="0 0 200 200" className="size-full -rotate-90">
-            <circle
-              cx="100"
-              cy="100"
-              r={ring.radius}
-              fill="none"
-              stroke="rgb(244 244 245 / 0.06)"
-              strokeWidth="8"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r={ring.radius}
-              fill="none"
-              stroke="var(--primary)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={`${ring.dash} ${ring.circ}`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="font-heading text-5xl text-foreground">
-              {formatElapsed(elapsed)}
-            </p>
-            <p className="mt-1 text-xs text-primary">
-              <span className="inline-flex items-center gap-1">
-                <TokenAmount value={earned} />
-                {session.kind === "verified" && taskMarkedDone ? (
-                  <>
-                    <span>+</span>
-                    <TokenAmount value={COMPLETION_BONUS} />
-                  </>
-                ) : null}
-              </span>
-            </p>
-            {planned ? (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {remaining > 0
-                  ? `${formatElapsed(remaining)} left in this block`
-                  : "Block complete"}
-              </p>
-            ) : null}
-          </div>
-        </div>
-        {demoMode ? (
-          <DemoBadge className="mt-4">Demo speed · 30s = 1 token</DemoBadge>
-        ) : (
-          <p className="mt-4 text-xs text-muted-foreground">
-            Real pace · 5 minutes = 1 token
-          </p>
-        )}
-      </div>
+    <div className="focus-session">
+      <FocusScene
+        elapsedMs={elapsed}
+        demoMode={demoMode}
+        plannedMs={planned}
+      />
+      <FocusHud
+        time={formatElapsed(elapsed)}
+        progress={sessionProgress}
+        tokens={liveTokens}
+      />
 
-      <div>
-        <p className="text-xs tracking-[0.2em] text-primary uppercase">
+      <div className={cn("focus-session-panel", room && "focus-session-panel-glass")}>
+        {!room ? (
+          <Spark
+            mood={mood}
+            taskId={session.taskId}
+            subject={session.subjectId}
+            hint={sessionHint(session)}
+            size={72}
+            className="mb-3"
+          />
+        ) : null}
+        <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
           Focus session
-          {state.appearance.focusTheme === "rocket"
-            ? ` · ${rocketStageLabel(scene.stage)}`
-            : ""}
         </p>
-        <h1 className="mt-3 text-4xl text-foreground">{title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="mt-2 font-heading text-2xl text-foreground sm:text-3xl">
+          {title}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           {session.kind === "study"
             ? "Personal study block. Time tokens only."
             : "Official ManageBac task."}
         </p>
         {session.goal && session.kind === "verified" ? (
-          <p className="mt-4 rounded-2xl bg-card px-4 py-3 text-sm text-foreground ring-1 ring-white/6">
-            {session.goal}
-          </p>
+          <p className="mt-3 text-sm text-foreground/90">{session.goal}</p>
         ) : null}
 
         {session.kind === "verified" ? (
-          <label className="mt-8 flex items-start gap-3 rounded-2xl bg-card p-4 ring-1 ring-white/6">
+          <label className="mt-5 flex items-start gap-3">
             <Checkbox
               checked={session.taskMarkedDone}
               onCheckedChange={(value) => markTaskDone(Boolean(value))}
@@ -198,28 +155,44 @@ export default function FocusPage() {
                 Mark ManageBac task done
               </span>
               <span className="mt-1 block text-xs text-muted-foreground">
-                Required to finish. Official tasks add +{COMPLETION_BONUS}{" "}
-                tokens on top of time earned. Simulated ManageBac.
+                Required to finish. Official tasks add{" "}
+                <TokenAmount value={COMPLETION_BONUS} /> on top of time earned.
               </span>
             </span>
           </label>
         ) : (
-          <p className="mt-8 rounded-2xl bg-card p-4 text-sm text-muted-foreground ring-1 ring-white/6">
+          <p className="mt-5 text-sm text-muted-foreground">
             Stay for the full block. Leaving early awards nothing.
           </p>
         )}
 
-        {error ? (
-          <p className="mt-4 text-sm text-rose-300">{error}</p>
+        {planned ? (
+          <p className="mt-3 text-xs text-muted-foreground">
+            {remaining > 0
+              ? `${formatElapsed(remaining)} left in this block`
+              : "Block complete"}
+          </p>
+        ) : null}
+
+        {demoMode ? (
+          <DemoBadge className="mt-4">Demo speed · 30s = 1 token</DemoBadge>
         ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs text-muted-foreground">
+            Real pace · 5 minutes = 1 token
+          </p>
+        )}
+
+        {error ? (
+          <p className="mt-3 text-sm text-rose-300">{error}</p>
+        ) : (
+          <p className="mt-3 text-xs text-muted-foreground">
             {session.kind === "study"
               ? "Tokens land with time. No completion bonus on personal blocks."
               : "Stay until a token lands, tick the task, then collect."}
           </p>
         )}
 
-        <Button className="mt-6 h-11 rounded-full px-6" onClick={finish}>
+        <Button className="mt-5 h-11 rounded-full px-6" onClick={finish}>
           Complete session
         </Button>
       </div>
