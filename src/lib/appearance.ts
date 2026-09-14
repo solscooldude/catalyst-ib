@@ -333,7 +333,7 @@ export function getSparkGear(id: SparkGearId) {
 }
 
 export function getSparkTrail(id: SparkTrailId) {
-  return SPARK_TINTS.find((row) => row.id === id) ?? SPARK_TRAILS[0];
+  return SPARK_TRAILS.find((row) => row.id === id) ?? SPARK_TRAILS[0];
 }
 
 export function getFocusTheme(id: FocusThemeId) {
