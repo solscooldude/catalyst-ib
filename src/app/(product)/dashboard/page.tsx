@@ -15,8 +15,9 @@ import {
   subjectStacks,
 } from "@/lib/stats";
 import { SUBJECTS } from "@/lib/constants";
+import { motivationReady } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
-import { useCatalyst } from "@/lib/store";
+import { sessionHint, useCatalyst } from "@/lib/store";
 
 export default function DashboardPage() {
   const auth = useAuth();
@@ -48,11 +49,11 @@ export default function DashboardPage() {
           mood={session?.status === "focus" ? "locked" : "idle"}
           taskId={session?.taskId}
           subject={
-            session ? undefined : (roundup.topSubject?.id ?? stacks[0]?.id)
+            session?.subjectId ?? roundup.topSubject?.id ?? stacks[0]?.id
           }
           hint={
             session
-              ? undefined
+              ? sessionHint(session)
               : (roundup.topSubject?.label ??
                 SUBJECTS.find((row) => row.id === stacks[0]?.id)?.label)
           }
@@ -113,10 +114,43 @@ export default function DashboardPage() {
             <Link href={ROUTES.unlocks}>Unlock shop</Link>
           </Button>
           <Button asChild variant="outline" className="h-11 rounded-full">
-            <Link href={`${ROUTES.stats}#log`}>Add study session</Link>
+            <Link href={`${ROUTES.focus}#study`}>Start a study block</Link>
           </Button>
         </div>
       )}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
+          <p className="text-xs tracking-[0.16em] text-primary uppercase">
+            Profile
+          </p>
+          <p className="mt-2 text-sm text-foreground">
+            {state.profile.complete
+              ? `Class of ${state.profile.classYear} · ${state.profile.subjects.length} DP subjects`
+              : "Add your class year and diploma subjects."}
+          </p>
+          <Button asChild variant="outline" className="mt-4 h-10 rounded-full">
+            <Link href={ROUTES.profile}>
+              {state.profile.complete ? "Edit profile" : "Finish profile"}
+            </Link>
+          </Button>
+        </div>
+        <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
+          <p className="text-xs tracking-[0.16em] text-primary uppercase">
+            Motivation
+          </p>
+          <p className="mt-2 text-sm text-foreground">
+            {motivationReady(state.motivation)
+              ? state.motivation.colleges
+              : "Write the colleges and the reason the phone stays locked."}
+          </p>
+          <Button asChild variant="outline" className="mt-4 h-10 rounded-full">
+            <Link href={ROUTES.motivation}>
+              {motivationReady(state.motivation) ? "Edit motivation" : "Add motivation"}
+            </Link>
+          </Button>
+        </div>
+      </div>
 
       <section className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6">
         <div className="flex items-end justify-between gap-3">

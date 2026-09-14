@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { StudyStartForm } from "@/components/study-start-form";
 import { MOCK_TASKS, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -152,8 +153,22 @@ export default function AppHomePage() {
             <Link href={ROUTES.unlocks}>Spend tokens instead</Link>
           </Button>
           <Button asChild variant="ghost" className="h-11 w-full rounded-full">
-            <Link href={ROUTES.stats}>Stats and study log</Link>
+            <Link href={ROUTES.stats}>Stats</Link>
           </Button>
+        </div>
+      </div>
+
+      <div
+        id="study"
+        className="h-fit rounded-3xl bg-card p-6 ring-1 ring-white/6 lg:col-span-2"
+      >
+        <h2 className="text-lg text-foreground">Start your own study block</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Same lock as a ManageBac task. You pick the subject and what you are
+          working on. Time tokens only — no +5.
+        </p>
+        <div className="mt-5 max-w-xl">
+          <StudyStartForm />
         </div>
       </div>
     </div>
