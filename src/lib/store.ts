@@ -2,6 +2,15 @@
 
 import { useSyncExternalStore } from "react";
 import {
+  ACCENTS,
+  BACKGROUNDS,
+  SPARK_GEAR,
+  SPARK_TINTS,
+  defaultAppearance,
+  normalizeAppearance,
+  type AppearanceState,
+} from "@/lib/appearance";
+import {
   COMPLETION_BONUS,
   DEMO_TOKEN_MS,
   DEMO_UNLOCK_MS,
@@ -75,6 +84,7 @@ export type CatalystState = {
   session: Session | null;
   unlocks: Unlock[];
   logs: SessionLog[];
+  appearance: AppearanceState;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -93,6 +103,7 @@ export const defaultState: CatalystState = {
   session: null,
   unlocks: [],
   logs: [],
+  appearance: defaultAppearance,
 };
 
 type Listener = () => void;
@@ -175,6 +186,7 @@ export function hydrateStore(userId: string | null = null) {
           : defaultTasks,
       unlocks: coalesceUnlocks(parsed.unlocks ?? []),
       logs: parsed.logs ?? [],
+      appearance: normalizeAppearance(parsed.appearance),
       hydrated: true,
     };
   } catch {
@@ -402,6 +414,75 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
   }));
 
   return { ok: true as const, unlock, stacked };
+}
+
+export type AppearanceKind = "accent" | "background" | "sparkTint" | "gear";
+
+function catalogFor(kind: AppearanceKind) {
+  if (kind === "accent") return ACCENTS;
+  if (kind === "background") return BACKGROUNDS;
+  if (kind === "sparkTint") return SPARK_TINTS;
+  return SPARK_GEAR;
+}
+
+function ownedKey(kind: AppearanceKind): keyof AppearanceState {
+  if (kind === "accent") return "ownedAccents";
+  if (kind === "background") return "ownedBackgrounds";
+  if (kind === "sparkTint") return "ownedSparkTints";
+  return "ownedGear";
+}
+
+function equippedKey(kind: AppearanceKind): keyof AppearanceState {
+  if (kind === "accent") return "accent";
+  if (kind === "background") return "background";
+  if (kind === "sparkTint") return "sparkTint";
+  return "gear";
+}
+
+export function buyAppearance(kind: AppearanceKind, id: string) {
+  const item = catalogFor(kind).find((row) => row.id === id);
+  if (!item) return { ok: false as const, reason: "Unknown item." };
+  const owned = state.appearance[ownedKey(kind)] as string[];
+  if (owned.includes(id)) {
+    return { ok: false as const, reason: "Already in your closet." };
+  }
+  if (state.tokens < item.cost) {
+    return { ok: false as const, reason: "Not enough tokens yet." };
+  }
+
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens - item.cost,
+    appearance: normalizeAppearance({
+      ...current.appearance,
+      [ownedKey(kind)]: [
+        ...(current.appearance[ownedKey(kind)] as string[]),
+        id,
+      ],
+      [equippedKey(kind)]: id,
+    }),
+  }));
+
+  return { ok: true as const, item, equipped: true };
+}
+
+export function equipAppearance(kind: AppearanceKind, id: string) {
+  const item = catalogFor(kind).find((row) => row.id === id);
+  if (!item) return { ok: false as const, reason: "Unknown item." };
+  const owned = state.appearance[ownedKey(kind)] as string[];
+  if (!owned.includes(id)) {
+    return { ok: false as const, reason: "Buy it first." };
+  }
+
+  setState((current) => ({
+    ...current,
+    appearance: normalizeAppearance({
+      ...current.appearance,
+      [equippedKey(kind)]: id,
+    }),
+  }));
+
+  return { ok: true as const, item };
 }
 
 export function resetDemo() {
