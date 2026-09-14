@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PhoneLock } from "@/components/phone-lock";
 import { DemoBadge } from "@/components/demo-badge";
+import { MotivationNudge } from "@/components/motivation-nudge";
 import { Spark } from "@/components/spark";
 import { ROUTES } from "@/lib/routes";
-import { enterFocus, getTask, useCatalyst } from "@/lib/store";
+import { enterFocus, sessionHint, sessionTitle, useCatalyst } from "@/lib/store";
 
 export default function LockPage() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function LockPage() {
 
   if (!state.session || state.session.status !== "locked") return null;
 
-  const task = getTask(state.session.taskId);
+  const title = sessionTitle(state.session);
 
   function begin() {
     enterFocus();
@@ -54,19 +55,25 @@ export default function LockPage() {
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
             Working on
           </p>
-          <p className="mt-2 text-lg text-foreground">{task?.title}</p>
-          {state.session.goal ? (
+          <p className="mt-2 text-lg text-foreground">{title}</p>
+          {state.session.kind === "study" && state.session.plannedMinutes ? (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Study block · {state.session.plannedMinutes} min · no +5 bonus
+            </p>
+          ) : state.session.goal ? (
             <p className="mt-1 text-sm text-muted-foreground">
               {state.session.goal}
             </p>
           ) : null}
         </div>
+        <MotivationNudge motivation={state.motivation} />
       </div>
       <div className="flex flex-col items-center">
         <Spark
           mood="locked"
           taskId={state.session.taskId}
-          hint={task ? `${task.title} ${task.subject}` : undefined}
+          subject={state.session.subjectId}
+          hint={sessionHint(state.session)}
           size={88}
           className="mb-3"
         />

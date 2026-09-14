@@ -33,5 +33,8 @@ npm run build
 8. `/unlocks` — spend tokens (Notes 2 / YouTube 4 / nemesis 8 per 10 minutes). Repeat buys stack time on one timer.
 9. `/stats` — study calendar, subject stack (week / month), monthly roundup, and manual study logs. Official task completion adds +5 tokens; manual logs earn time tokens only.
 10. `/appearance` — spend tokens on accent color, background, spark tint, and a few accessories. Mint / void / bare spark stay free for new accounts.
+11. `/profile` — graduating class and six DP subjects (Groups 1–5 required; Group 6 optional with an extra from another group). Required on first visit.
+12. `/motivation` — dream colleges, course, and why it matters. A short reminder appears on the lock screen.
+13. Study blocks (from Focus or Stats) lock the phone for the chosen duration. Time tokens only — no +5. Retroactive “log past study” is gone.
 
 Product data is stored per demo account in `localStorage` (`catalyst-v1:user:<id>`). Reset demo clears only the current account. Log out returns to the marketing page.
