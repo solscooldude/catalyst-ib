@@ -5,6 +5,7 @@ import {
   getSparkTint,
   type SparkGearId,
   type SparkTintId,
+  type SparkTrailId,
 } from "@/lib/appearance";
 import {
   sparkFlavorFromContext,
@@ -25,6 +26,7 @@ type SparkProps = {
   hint?: string | null;
   tint?: SparkTintId;
   gear?: SparkGearId;
+  trail?: SparkTrailId;
   size?: number;
   className?: string;
   pettable?: boolean;
@@ -147,7 +149,53 @@ function Gear({ id }: { id: SparkGearId }) {
       </g>
     );
   }
+  if (id === "veil") {
+    return (
+      <g>
+        <ellipse cx="42" cy="80" rx="22" ry="9" fill="#5EEAD4" fillOpacity="0.28" />
+        <ellipse cx="60" cy="78" rx="18" ry="8" fill="#A78BFA" fillOpacity="0.26" />
+        <path
+          d="M28 78c8 10 36 10 44 0"
+          fill="none"
+          stroke="#5EEAD4"
+          strokeOpacity="0.45"
+          strokeWidth="1.2"
+        />
+      </g>
+    );
+  }
+  if (id === "cap-gold") {
+    return (
+      <g>
+        <path
+          d="M22 20 50 10l28 10-28 10Z"
+          fill="#1C1917"
+          stroke="#E4C56A"
+          strokeWidth="1.3"
+        />
+        <path d="M38 22h24l-1.6 8H39.6Z" fill="#292524" stroke="#E4C56A" strokeWidth="0.7" />
+        <path
+          d="M50 12c8 4 14 10 16 16"
+          fill="none"
+          stroke="#F5D76A"
+          strokeWidth="1.6"
+        />
+        <circle cx="67" cy="29" r="2.3" fill="#F5D76A" />
+      </g>
+    );
+  }
   return null;
+}
+
+function Trail({ id }: { id: SparkTrailId }) {
+  if (id === "none") return null;
+  return (
+    <span className={cn("spark-trail", `spark-trail-${id}`)} aria-hidden>
+      {Array.from({ length: 8 }, (_, index) => (
+        <span key={index} className={`spark-trail-dot spark-trail-dot-${index}`} />
+      ))}
+    </span>
+  );
 }
 
 function MathFlourish() {
@@ -465,6 +513,7 @@ export function Spark({
   hint,
   tint,
   gear,
+  trail,
   size = 72,
   className,
   pettable = false,
@@ -477,6 +526,7 @@ export function Spark({
   const store = useCatalyst();
   const tintId = tint ?? store.appearance.sparkTint;
   const gearId = gear ?? store.appearance.gear;
+  const trailId = trail ?? store.appearance.trail;
   const palette = getSparkTint(tintId);
   const resolved =
     flavor ??
@@ -514,6 +564,7 @@ export function Spark({
   const body = (
     <>
       <span className="spark-halo absolute inset-[-28%] rounded-full" />
+      <Trail id={trailId} />
       <svg
         viewBox="-22 -18 144 150"
         width={size}
