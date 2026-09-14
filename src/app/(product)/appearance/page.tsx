@@ -43,9 +43,10 @@ export default function AppearancePage() {
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Starter pieces stay cheap. Night sky is mid. Elite gold is rare.
-            Focus scenes only change the lock and timer — rocket leaves the
-            ground and opens into the night sky. The spark also grows from
-            official study hours, not from shop buys.
+            Focus scenes sit on the lock and timer. Cat, desk, and library
+            keep one camera and drift from afternoon to night. Rocket stays
+            deferred. The spark grows from official study hours, not shop
+            buys.
           </p>
         </div>
         <Spark mood="idle" size={104} pettable className="hidden shrink-0 sm:block" />
@@ -131,6 +132,7 @@ export default function AppearancePage() {
             owned={(id) => look.ownedFocusThemes.includes(id)}
             equipped={(id) => look.focusTheme === id}
             onAct={(id, owned) => act("focusTheme", id, owned)}
+            equipLabel="Use"
             swatch={(item) => <FocusSwatch id={item.id} />}
           />
         </section>
@@ -149,14 +151,15 @@ function Group<
   onAct,
   swatch,
   blurb,
+  equipLabel = "Wear",
 }: {
   title: string;
   items: readonly T[];
   owned: (id: T["id"]) => boolean;
-  equipped: (id: T["id"]) => boolean;
-  onAct: (id: T["id"], owned: boolean) => void;
+  equipped: (id: T["id"], owned: boolean) => void;
   swatch: (item: T) => ReactNode;
   blurb?: string;
+  equipLabel?: string;
 }) {
   if (items.length === 0) return null;
   return (
@@ -174,6 +177,7 @@ function Group<
               cost={item.cost}
               owned={has}
               equipped={on}
+              equipLabel={equipLabel}
               onClick={() => onAct(item.id, has)}
             >
               {swatch(item)}
@@ -204,6 +208,26 @@ function BgSwatch({ id }: { id: string }) {
 }
 
 function FocusSwatch({ id }: { id: string }) {
+  const plate =
+    id === "cat"
+      ? "/api/plates/cat-afternoon.jpg"
+      : id === "desk"
+        ? "/api/plates/desk-afternoon.jpg"
+        : id === "library"
+          ? "/api/plates/lib-afternoon.jpg"
+          : null;
+  if (plate) {
+    return (
+      <span
+        className="size-10 overflow-hidden rounded-xl ring-1 ring-white/15"
+        style={{
+          backgroundImage: `url(${plate})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+    );
+  }
   if (id === "rocket") {
     return (
       <span className="size-8 rounded-full bg-[linear-gradient(180deg,#071018_0%,#12382c_55%,#1a2a18_100%)] ring-1 ring-white/15" />
@@ -218,6 +242,7 @@ function ShopCard({
   cost,
   owned,
   equipped,
+  equipLabel = "Wear",
   onClick,
   children,
 }: {
@@ -226,6 +251,7 @@ function ShopCard({
   cost: number;
   owned: boolean;
   equipped: boolean;
+  equipLabel?: string;
   onClick: () => void;
   children: React.ReactNode;
 }) {
@@ -251,7 +277,7 @@ function ShopCard({
         {equipped ? (
           "On"
         ) : owned ? (
-          "Wear"
+          equipLabel
         ) : cost === 0 ? (
           "Take"
         ) : (
