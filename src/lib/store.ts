@@ -121,6 +121,26 @@ function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
   return unlocks.filter((unlock) => unlock.expiresAt > now);
 }
 
+function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
+  const byCatalog = new Map<UnlockCatalogId, Unlock>();
+  for (const unlock of pruneUnlocks(unlocks, now)) {
+    const existing = byCatalog.get(unlock.catalogId);
+    if (!existing) {
+      byCatalog.set(unlock.catalogId, unlock);
+      continue;
+    }
+    const remaining =
+      Math.max(0, existing.expiresAt - now) +
+      Math.max(0, unlock.expiresAt - now);
+    byCatalog.set(unlock.catalogId, {
+      ...existing,
+      cost: existing.cost + unlock.cost,
+      expiresAt: now + remaining,
+    });
+  }
+  return [...byCatalog.values()];
+}
+
 export function hydrateStore() {
   if (typeof window === "undefined") return;
   try {
@@ -138,7 +158,7 @@ export function hydrateStore() {
         parsed.tasks && parsed.tasks.length === defaultTasks.length
           ? parsed.tasks
           : defaultTasks,
-      unlocks: pruneUnlocks(parsed.unlocks ?? []),
+      unlocks: coalesceUnlocks(parsed.unlocks ?? []),
       logs: parsed.logs ?? [],
       hydrated: true,
     };
@@ -340,23 +360,33 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
   const nemesisName =
     NEMESIS_APPS.find((app) => app.id === state.nemesis)?.name ?? "Nemesis app";
   const label = catalogId === "nemesis" ? nemesisName : item.name;
+  const existing = coalesceUnlocks(state.unlocks, now).find(
+    (unlock) => unlock.catalogId === catalogId,
+  );
+  const remaining = existing ? Math.max(0, existing.expiresAt - now) : 0;
+  const stacked = remaining > 0;
 
   const unlock: Unlock = {
-    id: crypto.randomUUID(),
+    id: existing?.id ?? crypto.randomUUID(),
     catalogId,
     label,
-    cost: item.cost,
-    startedAt: now,
-    expiresAt: now + duration,
+    cost: (existing?.cost ?? 0) + item.cost,
+    startedAt: existing?.startedAt ?? now,
+    expiresAt: now + remaining + duration,
   };
 
   setState((current) => ({
     ...current,
     tokens: current.tokens - item.cost,
-    unlocks: pruneUnlocks([...current.unlocks, unlock], now),
+    unlocks: [
+      ...coalesceUnlocks(current.unlocks, now).filter(
+        (row) => row.catalogId !== catalogId,
+      ),
+      unlock,
+    ],
   }));
 
-  return { ok: true as const, unlock };
+  return { ok: true as const, unlock, stacked };
 }
 
 export function resetDemo() {
@@ -380,7 +410,7 @@ export function isUnlockActive(
   catalogId: UnlockCatalogId,
   now = Date.now(),
 ) {
-  return unlocks.some(
-    (unlock) => unlock.catalogId === catalogId && unlock.expiresAt > now,
+  return coalesceUnlocks(unlocks, now).some(
+    (unlock) => unlock.catalogId === catalogId,
   );
 }

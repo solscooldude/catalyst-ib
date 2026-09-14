@@ -54,7 +54,11 @@ function UnlockInner() {
       setNotice(result.reason);
       return;
     }
-    setNotice(`Unlocked ${result.unlock.label} for a short window.`);
+    setNotice(
+      result.stacked
+        ? `Added time to ${result.unlock.label}. One timer, stacked.`
+        : `Unlocked ${result.unlock.label}. Buy again to add more time.`,
+    );
   }
 
   return (
@@ -96,6 +100,10 @@ function UnlockInner() {
           {UNLOCK_CATALOG.map((item) => {
             const label = item.id === "nemesis" ? (nemesis?.name ?? "Nemesis") : item.name;
             const affordable = state.tokens >= item.cost;
+            const activeForApp = active.find((unlock) => unlock.catalogId === item.id);
+            const left = activeForApp
+              ? Math.max(0, activeForApp.expiresAt - now)
+              : 0;
             return (
               <div
                 key={item.id}
@@ -105,6 +113,11 @@ function UnlockInner() {
                   <p className="text-sm text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">
                     {item.intensity} · {item.blurb}
+                    {left > 0
+                      ? ` · ${Math.floor(left / 60000)}:${String(
+                          Math.floor((left % 60000) / 1000),
+                        ).padStart(2, "0")} left`
+                      : ""}
                   </p>
                 </div>
                 <Button
@@ -112,7 +125,7 @@ function UnlockInner() {
                   disabled={!affordable}
                   onClick={() => buy(item.id)}
                 >
-                  Unlock · {item.cost}
+                  {left > 0 ? "Add time" : "Unlock"} · {item.cost}
                 </Button>
               </div>
             );
