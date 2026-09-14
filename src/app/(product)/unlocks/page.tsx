@@ -177,6 +177,7 @@ function UnlockInner() {
           <Spark
             mood={mood}
             taskId={lastSession?.taskId}
+            subject={lastSession?.subjectId}
             size={64}
           />
         </div>

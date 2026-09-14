@@ -10,8 +10,10 @@ import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants"
 import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
-  getTask,
   markTaskDone,
+  plannedLockMs,
+  sessionHint,
+  sessionTitle,
   tokensFromElapsed,
   useCatalyst,
 } from "@/lib/store";
@@ -59,7 +61,9 @@ export default function FocusPage() {
   const interval = demoMode ? DEMO_TOKEN_MS : REAL_TOKEN_MS;
   const earned = tokensFromElapsed(elapsed, demoMode);
   const progress = Math.min(1, (elapsed % interval) / interval);
-  const task = session ? getTask(session.taskId) : undefined;
+  const title = session ? sessionTitle(session) : "";
+  const planned = session ? plannedLockMs(session) : null;
+  const remaining = planned ? Math.max(0, planned - elapsed) : 0;
 
   const ring = useMemo(() => {
     const radius = 86;
@@ -69,11 +73,18 @@ export default function FocusPage() {
 
   const taskMarkedDone = session?.taskMarkedDone ?? false;
   const justEarned = earned >= 1 && progress < 0.12;
-  const mood: SparkMood = taskMarkedDone
-    ? "done"
-    : justEarned
-      ? "earning"
-      : "locked";
+  const mood: SparkMood =
+    session?.kind === "study"
+      ? remaining === 0
+        ? "done"
+        : justEarned
+          ? "earning"
+          : "locked"
+      : taskMarkedDone
+        ? "done"
+        : justEarned
+          ? "earning"
+          : "locked";
 
   if (!session || session.status !== "focus") return null;
 
@@ -91,8 +102,9 @@ export default function FocusPage() {
       <div className="flex flex-col items-center">
         <Spark
           mood={mood}
-          taskId={session?.taskId}
-          hint={task ? `${task.title} ${task.subject}` : undefined}
+          taskId={session.taskId}
+          subject={session.subjectId}
+          hint={sessionHint(session)}
           size={96}
           className="mb-2"
         />
@@ -123,8 +135,17 @@ export default function FocusPage() {
             </p>
             <p className="mt-1 font-mono text-xs text-primary">
               {earned} time token{earned === 1 ? "" : "s"}
-              {taskMarkedDone ? ` + ${COMPLETION_BONUS}` : ""}
+              {session.kind === "verified" && taskMarkedDone
+                ? ` + ${COMPLETION_BONUS}`
+                : ""}
             </p>
+            {planned ? (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {remaining > 0
+                  ? `${formatElapsed(remaining)} left in this block`
+                  : "Block complete"}
+              </p>
+            ) : null}
           </div>
         </div>
         {demoMode ? (
@@ -140,35 +161,47 @@ export default function FocusPage() {
         <p className="text-xs tracking-[0.2em] text-primary uppercase">
           Focus session
         </p>
-        <h1 className="mt-3 text-4xl text-foreground">{task?.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{task?.detail}</p>
-        {session.goal ? (
+        <h1 className="mt-3 text-4xl text-foreground">{title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {session.kind === "study"
+            ? "Personal study block. Time tokens only."
+            : "Official ManageBac task."}
+        </p>
+        {session.goal && session.kind === "verified" ? (
           <p className="mt-4 rounded-2xl bg-card px-4 py-3 text-sm text-foreground ring-1 ring-white/6">
             {session.goal}
           </p>
         ) : null}
 
-        <label className="mt-8 flex items-start gap-3 rounded-2xl bg-card p-4 ring-1 ring-white/6">
-          <Checkbox
-            checked={session.taskMarkedDone}
-            onCheckedChange={(value) => markTaskDone(Boolean(value))}
-          />
-          <span>
-            <span className="text-sm text-foreground">
-              Mark ManageBac task done
+        {session.kind === "verified" ? (
+          <label className="mt-8 flex items-start gap-3 rounded-2xl bg-card p-4 ring-1 ring-white/6">
+            <Checkbox
+              checked={session.taskMarkedDone}
+              onCheckedChange={(value) => markTaskDone(Boolean(value))}
+            />
+            <span>
+              <span className="text-sm text-foreground">
+                Mark ManageBac task done
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                Required to finish. Official tasks add +{COMPLETION_BONUS}{" "}
+                tokens on top of time earned. Simulated ManageBac.
+              </span>
             </span>
-            <span className="mt-1 block text-xs text-muted-foreground">
-              Required to finish. Official tasks add +{COMPLETION_BONUS}{" "}
-              tokens on top of time earned. Simulated ManageBac.
-            </span>
-          </span>
-        </label>
+          </label>
+        ) : (
+          <p className="mt-8 rounded-2xl bg-card p-4 text-sm text-muted-foreground ring-1 ring-white/6">
+            Stay for the full block. Leaving early awards nothing.
+          </p>
+        )}
 
         {error ? (
           <p className="mt-4 text-sm text-rose-300">{error}</p>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">
-            Stay until a token lands, tick the task, then collect.
+            {session.kind === "study"
+              ? "Tokens land with time. No completion bonus on personal blocks."
+              : "Stay until a token lands, tick the task, then collect."}
           </p>
         )}
 

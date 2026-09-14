@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Spark } from "@/components/spark";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudyCalendar } from "@/components/study-calendar";
-import { COMPLETION_BONUS, SUBJECTS, type SubjectId } from "@/lib/constants";
+import { StudyStartForm } from "@/components/study-start-form";
+import { COMPLETION_BONUS, SUBJECTS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
   formatDuration,
@@ -20,20 +18,13 @@ import {
   subjectStacks,
   weekLabel,
 } from "@/lib/stats";
-import { addManualSession, useCatalyst } from "@/lib/store";
+import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
-
-const selectClass =
-  "h-11 w-full rounded-xl border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
 
 export default function StatsPage() {
   const router = useRouter();
   const state = useCatalyst();
   const [range, setRange] = useState<"week" | "month">("month");
-  const [subjectId, setSubjectId] = useState<SubjectId>("biology");
-  const [minutes, setMinutes] = useState("25");
-  const [note, setNote] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (state.hydrated && !state.setupComplete) {
@@ -53,25 +44,6 @@ export default function StatsPage() {
   const recent = [...state.logs].reverse().slice(0, 8);
 
   if (!state.setupComplete) return null;
-
-  function logSession(event: React.FormEvent) {
-    event.preventDefault();
-    const result = addManualSession({
-      subjectId,
-      minutes: Number(minutes),
-      note,
-    });
-    if (!result.ok) {
-      setMessage(result.reason);
-      return;
-    }
-    setNote("");
-    setMessage(
-      result.timeTokens > 0
-        ? `Logged ${minutes} min. +${result.timeTokens} time token${result.timeTokens === 1 ? "" : "s"}. No completion bonus.`
-        : `Logged ${minutes} min. Under 5 minutes, so no time tokens yet.`,
-    );
-  }
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-10">
@@ -168,61 +140,15 @@ export default function StatsPage() {
         )}
       </section>
 
-      <section id="log" className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6">
-        <h2 className="text-lg text-foreground">Add study session</h2>
+      <section id="study" className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6">
+        <h2 className="text-lg text-foreground">Start a study block</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Counts toward the stack and earns 1 token per 5 minutes. No +
-          {COMPLETION_BONUS} completion bonus.
+          Locks the phone for the block you choose. Time tokens only. No +
+          {COMPLETION_BONUS}.
         </p>
-        <form className="mt-5 grid gap-4 sm:grid-cols-2" onSubmit={logSession}>
-          <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
-            <select
-              id="subject"
-              className={selectClass}
-              value={subjectId}
-              onChange={(event) =>
-                setSubjectId(event.target.value as SubjectId)
-              }
-            >
-              {SUBJECTS.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="minutes">Minutes</Label>
-            <Input
-              id="minutes"
-              type="number"
-              min={1}
-              step={1}
-              value={minutes}
-              onChange={(event) => setMinutes(event.target.value)}
-              className="h-11 rounded-xl"
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="note">Note (optional)</Label>
-            <Input
-              id="note"
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="Past paper timing, chapter 2, etc."
-              className="h-11 rounded-xl"
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <Button type="submit" className="h-11 rounded-full px-6">
-              Log session
-            </Button>
-            {message ? (
-              <p className="mt-3 text-sm text-muted-foreground">{message}</p>
-            ) : null}
-          </div>
-        </form>
+        <div className="mt-5">
+          <StudyStartForm />
+        </div>
       </section>
 
       <section>
