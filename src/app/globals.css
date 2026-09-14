@@ -117,7 +117,335 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spark-squish {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  38% {
+    transform: scale(1.045, 0.955);
+  }
+  56% {
+    transform: scale(0.96, 1.05);
+  }
+  74% {
+    transform: scale(1.015, 0.985);
+  }
+}
+
+@keyframes spark-glance {
+  0%,
+  16%,
+  100% {
+    transform: translateX(0);
+  }
+  22%,
+  30% {
+    transform: translateX(-2.6px);
+  }
+  36%,
+  54% {
+    transform: translateX(0);
+  }
+  60%,
+  70% {
+    transform: translateX(3px);
+  }
+  76% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spark-flourish {
+  0%,
+  62%,
+  100% {
+    opacity: 0;
+  }
+  68%,
+  78% {
+    opacity: 1;
+  }
+}
+
+@keyframes spark-symbol-drift {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  68%,
+  76% {
+    opacity: 0.92;
+    transform: translateY(-3px);
+  }
+  84%,
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes spark-leaf-grow {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.35) translateY(6px);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-2px);
+  }
+}
+
+@keyframes spark-book-read {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(5px) rotate(-8deg);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) rotate(4deg);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-3px) rotate(0deg);
+  }
+}
+
+@keyframes spark-bubble-rise {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.6);
+  }
+  70%,
+  76% {
+    opacity: 0.85;
+    transform: translateY(-4px) scale(1);
+  }
+  84%,
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.7);
+  }
+}
+
+@keyframes spark-orbit-spin {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(0deg);
+  }
+  68% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+    transform: rotate(110deg);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(150deg);
+  }
+}
+
+@keyframes spark-hourglass-flip {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.85);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: rotate(180deg) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.9);
+  }
+}
+
+@keyframes spark-globe-spin {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(-12deg) scale(0.7);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: rotate(16deg) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(28deg) scale(0.85);
+  }
+}
+
+@keyframes spark-bar-grow {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes spark-thought-pop {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.4) translateY(4px);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-3px);
+  }
+}
+
+@keyframes spark-bits-fade {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  70%,
+  76% {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spark-cursor-blink {
+  0%,
+  62%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  68%,
+  72%,
+  76%,
+  80% {
+    opacity: 1;
+  }
+  70%,
+  74%,
+  78% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes spark-brush-swoosh {
+  0%,
+  62% {
+    opacity: 0;
+    stroke-dashoffset: 48;
+  }
+  70%,
+  76% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes spark-note-bounce {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  76% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spark-lens-peek {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translate(4px, 3px) scale(0.8);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translate(-2px, -2px) scale(0.9);
+  }
+}
+
+@keyframes spark-pulse-draw {
+  0%,
+  62% {
+    opacity: 0;
+    stroke-dashoffset: 42;
+  }
+  70%,
+  76% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -8;
   }
 }
 
@@ -144,7 +472,160 @@
 }
 
 .spark-float {
-  animation: spark-float 3.6s ease-in-out infinite;
+  animation: spark-float 3.8s ease-in-out infinite;
+}
+
+.spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 82%;
+  animation: spark-squish 5.6s ease-in-out infinite;
+}
+
+.spark-glance {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-glance 10s ease-in-out infinite;
+}
+
+.spark-flourish {
+  animation: spark-flourish 16s ease-in-out infinite;
+}
+
+.spark-symbol {
+  animation: spark-symbol-drift 16s ease-in-out infinite;
+}
+
+.spark-symbol-b {
+  animation-delay: 0.28s;
+}
+
+.spark-symbol-c {
+  animation-delay: 0.56s;
+}
+
+.spark-leaf,
+.spark-cell {
+  transform-box: fill-box;
+  transform-origin: 20% 90%;
+  animation: spark-leaf-grow 16s ease-in-out infinite;
+}
+
+.spark-cell {
+  transform-origin: 50% 50%;
+  animation-delay: 0.35s;
+}
+
+.spark-book,
+.spark-crumb {
+  transform-box: fill-box;
+  transform-origin: 20% 80%;
+  animation: spark-book-read 16s ease-in-out infinite;
+}
+
+.spark-crumb {
+  transform-origin: 50% 50%;
+  animation-delay: 0.2s;
+}
+
+.spark-bubble,
+.spark-molecule {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: spark-bubble-rise 16s ease-in-out infinite;
+}
+
+.spark-bubble-b {
+  animation-delay: 0.22s;
+}
+
+.spark-bubble-c {
+  animation-delay: 0.4s;
+}
+
+.spark-molecule {
+  transform-origin: 50% 50%;
+  animation-delay: 0.18s;
+}
+
+.spark-orbit {
+  transform-box: fill-box;
+  transform-origin: 50% 46%;
+  animation: spark-orbit-spin 16s ease-in-out infinite;
+}
+
+.spark-hourglass {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-hourglass-flip 16s ease-in-out infinite;
+}
+
+.spark-globe {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-globe-spin 16s ease-in-out infinite;
+}
+
+.spark-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: spark-bar-grow 16s ease-in-out infinite;
+}
+
+.spark-bar-b {
+  animation-delay: 0.16s;
+}
+
+.spark-bar-c {
+  animation-delay: 0.32s;
+}
+
+.spark-thought {
+  transform-box: fill-box;
+  transform-origin: 30% 80%;
+  animation: spark-thought-pop 16s ease-in-out infinite;
+}
+
+.spark-bits {
+  animation: spark-bits-fade 16s ease-in-out infinite;
+}
+
+.spark-bits-b {
+  animation-delay: 0.24s;
+}
+
+.spark-cursor {
+  animation: spark-cursor-blink 16s ease-in-out infinite;
+}
+
+.spark-brush {
+  stroke-dasharray: 56;
+  animation: spark-brush-swoosh 16s ease-in-out infinite;
+}
+
+.spark-dab {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-thought-pop 16s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.spark-note {
+  animation: spark-note-bounce 16s ease-in-out infinite;
+}
+
+.spark-note-b {
+  animation-delay: 0.22s;
+}
+
+.spark-lens {
+  transform-box: fill-box;
+  transform-origin: 80% 30%;
+  animation: spark-lens-peek 16s ease-in-out infinite;
+}
+
+.spark-pulse {
+  stroke-dasharray: 48;
+  animation: spark-pulse-draw 16s ease-in-out infinite;
 }
 
 .spark-halo {
@@ -171,7 +652,29 @@
 @media (prefers-reduced-motion: reduce) {
   .spark-float,
   .spark-halo,
-  .spark-dot {
+  .spark-dot,
+  .spark-body,
+  .spark-glance,
+  .spark-flourish,
+  .spark-symbol,
+  .spark-leaf,
+  .spark-cell,
+  .spark-book,
+  .spark-crumb,
+  .spark-bubble,
+  .spark-molecule,
+  .spark-orbit,
+  .spark-hourglass,
+  .spark-globe,
+  .spark-bar,
+  .spark-thought,
+  .spark-bits,
+  .spark-cursor,
+  .spark-brush,
+  .spark-dab,
+  .spark-note,
+  .spark-lens,
+  .spark-pulse {
     animation: none;
   }
 }
