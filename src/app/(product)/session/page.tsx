@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
+import { FocusScene } from "@/components/focus-scene";
 import { Spark, type SparkMood } from "@/components/spark";
+import { rocketProgress, rocketStageLabel } from "@/lib/focus-scene";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
@@ -86,6 +88,8 @@ export default function FocusPage() {
           ? "earning"
           : "locked";
 
+  const scene = rocketProgress(elapsed, demoMode);
+
   if (!session || session.status !== "focus") return null;
 
   function finish() {
@@ -98,7 +102,8 @@ export default function FocusPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[1fr_1fr]">
+    <div className="relative mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[1fr_1fr]">
+      <FocusScene elapsedMs={elapsed} demoMode={demoMode} />
       <div className="flex flex-col items-center">
         <Spark
           mood={mood}
@@ -160,6 +165,9 @@ export default function FocusPage() {
       <div>
         <p className="text-xs tracking-[0.2em] text-primary uppercase">
           Focus session
+          {state.appearance.focusTheme === "rocket"
+            ? ` · ${rocketStageLabel(scene.stage)}`
+            : ""}
         </p>
         <h1 className="mt-3 text-4xl text-foreground">{title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">

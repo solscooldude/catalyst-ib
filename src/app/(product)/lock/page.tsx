@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { PhoneLock } from "@/components/phone-lock";
 import { DemoBadge } from "@/components/demo-badge";
 import { MotivationNudge } from "@/components/motivation-nudge";
+import { FocusScene } from "@/components/focus-scene";
 import { Spark } from "@/components/spark";
 import { ROUTES } from "@/lib/routes";
 import { enterFocus, sessionHint, sessionTitle, useCatalyst } from "@/lib/store";
@@ -41,7 +42,8 @@ export default function LockPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="relative mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+      <FocusScene elapsedMs={0} demoMode={state.session.demoMode ?? state.demoMode} />
       <div>
         <DemoBadge>Simulated phone lock</DemoBadge>
         <h1 className="mt-4 text-4xl text-foreground sm:text-5xl">
