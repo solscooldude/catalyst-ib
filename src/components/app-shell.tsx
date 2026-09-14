@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: ROUTES.home, label: "Home" },
   { href: ROUTES.focus, label: "Focus" },
+  { href: ROUTES.schedule, label: "Schedule" },
   { href: ROUTES.stats, label: "Stats" },
   { href: ROUTES.unlocks, label: "Unlocks" },
   { href: ROUTES.appearance, label: "Appearance" },

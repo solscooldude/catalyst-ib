@@ -50,7 +50,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
         {isSignup
-          ? "After signup you land in the dashboard, not the marketing page."
+          ? "After signup you set class year and DP subjects, then the dashboard."
           : "Welcome back. This opens your saved tokens, stats, and unlocks."}
       </p>
       <DemoBadge className="mt-4">Demo accounts · this browser only</DemoBadge>
