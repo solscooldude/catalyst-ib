@@ -4,7 +4,9 @@ import { useSyncExternalStore } from "react";
 import {
   ACCENTS,
   BACKGROUNDS,
+  FOCUS_THEMES,
   SPARK_GEAR,
+  SPARK_TRAILS,
   SPARK_TINTS,
   defaultAppearance,
   normalizeAppearance,
@@ -586,27 +588,39 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
   return { ok: true as const, unlock, stacked };
 }
 
-export type AppearanceKind = "accent" | "background" | "sparkTint" | "gear";
+export type AppearanceKind =
+  | "accent"
+  | "background"
+  | "sparkTint"
+  | "gear"
+  | "trail"
+  | "focusTheme";
 
 function catalogFor(kind: AppearanceKind) {
   if (kind === "accent") return ACCENTS;
   if (kind === "background") return BACKGROUNDS;
   if (kind === "sparkTint") return SPARK_TINTS;
-  return SPARK_GEAR;
+  if (kind === "gear") return SPARK_GEAR;
+  if (kind === "trail") return SPARK_TRAILS;
+  return FOCUS_THEMES;
 }
 
 function ownedKey(kind: AppearanceKind): keyof AppearanceState {
   if (kind === "accent") return "ownedAccents";
   if (kind === "background") return "ownedBackgrounds";
   if (kind === "sparkTint") return "ownedSparkTints";
-  return "ownedGear";
+  if (kind === "gear") return "ownedGear";
+  if (kind === "trail") return "ownedTrails";
+  return "ownedFocusThemes";
 }
 
 function equippedKey(kind: AppearanceKind): keyof AppearanceState {
   if (kind === "accent") return "accent";
   if (kind === "background") return "background";
   if (kind === "sparkTint") return "sparkTint";
-  return "gear";
+  if (kind === "gear") return "gear";
+  if (kind === "trail") return "trail";
+  return "focusTheme";
 }
 
 export function buyAppearance(kind: AppearanceKind, id: string) {
