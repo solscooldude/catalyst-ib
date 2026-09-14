@@ -28,7 +28,7 @@ export const COLLECTIONS: {
     id: "focus",
     name: "Focus scenes",
     range: "Free–120",
-    copy: "Study rooms with a slow afternoon-to-night cycle, plus a lamp-ember trail. Equip one room. Rocket stays on the shelf.",
+    copy: "Lamp ember trail. Room plates are parked — focus is the spark on a quiet stage.",
   },
 ];
 
@@ -314,7 +314,7 @@ export const defaultAppearance: AppearanceState = {
   sparkTint: "mint",
   gear: "none",
   trail: "none",
-  focusTheme: "cat",
+  focusTheme: "none",
 };
 
 function unique<T extends string>(values: T[], fallback: T): T[] {
