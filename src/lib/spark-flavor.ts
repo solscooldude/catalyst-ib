@@ -5,6 +5,7 @@ import {
   type SubjectId,
   type TaskId,
 } from "@/lib/constants";
+import { diplomaSubjectList, type ProfileState } from "@/lib/ib";
 
 export type SparkFlavor =
   | "math"
@@ -198,4 +199,13 @@ export function sparkFlavorFromTask(taskId?: TaskId | null): SparkFlavor {
     subjectId: TASK_SUBJECT[taskId],
     text: sparkHintFromTask(taskId),
   });
+}
+
+export function idleSubjectMoments(profile: ProfileState) {
+  const { core, groups } = diplomaSubjectList(profile);
+  return [...core, ...groups].map((row) => ({
+    id: row.id,
+    label: row.label,
+    flavor: sparkFlavorFromSubject(row.statId),
+  }));
 }
