@@ -80,14 +80,20 @@ function Heart() {
 function PetHearts() {
   return (
     <g className="spark-hearts" fill="#F9A8D4">
-      <g className="spark-heart spark-heart-a" transform="translate(6 18) scale(1.05)">
-        <Heart />
+      <g transform="translate(6 18) scale(1.05)">
+        <g className="spark-heart spark-heart-a">
+          <Heart />
+        </g>
       </g>
-      <g className="spark-heart spark-heart-b" transform="translate(78 12) scale(0.85)">
-        <Heart />
+      <g transform="translate(78 12) scale(0.85)">
+        <g className="spark-heart spark-heart-b">
+          <Heart />
+        </g>
       </g>
-      <g className="spark-heart spark-heart-c" transform="translate(86 48) scale(0.7)">
-        <Heart />
+      <g transform="translate(86 48) scale(0.7)">
+        <g className="spark-heart spark-heart-c">
+          <Heart />
+        </g>
       </g>
     </g>
   );
@@ -537,10 +543,10 @@ export function Spark({
       subjectId: subject ?? (taskId ? TASK_SUBJECT[taskId] : undefined),
       text: hint ?? sparkHintFromTask(taskId),
     });
-  const busy = mood === "locked" || mood === "earning";
-  const canPet = pettable && !busy;
+  const canPet = pettable;
   const [petted, setPetted] = useState(false);
   const petTimer = useRef<number>(0);
+  const lastPet = useRef(0);
 
   useEffect(() => {
     return () => window.clearTimeout(petTimer.current);
@@ -548,6 +554,9 @@ export function Spark({
 
   function pet() {
     if (!canPet) return;
+    const now = Date.now();
+    if (now - lastPet.current < 280) return;
+    lastPet.current = now;
     setPetted(true);
     window.clearTimeout(petTimer.current);
     petTimer.current = window.setTimeout(() => setPetted(false), 1800);
@@ -558,8 +567,10 @@ export function Spark({
   const evo = evolve ? sparkEvolution(store.logs) : { scale: 1, glow: 1 };
   const drawn = size * evo.scale;
   const frameClass = cn(
-    "spark-float relative",
-    canPet ? "cursor-pointer border-0 bg-transparent p-0" : "pointer-events-none",
+    "spark-float relative isolate z-20 overflow-visible",
+    canPet
+      ? "cursor-pointer touch-manipulation border-0 bg-transparent p-0"
+      : "pointer-events-none",
     petted && "spark-petted",
     flourish === "now" && "spark-idle-pop",
     className,
@@ -632,6 +643,12 @@ export function Spark({
       <button
         type="button"
         onClick={pet}
+        onPointerUp={(event) => {
+          if (event.pointerType === "touch") {
+            event.preventDefault();
+            pet();
+          }
+        }}
         aria-label="Pet the spark"
         className={frameClass}
         style={frameStyle}
