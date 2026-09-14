@@ -559,12 +559,12 @@ html[data-bg="aurora"] {
 @keyframes spark-halo {
   0%,
   100% {
-    opacity: 0.28;
-    transform: scale(0.94);
+    opacity: calc(0.22 * var(--spark-evo-glow, 1));
+    transform: scale(calc(0.9 + 0.06 * var(--spark-evo-glow, 1)));
   }
   50% {
-    opacity: 0.7;
-    transform: scale(1.04);
+    opacity: calc(0.62 * var(--spark-evo-glow, 1));
+    transform: scale(calc(1 + 0.08 * var(--spark-evo-glow, 1)));
   }
 }
 
@@ -1047,10 +1047,17 @@ html[data-bg="aurora"] {
 
 .focus-ground {
   position: absolute;
-  inset: auto 0 0;
-  height: calc(38% - var(--focus-t) * 26%);
-  background: linear-gradient(to top, #0c1610, rgb(12 22 16 / 0));
-  opacity: calc(0.88 - var(--focus-t) * 0.82);
+  inset: auto -20% -18%;
+  height: calc(46% - var(--focus-t) * 28%);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    #243044 0%,
+    #10141c 42%,
+    #07080d 70%
+  );
+  box-shadow: 0 -24px 60px rgb(94 234 212 / 0.08);
+  opacity: calc(0.9 - var(--focus-t) * 0.78);
 }
 
 .focus-plume {
