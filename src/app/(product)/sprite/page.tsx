@@ -33,6 +33,7 @@ export default function SpritePage() {
     dragging: false,
   });
   const idleTimer = useRef(0);
+  const pokeAt = useRef(0);
   const look = state.appearance;
   const evo = sparkEvolution(state.logs);
   const official = verifiedStudyMs(state.logs);
@@ -81,6 +82,12 @@ export default function SpritePage() {
   }
 
   function onPoke() {
+    const now = Date.now();
+    if (now - pokeAt.current < 2400) {
+      setNotice("Give it a second.");
+      return;
+    }
+    pokeAt.current = now;
     react("annoyed", 900);
     setNotice("Hey.");
   }
@@ -237,7 +244,9 @@ export default function SpritePage() {
       />
       <EquipRow
         title="Trail"
-        items={SPARK_TRAILS.map((item) => ({
+        items={SPARK_TRAILS.filter(
+          (item) => item.id !== "week" || look.ownedTrails.includes("week"),
+        ).map((item) => ({
           id: item.id,
           name: item.name,
           owned: look.ownedTrails.includes(item.id),
