@@ -971,6 +971,34 @@ html[data-bg="aurora"] {
   height: 3px;
 }
 
+.spark-trail-paper .spark-trail-dot {
+  background: #f4efe4;
+  width: 4px;
+  height: 3px;
+  border-radius: 1px;
+  box-shadow: none;
+  animation-name: spark-trail-paper;
+  animation-duration: 3.6s;
+}
+
+.spark-trail-vapor .spark-trail-dot {
+  background: rgb(94 234 212 / 0.38);
+  width: 16px;
+  height: 7px;
+  filter: blur(2.2px);
+  animation-name: spark-trail-vapor;
+  animation-duration: 4.4s;
+}
+
+.spark-trail-ember .spark-trail-dot {
+  background: #fb923c;
+  box-shadow: 0 0 10px rgb(251 146 60 / 0.8);
+  width: 2px;
+  height: 6px;
+  animation-name: spark-trail-ember;
+  animation-duration: 2.1s;
+}
+
 .spark-trail-dot-0 { top: 12%; left: 22%; animation-delay: 0s; }
 .spark-trail-dot-1 { top: 28%; left: 78%; animation-delay: 0.25s; }
 .spark-trail-dot-2 { top: 46%; left: 14%; animation-delay: 0.5s; }
@@ -989,6 +1017,45 @@ html[data-bg="aurora"] {
   50% {
     opacity: 0.95;
     transform: translateY(-8px) scale(1);
+  }
+}
+
+@keyframes spark-trail-paper {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate(4px, 8px) rotate(-12deg);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-6px, -10px) rotate(8deg);
+  }
+}
+
+@keyframes spark-trail-vapor {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: translateX(-10px) scale(0.85);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(12px) scale(1.15);
+  }
+}
+
+@keyframes spark-trail-ember {
+  0% {
+    opacity: 0.1;
+    transform: translateY(10px) scale(0.6);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.4);
   }
 }
 
