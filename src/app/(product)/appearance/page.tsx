@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import Link from "next/link";
 import { MintChip, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   SPARK_TRAILS,
   SPARK_TINTS,
 } from "@/lib/appearance";
+import { ROUTES } from "@/lib/routes";
 import {
   buyAppearance,
   equipAppearance,
@@ -45,11 +47,16 @@ export default function AppearancePage() {
             Starter pieces stay cheap. Night sky is mid. Elite gold is rare.
             Focus scenes sit on the lock and timer. Cat, desk, and library
             keep one camera and drift from afternoon to night. Rocket stays
-            deferred. The spark grows from official study hours, not shop
-            buys.
+            deferred. Dress the spark on My Sprite. It grows from official
+            study hours, not shop buys.
+          </p>
+          <p className="mt-3 text-sm">
+            <Link href={ROUTES.sprite} className="text-foreground underline">
+              Care and equip on My Sprite
+            </Link>
           </p>
         </div>
-        <Spark mood="idle" size={104} pettable className="hidden shrink-0 sm:block" />
+        <Spark mood="idle" size={132} pettable className="hidden shrink-0 sm:block" />
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
@@ -211,11 +218,11 @@ function BgSwatch({ id }: { id: string }) {
 function FocusSwatch({ id }: { id: string }) {
   const plate =
     id === "cat"
-      ? "/api/plates/cat-afternoon.jpg"
+      ? "/focus/cat-afternoon.jpg"
       : id === "desk"
-        ? "/api/plates/desk-afternoon.jpg"
+        ? "/focus/desk-afternoon.jpg"
         : id === "library"
-          ? "/api/plates/lib-afternoon.jpg"
+          ? "/focus/lib-afternoon.jpg"
           : null;
   if (plate) {
     return (
