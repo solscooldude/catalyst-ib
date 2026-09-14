@@ -7,27 +7,29 @@ import { TokenChip } from "@/components/token-chip";
 import { DemoBadge } from "@/components/demo-badge";
 import { Button } from "@/components/ui/button";
 import { logOut, useAuth } from "@/lib/auth";
+import { ROUTES } from "@/lib/routes";
 import { resetDemo, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/dashboard", label: "Home" },
-  { href: "/app", label: "Focus" },
-  { href: "/app/stats", label: "Stats" },
-  { href: "/app/unlock", label: "Unlocks" },
-  { href: "/app/setup", label: "Setup" },
+  { href: ROUTES.home, label: "Home" },
+  { href: ROUTES.focus, label: "Focus" },
+  { href: ROUTES.stats, label: "Stats" },
+  { href: ROUTES.unlocks, label: "Unlocks" },
+  { href: ROUTES.appearance, label: "Appearance" },
+  { href: ROUTES.setup, label: "Setup" },
 ];
 
 function isActive(pathname: string, href: string) {
-  if (href === "/dashboard") return pathname === "/dashboard";
-  if (href === "/app") {
+  if (href === ROUTES.home) return pathname === ROUTES.home;
+  if (href === ROUTES.focus) {
     return (
-      pathname === "/app" ||
-      pathname.startsWith("/app/lock") ||
-      pathname.startsWith("/app/focus")
+      pathname === ROUTES.focus ||
+      pathname === ROUTES.lock ||
+      pathname === ROUTES.session
     );
   }
-  return pathname.startsWith(href);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -38,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   function handleReset() {
     resetDemo();
-    router.push("/app/setup");
+    router.push(ROUTES.setup);
   }
 
   function handleLogout() {
@@ -48,10 +50,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 border-b border-white/6 bg-[#0b0b0f]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-white/6 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
-          <Wordmark href="/dashboard" />
-          <nav className="hidden items-center gap-1 md:flex">
+          <Wordmark href={ROUTES.home} />
+          <nav className="hidden items-center gap-1 lg:flex">
             {NAV.map((item) => {
               const active = isActive(pathname, item.href);
               return (
@@ -75,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="sm"
-              className="hidden text-muted-foreground lg:inline-flex"
+              className="hidden text-muted-foreground xl:inline-flex"
               onClick={handleReset}
             >
               Reset demo
@@ -90,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
         </div>
-        <div className="flex gap-1 overflow-x-auto px-4 pb-2 md:hidden">
+        <div className="flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -126,7 +128,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden"
+            className="xl:hidden"
             onClick={handleReset}
           >
             Reset demo

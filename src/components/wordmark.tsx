@@ -16,7 +16,7 @@ export function Wordmark({
         className,
       )}
     >
-      <span className="size-1.5 rounded-full bg-primary shadow-[0_0_12px_rgb(94_234_212_/_0.8)]" />
+      <span className="size-1.5 rounded-full bg-primary shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_80%,transparent)]" />
       Catalyst
     </Link>
   );
