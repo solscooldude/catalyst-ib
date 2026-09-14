@@ -9,7 +9,6 @@ import {
   ACCENTS,
   BACKGROUNDS,
   COLLECTIONS,
-  FOCUS_THEMES,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
@@ -45,10 +44,9 @@ export default function AppearancePage() {
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Starter pieces stay cheap. Night sky is mid. Elite gold is rare.
-            Focus scenes sit on the lock and timer. Cat, desk, and library
-            keep one camera and drift from afternoon to night. Rocket stays
-            deferred. Dress the spark on My Sprite. It grows from official
-            study hours, not shop buys.
+            Focus is the spark on a quiet stage — room plates are parked.
+            Dress the spark on My Sprite. It grows from official study hours,
+            not shop buys.
           </p>
           <p className="mt-3 text-sm">
             <Link href={ROUTES.sprite} className="text-foreground underline">
@@ -60,6 +58,9 @@ export default function AppearancePage() {
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
+      <p className="text-sm text-muted-foreground">
+        Room backgrounds are parked. Focus is a large spark on a quiet stage.
+      </p>
 
       {COLLECTIONS.map((collection) => (
         <section key={collection.id} className="space-y-6">
@@ -133,15 +134,6 @@ export default function AppearancePage() {
             )}
           />
 
-          <Group
-            title="Focus scene"
-            items={FOCUS_THEMES.filter((item) => item.collection === collection.id)}
-            owned={(id) => look.ownedFocusThemes.includes(id)}
-            equipped={(id) => look.focusTheme === id}
-            onAct={(id, owned) => act("focusTheme", id, owned)}
-            equipLabel="Use"
-            swatch={(item) => <FocusSwatch id={item.id} />}
-          />
         </section>
       ))}
     </div>
@@ -213,35 +205,6 @@ function BgSwatch({ id }: { id: string }) {
       )}
     />
   );
-}
-
-function FocusSwatch({ id }: { id: string }) {
-  const plate =
-    id === "cat"
-      ? "/focus/cat-afternoon.jpg"
-      : id === "desk"
-        ? "/focus/desk-afternoon.jpg"
-        : id === "library"
-          ? "/focus/lib-afternoon.jpg"
-          : null;
-  if (plate) {
-    return (
-      <span
-        className="size-10 overflow-hidden rounded-xl ring-1 ring-white/15"
-        style={{
-          backgroundImage: `url(${plate})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-    );
-  }
-  if (id === "rocket") {
-    return (
-      <span className="size-8 rounded-full bg-[linear-gradient(180deg,#071018_0%,#12382c_55%,#1a2a18_100%)] ring-1 ring-white/15" />
-    );
-  }
-  return <span className="size-8 rounded-full bg-[#0B0B0F] ring-1 ring-white/15" />;
 }
 
 function ShopCard({
