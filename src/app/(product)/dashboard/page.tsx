@@ -55,6 +55,9 @@ export default function DashboardPage() {
             Spark is {sparkEvolutionLabel(evo.stage)} ·{" "}
             {formatHours(verifiedStudyMs(state.logs))} official
           </p>
+          <Button asChild variant="ghost" size="sm" className="mt-3 h-8 px-0 text-muted-foreground">
+            <Link href={ROUTES.sprite}>Open My Sprite</Link>
+          </Button>
         </div>
         <Spark
           mood={session?.status === "focus" ? "locked" : "idle"}
@@ -68,9 +71,9 @@ export default function DashboardPage() {
               : (roundup.topSubject?.label ??
                 SUBJECTS.find((row) => row.id === stacks[0]?.id)?.label)
           }
-          size={112}
+          size={188}
           pettable
-          className="shrink-0"
+          className="mx-auto shrink-0 sm:mx-0"
         />
       </div>
 
