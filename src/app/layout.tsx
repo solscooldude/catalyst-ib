@@ -22,7 +22,7 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Catalyst — focus tool for IB DP",
   description:
-    "A personal focus tool for IB DP students. Lock the apps that pull you off ManageBac, finish the task, earn tokens from that session, then unlock a short break.",
+    "For IB DP students. Apps pull you off ManageBac. Catalyst locks them until a session finishes. Tokens come from that work, then you buy a short unlock.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
