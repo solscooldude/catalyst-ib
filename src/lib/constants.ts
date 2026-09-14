@@ -50,6 +50,29 @@ export const MOCK_TASKS = [
 
 export type TaskId = (typeof MOCK_TASKS)[number]["id"];
 
+export const SUBJECTS = [
+  { id: "biology", label: "Biology HL" },
+  { id: "tok", label: "Theory of Knowledge" },
+  { id: "math-aa", label: "Mathematics AA HL" },
+  { id: "chemistry", label: "Chemistry SL" },
+  { id: "ee", label: "Extended Essay" },
+  { id: "english", label: "English A" },
+  { id: "history", label: "History" },
+  { id: "other", label: "Other" },
+] as const;
+
+export type SubjectId = (typeof SUBJECTS)[number]["id"];
+
+export const TASK_SUBJECT: Record<TaskId, SubjectId> = {
+  "bio-ia": "biology",
+  "tok-essay": "tok",
+  "math-aa": "math-aa",
+  "chem-study": "chemistry",
+  "ee-chapter": "ee",
+};
+
+export const COMPLETION_BONUS = 5;
+
 export const UNLOCK_CATALOG = [
   {
     id: "notes",

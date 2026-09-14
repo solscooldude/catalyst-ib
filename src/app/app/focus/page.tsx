@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { Spark, type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
+import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
 import {
   completeSession,
   getTask,
@@ -27,8 +27,6 @@ export default function FocusPage() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
-  const [mood, setMood] = useState<SparkMood>("locked");
-  const previousEarned = useRef(0);
 
   useEffect(() => {
     if (!state.hydrated) return;
@@ -69,21 +67,12 @@ export default function FocusPage() {
   }, [progress]);
 
   const taskMarkedDone = session?.taskMarkedDone ?? false;
-
-  useEffect(() => {
-    if (taskMarkedDone) {
-      setMood("done");
-      previousEarned.current = earned;
-      return;
-    }
-    if (earned > previousEarned.current) {
-      setMood("earning");
-      previousEarned.current = earned;
-      const timeout = window.setTimeout(() => setMood("locked"), 2800);
-      return () => window.clearTimeout(timeout);
-    }
-    previousEarned.current = earned;
-  }, [earned, taskMarkedDone]);
+  const justEarned = earned >= 1 && progress < 0.12;
+  const mood: SparkMood = taskMarkedDone
+    ? "done"
+    : justEarned
+      ? "earning"
+      : "locked";
 
   if (!session || session.status !== "focus") return null;
 
@@ -126,7 +115,8 @@ export default function FocusPage() {
               {formatElapsed(elapsed)}
             </p>
             <p className="mt-1 font-mono text-xs text-primary">
-              {earned} token{earned === 1 ? "" : "s"} earned
+              {earned} time token{earned === 1 ? "" : "s"}
+              {taskMarkedDone ? ` + ${COMPLETION_BONUS}` : ""}
             </p>
           </div>
         </div>
@@ -161,8 +151,8 @@ export default function FocusPage() {
               Mark ManageBac task done
             </span>
             <span className="mt-1 block text-xs text-muted-foreground">
-              Required before this session can pay out. Simulated school
-              gradebook — nothing syncs to a real ManageBac account.
+              Required to finish. Official tasks add +{COMPLETION_BONUS}{" "}
+              tokens on top of time earned. Simulated ManageBac.
             </span>
           </span>
         </label>

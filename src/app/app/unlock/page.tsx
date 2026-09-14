@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { DemoBadge } from "@/components/demo-badge";
 import { PhoneLock } from "@/components/phone-lock";
-import { Spark, type SparkMood } from "@/components/spark";
+import { Spark } from "@/components/spark";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import { UNLOCK_CATALOG } from "@/lib/constants";
@@ -22,7 +22,7 @@ function UnlockInner() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
-  const [mood, setMood] = useState<SparkMood>("tempted");
+  const [arrivedAt] = useState(() => Date.now());
   const earned = params.get("earned") === "1";
 
   useEffect(() => {
@@ -35,17 +35,12 @@ function UnlockInner() {
     return () => window.clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    if (earned) {
-      setMood("done");
-      const timeout = window.setTimeout(() => setMood("tempted"), 3200);
-      return () => window.clearTimeout(timeout);
-    }
-    setMood("tempted");
-  }, [earned]);
+  const mood = earned && now - arrivedAt < 3200 ? "done" : "tempted";
 
   const nemesis = getNemesis(state.nemesis);
-  const lastEarned = state.session?.status === "completed" ? state.session.tokensEarned : 0;
+  const lastSession =
+    state.session?.status === "completed" ? state.session : null;
+  const lastEarned = lastSession?.tokensEarned ?? 0;
   const active = useMemo(
     () => state.unlocks.filter((unlock) => unlock.expiresAt > now),
     [state.unlocks, now],
@@ -74,7 +69,11 @@ function UnlockInner() {
               +{lastEarned} token{lastEarned === 1 ? "" : "s"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              ManageBac task marked done. Balance updated in this browser.
+              {lastSession?.timeTokens ?? 0} from time
+              {lastSession?.completionTokens
+                ? ` + ${lastSession.completionTokens} official completion`
+                : ""}
+              . Logged to Stats.
             </p>
           </div>
         ) : null}

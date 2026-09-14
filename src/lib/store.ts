@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import {
+  COMPLETION_BONUS,
   DEMO_TOKEN_MS,
   DEMO_UNLOCK_MS,
   MOCK_TASKS,
@@ -9,8 +10,11 @@ import {
   REAL_TOKEN_MS,
   REAL_UNLOCK_MS,
   STORAGE_KEY,
+  SUBJECTS,
+  TASK_SUBJECT,
   UNLOCK_CATALOG,
   type NemesisId,
+  type SubjectId,
   type TaskId,
   type UnlockCatalogId,
 } from "@/lib/constants";
@@ -33,6 +37,22 @@ export type Session = {
   completedAt: number | null;
   taskMarkedDone: boolean;
   tokensEarned: number;
+  timeTokens: number;
+  completionTokens: number;
+};
+
+export type SessionLog = {
+  id: string;
+  kind: "verified" | "manual";
+  subjectId: SubjectId;
+  subjectLabel: string;
+  startedAt: number;
+  endedAt: number;
+  durationMs: number;
+  timeTokens: number;
+  completionTokens: number;
+  note?: string;
+  taskId?: TaskId;
 };
 
 export type Unlock = {
@@ -54,6 +74,7 @@ export type CatalystState = {
   tasks: TaskState[];
   session: Session | null;
   unlocks: Unlock[];
+  logs: SessionLog[];
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -71,6 +92,7 @@ export const defaultState: CatalystState = {
   tasks: defaultTasks,
   session: null,
   unlocks: [],
+  logs: [],
 };
 
 type Listener = () => void;
@@ -117,6 +139,7 @@ export function hydrateStore() {
           ? parsed.tasks
           : defaultTasks,
       unlocks: pruneUnlocks(parsed.unlocks ?? []),
+      logs: parsed.logs ?? [],
       hydrated: true,
     };
   } catch {
@@ -167,6 +190,8 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     completedAt: null,
     taskMarkedDone: false,
     tokensEarned: 0,
+    timeTokens: 0,
+    completionTokens: 0,
   };
   setState((current) => ({ ...current, session }));
 }
@@ -214,22 +239,89 @@ export function completeSession(tokensEarned: number) {
   }
 
   const taskId = state.session.taskId;
+  const timeTokens = tokensEarned;
+  const completionTokens = COMPLETION_BONUS;
+  const totalTokens = timeTokens + completionTokens;
+  const endedAt = Date.now();
+  const startedAt =
+    state.session.focusStartedAt ?? state.session.lockedAt;
+  const subjectId = TASK_SUBJECT[taskId];
+  const subjectLabel =
+    SUBJECTS.find((subject) => subject.id === subjectId)?.label ??
+    getTask(taskId)?.subject ??
+    "Other";
+  const log: SessionLog = {
+    id: state.session.id,
+    kind: "verified",
+    subjectId,
+    subjectLabel,
+    startedAt,
+    endedAt,
+    durationMs: Math.max(0, endedAt - startedAt),
+    timeTokens,
+    completionTokens,
+    note: state.session.goal || undefined,
+    taskId,
+  };
+
   setState((current) => ({
     ...current,
-    tokens: current.tokens + tokensEarned,
+    tokens: current.tokens + totalTokens,
     tasks: current.tasks.map((task) =>
       task.id === taskId ? { ...task, done: true } : task,
     ),
+    logs: [...current.logs, log],
     session: current.session
       ? {
           ...current.session,
           status: "completed",
-          completedAt: Date.now(),
-          tokensEarned,
+          completedAt: endedAt,
+          tokensEarned: totalTokens,
+          timeTokens,
+          completionTokens,
         }
       : null,
   }));
-  return { ok: true as const };
+  return { ok: true as const, timeTokens, completionTokens, totalTokens };
+}
+
+export function addManualSession(input: {
+  subjectId: SubjectId;
+  minutes: number;
+  note: string;
+}) {
+  const minutes = Math.floor(input.minutes);
+  if (!Number.isFinite(minutes) || minutes < 1) {
+    return { ok: false as const, reason: "Enter at least 1 minute." };
+  }
+  const subject = SUBJECTS.find((row) => row.id === input.subjectId);
+  if (!subject) {
+    return { ok: false as const, reason: "Pick a subject." };
+  }
+
+  const durationMs = minutes * 60 * 1000;
+  const timeTokens = tokensFromElapsed(durationMs, false);
+  const endedAt = Date.now();
+  const log: SessionLog = {
+    id: crypto.randomUUID(),
+    kind: "manual",
+    subjectId: subject.id,
+    subjectLabel: subject.label,
+    startedAt: endedAt - durationMs,
+    endedAt,
+    durationMs,
+    timeTokens,
+    completionTokens: 0,
+    note: input.note.trim() || undefined,
+  };
+
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens + timeTokens,
+    logs: [...current.logs, log],
+  }));
+
+  return { ok: true as const, timeTokens, log };
 }
 
 export function clearSession() {

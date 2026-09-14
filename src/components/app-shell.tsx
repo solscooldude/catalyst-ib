@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/app", label: "Focus" },
+  { href: "/app/stats", label: "Stats" },
   { href: "/app/unlock", label: "Unlocks" },
   { href: "/app/setup", label: "Setup" },
 ];

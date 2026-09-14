@@ -150,6 +150,9 @@ export default function AppHomePage() {
           <Button asChild variant="outline" className="h-11 w-full rounded-full">
             <Link href="/app/unlock">Spend tokens instead</Link>
           </Button>
+          <Button asChild variant="ghost" className="h-11 w-full rounded-full">
+            <Link href="/app/stats">Stats and study log</Link>
+          </Button>
         </div>
       </div>
     </div>

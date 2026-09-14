@@ -29,5 +29,6 @@ npm run build
 4. `/app/lock` — simulated lock screen. Emergency stays; social apps are grey.
 5. `/app/focus` — timer. Mark the ManageBac task done, then complete the session.
 6. `/app/unlock` — spend tokens (Notes 2 / YouTube 4 / nemesis 8 per 10 minutes). Demo unlocks last 60 seconds.
+7. `/app/stats` — subject time stack (week / month), monthly roundup, and manual study logs. Official task completion adds +5 tokens; manual logs earn time tokens only.
 
 Tokens, setup, task completion, and unlocks persist in `localStorage` under `catalyst-v1`. Use **Reset demo** in the app header to start over.
