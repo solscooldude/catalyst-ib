@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
-import { FocusScene } from "@/components/focus-scene";
+import { FocusSpark } from "@/components/focus-spark";
 import { TokenAmount } from "@/components/mint-chip";
-import { Spark, type SparkMood } from "@/components/spark";
+import { type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
-import { isRoomFocusTheme } from "@/lib/focus-scene";
 import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
@@ -21,7 +20,6 @@ import {
   tokensFromElapsed,
   useCatalyst,
 } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 function formatElapsed(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -72,8 +70,6 @@ export default function FocusPage() {
   const sessionProgress = planned
     ? Math.min(1, elapsed / planned)
     : tokenProgress;
-  const room = isRoomFocusTheme(state.appearance.focusTheme);
-
   const taskMarkedDone = session?.taskMarkedDone ?? false;
   const justEarned = earned >= 1 && tokenProgress < 0.12;
   const mood: SparkMood =
@@ -106,31 +102,20 @@ export default function FocusPage() {
   }
 
   return (
-    <div className={cn("focus-session", !room && "focus-session-stage")}>
-      {room ? (
-        <FocusScene
-          elapsedMs={elapsed}
-          demoMode={demoMode}
-          plannedMs={planned}
-        />
-      ) : (
-        <div className="focus-quiet-stage">
-          <Spark
-            mood={mood}
-            taskId={session.taskId}
-            subject={session.subjectId}
-            hint={sessionHint(session)}
-            size={248}
-          />
-        </div>
-      )}
+    <div className="focus-session focus-session-stage">
+      <FocusSpark
+        mood={mood}
+        taskId={session.taskId}
+        subject={session.subjectId}
+        hint={sessionHint(session)}
+      />
       <FocusHud
         time={formatElapsed(elapsed)}
         progress={sessionProgress}
         tokens={liveTokens}
       />
 
-      <div className={cn("focus-session-panel", room && "focus-session-panel-glass")}>
+      <div className="focus-session-panel">
         <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
           Focus session
         </p>
