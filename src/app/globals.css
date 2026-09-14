@@ -1000,6 +1000,13 @@ html[data-bg="aurora"] {
   animation-duration: 4.4s;
 }
 
+.spark-trail-week .spark-trail-dot {
+  background: #f3c14b;
+  box-shadow: 0 0 10px rgb(243 193 75 / 0.85);
+  width: 3px;
+  height: 4px;
+}
+
 .spark-trail-ember .spark-trail-dot {
   background: #fb923c;
   box-shadow: 0 0 10px rgb(251 146 60 / 0.8);
