@@ -65,8 +65,8 @@ export default function AppHomePage() {
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           Pick a ManageBac task or start your own study block. The phone locks
-          after you begin. Equip Cat study, Desk window, or Library attic in
-          Appearance if you want a room behind the timer.
+          after you begin. Focus is a large spark on a quiet stage — tap it
+          to pet it.
         </p>
         {nemesisApps.length > 0 ? (
           <div className="mt-3">
