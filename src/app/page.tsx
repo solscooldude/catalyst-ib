@@ -5,31 +5,31 @@ import { MintChip, TokenAmount } from "@/components/mint-chip";
 import { PhoneLock } from "@/components/phone-lock";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
-import { UNLOCK_CATALOG } from "@/lib/constants";
+import { PRICING, UNLOCK_CATALOG } from "@/lib/constants";
 
 const STEPS = [
   {
     n: "01",
     title: "Phone lock",
-    copy: "Social apps are greyed out. Emergency and essentials stay available.",
+    copy: "The apps you name go grey. Calls, SOS, and essentials stay available.",
     icon: Smartphone,
   },
   {
     n: "02",
     title: "Work",
-    copy: "Choose a ManageBac task and stay on your laptop until it is marked done.",
+    copy: "Stay on the laptop. Pick a ManageBac task or a study block and finish it there.",
     icon: NotebookPen,
   },
   {
     n: "03",
     title: "Tokens",
-    copy: "You earn 1 token every 5 minutes of focus. This demo can use 30 seconds so you can try the loop.",
+    copy: "You earn 1 token every 5 minutes of a session that actually ran. This demo can use 30 seconds so you can try the loop.",
     icon: "chip" as const,
   },
   {
     n: "04",
     title: "Unlock",
-    copy: "Spend tokens for 10 minutes. Notes is 2, YouTube is 4, and your nemesis app is 8.",
+    copy: "Spend tokens for 10 minutes. Notes is 2, YouTube is 4, and your nemesis apps are 8.",
     icon: Lock,
   },
 ];
@@ -46,12 +46,12 @@ export default function LandingPage() {
               For IB Diploma Programme students
             </p>
             <h1 className="mt-5 max-w-xl text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-              Finish the ManageBac task. Then unlock your phone.
+              The phone pulls you off ManageBac. Catalyst makes it wait.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
-              Catalyst is a personal focus tool. It locks your nemesis app,
-              you complete work on your laptop, and you spend tokens on a
-              short unlock. Not a group sprint.
+              Name the apps that steal the block. Work on the laptop until the
+              task is marked done. Tokens come from those minutes — then you
+              buy a short unlock. Not a streak. Not a pep talk.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
@@ -69,11 +69,11 @@ export default function LandingPage() {
               </Button>
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              First month free, then about $9.99 a month. Phone lock and
-              ManageBac are simulated in this demo.
+              First month free, then {PRICING.then.toLowerCase()}. Phone lock
+              and ManageBac are simulated in this demo.
             </p>
           </div>
-          <PhoneLock compact />
+          <PhoneLock compact nemeses={["tiktok", "instagram"]} />
         </section>
 
         <section className="border-y border-white/6">
@@ -83,18 +83,18 @@ export default function LandingPage() {
                 The problem
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                Why this exists
+                You sat down to write. Then you opened TikTok.
               </h2>
             </div>
             <div className="self-end space-y-4 text-base leading-7 text-muted-foreground">
               <p>
-                IAs, TOK, and the EE take hours. TikTok and Instagram take
-                the block you meant to spend on them.
+                IAs, TOK, and the EE live on ManageBac. The apps live on the
+                same desk. A five-minute check becomes the hour you needed.
               </p>
               <p>
-                You already know you should stay on the laptop. Catalyst
-                just makes the distracting app wait until a ManageBac task
-                is marked done.
+                Catalyst greys the apps you pick as nemesis. You get them back
+                only after a session that ran — tokens from verified focus,
+                plus a bonus when an official task is marked complete.
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function LandingPage() {
             How it works
           </p>
           <h2 className="mt-3 max-w-xl text-4xl text-foreground sm:text-5xl">
-            Phone lock, work, tokens, unlock
+            Lock the apps. Finish the work. Spend what you earned.
           </h2>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {STEPS.map((step) => (
@@ -185,7 +185,7 @@ export default function LandingPage() {
                 Pricing
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                First month free, then $9.99 a month
+                First month free, then $2 a month
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
                 This build is a product demo. Sign up creates a demo account in
@@ -203,8 +203,8 @@ export default function LandingPage() {
                 What the demo includes
               </p>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Laptop focus plus a ManageBac task marked done. Your nemesis
-                app costs the most tokens to unlock.
+                Laptop focus plus a ManageBac task marked done. The apps you
+                named as nemesis cost the most tokens to unlock.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-3">

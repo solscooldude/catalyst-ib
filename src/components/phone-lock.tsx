@@ -17,12 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { NEMESIS_APPS, type NemesisId } from "@/lib/constants";
+import { formatNemesisList, type NemesisId } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { isUnlockActive, type Unlock } from "@/lib/store";
 
 type PhoneLockProps = {
-  nemesis?: NemesisId | null;
+  nemeses?: NemesisId[];
   unlocks?: Unlock[];
   locked?: boolean;
   compact?: boolean;
@@ -44,8 +44,17 @@ function SocialGlyph({ label }: { label: string }) {
   );
 }
 
+const SOCIALS = [
+  { id: "instagram", name: "Instagram", glyph: "IG" },
+  { id: "tiktok", name: "TikTok", glyph: "TT" },
+  { id: "snapchat", name: "Snapchat", glyph: "SC" },
+  { id: "youtube", name: "YouTube", glyph: "YT" },
+  { id: "x", name: "X", glyph: "X" },
+  { id: "reddit", name: "Reddit", glyph: "RD" },
+] as const;
+
 export function PhoneLock({
-  nemesis = "tiktok",
+  nemeses = ["tiktok"],
   unlocks = [],
   locked = true,
   compact = false,
@@ -70,42 +79,23 @@ export function PhoneLock({
     day: "numeric",
   });
 
-  const nemesisApp =
-    NEMESIS_APPS.find((app) => app.id === nemesis) ?? NEMESIS_APPS[0];
+  const named = formatNemesisList(nemeses);
   const notesOpen = isUnlockActive(unlocks, "notes");
   const youtubeOpen = isUnlockActive(unlocks, "youtube");
   const nemesisOpen = isUnlockActive(unlocks, "nemesis");
 
-  const socials = [
-    {
-      id: "instagram",
-      name: "Instagram",
-      glyph: "IG",
-      locked: locked && !(nemesis === "instagram" && nemesisOpen),
-      isNemesis: nemesis === "instagram",
-    },
-    {
-      id: "tiktok",
-      name: "TikTok",
-      glyph: "TT",
-      locked: locked && !(nemesis === "tiktok" && nemesisOpen),
-      isNemesis: nemesis === "tiktok",
-    },
-    {
-      id: "snapchat",
-      name: "Snapchat",
-      glyph: "SC",
-      locked: locked && !(nemesis === "snapchat" && nemesisOpen),
-      isNemesis: nemesis === "snapchat",
-    },
-    {
-      id: "youtube",
-      name: "YouTube",
-      glyph: "YT",
-      locked: locked && !youtubeOpen,
-      isNemesis: false,
-    },
-  ];
+  const socials = SOCIALS.map((app) => {
+    const isNemesis = nemeses.includes(app.id as NemesisId);
+    const unlocked =
+      app.id === "youtube"
+        ? youtubeOpen
+        : isNemesis && nemesisOpen;
+    return {
+      ...app,
+      locked: locked && !unlocked,
+      isNemesis,
+    };
+  });
 
   function tapLocked(name: string) {
     setNotice(`${name} stays grey until you earn and spend tokens.`);
@@ -176,7 +166,7 @@ export function PhoneLock({
             <p className="mt-5 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
               Greyed until you earn it
             </p>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {socials.map((app) => (
                 <button
                   key={app.id}
@@ -217,7 +207,8 @@ export function PhoneLock({
               </p>
             ) : (
               <p className="text-center text-[11px] text-zinc-600">
-                {nemesisApp.name} is your nemesis. Emergency stays live.
+                {named} {nemeses.length === 1 ? "is" : "are"} locked. Emergency
+                stays live.
               </p>
             )}
             <div className="flex gap-2">
