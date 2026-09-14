@@ -156,7 +156,8 @@ function Group<
   title: string;
   items: readonly T[];
   owned: (id: T["id"]) => boolean;
-  equipped: (id: T["id"], owned: boolean) => void;
+  equipped: (id: T["id"]) => boolean;
+  onAct: (id: T["id"], owned: boolean) => void;
   swatch: (item: T) => ReactNode;
   blurb?: string;
   equipLabel?: string;
