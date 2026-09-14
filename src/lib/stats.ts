@@ -84,3 +84,53 @@ export function weekLabel(now = new Date()) {
 export function getSubject(id: SubjectId) {
   return SUBJECTS.find((subject) => subject.id === id);
 }
+
+export type StudyDay = {
+  key: string;
+  date: Date;
+  durationMs: number;
+  sessions: number;
+};
+
+function dayKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function studyDayBuckets(logs: SessionLog[], weeks = 12, now = new Date()) {
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  const start = startOfWeek(now);
+  start.setDate(start.getDate() - (weeks - 1) * 7);
+
+  const totals = new Map<string, { durationMs: number; sessions: number }>();
+  for (const log of logs) {
+    const date = new Date(log.endedAt);
+    if (date < start || date > end) continue;
+    const key = dayKey(date);
+    const current = totals.get(key) ?? { durationMs: 0, sessions: 0 };
+    totals.set(key, {
+      durationMs: current.durationMs + log.durationMs,
+      sessions: current.sessions + 1,
+    });
+  }
+
+  const days: StudyDay[] = [];
+  const cursor = new Date(start);
+  const last = new Date(end);
+  last.setHours(0, 0, 0, 0);
+  while (cursor <= last) {
+    const key = dayKey(cursor);
+    const row = totals.get(key);
+    days.push({
+      key,
+      date: new Date(cursor),
+      durationMs: row?.durationMs ?? 0,
+      sessions: row?.sessions ?? 0,
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
+}
