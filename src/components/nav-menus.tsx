@@ -14,6 +14,7 @@ const GROUPS = [
     items: [
       { href: ROUTES.home, label: "Dashboard" },
       { href: ROUTES.sprite, label: "My Sprite" },
+      { href: ROUTES.quiz, label: "Quiz" },
       { href: ROUTES.motivation, label: "Motivation" },
       { href: ROUTES.stats, label: "Stats" },
       { href: ROUTES.schedule, label: "Schedule" },

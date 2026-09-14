@@ -11,4 +11,5 @@ export const ROUTES = {
   motivation: "/motivation",
   schedule: "/schedule",
   sprite: "/sprite",
+  quiz: "/quiz",
 } as const;
