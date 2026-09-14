@@ -53,8 +53,8 @@ export default function LandingPage() {
               TikTok, Instagram, and the rest sit next to the IA, TOK essay, or
               EE. Catalyst greys the apps you name. You stay on the laptop
               until a task is marked done or a study block finishes. Tokens
-              come from those minutes — verified focus, not a quote. Then you
-              buy a short unlock.
+              come from those minutes of real work. Then you buy a short
+              unlock.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
