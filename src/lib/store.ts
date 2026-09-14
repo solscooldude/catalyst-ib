@@ -563,6 +563,14 @@ export function clearSession() {
   setState((current) => ({ ...current, session: null }));
 }
 
+export function grantFocusGift() {
+  if (state.session?.status !== "focus") {
+    return { ok: false as const };
+  }
+  setState((current) => ({ ...current, tokens: current.tokens + 1 }));
+  return { ok: true as const };
+}
+
 export function spendUnlock(catalogId: UnlockCatalogId) {
   const item = UNLOCK_CATALOG.find((entry) => entry.id === catalogId);
   if (!item) return { ok: false as const, reason: "Unknown unlock." };
