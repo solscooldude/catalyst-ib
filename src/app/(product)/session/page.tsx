@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusScene } from "@/components/focus-scene";
+import { TokenAmount } from "@/components/mint-chip";
 import { Spark, type SparkMood } from "@/components/spark";
 import { rocketProgress, rocketStageLabel } from "@/lib/focus-scene";
 import { Button } from "@/components/ui/button";
@@ -138,11 +139,16 @@ export default function FocusPage() {
             <p className="font-heading text-5xl text-foreground">
               {formatElapsed(elapsed)}
             </p>
-            <p className="mt-1 font-mono text-xs text-primary">
-              {earned} time token{earned === 1 ? "" : "s"}
-              {session.kind === "verified" && taskMarkedDone
-                ? ` + ${COMPLETION_BONUS}`
-                : ""}
+            <p className="mt-1 text-xs text-primary">
+              <span className="inline-flex items-center gap-1">
+                <TokenAmount value={earned} />
+                {session.kind === "verified" && taskMarkedDone ? (
+                  <>
+                    <span>+</span>
+                    <TokenAmount value={COMPLETION_BONUS} />
+                  </>
+                ) : null}
+              </span>
             </p>
             {planned ? (
               <p className="mt-1 text-xs text-muted-foreground">

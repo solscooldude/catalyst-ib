@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Spark } from "@/components/spark";
 import { CoreSubjects } from "@/components/core-subjects";
 import { ScheduleStatus } from "@/components/schedule-status";
 import { StudyCalendar } from "@/components/study-calendar";
+import { TokenAmount } from "@/components/mint-chip";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -186,7 +187,10 @@ export default function DashboardPage() {
           <MiniStat label="Time" value={formatHours(roundup.durationMs)} />
           <MiniStat label="Top subject" value={roundup.topSubject?.label ?? "—"} />
           <MiniStat label="Sessions" value={String(roundup.sessions)} />
-          <MiniStat label="Tokens earned" value={String(roundup.tokensEarned)} />
+          <MiniStat
+            label="Tokens earned"
+            value={<TokenAmount value={roundup.tokensEarned} />}
+          />
         </div>
       </section>
 
@@ -226,13 +230,13 @@ export default function DashboardPage() {
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: string }) {
+function MiniStat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="rounded-2xl bg-background/60 px-3 py-3">
       <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="mt-1 truncate text-sm text-foreground">{value}</p>
+      <div className="mt-1 truncate text-sm text-foreground">{value}</div>
     </div>
   );
 }
