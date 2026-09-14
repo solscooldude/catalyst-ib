@@ -27,8 +27,8 @@ export const COLLECTIONS: {
   {
     id: "focus",
     name: "Focus scenes",
-    range: "0–120",
-    copy: "Only the lock and timer. Equip one. Rocket is one scene; more can sit beside it.",
+    range: "Free–120",
+    copy: "Study rooms with a slow afternoon-to-night cycle. Equip one. Rocket stays on the shelf.",
   },
 ];
 
@@ -230,11 +230,32 @@ export const FOCUS_THEMES = [
     blurb: "No extra scene on the timer.",
   },
   {
+    id: "cat",
+    name: "Cat study",
+    cost: 0,
+    collection: "focus" as const,
+    blurb: "A sleeping study cat. One window, afternoon into night.",
+  },
+  {
+    id: "desk",
+    name: "Desk window",
+    cost: 40,
+    collection: "focus" as const,
+    blurb: "Laptop at the glass. Hills go gold, then starlight.",
+  },
+  {
+    id: "library",
+    name: "Library attic",
+    cost: 48,
+    collection: "focus" as const,
+    blurb: "Books, a chair, and a skylight that turns to night.",
+  },
+  {
     id: "rocket",
     name: "Rocket to space",
     cost: 120,
     collection: "focus" as const,
-    blurb: "Liftoff, climb, then the open universe — stars and deep night sky.",
+    blurb: "Older option. Liftoff into the open universe — kept, not the main scene.",
   },
 ] as const;
 
@@ -266,13 +287,13 @@ export const defaultAppearance: AppearanceState = {
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
   ownedTrails: ["none"],
-  ownedFocusThemes: ["none"],
+  ownedFocusThemes: ["none", "cat"],
   accent: "mint",
   background: "void",
   sparkTint: "mint",
   gear: "none",
   trail: "none",
-  focusTheme: "none",
+  focusTheme: "cat",
 };
 
 function unique<T extends string>(values: T[], fallback: T): T[] {
@@ -289,7 +310,10 @@ export function normalizeAppearance(
   const ownedSparkTints = unique(raw?.ownedSparkTints ?? ["mint"], "mint");
   const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
   const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
-  const ownedFocusThemes = unique(raw?.ownedFocusThemes ?? ["none"], "none");
+  const ownedFocusThemes = unique(
+    [...(raw?.ownedFocusThemes ?? ["none", "cat"]), "cat"],
+    "none",
+  );
   return {
     ownedAccents,
     ownedBackgrounds,
