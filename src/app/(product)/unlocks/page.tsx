@@ -10,10 +10,9 @@ import { Spark } from "@/components/spark";
 import { TokenAmount } from "@/components/mint-chip";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
-import { UNLOCK_CATALOG } from "@/lib/constants";
+import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
-  getNemesis,
   spendUnlock,
   useCatalyst,
 } from "@/lib/store";
@@ -39,7 +38,7 @@ function UnlockInner() {
 
   const mood = earned && now - arrivedAt < 3200 ? "done" : "tempted";
 
-  const nemesis = getNemesis(state.nemesis);
+  const nemesisLabel = formatNemesisList(state.nemeses);
   const lastSession =
     state.session?.status === "completed" ? state.session : null;
   const lastEarned = lastSession?.tokensEarned ?? 0;
@@ -100,7 +99,7 @@ function UnlockInner() {
 
         <div className="mt-8 space-y-3">
           {UNLOCK_CATALOG.map((item) => {
-            const label = item.id === "nemesis" ? (nemesis?.name ?? "Nemesis") : item.name;
+            const label = item.id === "nemesis" ? nemesisLabel : item.name;
             const affordable = state.tokens >= item.cost;
             const activeForApp = active.find((unlock) => unlock.catalogId === item.id);
             const left = activeForApp
@@ -186,7 +185,7 @@ function UnlockInner() {
             pettable
           />
         </div>
-        <PhoneLock nemesis={state.nemesis} unlocks={state.unlocks} />
+        <PhoneLock nemeses={state.nemeses} unlocks={state.unlocks} />
         <div className="mt-4 flex justify-center">
           <DemoBadge>Unlocks are simulated</DemoBadge>
         </div>

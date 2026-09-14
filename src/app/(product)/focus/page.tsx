@@ -10,10 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StudyStartForm } from "@/components/study-start-form";
-import { MOCK_TASKS, type TaskId } from "@/lib/constants";
+import { MOCK_TASKS, formatNemesisList, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
-  getNemesis,
+  getNemeses,
   setDemoMode,
   startSession,
   useCatalyst,
@@ -43,7 +43,7 @@ export default function AppHomePage() {
 
   if (!state.setupComplete) return null;
 
-  const nemesis = getNemesis(state.nemesis);
+  const nemesisApps = getNemeses(state.nemeses);
   const openTasks = MOCK_TASKS.filter(
     (task) => !state.tasks.find((row) => row.id === task.id)?.done,
   );
@@ -68,14 +68,26 @@ export default function AppHomePage() {
           after you begin. Equip Cat study, Desk window, or Library attic in
           Appearance if you want a room behind the timer.
         </p>
-        {nemesis ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Nemesis is {nemesis.name}.{" "}
-            <Link href={ROUTES.setup} className="text-primary/80 hover:text-primary">
-              Change it in Setup
-            </Link>
-            , not here.
-          </p>
+        {nemesisApps.length > 0 ? (
+          <div className="mt-3">
+            <div className="flex flex-wrap gap-1.5">
+              {nemesisApps.map((app) => (
+                <span
+                  key={app.id}
+                  className="rounded-full border border-white/10 bg-white/4 px-2.5 py-0.5 text-[11px] text-foreground"
+                >
+                  {app.name}
+                </span>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Locked set: {formatNemesisList(state.nemeses)}.{" "}
+              <Link href={ROUTES.setup} className="text-primary/80 hover:text-primary">
+                Edit in Setup
+              </Link>
+              . You do not re-pick when a session starts.
+            </p>
+          </div>
         ) : null}
 
         <div className="mt-8 space-y-3">
