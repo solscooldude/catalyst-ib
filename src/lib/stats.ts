@@ -31,6 +31,32 @@ export function formatDuration(ms: number) {
   return `${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)} h`;
 }
 
+export function verifiedStudyMs(logs: SessionLog[]) {
+  return logs
+    .filter((log) => log.kind === "verified")
+    .reduce((sum, log) => sum + log.durationMs, 0);
+}
+
+export function sparkEvolution(logs: SessionLog[]) {
+  const hours = verifiedStudyMs(logs) / 3_600_000;
+  const t = Math.min(1, hours / 24);
+  return {
+    hours,
+    t,
+    scale: 1 + t * 0.2,
+    glow: 1 + t * 0.85,
+    stage:
+      hours < 2 ? "ember" : hours < 8 ? "kindled" : hours < 20 ? "steady" : "bright",
+  };
+}
+
+export function sparkEvolutionLabel(stage: ReturnType<typeof sparkEvolution>["stage"]) {
+  if (stage === "ember") return "Ember";
+  if (stage === "kindled") return "Kindled";
+  if (stage === "steady") return "Steady";
+  return "Bright";
+}
+
 export function formatHours(ms: number) {
   const hours = Math.max(0, ms / 3_600_000);
   if (hours === 0) return "0 h";
