@@ -104,11 +104,20 @@ function emit() {
   listeners.forEach((listener) => listener());
 }
 
+let storageAccountId: string | null = null;
+
+function accountStorageKey(userId: string) {
+  return `${STORAGE_KEY}:user:${userId}`;
+}
+
 function persist(next: CatalystState) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !storageAccountId) return;
   const { hydrated, ...rest } = next;
   void hydrated;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
+  window.localStorage.setItem(
+    accountStorageKey(storageAccountId),
+    JSON.stringify(rest),
+  );
 }
 
 function setState(updater: (current: CatalystState) => CatalystState) {
@@ -141,10 +150,16 @@ function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
   return [...byCatalog.values()];
 }
 
-export function hydrateStore() {
+export function hydrateStore(userId: string | null = null) {
   if (typeof window === "undefined") return;
+  storageAccountId = userId;
+  if (!userId) {
+    state = { ...defaultState, hydrated: true };
+    emit();
+    return;
+  }
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(accountStorageKey(userId));
     if (!raw) {
       state = { ...defaultState, hydrated: true };
       emit();
@@ -390,8 +405,8 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
 }
 
 export function resetDemo() {
-  if (typeof window !== "undefined") {
-    window.localStorage.removeItem(STORAGE_KEY);
+  if (typeof window !== "undefined" && storageAccountId) {
+    window.localStorage.removeItem(accountStorageKey(storageAccountId));
   }
   state = { ...defaultState, hydrated: true };
   emit();

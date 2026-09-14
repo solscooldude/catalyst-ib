@@ -1,7 +1,7 @@
 import { AuthGate } from "@/components/auth-gate";
 import { AppShell } from "@/components/app-shell";
 
-export default function AppSectionLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

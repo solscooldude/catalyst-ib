@@ -1,4 +1,6 @@
 export const STORAGE_KEY = "catalyst-v1";
+export const ACCOUNTS_KEY = "catalyst-v1-accounts";
+export const AUTH_SESSION_KEY = "catalyst-v1-session";
 
 export const NEMESIS_APPS = [
   { id: "tiktok", name: "TikTok", blurb: "The For You page that ate TOK." },

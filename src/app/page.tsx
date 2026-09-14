@@ -6,7 +6,7 @@ import {
   Smartphone,
   Timer,
 } from "lucide-react";
-import { DemoBadge } from "@/components/demo-badge";
+import { LandingHeader } from "@/components/landing-header";
 import { PhoneLock } from "@/components/phone-lock";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
@@ -42,18 +42,7 @@ const STEPS = [
 export default function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6">
-        <Wordmark />
-        <div className="flex items-center gap-3">
-          <DemoBadge className="hidden sm:inline-flex">Interactive demo</DemoBadge>
-          <Button asChild className="h-9 rounded-full px-4">
-            <Link href="/app">
-              Open the app
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <LandingHeader />
 
       <main className="flex-1">
         <section className="mx-auto grid w-full max-w-6xl items-center gap-16 px-5 pt-8 pb-20 lg:grid-cols-[1.1fr_0.9fr] lg:pt-16">
@@ -71,7 +60,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
-                <Link href="/app">
+                <Link href="/signup">
                   Start free month
                   <ArrowRight className="size-4" />
                 </Link>
@@ -200,11 +189,11 @@ export default function LandingPage() {
                 First month free, then $9.99 a month
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-                This build is a product demo. There is no checkout or account.
-                Tokens stay in your browser.
+                This build is a product demo. Sign up creates a demo account in
+                this browser — not a real checkout.
               </p>
               <Button asChild className="mt-8 h-12 rounded-full px-6">
-                <Link href="/app">
+                <Link href="/signup">
                   Try the demo
                   <ArrowRight className="size-4" />
                 </Link>
