@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { MintChip, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,8 +56,9 @@ export default function AppearancePage() {
       {COLLECTIONS.map((collection) => (
         <section key={collection.id} className="space-y-6">
           <div>
-            <p className="text-[11px] tracking-[0.16em] text-primary uppercase">
-              {collection.range} tokens
+            <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.16em] text-primary uppercase">
+              <MintChip size={11} />
+              {collection.range}
             </p>
             <h2 className="mt-1 text-2xl text-foreground">{collection.name}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{collection.copy}</p>
@@ -246,7 +248,17 @@ function ShopCard({
         disabled={equipped}
         onClick={onClick}
       >
-        {equipped ? "On" : owned ? "Wear" : cost === 0 ? "Take" : `Buy · ${cost}`}
+        {equipped ? (
+          "On"
+        ) : owned ? (
+          "Wear"
+        ) : cost === 0 ? (
+          "Take"
+        ) : (
+          <span className="inline-flex items-center gap-1">
+            Buy · <TokenAmount value={cost} />
+          </span>
+        )}
       </Button>
     </div>
   );

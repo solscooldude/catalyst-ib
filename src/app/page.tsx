@@ -1,12 +1,7 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Lock,
-  NotebookPen,
-  Smartphone,
-  Timer,
-} from "lucide-react";
+import { ArrowRight, Lock, NotebookPen, Smartphone } from "lucide-react";
 import { LandingHeader } from "@/components/landing-header";
+import { MintChip, TokenAmount } from "@/components/mint-chip";
 import { PhoneLock } from "@/components/phone-lock";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
@@ -29,7 +24,7 @@ const STEPS = [
     n: "03",
     title: "Tokens",
     copy: "You earn 1 token every 5 minutes of focus. This demo can use 30 seconds so you can try the loop.",
-    icon: Timer,
+    icon: "chip" as const,
   },
   {
     n: "04",
@@ -120,7 +115,11 @@ export default function LandingPage() {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs text-primary">{step.n}</span>
-                  <step.icon className="size-4 text-muted-foreground" />
+                  {step.icon === "chip" ? (
+                    <MintChip size={16} />
+                  ) : (
+                    <step.icon className="size-4 text-muted-foreground" />
+                  )}
                 </div>
                 <h3 className="mt-6 text-2xl text-foreground">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -168,8 +167,8 @@ export default function LandingPage() {
                       <td className="px-5 py-4 text-muted-foreground">
                         {row.intensity}
                       </td>
-                      <td className="px-5 py-4 font-mono text-primary">
-                        {row.cost} tokens
+                      <td className="px-5 py-4 text-primary">
+                        <TokenAmount value={row.cost} />
                       </td>
                     </tr>
                   ))}
