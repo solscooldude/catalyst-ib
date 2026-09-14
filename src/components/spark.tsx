@@ -2,11 +2,17 @@
 
 import { useId } from "react";
 import {
+  getSparkTint,
+  type SparkGearId,
+  type SparkTintId,
+} from "@/lib/appearance";
+import {
   sparkFlavorFromContext,
   sparkHintFromTask,
   type SparkFlavor,
 } from "@/lib/spark-flavor";
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
+import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export type SparkMood = "idle" | "locked" | "earning" | "done" | "tempted";
@@ -17,79 +23,122 @@ type SparkProps = {
   taskId?: TaskId | null;
   flavor?: SparkFlavor;
   hint?: string | null;
+  tint?: SparkTintId;
+  gear?: SparkGearId;
   size?: number;
   className?: string;
 };
 
+function OpenEyes({
+  wider,
+  look,
+  fill,
+}: {
+  wider?: boolean;
+  look?: "center" | "side";
+  fill: string;
+}) {
+  const rx = wider ? 5.4 : 4.6;
+  const ry = wider ? 6.4 : 5.6;
+  const pupil = look === "side" ? 1.7 : 0;
+  return (
+    <g className="spark-blink">
+      <ellipse cx="38.2" cy="63.6" rx={rx} ry={ry} fill={fill} />
+      <ellipse cx="61.8" cy="63.6" rx={rx} ry={ry} fill={fill} />
+      <ellipse
+        cx={39.6 + pupil}
+        cy="62.1"
+        rx="1.55"
+        ry="1.95"
+        fill="#fff"
+        fillOpacity="0.88"
+      />
+      <ellipse
+        cx={63.2 + pupil}
+        cy="62.1"
+        rx="1.55"
+        ry="1.95"
+        fill="#fff"
+        fillOpacity="0.88"
+      />
+    </g>
+  );
+}
+
 function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
-  if (mood === "idle") {
-    return (
-      <g fill={fill}>
-        <rect x="34.5" y="63.2" width="9" height="2.6" rx="1.3" />
-        <rect x="56.5" y="63.2" width="9" height="2.6" rx="1.3" />
-      </g>
-    );
-  }
-
-  if (mood === "locked") {
-    return (
-      <g fill={fill}>
-        <rect x="30.5" y="63" width="14.5" height="2.8" rx="1.4" />
-        <rect x="55" y="63" width="14.5" height="2.8" rx="1.4" />
-      </g>
-    );
-  }
-
-  if (mood === "earning") {
-    return (
-      <g fill={fill}>
-        <ellipse cx="38.5" cy="64" rx="3.4" ry="4.6" />
-        <ellipse cx="61.5" cy="64" rx="3.4" ry="4.6" />
-      </g>
-    );
-  }
-
   if (mood === "done") {
     return (
-      <g
-        fill="none"
-        stroke={fill}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      >
+      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
         <path d="M33.5 65.2c2.2-3.2 7.2-3.2 9.4 0" />
         <path d="M57.1 65.2c2.2-3.2 7.2-3.2 9.4 0" />
         <path d="M45.6 73.2c1.6 1.8 7.2 1.8 8.8 0" />
       </g>
     );
   }
+  if (mood === "tempted") return <OpenEyes look="side" fill={fill} />;
+  if (mood === "locked" || mood === "earning") {
+    return <OpenEyes wider fill={fill} />;
+  }
+  return <OpenEyes fill={fill} />;
+}
 
-  return (
-    <g fill={fill}>
-      <ellipse cx="39" cy="64" rx="3.5" ry="4.8" />
-      <ellipse cx="61" cy="64" rx="3.5" ry="4.8" />
-      <ellipse cx="40.6" cy="63.4" rx="1.15" ry="1.6" fill="#5eead4" />
-      <ellipse cx="62.6" cy="63.4" rx="1.15" ry="1.6" fill="#5eead4" />
-    </g>
-  );
+function Gear({ id }: { id: SparkGearId }) {
+  if (id === "bow") {
+    return (
+      <g fill="currentColor" stroke="#0B0B0F" strokeOpacity="0.18" strokeWidth="0.6">
+        <path d="M42 16c-4-6 2-9 6-4 4-5 10-2 6 4l-6 3Z" />
+        <circle cx="50" cy="18.5" r="2.1" />
+      </g>
+    );
+  }
+  if (id === "glasses") {
+    return (
+      <g fill="none" stroke="#0B0B0F" strokeWidth="1.6">
+        <circle cx="38.2" cy="63.4" r="8.2" />
+        <circle cx="61.8" cy="63.4" r="8.2" />
+        <path d="M46.4 63.2h7.2" />
+      </g>
+    );
+  }
+  if (id === "scarf") {
+    return (
+      <g fill="currentColor">
+        <path d="M32 78c6 8 30 8 36 0-4 10-10 14-18 14-7 0-13-4-18-14Z" />
+        <path d="M58 90c2 8 7 13 4 18-6-2-10-10-9-16Z" opacity="0.85" />
+      </g>
+    );
+  }
+  if (id === "cap") {
+    return (
+      <g fill="currentColor">
+        <ellipse cx="46" cy="18" rx="16" ry="7" />
+        <path d="M32 18c1-10 12-16 24-12 4 1 6 5 5 9Z" />
+        <path d="M55 20h16" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+      </g>
+    );
+  }
+  return null;
 }
 
 function MathFlourish() {
   return (
     <g
       className="spark-flourish"
-      fill="#5EEAD4"
+      fill="currentColor"
       fontFamily="Geist, ui-sans-serif, system-ui, sans-serif"
-      fontSize="8"
+      fontSize="16"
     >
-      <text className="spark-symbol spark-symbol-a" x="6" y="30">
+      <text className="spark-symbol spark-symbol-a" x="0" y="28">
         π
       </text>
-      <text className="spark-symbol spark-symbol-b" x="84" y="24" fontSize="7">
+      <text className="spark-symbol spark-symbol-b" x="92" y="22" fontSize="15">
         ∑
       </text>
-      <text className="spark-symbol spark-symbol-c" x="80" y="42" fontSize="6.5">
+      <text className="spark-symbol spark-symbol-c" x="86" y="48" fontSize="13">
         x²
+      </text>
+      <text className="spark-symbol spark-symbol-a" x="4" y="50" fontSize="12">
+        √
       </text>
     </g>
   );
@@ -97,21 +146,32 @@ function MathFlourish() {
 
 function BiologyFlourish() {
   return (
-    <g className="spark-flourish" fill="#5EEAD4">
+    <g className="spark-flourish" fill="currentColor">
       <g className="spark-leaf">
-        <path d="M10 86c0-9 10-16 16-6-5 2-11 5-16 6Z" />
+        <path d="M4 92c0-14 16-24 24-8-8 3-16 7-24 8Z" />
+        <path d="M18 86c-4-8 6-16 14-6-6 2-11 5-14 6Z" />
         <path
-          d="M11 85c5-4 10-6 14-5"
+          d="M6 90c8-6 16-9 21-7"
           fill="none"
           stroke="#0B0B0F"
-          strokeOpacity="0.22"
-          strokeWidth="0.7"
+          strokeOpacity="0.2"
+          strokeWidth="0.8"
         />
       </g>
-      <g className="spark-cell" transform="translate(82 28)">
-        <circle r="6.2" fill="#5EEAD4" fillOpacity="0.22" />
-        <circle r="6.2" fill="none" stroke="#5EEAD4" strokeWidth="0.8" />
-        <circle cx="-1.4" cy="-0.6" r="1.6" />
+      <g className="spark-cell" transform="translate(94 24)">
+        <circle r="9" fill="currentColor" fillOpacity="0.2" />
+        <circle r="9" fill="none" stroke="currentColor" strokeWidth="1.1" />
+        <circle cx="-2" cy="-1" r="2.4" />
+      </g>
+      <g className="spark-cell spark-cell-b" transform="translate(78 44)">
+        <circle r="6.2" fill="currentColor" fillOpacity="0.18" />
+        <circle r="6.2" fill="none" stroke="currentColor" strokeWidth="0.9" />
+        <circle cx="1.2" cy="0.8" r="1.6" />
+      </g>
+      <g className="spark-cell spark-cell-c" transform="translate(12 28)">
+        <circle r="5" fill="currentColor" fillOpacity="0.16" />
+        <circle r="5" fill="none" stroke="currentColor" strokeWidth="0.8" />
+        <circle cx="-0.8" cy="-0.4" r="1.3" />
       </g>
     </g>
   );
@@ -119,19 +179,19 @@ function BiologyFlourish() {
 
 function ChemistryFlourish() {
   return (
-    <g className="spark-flourish" fill="#5EEAD4">
-      <circle className="spark-bubble spark-bubble-a" cx="16" cy="78" r="2.1" />
-      <circle className="spark-bubble spark-bubble-b" cx="24" cy="84" r="1.35" />
-      <circle className="spark-bubble spark-bubble-c" cx="12" cy="86" r="1.1" />
-      <g className="spark-molecule" transform="translate(82 30)">
-        <circle cx="-6" cy="0" r="2.1" />
-        <circle cx="6" cy="-3" r="1.7" />
-        <circle cx="5" cy="5" r="1.7" />
+    <g className="spark-flourish" fill="currentColor">
+      <circle className="spark-bubble spark-bubble-a" cx="14" cy="74" r="4.2" fillOpacity="0.85" />
+      <circle className="spark-bubble spark-bubble-b" cx="28" cy="84" r="2.8" fillOpacity="0.7" />
+      <circle className="spark-bubble spark-bubble-c" cx="8" cy="88" r="2.2" fillOpacity="0.6" />
+      <g className="spark-molecule" transform="translate(90 28)">
+        <circle cx="-9" cy="0" r="3.4" />
+        <circle cx="8" cy="-5" r="2.7" />
+        <circle cx="7" cy="7" r="2.7" />
         <path
-          d="M-4.2 0h8.4M4.6-1.6 3.8 3.6"
+          d="M-6 0h12.2M6.4-3.2 5.2 5"
           fill="none"
-          stroke="#5EEAD4"
-          strokeWidth="0.75"
+          stroke="currentColor"
+          strokeWidth="1.15"
         />
       </g>
     </g>
@@ -140,24 +200,24 @@ function ChemistryFlourish() {
 
 function PhysicsFlourish() {
   return (
-    <g className="spark-flourish spark-orbit" fill="#5EEAD4">
+    <g className="spark-flourish spark-orbit" fill="currentColor">
       <ellipse
         cx="50"
-        cy="46"
-        rx="36"
-        ry="13"
+        cy="48"
+        rx="46"
+        ry="18"
         fill="none"
-        stroke="#5EEAD4"
-        strokeOpacity="0.35"
-        strokeWidth="0.7"
+        stroke="currentColor"
+        strokeOpacity="0.45"
+        strokeWidth="1.15"
       />
-      <circle className="spark-orbit-dot" cx="86" cy="46" r="1.7" />
+      <circle cx="96" cy="48" r="3" />
+      <circle cx="8" cy="42" r="2.1" />
       <path
-        className="spark-comet"
-        d="M18 22c8 3 16 2 22-4"
+        d="M10 18c12 5 24 4 34-7"
         fill="none"
-        stroke="#5EEAD4"
-        strokeWidth="1"
+        stroke="currentColor"
+        strokeWidth="1.6"
         strokeLinecap="round"
       />
     </g>
@@ -169,27 +229,37 @@ function ReadingFlourish() {
     <g className="spark-flourish">
       <text
         className="spark-crumb"
-        x="8"
-        y="36"
-        fill="#5EEAD4"
-        fontSize="7"
+        x="2"
+        y="34"
+        fill="currentColor"
+        fontSize="13"
         fontFamily="Geist, ui-sans-serif, system-ui, sans-serif"
       >
         ¿
       </text>
-      <g className="spark-book" transform="translate(64 78)">
+      <text
+        className="spark-crumb"
+        x="88"
+        y="30"
+        fill="currentColor"
+        fontSize="12"
+        fontFamily="Geist, ui-sans-serif, system-ui, sans-serif"
+      >
+        ä
+      </text>
+      <g className="spark-book" transform="translate(58 74) scale(1.35)">
         <path
           d="M0 2 9-1l9 3v11l-9-2.4L0 13Z"
           fill="#121218"
-          stroke="#5EEAD4"
-          strokeWidth="1"
+          stroke="currentColor"
+          strokeWidth="1.1"
         />
-        <path d="M9-1v11.6" fill="none" stroke="#5EEAD4" strokeWidth="0.8" />
+        <path d="M9-1v11.6" fill="none" stroke="currentColor" strokeWidth="0.9" />
         <path
           d="M3 6.2h4.2M3 8.6h3.4"
           fill="none"
           stroke="#A1A1AA"
-          strokeWidth="0.55"
+          strokeWidth="0.6"
         />
       </g>
     </g>
@@ -198,36 +268,30 @@ function ReadingFlourish() {
 
 function HistoryFlourish() {
   return (
-    <g className="spark-flourish spark-hourglass" fill="#5EEAD4">
+    <g className="spark-flourish spark-hourglass" fill="currentColor">
       <path
-        d="M80 22h12l-5.4 7.2 5.4 7.2H80l5.4-7.2Z"
+        d="M78 16h18l-8 11 8 11H78l8-11Z"
         fill="none"
-        stroke="#5EEAD4"
-        strokeWidth="1"
+        stroke="currentColor"
+        strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <path d="M83.2 24.2h5.6L86 28.4Z" fillOpacity="0.7" />
+      <path d="M82.4 19.4h9.2L87 26Z" fillOpacity="0.75" />
     </g>
   );
 }
 
 function GeographyFlourish() {
   return (
-    <g className="spark-flourish spark-globe" transform="translate(82 28)">
-      <circle r="7.2" fill="#5EEAD4" fillOpacity="0.16" />
-      <circle r="7.2" fill="none" stroke="#5EEAD4" strokeWidth="0.85" />
-      <ellipse
-        rx="3.1"
-        ry="7.2"
-        fill="none"
-        stroke="#5EEAD4"
-        strokeWidth="0.6"
-      />
+    <g className="spark-flourish spark-globe" transform="translate(90 26)">
+      <circle r="11" fill="currentColor" fillOpacity="0.16" />
+      <circle r="11" fill="none" stroke="currentColor" strokeWidth="1.2" />
+      <ellipse rx="4.6" ry="11" fill="none" stroke="currentColor" strokeWidth="0.85" />
       <path
-        d="M-6.4-2.2h12.8M-6.6 2.4h13.2"
+        d="M-9.6-3.2h19.2M-10 3.6h20"
         fill="none"
-        stroke="#5EEAD4"
-        strokeWidth="0.55"
+        stroke="currentColor"
+        strokeWidth="0.8"
       />
     </g>
   );
@@ -235,25 +299,25 @@ function GeographyFlourish() {
 
 function EconomicsFlourish() {
   return (
-    <g className="spark-flourish spark-bars" fill="#5EEAD4" transform="translate(78 36)">
-      <rect className="spark-bar spark-bar-a" x="0" y="6" width="3.2" height="8" rx="0.7" />
-      <rect className="spark-bar spark-bar-b" x="5" y="2" width="3.2" height="12" rx="0.7" />
-      <rect className="spark-bar spark-bar-c" x="10" y="8" width="3.2" height="6" rx="0.7" />
+    <g className="spark-flourish spark-bars" fill="currentColor" transform="translate(76 28)">
+      <rect className="spark-bar spark-bar-a" x="0" y="10" width="5" height="14" rx="1" />
+      <rect className="spark-bar spark-bar-b" x="8" y="2" width="5" height="22" rx="1" />
+      <rect className="spark-bar spark-bar-c" x="16" y="14" width="5" height="10" rx="1" />
     </g>
   );
 }
 
 function PsychologyFlourish() {
   return (
-    <g className="spark-flourish spark-thought" fill="#5EEAD4">
-      <circle cx="18" cy="78" r="1.1" fillOpacity="0.55" />
-      <circle cx="22" cy="72" r="1.55" fillOpacity="0.7" />
+    <g className="spark-flourish spark-thought" fill="currentColor">
+      <circle cx="14" cy="82" r="1.8" fillOpacity="0.55" />
+      <circle cx="20" cy="74" r="2.5" fillOpacity="0.7" />
       <path
-        d="M28 54c-6 0-10 4.2-10 9.2 0 3.4 2 6.4 5.2 8l-.4 4.6 5.2-3.2c.8.12 1.6.2 2.4.2 6 0 10-4.2 10-9.4S34 54 28 54Z"
-        fill="#5EEAD4"
-        fillOpacity="0.18"
-        stroke="#5EEAD4"
-        strokeWidth="0.85"
+        d="M30 48c-9 0-15 6.4-15 14 0 5.2 3.2 9.8 8 12.2l-.6 7 8-4.8c1.2.2 2.4.3 3.6.3 9 0 15-6.4 15-14S39 48 30 48Z"
+        fill="currentColor"
+        fillOpacity="0.16"
+        stroke="currentColor"
+        strokeWidth="1.15"
       />
     </g>
   );
@@ -263,31 +327,32 @@ function CsFlourish() {
   return (
     <g
       className="spark-flourish"
-      fill="#5EEAD4"
+      fill="currentColor"
       fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
-      fontSize="6.5"
+      fontSize="12"
     >
-      <text className="spark-bits spark-bits-a" x="6" y="32">
+      <text className="spark-bits spark-bits-a" x="0" y="30">
         01
       </text>
-      <text className="spark-bits spark-bits-b" x="82" y="40">
+      <text className="spark-bits spark-bits-b" x="86" y="38">
         10
       </text>
-      <rect className="spark-cursor" x="84" y="78" width="1.2" height="7" rx="0.4" />
+      <rect className="spark-cursor" x="88" y="76" width="2" height="11" rx="0.5" />
     </g>
   );
 }
 
 function ArtsFlourish() {
   return (
-    <g className="spark-flourish" fill="none" stroke="#5EEAD4">
+    <g className="spark-flourish" fill="none" stroke="currentColor">
       <path
         className="spark-brush"
-        d="M12 80c8-10 18-16 28-12 6 2 8 10 4 14"
-        strokeWidth="1.2"
+        d="M6 86c12-16 28-24 42-16 9 3 12 16 5 22"
+        strokeWidth="2"
         strokeLinecap="round"
       />
-      <circle className="spark-dab" cx="84" cy="30" r="3.2" fill="#5EEAD4" stroke="none" />
+      <circle className="spark-dab" cx="90" cy="26" r="5.4" fill="currentColor" stroke="none" />
+      <circle className="spark-dab" cx="78" cy="36" r="3.2" fill="currentColor" fillOpacity="0.55" stroke="none" />
     </g>
   );
 }
@@ -296,14 +361,14 @@ function MusicFlourish() {
   return (
     <g
       className="spark-flourish"
-      fill="#5EEAD4"
+      fill="currentColor"
       fontFamily="Geist, ui-sans-serif, system-ui, sans-serif"
-      fontSize="9"
+      fontSize="18"
     >
-      <text className="spark-note spark-note-a" x="8" y="34">
+      <text className="spark-note spark-note-a" x="2" y="34">
         ♪
       </text>
-      <text className="spark-note spark-note-b" x="82" y="28">
+      <text className="spark-note spark-note-b" x="86" y="26">
         ♫
       </text>
     </g>
@@ -312,27 +377,19 @@ function MusicFlourish() {
 
 function ResearchFlourish() {
   return (
-    <g className="spark-flourish spark-lens" fill="none" stroke="#5EEAD4">
-      <circle cx="80" cy="30" r="6" strokeWidth="1.05" />
-      <path d="M84.6 35.2 90 41" strokeWidth="1.2" strokeLinecap="round" />
+    <g className="spark-flourish spark-lens" fill="none" stroke="currentColor">
+      <circle cx="84" cy="26" r="9.2" strokeWidth="1.5" />
+      <path d="M91 33.6 99 42" strokeWidth="1.8" strokeLinecap="round" />
+      <rect x="4" y="74" width="14" height="16" rx="1.6" fill="#121218" strokeWidth="1.1" />
       <rect
-        x="8"
-        y="76"
-        width="10"
-        height="12"
-        rx="1.2"
+        x="10"
+        y="70"
+        width="14"
+        height="16"
+        rx="1.6"
         fill="#121218"
-        strokeWidth="0.85"
-      />
-      <rect
-        x="11"
-        y="73"
-        width="10"
-        height="12"
-        rx="1.2"
-        fill="#121218"
-        fillOpacity="0.85"
-        strokeWidth="0.85"
+        fillOpacity="0.88"
+        strokeWidth="1.1"
       />
     </g>
   );
@@ -340,11 +397,11 @@ function ResearchFlourish() {
 
 function CasFlourish() {
   return (
-    <g className="spark-flourish" fill="none" stroke="#5EEAD4">
+    <g className="spark-flourish" fill="none" stroke="currentColor">
       <path
         className="spark-pulse"
-        d="M10 80h8l3-8 4 14 3-6h10"
-        strokeWidth="1.15"
+        d="M4 82h14l5-14 7 24 5-10h16"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -376,6 +433,8 @@ export function Spark({
   taskId,
   flavor,
   hint,
+  tint,
+  gear,
   size = 72,
   className,
 }: SparkProps) {
@@ -383,6 +442,10 @@ export function Spark({
   const glowId = `spark-glow-${uid}`;
   const bodyId = `spark-body-${uid}`;
   const specId = `spark-spec-${uid}`;
+  const store = useCatalyst();
+  const tintId = tint ?? store.appearance.sparkTint;
+  const gearId = gear ?? store.appearance.gear;
+  const palette = getSparkTint(tintId);
   const resolved =
     flavor ??
     sparkFlavorFromContext({
@@ -394,25 +457,25 @@ export function Spark({
   return (
     <div
       className={cn("spark-float pointer-events-none relative", className)}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, color: palette.lo }}
       aria-hidden
     >
-      <span className="spark-halo absolute inset-[-22%] rounded-full" />
+      <span className="spark-halo absolute inset-[-28%] rounded-full" />
       <svg
-        viewBox="-16 -12 132 136"
+        viewBox="-22 -18 144 150"
         width={size}
         height={size}
         className="relative z-10 overflow-visible"
       >
         <defs>
           <radialGradient id={glowId} cx="50%" cy="58%" r="48%">
-            <stop offset="0%" stopColor="#5EEAD4" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#5EEAD4" stopOpacity="0" />
+            <stop offset="0%" stopColor={palette.lo} stopOpacity="0.55" />
+            <stop offset="100%" stopColor={palette.lo} stopOpacity="0" />
           </radialGradient>
           <radialGradient id={bodyId} cx="38%" cy="32%" r="72%">
-            <stop offset="0%" stopColor="#B8FFF3" />
-            <stop offset="42%" stopColor="#7AF0DC" />
-            <stop offset="100%" stopColor="#5EEAD4" />
+            <stop offset="0%" stopColor={palette.hi} />
+            <stop offset="42%" stopColor={palette.mid} />
+            <stop offset="100%" stopColor={palette.lo} />
           </radialGradient>
           <radialGradient id={specId} cx="35%" cy="30%" r="22%">
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
@@ -428,17 +491,18 @@ export function Spark({
             fill={`url(#${bodyId})`}
           />
           <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
+          <Gear id={gearId} />
           <g className={canGlance ? "spark-glance" : undefined}>
             <Eyes mood={mood} fill="#0B0B0F" />
           </g>
         </g>
 
         {mood === "earning" ? (
-          <g className="spark-particles" fill="#5EEAD4">
-            <circle className="spark-dot spark-dot-a" cx="18" cy="36" r="1.4" />
-            <circle className="spark-dot spark-dot-b" cx="84" cy="42" r="1.15" />
-            <circle className="spark-dot spark-dot-c" cx="78" cy="78" r="1.05" />
-            <circle className="spark-dot spark-dot-d" cx="22" cy="80" r="0.95" />
+          <g className="spark-particles" fill="currentColor">
+            <circle className="spark-dot spark-dot-a" cx="14" cy="32" r="2" />
+            <circle className="spark-dot spark-dot-b" cx="90" cy="38" r="1.6" />
+            <circle className="spark-dot spark-dot-c" cx="84" cy="80" r="1.4" />
+            <circle className="spark-dot spark-dot-d" cx="18" cy="82" r="1.3" />
           </g>
         ) : null}
 
