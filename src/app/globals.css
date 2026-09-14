@@ -140,6 +140,24 @@ html[data-bg="grove"] {
   --sidebar: #141c18;
 }
 
+html[data-bg="stars"] {
+  --background: #07080d;
+  --card: #101018;
+  --popover: #101018;
+  --secondary: #17171f;
+  --muted: #17171f;
+  --sidebar: #101018;
+}
+
+html[data-bg="aurora"] {
+  --background: #08110f;
+  --card: #101a18;
+  --popover: #101a18;
+  --secondary: #162420;
+  --muted: #162420;
+  --sidebar: #101a18;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -744,6 +762,172 @@ html[data-bg="grove"] {
   animation-delay: 0.7s;
 }
 
+@keyframes spark-heart-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.45);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.75);
+  }
+}
+
+@keyframes spark-pet-bounce {
+  0% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: scale(1.08, 0.92);
+  }
+  60% {
+    transform: scale(0.96, 1.06);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.spark-heart {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-heart-rise 1.7s ease-out both;
+}
+
+.spark-heart-b {
+  animation-delay: 0.12s;
+}
+
+.spark-heart-c {
+  animation-delay: 0.24s;
+}
+
+.spark-petted .spark-body {
+  animation: spark-pet-bounce 0.7s ease-out;
+}
+
+@keyframes idle-subject-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  12%,
+  82% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.idle-subject-pop {
+  animation: idle-subject-in 3.4s ease-out both;
+}
+
+.spark-idle-pop .spark-flourish,
+.spark-idle-pop .spark-symbol,
+.spark-idle-pop .spark-leaf,
+.spark-idle-pop .spark-cell,
+.spark-idle-pop .spark-book,
+.spark-idle-pop .spark-crumb,
+.spark-idle-pop .spark-bubble,
+.spark-idle-pop .spark-molecule,
+.spark-idle-pop .spark-orbit,
+.spark-idle-pop .spark-hourglass,
+.spark-idle-pop .spark-globe,
+.spark-idle-pop .spark-bar,
+.spark-idle-pop .spark-thought,
+.spark-idle-pop .spark-bits,
+.spark-idle-pop .spark-cursor,
+.spark-idle-pop .spark-brush,
+.spark-idle-pop .spark-dab,
+.spark-idle-pop .spark-note,
+.spark-idle-pop .spark-lens,
+.spark-idle-pop .spark-pulse {
+  animation-delay: -10.9s;
+}
+
+.scene-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.scene-star {
+  position: absolute;
+  border-radius: 999px;
+  background: #f8fafc;
+  box-shadow: 0 0 7px 1px rgb(248 250 252 / 42%);
+  animation-name: scene-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.65);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+.scene-aurora-band {
+  position: absolute;
+  inset: -18% -12% auto;
+  height: 52%;
+  filter: blur(42px);
+  opacity: 0.58;
+  animation: scene-aurora 18s ease-in-out infinite;
+}
+
+.scene-aurora-a {
+  background: radial-gradient(
+    ellipse at 28% 40%,
+    rgb(94 234 212 / 0.34),
+    transparent 62%
+  );
+}
+
+.scene-aurora-b {
+  background: radial-gradient(
+    ellipse at 78% 18%,
+    rgb(167 139 250 / 0.28),
+    transparent 58%
+  );
+  animation-delay: -6s;
+}
+
+.scene-aurora-c {
+  background: radial-gradient(
+    ellipse at 48% 72%,
+    rgb(45 212 191 / 0.16),
+    transparent 60%
+  );
+  animation-delay: -11s;
+}
+
+@keyframes scene-aurora {
+  0%,
+  100% {
+    transform: translate3d(-5%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7%, 5%, 0) scale(1.08);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spark-float,
   .spark-halo,
@@ -772,7 +956,12 @@ html[data-bg="grove"] {
   .spark-dab,
   .spark-note,
   .spark-lens,
-  .spark-pulse {
+  .spark-pulse,
+  .spark-heart,
+  .spark-petted .spark-body,
+  .idle-subject-pop,
+  .scene-star,
+  .scene-aurora-band {
     animation: none;
   }
 }
