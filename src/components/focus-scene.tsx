@@ -1,7 +1,13 @@
 "use client";
 
 import type { FocusThemeId } from "@/lib/appearance";
-import { rocketProgress, rocketStageLabel } from "@/lib/focus-scene";
+import {
+  ROOM_PLATES,
+  dayCycle,
+  isRoomFocusTheme,
+  rocketProgress,
+  rocketStageLabel,
+} from "@/lib/focus-scene";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -18,18 +24,62 @@ const STARS = Array.from({ length: 36 }, (_, index) => {
 export function FocusScene({
   elapsedMs,
   demoMode,
+  plannedMs = null,
   theme,
   caption = false,
   className,
 }: {
   elapsedMs: number;
   demoMode: boolean;
+  plannedMs?: number | null;
   theme?: FocusThemeId;
   caption?: boolean;
   className?: string;
 }) {
   const equipped = useCatalyst().appearance.focusTheme;
   const id = theme ?? equipped;
+
+  if (isRoomFocusTheme(id)) {
+    const cycle = dayCycle(elapsedMs, demoMode, plannedMs);
+    const plates = ROOM_PLATES[id];
+    return (
+      <div
+        className={cn("focus-scene focus-room", className)}
+        data-room={id}
+        data-phase={cycle.phase}
+        aria-hidden={!caption}
+      >
+        <img
+          src={plates.afternoon}
+          alt=""
+          className="focus-plate"
+          style={{ opacity: cycle.afternoon }}
+        />
+        <img
+          src={plates.sunset}
+          alt=""
+          className="focus-plate"
+          style={{ opacity: cycle.sunset }}
+        />
+        <img
+          src={plates.night}
+          alt=""
+          className="focus-plate"
+          style={{ opacity: cycle.night }}
+        />
+        {caption ? (
+          <p className="focus-caption">
+            {id === "cat"
+              ? "Cat study"
+              : id === "desk"
+                ? "Desk window"
+                : "Library attic"}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
   if (id === "none") return null;
 
   const { t, stage } = rocketProgress(elapsedMs, demoMode);
