@@ -11,7 +11,7 @@ export function TokenChip({
   return (
     <div
       className={cn(
-        "token-chip inline-flex items-center gap-1.5 rounded-full border border-[#E8DCC4]/28 bg-[#F4EFE4]/10 px-2.5 py-1 font-mono text-xs text-[#F4EFE4]",
+        "token-chip inline-flex items-center gap-1.5 rounded-full border border-[#C9B896] bg-[#F4EFE4] px-2.5 py-1 font-mono text-xs font-semibold text-[#2A2420]",
         className,
       )}
       aria-label={`${tokens} tokens`}
