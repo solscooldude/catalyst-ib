@@ -8,6 +8,7 @@ import {
   type SparkTrailId,
 } from "@/lib/appearance";
 import {
+  SPARK_FLAVOR_INK,
   sparkFlavorFromContext,
   sparkHintFromTask,
   type SparkFlavor,
@@ -363,22 +364,30 @@ function HistoryFlourish() {
         strokeLinejoin="round"
       />
       <path d="M82.4 19.4h9.2L87 26Z" fillOpacity="0.75" />
+      <circle className="spark-dot spark-dot-a" cx="10" cy="28" r="1.8" />
+      <circle className="spark-dot spark-dot-b" cx="22" cy="18" r="1.4" />
+      <circle className="spark-dot spark-dot-c" cx="16" cy="40" r="1.2" />
     </g>
   );
 }
 
 function GeographyFlourish() {
   return (
-    <g className="spark-flourish spark-globe" transform="translate(90 26)">
-      <circle r="11" fill="currentColor" fillOpacity="0.16" />
-      <circle r="11" fill="none" stroke="currentColor" strokeWidth="1.2" />
-      <ellipse rx="4.6" ry="11" fill="none" stroke="currentColor" strokeWidth="0.85" />
-      <path
-        d="M-9.6-3.2h19.2M-10 3.6h20"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.8"
-      />
+    <g className="spark-flourish spark-globe" fill="currentColor">
+      <g transform="translate(90 26)">
+        <circle r="11" fill="currentColor" fillOpacity="0.16" />
+        <circle r="11" fill="none" stroke="currentColor" strokeWidth="1.2" />
+        <ellipse rx="4.6" ry="11" fill="none" stroke="currentColor" strokeWidth="0.85" />
+        <path
+          d="M-9.6-3.2h19.2M-10 3.6h20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="0.8"
+        />
+      </g>
+      <circle className="spark-dot spark-dot-a" cx="12" cy="30" r="2" />
+      <circle className="spark-dot spark-dot-b" cx="24" cy="18" r="1.5" />
+      <circle className="spark-dot spark-dot-c" cx="8" cy="46" r="1.3" />
     </g>
   );
 }
@@ -491,26 +500,62 @@ function CasFlourish() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      <circle className="spark-dot spark-dot-a" cx="88" cy="24" r="2.2" fill="currentColor" stroke="none" />
+      <circle className="spark-dot spark-dot-b" cx="76" cy="36" r="1.6" fill="currentColor" stroke="none" />
+      <circle className="spark-dot spark-dot-c" cx="94" cy="40" r="1.4" fill="currentColor" stroke="none" />
+    </g>
+  );
+}
+
+function SubjectBits() {
+  return (
+    <g className="spark-subject-bits" fill="currentColor">
+      <circle className="spark-dot spark-dot-a" cx="6" cy="36" r="2.3" />
+      <circle className="spark-dot spark-dot-b" cx="98" cy="30" r="1.9" />
+      <circle className="spark-dot spark-dot-c" cx="90" cy="88" r="2.1" />
+      <circle className="spark-dot spark-dot-d" cx="14" cy="90" r="1.7" />
+      <circle className="spark-dot spark-dot-a" cx="50" cy="6" r="1.6" />
     </g>
   );
 }
 
 function SubjectFlourish({ flavor }: { flavor: SparkFlavor }) {
-  if (flavor === "math") return <MathFlourish />;
-  if (flavor === "biology") return <BiologyFlourish />;
-  if (flavor === "chemistry") return <ChemistryFlourish />;
-  if (flavor === "physics") return <PhysicsFlourish />;
-  if (flavor === "reading") return <ReadingFlourish />;
-  if (flavor === "history") return <HistoryFlourish />;
-  if (flavor === "geography") return <GeographyFlourish />;
-  if (flavor === "economics") return <EconomicsFlourish />;
-  if (flavor === "psychology") return <PsychologyFlourish />;
-  if (flavor === "cs") return <CsFlourish />;
-  if (flavor === "arts") return <ArtsFlourish />;
-  if (flavor === "music") return <MusicFlourish />;
-  if (flavor === "research") return <ResearchFlourish />;
-  if (flavor === "cas") return <CasFlourish />;
-  return null;
+  const mark =
+    flavor === "math" ? (
+      <MathFlourish />
+    ) : flavor === "biology" ? (
+      <BiologyFlourish />
+    ) : flavor === "chemistry" ? (
+      <ChemistryFlourish />
+    ) : flavor === "physics" ? (
+      <PhysicsFlourish />
+    ) : flavor === "reading" ? (
+      <ReadingFlourish />
+    ) : flavor === "history" ? (
+      <HistoryFlourish />
+    ) : flavor === "geography" ? (
+      <GeographyFlourish />
+    ) : flavor === "economics" ? (
+      <EconomicsFlourish />
+    ) : flavor === "psychology" ? (
+      <PsychologyFlourish />
+    ) : flavor === "cs" ? (
+      <CsFlourish />
+    ) : flavor === "arts" ? (
+      <ArtsFlourish />
+    ) : flavor === "music" ? (
+      <MusicFlourish />
+    ) : flavor === "research" ? (
+      <ResearchFlourish />
+    ) : flavor === "cas" ? (
+      <CasFlourish />
+    ) : null;
+  return (
+    <g className="spark-subject-ink" style={{ color: SPARK_FLAVOR_INK[flavor] }}>
+      <SubjectBits />
+      {mark}
+    </g>
+  );
 }
 
 export function Spark({
@@ -625,11 +670,16 @@ export function Spark({
         {petted ? <PetHearts /> : null}
 
         {mood === "earning" ? (
-          <g className="spark-particles" fill="currentColor">
-            <circle className="spark-dot spark-dot-a" cx="14" cy="32" r="2" />
-            <circle className="spark-dot spark-dot-b" cx="90" cy="38" r="1.6" />
-            <circle className="spark-dot spark-dot-c" cx="84" cy="80" r="1.4" />
-            <circle className="spark-dot spark-dot-d" cx="18" cy="82" r="1.3" />
+          <g
+            className="spark-particles"
+            fill={SPARK_FLAVOR_INK[resolved]}
+          >
+            <circle className="spark-dot spark-dot-a" cx="14" cy="32" r="2.3" />
+            <circle className="spark-dot spark-dot-b" cx="90" cy="38" r="1.9" />
+            <circle className="spark-dot spark-dot-c" cx="84" cy="80" r="1.8" />
+            <circle className="spark-dot spark-dot-d" cx="18" cy="82" r="1.6" />
+            <circle className="spark-dot spark-dot-a" cx="50" cy="8" r="1.5" />
+            <circle className="spark-dot spark-dot-b" cx="70" cy="16" r="1.4" />
           </g>
         ) : null}
 
