@@ -129,7 +129,7 @@ export default function DashboardPage() {
           </p>
           <p className="mt-2 text-sm text-foreground">
             {state.profile.complete
-              ? `Class of ${state.profile.classYear} · ${state.profile.subjects.length} DP subjects`
+              ? `Class of ${state.profile.classYear} · ${state.profile.subjects.length} DP subjects · TOK & EE`
               : "Add your class year and diploma subjects."}
           </p>
           <Button asChild variant="outline" className="mt-4 h-10 rounded-full">

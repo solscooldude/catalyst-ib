@@ -64,8 +64,9 @@ export default function AppHomePage() {
           Pick the task. Then lock the phone.
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Nemesis: {nemesis?.name ?? "unset"}. Finish something on ManageBac
-          before Catalyst will sell you that app back.
+          {nemesis
+            ? `${nemesis.name} is locked as your nemesis. Finish a ManageBac task, then buy that app back.`
+            : "Finish a ManageBac task, then buy phone time back."}
         </p>
 
         <div className="mt-8 space-y-3">

@@ -85,9 +85,9 @@ function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
 function Gear({ id }: { id: SparkGearId }) {
   if (id === "bow") {
     return (
-      <g fill="currentColor" stroke="#0B0B0F" strokeOpacity="0.18" strokeWidth="0.6">
+      <g fill="#F9A8D4" stroke="#BE185D" strokeOpacity="0.35" strokeWidth="0.6">
         <path d="M42 16c-4-6 2-9 6-4 4-5 10-2 6 4l-6 3Z" />
-        <circle cx="50" cy="18.5" r="2.1" />
+        <circle cx="50" cy="18.5" r="2.1" fill="#F472B6" />
       </g>
     );
   }
@@ -102,18 +102,24 @@ function Gear({ id }: { id: SparkGearId }) {
   }
   if (id === "scarf") {
     return (
-      <g fill="currentColor">
+      <g fill="#DC2626">
         <path d="M32 78c6 8 30 8 36 0-4 10-10 14-18 14-7 0-13-4-18-14Z" />
-        <path d="M58 90c2 8 7 13 4 18-6-2-10-10-9-16Z" opacity="0.85" />
+        <path d="M58 90c2 8 7 13 4 18-6-2-10-10-9-16Z" fill="#B91C1C" />
       </g>
     );
   }
   if (id === "cap") {
     return (
-      <g fill="currentColor">
-        <ellipse cx="46" cy="18" rx="16" ry="7" />
-        <path d="M32 18c1-10 12-16 24-12 4 1 6 5 5 9Z" />
-        <path d="M55 20h16" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+      <g>
+        <path d="M22 20 50 10l28 10-28 10Z" fill="#18181B" />
+        <path d="M38 22h24l-1.6 8H39.6Z" fill="#27272A" />
+        <path
+          d="M50 12c8 4 14 10 16 16"
+          fill="none"
+          stroke="#FBBF24"
+          strokeWidth="1.4"
+        />
+        <circle cx="67" cy="29" r="2.1" fill="#FBBF24" />
       </g>
     );
   }

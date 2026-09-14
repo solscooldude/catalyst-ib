@@ -9,6 +9,7 @@ import {
   CLASS_YEARS,
   GROUP_LABELS,
   subjectsInGroup,
+  takenCourses,
   validateDiploma,
 } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
@@ -68,7 +69,7 @@ export default function ProfilePage() {
 
   const extraChoices = ([1, 2, 3, 4, 5] as const)
     .flatMap((group) => subjectsInGroup(group))
-    .filter((row) => !requiredIds.includes(row.id));
+    .filter((row) => !takenCourses(requiredIds).has(row.course));
 
   function save() {
     const result = saveProfile({ classYear, subjects });
@@ -90,7 +91,9 @@ export default function ProfilePage() {
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           Groups 1–5 are required. Group 6 is optional — if you skip arts, take
-          a sixth subject from another group. Exactly six DP subjects.
+          a sixth subject from another group. Every subject is HL or SL. Ab
+          initio and self-taught Language A are SL only. TOK and EE sit on
+          every diploma automatically.
         </p>
       </div>
 
@@ -113,7 +116,7 @@ export default function ProfilePage() {
           <AppSelect
             id={`group-${group}`}
             value={required[group]}
-            placeholder="Choose a subject"
+            placeholder="Choose a subject · HL or SL"
             onChange={(next) =>
               setRequired((current) => ({
                 ...current,
@@ -133,7 +136,7 @@ export default function ProfilePage() {
         <AppSelect
           id="sixth"
           value={sixth}
-          placeholder="Choose arts or another subject"
+          placeholder="Choose arts or an extra · HL or SL"
           onChange={setSixth}
           groups={[
             {
@@ -154,9 +157,18 @@ export default function ProfilePage() {
         />
       </div>
 
+      <div className="rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-white/6">
+        <p className="text-xs tracking-[0.16em] text-primary uppercase">
+          Core · always on
+        </p>
+        <p className="mt-1 text-foreground">
+          Theory of Knowledge · Extended Essay
+        </p>
+      </div>
+
       <p className="text-sm text-muted-foreground">
         {preview.ok
-          ? `Class of ${classYear} · six subjects locked in.`
+          ? `Class of ${classYear} · six subjects plus TOK and EE.`
           : preview.reason}
       </p>
       {error ? <p className="text-sm text-rose-300">{error}</p> : null}
