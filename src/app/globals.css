@@ -21,6 +21,8 @@
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
@@ -108,5 +110,70 @@
     font-family: var(--font-heading);
     font-weight: 400;
     letter-spacing: -0.03em;
+  }
+}
+
+@keyframes spark-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes spark-halo {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes spark-dot {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.spark-float {
+  animation: spark-float 3.6s ease-in-out infinite;
+}
+
+.spark-halo {
+  background: radial-gradient(circle, rgb(94 234 212 / 42%), transparent 68%);
+  animation: spark-halo 2.8s ease-in-out infinite;
+}
+
+.spark-dot {
+  animation: spark-dot 1.5s ease-in-out infinite;
+}
+
+.spark-dot-b {
+  animation-delay: 0.2s;
+}
+
+.spark-dot-c {
+  animation-delay: 0.45s;
+}
+
+.spark-dot-d {
+  animation-delay: 0.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-float,
+  .spark-halo,
+  .spark-dot {
+    animation: none;
   }
 }

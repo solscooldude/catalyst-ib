@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
+import { Spark, type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
@@ -26,6 +27,8 @@ export default function FocusPage() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
+  const [mood, setMood] = useState<SparkMood>("locked");
+  const previousEarned = useRef(0);
 
   useEffect(() => {
     if (!state.hydrated) return;
@@ -65,6 +68,23 @@ export default function FocusPage() {
     return { radius, circ, dash: circ * progress };
   }, [progress]);
 
+  const taskMarkedDone = session?.taskMarkedDone ?? false;
+
+  useEffect(() => {
+    if (taskMarkedDone) {
+      setMood("done");
+      previousEarned.current = earned;
+      return;
+    }
+    if (earned > previousEarned.current) {
+      setMood("earning");
+      previousEarned.current = earned;
+      const timeout = window.setTimeout(() => setMood("locked"), 2800);
+      return () => window.clearTimeout(timeout);
+    }
+    previousEarned.current = earned;
+  }, [earned, taskMarkedDone]);
+
   if (!session || session.status !== "focus") return null;
 
   function finish() {
@@ -79,6 +99,7 @@ export default function FocusPage() {
   return (
     <div className="mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[1fr_1fr]">
       <div className="flex flex-col items-center">
+        <Spark mood={mood} size={72} className="mb-2" />
         <div className="relative size-64">
           <svg viewBox="0 0 200 200" className="size-full -rotate-90">
             <circle

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PhoneLock } from "@/components/phone-lock";
 import { DemoBadge } from "@/components/demo-badge";
+import { Spark } from "@/components/spark";
 import { enterFocus, getTask, useCatalyst } from "@/lib/store";
 
 export default function LockPage() {
@@ -60,11 +61,14 @@ export default function LockPage() {
           ) : null}
         </div>
       </div>
-      <PhoneLock
-        nemesis={state.nemesis}
-        unlocks={state.unlocks}
-        onBeginFocus={begin}
-      />
+      <div className="flex flex-col items-center">
+        <Spark mood="locked" size={64} className="mb-3" />
+        <PhoneLock
+          nemesis={state.nemesis}
+          unlocks={state.unlocks}
+          onBeginFocus={begin}
+        />
+      </div>
     </div>
   );
 }

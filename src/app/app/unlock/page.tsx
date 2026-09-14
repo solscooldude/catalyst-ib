@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { DemoBadge } from "@/components/demo-badge";
 import { PhoneLock } from "@/components/phone-lock";
+import { Spark, type SparkMood } from "@/components/spark";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import { UNLOCK_CATALOG } from "@/lib/constants";
@@ -21,6 +22,7 @@ function UnlockInner() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
+  const [mood, setMood] = useState<SparkMood>("tempted");
   const earned = params.get("earned") === "1";
 
   useEffect(() => {
@@ -32,6 +34,15 @@ function UnlockInner() {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (earned) {
+      setMood("done");
+      const timeout = window.setTimeout(() => setMood("tempted"), 3200);
+      return () => window.clearTimeout(timeout);
+    }
+    setMood("tempted");
+  }, [earned]);
 
   const nemesis = getNemesis(state.nemesis);
   const lastEarned = state.session?.status === "completed" ? state.session.tokensEarned : 0;
@@ -149,6 +160,9 @@ function UnlockInner() {
       </div>
 
       <div>
+        <div className="mb-3 flex justify-center">
+          <Spark mood={mood} size={64} />
+        </div>
         <PhoneLock nemesis={state.nemesis} unlocks={state.unlocks} />
         <div className="mt-4 flex justify-center">
           <DemoBadge>Unlocks are simulated</DemoBadge>
