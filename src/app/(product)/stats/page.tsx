@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { TokenAmount } from "@/components/mint-chip";
 import { CoreSubjects } from "@/components/core-subjects";
 import { Spark } from "@/components/spark";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -95,7 +96,10 @@ export default function StatsPage() {
             value={roundup.topSubject?.label ?? "—"}
           />
           <RoundupStat label="Sessions" value={String(roundup.sessions)} />
-          <RoundupStat label="Tokens" value={String(roundup.tokensEarned)} />
+          <RoundupStat
+            label="Tokens"
+            value={<TokenAmount value={roundup.tokensEarned} />}
+          />
         </div>
       </section>
 
@@ -191,13 +195,13 @@ export default function StatsPage() {
   );
 }
 
-function RoundupStat({ label, value }: { label: string; value: string }) {
+function RoundupStat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="rounded-2xl bg-background/60 px-3 py-3">
       <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="mt-1 truncate text-sm text-foreground">{value}</p>
+      <div className="mt-1 truncate text-sm text-foreground">{value}</div>
     </div>
   );
 }

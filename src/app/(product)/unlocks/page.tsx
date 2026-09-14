@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { DemoBadge } from "@/components/demo-badge";
 import { PhoneLock } from "@/components/phone-lock";
 import { Spark } from "@/components/spark";
+import { TokenAmount } from "@/components/mint-chip";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import { UNLOCK_CATALOG } from "@/lib/constants";
@@ -70,8 +71,8 @@ function UnlockInner() {
             <p className="text-xs tracking-[0.16em] text-primary uppercase">
               Session paid out
             </p>
-            <p className="mt-2 font-heading text-3xl text-foreground">
-              +{lastEarned} token{lastEarned === 1 ? "" : "s"}
+            <p className="mt-2 inline-flex items-center gap-2 font-heading text-3xl text-foreground">
+              +<TokenAmount value={lastEarned} />
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {lastSession?.timeTokens ?? 0} from time
@@ -126,7 +127,10 @@ function UnlockInner() {
                   disabled={!affordable}
                   onClick={() => buy(item.id)}
                 >
-                  {left > 0 ? "Add time" : "Unlock"} · {item.cost}
+                  <span className="inline-flex items-center gap-1">
+                    {left > 0 ? "Add time" : "Unlock"} ·{" "}
+                    <TokenAmount value={item.cost} />
+                  </span>
                 </Button>
               </div>
             );
