@@ -10,4 +10,5 @@ export const ROUTES = {
   profile: "/profile",
   motivation: "/motivation",
   schedule: "/schedule",
+  sprite: "/sprite",
 } as const;
