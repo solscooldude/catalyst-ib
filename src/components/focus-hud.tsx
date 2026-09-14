@@ -26,7 +26,7 @@ export function FocusHud({
         className="focus-hud-tokens"
         aria-label={`${tokens} tokens`}
       >
-        <MintChip size={16} />
+        <MintChip size={16} tone="soft" />
         <span>{tokens}</span>
       </div>
     </div>
