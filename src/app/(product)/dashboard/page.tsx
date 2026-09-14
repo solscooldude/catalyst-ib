@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Spark } from "@/components/spark";
+import { ScheduleStatus } from "@/components/schedule-status";
 import { StudyCalendar } from "@/components/study-calendar";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
@@ -119,6 +120,8 @@ export default function DashboardPage() {
         </div>
       )}
 
+      <ScheduleStatus />
+
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
           <p className="text-xs tracking-[0.16em] text-primary uppercase">
@@ -179,7 +182,7 @@ export default function DashboardPage() {
         <p className="mt-1 text-xs text-muted-foreground">This month</p>
         {stacks.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No minutes logged yet. Start a focus block or add a study session.
+            No minutes logged yet. Start a focus or study block.
           </p>
         ) : (
           <ul className="mt-4 space-y-3">

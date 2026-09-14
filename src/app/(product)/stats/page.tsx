@@ -56,8 +56,8 @@ export default function StatsPage() {
             Time by subject
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Official focus sessions and manual study logs both add minutes.
-            Only ManageBac completions get +{COMPLETION_BONUS} tokens.
+            Official tasks and personal study blocks both add minutes. Only
+            ManageBac completions get +{COMPLETION_BONUS} tokens.
           </p>
         </div>
         <Spark
@@ -113,8 +113,8 @@ export default function StatsPage() {
         </p>
         {stacks.length === 0 ? (
           <p className="mt-6 rounded-2xl bg-card px-4 py-6 text-sm text-muted-foreground ring-1 ring-white/6">
-            No time logged in this range yet. Finish a focus session or add a
-            study session below.
+            No time logged in this range yet. Finish a focus session or start
+            a study block below.
           </p>
         ) : (
           <ul className="mt-5 space-y-3">
@@ -167,7 +167,7 @@ export default function StatsPage() {
                 <div>
                   <p className="text-foreground">{log.subjectLabel}</p>
                   <p className="text-xs text-muted-foreground">
-                    {log.kind === "verified" ? "Official task" : "Manual"}
+                    {log.kind === "verified" ? "Official task" : "Study block"}
                     {log.note ? ` · ${log.note}` : ""}
                   </p>
                 </div>
