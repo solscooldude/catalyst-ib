@@ -16,25 +16,25 @@ const STEPS = [
   {
     n: "01",
     title: "Phone lock",
-    copy: "Your nemesis app greys out. Emergency and the boring essentials stay.",
+    copy: "Social apps are greyed out. Emergency and essentials stay available.",
     icon: Smartphone,
   },
   {
     n: "02",
     title: "Work",
-    copy: "Pick a ManageBac task. Stay on the laptop. The scroll can wait.",
+    copy: "Choose a ManageBac task and stay on your laptop until it is marked done.",
     icon: NotebookPen,
   },
   {
     n: "03",
     title: "Tokens",
-    copy: "One token every five minutes of proven focus. Demo speed exists so you can try it.",
+    copy: "You earn 1 token every 5 minutes of focus. This demo can use 30 seconds so you can try the loop.",
     icon: Timer,
   },
   {
     n: "04",
     title: "Unlock",
-    copy: "Spend tokens for ten minutes. Notes is cheap. Your nemesis is not.",
+    copy: "Spend tokens for 10 minutes. Notes is 2, YouTube is 4, and your nemesis app is 8.",
     icon: Lock,
   },
 ];
@@ -59,17 +59,15 @@ export default function LandingPage() {
         <section className="mx-auto grid w-full max-w-6xl items-center gap-16 px-5 pt-8 pb-20 lg:grid-cols-[1.1fr_0.9fr] lg:pt-16">
           <div>
             <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
-              For IB DP students who know the next scroll won’t write the IA
+              For IB Diploma Programme students
             </p>
             <h1 className="mt-5 max-w-xl text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-              Prove the work.
-              <br />
-              Earn the unlock.
+              Finish the ManageBac task. Then unlock your phone.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
-              Catalyst is a personal focus tool — not a group sprint. It locks
-              the phone you hide under the desk, watches a ManageBac task get
-              finished, and only then sells you TikTok time.
+              Catalyst is a personal focus tool. It locks your nemesis app,
+              you complete work on your laptop, and you spend tokens on a
+              short unlock. Not a group sprint.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
@@ -87,8 +85,8 @@ export default function LandingPage() {
               </Button>
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              First month free, then about $9.99. Laptop focus + a marked-done
-              task is the proof — simulated here so you can feel the loop.
+              First month free, then about $9.99 a month. Phone lock and
+              ManageBac are simulated in this demo.
             </p>
           </div>
           <PhoneLock compact />
@@ -101,27 +99,29 @@ export default function LandingPage() {
                 The problem
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                You sat down for TOK.
-                <br />
-                TikTok sat down harder.
+                Why this exists
               </h2>
             </div>
-            <p className="self-end text-base leading-7 text-muted-foreground">
-              IB DP is a deadline factory. The For You page is a slot machine.
-              You open Instagram “for a second,” lose the Chemistry block, then
-              promise the Extended Essay you’ll start after one more video. You
-              don’t need a study group cheering. You need the nemesis app to
-              cost something.
-            </p>
+            <div className="self-end space-y-4 text-base leading-7 text-muted-foreground">
+              <p>
+                IAs, TOK, and the EE take hours. TikTok and Instagram take
+                the block you meant to spend on them.
+              </p>
+              <p>
+                You already know you should stay on the laptop. Catalyst
+                just makes the distracting app wait until a ManageBac task
+                is marked done.
+              </p>
+            </div>
           </div>
         </section>
 
         <section id="how" className="mx-auto max-w-6xl px-5 py-20">
           <p className="text-xs tracking-[0.2em] text-primary uppercase">
-            The loop
+            How it works
           </p>
           <h2 className="mt-3 max-w-xl text-4xl text-foreground sm:text-5xl">
-            Phone lock → work → tokens → unlock.
+            Phone lock, work, tokens, unlock
           </h2>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {STEPS.map((step) => (
@@ -150,12 +150,12 @@ export default function LandingPage() {
                   Token costs
                 </p>
                 <h2 className="mt-3 text-4xl text-foreground">
-                  Ten minutes. Priced by temptation.
+                  What 10 minutes costs
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-6 text-muted-foreground">
                 Earn 1 token per 5 minutes of focus. In this demo, 30 seconds
-                can equal 1 token so you aren’t waiting on a real Pomodoro.
+                can equal 1 token so you can try it without waiting.
               </p>
             </div>
             <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-white/6">
@@ -194,32 +194,29 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 lg:grid-cols-2">
             <div>
               <p className="text-xs tracking-[0.2em] text-primary uppercase">
-                Pricing tease
+                Pricing
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                One month free.
-                <br />
-                Then about $9.99.
+                First month free, then $9.99 a month
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-                Cheaper than the week you lose to one “quick” scroll before the
-                IA deadline. This build is a product demo — no checkout, no
-                account, tokens live in your browser.
+                This build is a product demo. There is no checkout or account.
+                Tokens stay in your browser.
               </p>
               <Button asChild className="mt-8 h-12 rounded-full px-6">
                 <Link href="/app">
-                  Enter Catalyst
+                  Try the demo
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
             </div>
             <div className="rounded-[2rem] bg-card p-8 ring-1 ring-white/6">
               <p className="font-heading text-3xl text-foreground">
-                Focus mode + ManageBac.
+                What the demo includes
               </p>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Tokens for phone time — your nemesis app costs the most. Laptop
-                stays open. Phone stays honest. The work is the receipt.
+                Laptop focus plus a ManageBac task marked done. Your nemesis
+                app costs the most tokens to unlock.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-3">
@@ -243,7 +240,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/6 px-5 py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <Wordmark />
-          <p>Built as a v1 demo for IB DP students. Mint, not lime.</p>
+          <p>v1 demo for IB DP students. Phone lock and ManageBac are simulated.</p>
         </div>
       </footer>
     </div>

@@ -57,7 +57,7 @@ export const UNLOCK_CATALOG = [
     intensity: "Low distraction",
     cost: 2,
     minutes: 10,
-    blurb: "Apple Notes, Notability, or a doc. Work-adjacent.",
+    blurb: "Notes or a document. Lowest token cost.",
   },
   {
     id: "youtube",
@@ -65,7 +65,7 @@ export const UNLOCK_CATALOG = [
     intensity: "Medium",
     cost: 4,
     minutes: 10,
-    blurb: "A lecture — or a spiral. Priced to make you choose.",
+    blurb: "Videos. Medium token cost.",
   },
   {
     id: "nemesis",
@@ -73,7 +73,7 @@ export const UNLOCK_CATALOG = [
     intensity: "High",
     cost: 8,
     minutes: 10,
-    blurb: "The one you picked. Expensive on purpose.",
+    blurb: "The app you chose in setup. Highest token cost.",
   },
 ] as const;
 
