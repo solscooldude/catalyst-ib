@@ -18,7 +18,14 @@ import { sparkEvolution } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-export type SparkMood = "idle" | "locked" | "earning" | "done" | "tempted";
+export type SparkMood =
+  | "idle"
+  | "locked"
+  | "earning"
+  | "done"
+  | "tempted"
+  | "annoyed"
+  | "sleepy";
 
 type SparkProps = {
   mood?: SparkMood;
@@ -107,6 +114,22 @@ function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
         <path d="M33.5 65.2c2.2-3.2 7.2-3.2 9.4 0" />
         <path d="M57.1 65.2c2.2-3.2 7.2-3.2 9.4 0" />
         <path d="M45.6 73.2c1.6 1.8 7.2 1.8 8.8 0" />
+      </g>
+    );
+  }
+  if (mood === "annoyed") {
+    return (
+      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
+        <path d="M33 61.4h11.2" />
+        <path d="M55.8 61.4h11.2" />
+      </g>
+    );
+  }
+  if (mood === "sleepy") {
+    return (
+      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
+        <path d="M33.4 66.2c2.4 2.2 7.6 2.2 10 0" />
+        <path d="M56.6 66.2c2.4 2.2 7.6 2.2 10 0" />
       </g>
     );
   }
