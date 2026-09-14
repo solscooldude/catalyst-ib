@@ -173,7 +173,11 @@ function UnlockInner() {
 
       <div>
         <div className="mb-3 flex justify-center">
-          <Spark mood={mood} size={64} />
+          <Spark
+            mood={mood}
+            taskId={lastSession?.taskId}
+            size={64}
+          />
         </div>
         <PhoneLock nemesis={state.nemesis} unlocks={state.unlocks} />
         <div className="mt-4 flex justify-center">

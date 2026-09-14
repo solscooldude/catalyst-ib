@@ -86,7 +86,16 @@ export default function StatsPage() {
             Only ManageBac completions get +{COMPLETION_BONUS} tokens.
           </p>
         </div>
-        <Spark mood="idle" size={56} className="hidden shrink-0 sm:block" />
+        <Spark
+          mood="idle"
+          subject={stacks[0]?.id ?? recent[0]?.subjectId}
+          hint={
+            stacks[0]?.label ??
+            SUBJECTS.find((row) => row.id === recent[0]?.subjectId)?.label
+          }
+          size={56}
+          className="hidden shrink-0 sm:block"
+        />
       </div>
 
       <section className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6 sm:p-8">

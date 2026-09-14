@@ -88,7 +88,13 @@ export default function FocusPage() {
   return (
     <div className="mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[1fr_1fr]">
       <div className="flex flex-col items-center">
-        <Spark mood={mood} size={72} className="mb-2" />
+        <Spark
+          mood={mood}
+          taskId={session?.taskId}
+          hint={task ? `${task.title} ${task.subject}` : undefined}
+          size={72}
+          className="mb-2"
+        />
         <div className="relative size-64">
           <svg viewBox="0 0 200 200" className="size-full -rotate-90">
             <circle

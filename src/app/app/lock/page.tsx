@@ -62,7 +62,13 @@ export default function LockPage() {
         </div>
       </div>
       <div className="flex flex-col items-center">
-        <Spark mood="locked" size={64} className="mb-3" />
+        <Spark
+          mood="locked"
+          taskId={state.session.taskId}
+          hint={task ? `${task.title} ${task.subject}` : undefined}
+          size={64}
+          className="mb-3"
+        />
         <PhoneLock
           nemesis={state.nemesis}
           unlocks={state.unlocks}

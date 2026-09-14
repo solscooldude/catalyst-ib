@@ -13,6 +13,7 @@ import {
   startOfMonth,
   subjectStacks,
 } from "@/lib/stats";
+import { SUBJECTS } from "@/lib/constants";
 import { useCatalyst } from "@/lib/store";
 
 export default function DashboardPage() {
@@ -43,6 +44,16 @@ export default function DashboardPage() {
         </div>
         <Spark
           mood={session?.status === "focus" ? "locked" : "idle"}
+          taskId={session?.taskId}
+          subject={
+            session ? undefined : (roundup.topSubject?.id ?? stacks[0]?.id)
+          }
+          hint={
+            session
+              ? undefined
+              : (roundup.topSubject?.label ??
+                SUBJECTS.find((row) => row.id === stacks[0]?.id)?.label)
+          }
           size={56}
           className="hidden shrink-0 sm:block"
         />
