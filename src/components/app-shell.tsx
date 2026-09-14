@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
 import { TokenChip } from "@/components/token-chip";
 import { DemoBadge } from "@/components/demo-badge";
+import { IdleSubjectPopup } from "@/components/idle-subject-popup";
 import { NavMenus } from "@/components/nav-menus";
+import { SceneBackground } from "@/components/scene-background";
 import { Button } from "@/components/ui/button";
 import { logOut, useAuth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
@@ -26,7 +28,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="relative flex min-h-dvh flex-col">
+      <SceneBackground id={state.appearance.background} />
       <header className="sticky top-0 z-30 border-b border-white/6 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
           <Wordmark href={ROUTES.home} />
@@ -57,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <NavMenus compact />
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8 sm:py-12">
+      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8 sm:py-12">
         {!state.hydrated || !auth.hydrated ? (
           <div className="grid gap-4">
             <div className="h-8 w-48 animate-pulse rounded-full bg-white/6" />
@@ -67,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           children
         )}
       </main>
-      <footer className="border-t border-white/6 px-4 py-4">
+      <footer className="relative z-10 border-t border-white/6 px-4 py-4">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
           <DemoBadge>Demo accounts · no real Screen Time</DemoBadge>
           <Button
@@ -80,6 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
       </footer>
+      <IdleSubjectPopup />
     </div>
   );
 }
