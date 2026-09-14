@@ -1284,6 +1284,114 @@ html[data-bg="aurora"] {
     #0b0b0f;
 }
 
+.focus-spark-stage {
+  pointer-events: auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.focus-spark-wander {
+  animation: focus-spark-wander 5s ease-in-out;
+}
+
+.focus-spark-morph {
+  animation: focus-spark-morph 5s ease-in-out;
+}
+
+.focus-spark-loop {
+  animation: focus-spark-loop 5s ease-in-out;
+}
+
+.focus-spark-gift {
+  animation: focus-spark-gift 1.1s ease-out;
+}
+
+.focus-token-drop {
+  pointer-events: none;
+  position: absolute;
+  top: 8%;
+  left: 58%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid #c9b896;
+  background: #f4efe4;
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2a2420;
+  animation: focus-token-rise 2.4s ease-out both;
+}
+
+@keyframes focus-spark-wander {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(14%, -10%);
+  }
+  70% {
+    transform: translate(-12%, 8%);
+  }
+}
+
+@keyframes focus-spark-morph {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.14, 0.86);
+  }
+  62% {
+    transform: scale(0.88, 1.12);
+  }
+}
+
+@keyframes focus-spark-loop {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(10%, -12%) rotate(20deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+@keyframes focus-spark-gift {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes focus-token-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  18%,
+  62% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+}
+
 .focus-session {
   position: relative;
   display: flex;
@@ -1331,6 +1439,13 @@ html[data-bg="aurora"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .focus-spark-wander,
+  .focus-spark-morph,
+  .focus-spark-loop,
+  .focus-spark-gift,
+  .focus-token-drop {
+    animation: none !important;
+  }
   .spark-float,
   .spark-halo,
   .spark-dot,
