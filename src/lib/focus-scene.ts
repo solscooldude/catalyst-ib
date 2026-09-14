@@ -12,19 +12,19 @@ export const ROOM_PLATES: Record<
   Record<DayPhase, string>
 > = {
   cat: {
-    afternoon: "/api/plates/cat-afternoon.jpg",
-    sunset: "/api/plates/cat-sunset.jpg",
-    night: "/api/plates/cat-night.jpg",
+    afternoon: "/focus/cat-afternoon.jpg",
+    sunset: "/focus/cat-sunset.jpg",
+    night: "/focus/cat-night.jpg",
   },
   desk: {
-    afternoon: "/api/plates/desk-afternoon.jpg",
-    sunset: "/api/plates/desk-sunset.jpg",
-    night: "/api/plates/desk-night.jpg",
+    afternoon: "/focus/desk-afternoon.jpg",
+    sunset: "/focus/desk-sunset.jpg",
+    night: "/focus/desk-night.jpg",
   },
   library: {
-    afternoon: "/api/plates/lib-afternoon.jpg",
-    sunset: "/api/plates/lib-sunset.jpg",
-    night: "/api/plates/lib-night.jpg",
+    afternoon: "/focus/lib-afternoon.jpg",
+    sunset: "/focus/lib-sunset.jpg",
+    night: "/focus/lib-night.jpg",
   },
 };
 
