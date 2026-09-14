@@ -24,6 +24,25 @@ export type SparkFlavor =
   | "cas"
   | "generic";
 
+/** Subject ink — contrast the mint spark body, never reuse #5EEAD4. */
+export const SPARK_FLAVOR_INK: Record<SparkFlavor, string> = {
+  math: "#F5C14A",
+  biology: "#8BD14A",
+  chemistry: "#FB8A3C",
+  physics: "#8BA4FF",
+  reading: "#E8B86D",
+  history: "#D4A06A",
+  geography: "#4DB7F5",
+  economics: "#F3C14B",
+  psychology: "#F47A9A",
+  cs: "#7EB6FF",
+  arts: "#E879F9",
+  music: "#F472B6",
+  research: "#E2C07A",
+  cas: "#FB7A6E",
+  generic: "#E8DFC8",
+};
+
 export type SparkFlavorInput = {
   subjectId?: SubjectId | null;
   text?: string | null;
