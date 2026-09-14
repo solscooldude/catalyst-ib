@@ -54,12 +54,22 @@ export type TaskId = (typeof MOCK_TASKS)[number]["id"];
 
 export const SUBJECTS = [
   { id: "biology", label: "Biology HL" },
-  { id: "tok", label: "Theory of Knowledge" },
-  { id: "math-aa", label: "Mathematics AA HL" },
   { id: "chemistry", label: "Chemistry SL" },
+  { id: "physics", label: "Physics HL" },
+  { id: "math-aa", label: "Mathematics AA HL" },
+  { id: "tok", label: "Theory of Knowledge" },
   { id: "ee", label: "Extended Essay" },
   { id: "english", label: "English A" },
+  { id: "language-b", label: "Language B" },
   { id: "history", label: "History" },
+  { id: "geography", label: "Geography" },
+  { id: "economics", label: "Economics" },
+  { id: "psychology", label: "Psychology" },
+  { id: "cs", label: "Computer Science" },
+  { id: "digital-societies", label: "Digital Societies" },
+  { id: "visual-arts", label: "Visual Arts" },
+  { id: "music", label: "Music" },
+  { id: "cas", label: "CAS" },
   { id: "other", label: "Other" },
 ] as const;
 
