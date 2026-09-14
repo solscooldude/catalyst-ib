@@ -1,6 +1,6 @@
 # Catalyst
 
-A personal focus tool for IB DP students who doomscroll instead of writing the IA, TOK essay, or EE. Lock the nemesis app, finish a ManageBac task, earn tokens, then buy phone time.
+A personal focus tool for IB DP students who doomscroll instead of writing the IA, TOK essay, or EE. Lock the apps that steal the block, finish a ManageBac task, earn tokens from that session, then buy phone time. First month free, then $2 a month.
 
 This repo is a **web demo**. Phone lock and ManageBac are simulated — there is no real Screen Time or school integration.
 
@@ -26,13 +26,13 @@ npm run build
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only (password is hashed locally). After auth you land on `/dashboard`.
 3. `/dashboard` — signed-in home: tokens, study calendar, lock schedule, month snapshot, start focus. After signup (or any account without a diploma profile) you hit `/profile` first.
-4. `/setup` — pick a nemesis app, connect mock ManageBac (Bio IA, TOK essay, Math AA PS, Chem study, EE chapter).
+4. `/setup` — pick one or more nemesis apps (edit the set here later; you do not re-pick at each focus start), connect mock ManageBac (Bio IA, TOK essay, Math AA PS, Chem study, EE chapter).
 5. `/focus` — choose a task and optional goal. Demo speed is on by default: **30 seconds = 1 token** (real pace is 5 minutes).
 6. `/lock` — simulated lock screen. Emergency stays; social apps are grey.
 7. `/session` — timer. Mark the ManageBac task done, then complete the session.
-8. `/unlocks` — spend tokens (Notes 2 / YouTube 4 / nemesis 8 per 10 minutes). Repeat buys stack time on one timer.
+8. `/unlocks` — spend tokens (Notes 2 / YouTube 4 / nemesis apps 8 per 10 minutes). Repeat buys stack time on one timer.
 9. `/stats` — study calendar, subject stack (week / month), monthly roundup, and recent sessions. Official task completion adds +5 tokens; study blocks earn time tokens only.
-10. `/appearance` — four collections. Starter: cheap accents, tints, pink bow, black glasses, red scarf, dark cap, basic sparkle trail. Night sky (80–150): Stars, Aurora, aurora veil, aurora spark tint, aurora trail. Elite gold (200–350): gold accent, gilded cap, gold sparkle trail. Focus scenes: Cat study (free), Desk window (40), Library attic (48). Each room keeps one camera and crossfades afternoon → sunset → night. Rocket to space (120) stays deferred. The spark grows from official study hours. Tap it on the dashboard to pet it.
+10. `/appearance` — four collections. Starter: cheap accents, tints, pink bow, black glasses, red scarf, dark cap, paper dust / mint vapor / basic sparkle trails. Night sky (80–150): Stars, Aurora, aurora veil, aurora spark tint, aurora trail. Elite gold (200–350): gold accent, gilded cap, gold sparkle trail. Focus scenes: Cat study (free), Desk window (40), Library attic (48), lamp ember trail (72). Each room keeps one camera and crossfades afternoon → sunset → night. Rocket to space (120) stays deferred. `/sprite` is My Sprite — larger pettable spark, care status, and equip. The spark grows from official study hours. Tap it on the dashboard or My Sprite to pet it.
 11. `/profile` — graduating class and six DP subjects with HL or SL on each (Groups 1–5 required; Group 6 optional with an extra from another group). TOK and EE are always on the diploma. Required on first visit.
 12. `/motivation` — dream colleges, course, and why it matters. A short reminder appears on the lock screen.
 13. Study blocks (from Focus or Stats) lock the phone for the chosen duration. Time tokens only — no +5. Retroactive “log past study” is gone.
