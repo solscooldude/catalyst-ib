@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AppSelect } from "@/components/app-select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,9 +13,6 @@ import {
 } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { saveProfile, useCatalyst } from "@/lib/store";
-
-const selectClass =
-  "h-11 w-full rounded-xl border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -98,68 +96,62 @@ export default function ProfilePage() {
 
       <div className="space-y-2">
         <Label htmlFor="class-year">Graduating class</Label>
-        <select
+        <AppSelect
           id="class-year"
-          className={selectClass}
-          value={classYear}
-          onChange={(event) => setClassYear(Number(event.target.value))}
-        >
-          {CLASS_YEARS.map((year) => (
-            <option key={year} value={year}>
-              Class of {year}
-            </option>
-          ))}
-        </select>
+          value={String(classYear)}
+          onChange={(next) => setClassYear(Number(next))}
+          options={CLASS_YEARS.map((year) => ({
+            value: String(year),
+            label: `Class of ${year}`,
+          }))}
+        />
       </div>
 
       {([1, 2, 3, 4, 5] as const).map((group) => (
         <div key={group} className="space-y-2">
           <Label htmlFor={`group-${group}`}>{GROUP_LABELS[group]}</Label>
-          <select
+          <AppSelect
             id={`group-${group}`}
-            className={selectClass}
             value={required[group]}
-            onChange={(event) =>
+            placeholder="Choose a subject"
+            onChange={(next) =>
               setRequired((current) => ({
                 ...current,
-                [group]: event.target.value,
+                [group]: next,
               }))
             }
-          >
-            <option value="">Choose a subject</option>
-            {subjectsInGroup(group).map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.label}
-              </option>
-            ))}
-          </select>
+            options={subjectsInGroup(group).map((subject) => ({
+              value: subject.id,
+              label: subject.label,
+            }))}
+          />
         </div>
       ))}
 
       <div className="space-y-2">
         <Label htmlFor="sixth">Sixth subject · arts or an extra</Label>
-        <select
+        <AppSelect
           id="sixth"
-          className={selectClass}
           value={sixth}
-          onChange={(event) => setSixth(event.target.value)}
-        >
-          <option value="">Choose arts or another subject</option>
-          <optgroup label={GROUP_LABELS[6]}>
-            {subjectsInGroup(6).map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.label}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Extra from Groups 1–5">
-            {extraChoices.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.label}
-              </option>
-            ))}
-          </optgroup>
-        </select>
+          placeholder="Choose arts or another subject"
+          onChange={setSixth}
+          groups={[
+            {
+              label: GROUP_LABELS[6],
+              options: subjectsInGroup(6).map((subject) => ({
+                value: subject.id,
+                label: subject.label,
+              })),
+            },
+            {
+              label: "Extra from Groups 1–5",
+              options: extraChoices.map((subject) => ({
+                value: subject.id,
+                label: subject.label,
+              })),
+            },
+          ]}
+        />
       </div>
 
       <p className="text-sm text-muted-foreground">

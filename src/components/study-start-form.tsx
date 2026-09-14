@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import { AppSelect } from "@/components/app-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +11,6 @@ import { SUBJECTS, type SubjectId } from "@/lib/constants";
 import { studySubjectOptions } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { startStudySession, useCatalyst } from "@/lib/store";
-
-const selectClass =
-  "h-11 w-full rounded-xl border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
 
 const BLOCKS = [15, 25, 45, 60];
 
@@ -47,18 +45,15 @@ export function StudyStartForm() {
     <form className="grid gap-4" onSubmit={begin}>
       <div className="space-y-2">
         <Label htmlFor="study-subject">Subject</Label>
-        <select
+        <AppSelect
           id="study-subject"
-          className={selectClass}
           value={subjectId}
-          onChange={(event) => setSubjectId(event.target.value as SubjectId)}
-        >
-          {options.map((subject) => (
-            <option key={`${subject.id}-${subject.label}`} value={subject.statId}>
-              {subject.label}
-            </option>
-          ))}
-        </select>
+          onChange={(next) => setSubjectId(next as SubjectId)}
+          options={options.map((subject) => ({
+            value: subject.statId,
+            label: subject.label,
+          }))}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="study-what">What are you studying</Label>
