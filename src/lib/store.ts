@@ -24,6 +24,8 @@ import {
   SUBJECTS,
   TASK_SUBJECT,
   UNLOCK_CATALOG,
+  formatNemesisList,
+  isNemesisId,
   type NemesisId,
   type SubjectId,
   type TaskId,
@@ -99,7 +101,7 @@ export type Unlock = {
 export type CatalystState = {
   hydrated: boolean;
   setupComplete: boolean;
-  nemesis: NemesisId | null;
+  nemeses: NemesisId[];
   manageBacConnected: boolean;
   demoMode: boolean;
   tokens: number;
@@ -121,7 +123,7 @@ const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
 export const defaultState: CatalystState = {
   hydrated: false,
   setupComplete: false,
-  nemesis: null,
+  nemeses: [],
   manageBacConnected: false,
   demoMode: true,
   tokens: 0,
@@ -205,10 +207,13 @@ export function hydrateStore(userId: string | null = null) {
       emit();
       return;
     }
-    const parsed = JSON.parse(raw) as Partial<CatalystState>;
+    const parsed = JSON.parse(raw) as Partial<CatalystState> & {
+      nemesis?: NemesisId | null;
+    };
     state = {
       ...defaultState,
       ...parsed,
+      nemeses: normalizeNemeses(parsed),
       tasks:
         parsed.tasks && parsed.tasks.length === defaultTasks.length
           ? parsed.tasks
@@ -245,10 +250,21 @@ export function useCatalyst() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-export function completeSetup(nemesis: NemesisId) {
+function normalizeNemeses(
+  raw: Partial<CatalystState> & { nemesis?: NemesisId | null },
+): NemesisId[] {
+  const fromList = (raw.nemeses ?? []).filter(isNemesisId);
+  if (fromList.length > 0) return [...new Set(fromList)];
+  if (raw.nemesis && isNemesisId(raw.nemesis)) return [raw.nemesis];
+  return [];
+}
+
+export function completeSetup(nemeses: NemesisId[]) {
+  const next = [...new Set(nemeses.filter(isNemesisId))];
+  if (next.length === 0) return;
   setState((current) => ({
     ...current,
-    nemesis,
+    nemeses: next,
     manageBacConnected: true,
     setupComplete: true,
   }));
@@ -556,9 +572,8 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
 
   const duration = state.demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
   const now = Date.now();
-  const nemesisName =
-    NEMESIS_APPS.find((app) => app.id === state.nemesis)?.name ?? "Nemesis app";
-  const label = catalogId === "nemesis" ? nemesisName : item.name;
+  const label =
+    catalogId === "nemesis" ? formatNemesisList(state.nemeses) : item.name;
   const existing = coalesceUnlocks(state.unlocks, now).find(
     (unlock) => unlock.catalogId === catalogId,
   );
@@ -683,6 +698,10 @@ export function getTask(id: TaskId) {
 
 export function getNemesis(id: NemesisId | null) {
   return NEMESIS_APPS.find((app) => app.id === id);
+}
+
+export function getNemeses(ids: readonly NemesisId[]) {
+  return NEMESIS_APPS.filter((app) => ids.includes(app.id));
 }
 
 export function isUnlockActive(
