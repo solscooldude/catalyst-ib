@@ -13,6 +13,7 @@ import {
   type SparkFlavor,
 } from "@/lib/spark-flavor";
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
+import { sparkEvolution } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,7 @@ type SparkProps = {
   className?: string;
   pettable?: boolean;
   flourish?: "loop" | "now";
+  evolve?: boolean;
 };
 
 function OpenEyes({
@@ -518,6 +520,7 @@ export function Spark({
   className,
   pettable = false,
   flourish = "loop",
+  evolve = true,
 }: SparkProps) {
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
@@ -552,6 +555,8 @@ export function Spark({
 
   const shownMood: SparkMood = petted ? "done" : mood;
   const canGlance = !petted && (mood === "idle" || mood === "locked");
+  const evo = evolve ? sparkEvolution(store.logs) : { scale: 1, glow: 1 };
+  const drawn = size * evo.scale;
   const frameClass = cn(
     "spark-float relative",
     canPet ? "cursor-pointer border-0 bg-transparent p-0" : "pointer-events-none",
@@ -559,7 +564,12 @@ export function Spark({
     flourish === "now" && "spark-idle-pop",
     className,
   );
-  const frameStyle = { width: size, height: size, color: palette.lo };
+  const frameStyle = {
+    width: drawn,
+    height: drawn,
+    color: palette.lo,
+    ["--spark-evo-glow" as string]: String(evo.glow),
+  };
 
   const body = (
     <>
@@ -567,8 +577,8 @@ export function Spark({
       <Trail id={trailId} />
       <svg
         viewBox="-22 -18 144 150"
-        width={size}
-        height={size}
+        width={drawn}
+        height={drawn}
         className="relative z-10 overflow-visible"
       >
         <defs>

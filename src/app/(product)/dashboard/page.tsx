@@ -13,8 +13,11 @@ import { useAuth } from "@/lib/auth";
 import {
   formatHours,
   monthlyRoundup,
+  sparkEvolution,
+  sparkEvolutionLabel,
   startOfMonth,
   subjectStacks,
+  verifiedStudyMs,
 } from "@/lib/stats";
 import { SUBJECTS } from "@/lib/constants";
 import { motivationReady } from "@/lib/ib";
@@ -32,6 +35,7 @@ export default function DashboardPage() {
   const maxMs = stacks[0]?.durationMs ?? 0;
   const session = state.session;
   const firstName = auth.user?.email.split("@")[0] ?? "there";
+  const evo = sparkEvolution(state.logs);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8">
@@ -45,6 +49,10 @@ export default function DashboardPage() {
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
             {auth.user?.email} · demo account in this browser
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Spark is {sparkEvolutionLabel(evo.stage)} ·{" "}
+            {formatHours(verifiedStudyMs(state.logs))} official
           </p>
         </div>
         <Spark
