@@ -50,7 +50,7 @@ export default function MotivationPage() {
             rest is optional.
           </p>
         </div>
-        <Spark mood="idle" size={88} className="hidden shrink-0 sm:block" />
+        <Spark mood="idle" size={88} pettable className="hidden shrink-0 sm:block" />
       </div>
 
       <form className="space-y-5" onSubmit={save}>
