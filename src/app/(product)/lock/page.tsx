@@ -84,7 +84,7 @@ export default function LockPage() {
           className="mb-3"
         />
         <PhoneLock
-          nemesis={state.nemesis}
+          nemeses={state.nemeses}
           unlocks={state.unlocks}
           onBeginFocus={begin}
         />

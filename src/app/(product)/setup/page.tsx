@@ -13,9 +13,17 @@ import { cn } from "@/lib/utils";
 export default function SetupPage() {
   const router = useRouter();
   const state = useCatalyst();
-  const [nemesis, setNemesis] = useState<NemesisId | null>(state.nemesis);
+  const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
   const [connected, setConnected] = useState(state.manageBacConnected);
   const [connecting, setConnecting] = useState(false);
+
+  function toggle(id: NemesisId) {
+    setNemeses((current) =>
+      current.includes(id)
+        ? current.filter((row) => row !== id)
+        : [...current, id],
+    );
+  }
 
   function connectManageBac() {
     setConnecting(true);
@@ -26,8 +34,8 @@ export default function SetupPage() {
   }
 
   function finish() {
-    if (!nemesis || !connected) return;
-    completeSetup(nemesis);
+    if (nemeses.length === 0 || !connected) return;
+    completeSetup(nemeses);
     router.push(ROUTES.focus);
   }
 
@@ -35,23 +43,28 @@ export default function SetupPage() {
     <div className="mx-auto w-full max-w-2xl">
       <p className="text-xs tracking-[0.2em] text-primary uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-        Name the app that steals the block.
+        Name the apps that steal the block.
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Pick the nemesis once. Catalyst remembers it. Then connect a mock
-        ManageBac so the demo has real IB work to prove.
+        Pick one or more nemesis apps. Catalyst remembers the set — you do not
+        re-pick at the start of every focus. Change the list here when you
+        need to. Then connect a mock ManageBac so the demo has IB work to
+        prove.
       </p>
 
       <section className="mt-10">
-        <h2 className="text-sm font-medium text-foreground">Your nemesis</h2>
+        <h2 className="text-sm font-medium text-foreground">Your nemesis apps</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Tap to add or remove. At least one.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {NEMESIS_APPS.map((app) => {
-            const selected = nemesis === app.id;
+            const selected = nemeses.includes(app.id);
             return (
               <button
                 key={app.id}
                 type="button"
-                onClick={() => setNemesis(app.id)}
+                onClick={() => toggle(app.id)}
                 className={cn(
                   "rounded-2xl bg-card p-4 text-left ring-1 transition-colors",
                   selected
@@ -115,10 +128,10 @@ export default function SetupPage() {
       <div className="mt-8 flex justify-end">
         <Button
           className="h-11 rounded-full px-6"
-          disabled={!nemesis || !connected}
+          disabled={nemeses.length === 0 || !connected}
           onClick={finish}
         >
-          Lock in setup
+          {state.setupComplete ? "Save setup" : "Lock in setup"}
         </Button>
       </div>
     </div>

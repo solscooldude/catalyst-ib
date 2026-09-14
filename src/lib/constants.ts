@@ -104,11 +104,11 @@ export const UNLOCK_CATALOG = [
   },
   {
     id: "nemesis",
-    name: "Nemesis app",
+    name: "Nemesis apps",
     intensity: "High",
     cost: 8,
     minutes: 10,
-    blurb: "The app you chose in setup. Highest token cost.",
+    blurb: "The apps you named in setup. Highest token cost.",
   },
 ] as const;
 
@@ -121,5 +121,19 @@ export const DEMO_UNLOCK_MS = 60 * 1000;
 
 export const PRICING = {
   trial: "1 month free",
-  then: "$9.99 / month",
+  then: "$2 / month",
 };
+
+export function isNemesisId(id: string): id is NemesisId {
+  return NEMESIS_APPS.some((app) => app.id === id);
+}
+
+export function formatNemesisList(ids: readonly NemesisId[]): string {
+  const names = NEMESIS_APPS.filter((app) => ids.includes(app.id)).map(
+    (app) => app.name,
+  );
+  if (names.length === 0) return "your nemesis apps";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
