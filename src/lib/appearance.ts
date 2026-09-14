@@ -28,7 +28,7 @@ export const COLLECTIONS: {
     id: "focus",
     name: "Focus scenes",
     range: "0–120",
-    copy: "Only the lock and timer. Equip one. More scenes can sit beside rocket.",
+    copy: "Only the lock and timer. Equip one. Rocket is one scene; more can sit beside it.",
   },
 ];
 
@@ -333,7 +333,7 @@ export function getSparkGear(id: SparkGearId) {
 }
 
 export function getSparkTrail(id: SparkTrailId) {
-  return SPARK_TRAILS.find((row) => row.id === id) ?? SPARK_TRAILS[0];
+  return SPARK_TINTS.find((row) => row.id === id) ?? SPARK_TRAILS[0];
 }
 
 export function getFocusTheme(id: FocusThemeId) {

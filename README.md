@@ -38,4 +38,6 @@ npm run build
 13. Study blocks (from Focus or Stats) lock the phone for the chosen duration. Time tokens only — no +5. Retroactive “log past study” is gone.
 14. `/schedule` — recurring lock hours. The simulated phone greys during a window. The schedule itself awards no tokens.
 
+The token mark is a mint hex chip with a **C**. Balances and prices use that icon.
+
 Product data is stored per demo account in `localStorage` (`catalyst-v1:user:<id>`). Reset demo clears only the current account. Log out returns to the marketing page.
