@@ -125,7 +125,11 @@ export default function AppearancePage() {
 
           <Group
             title="Trail"
-            items={SPARK_TRAILS.filter((item) => item.collection === collection.id)}
+            items={SPARK_TRAILS.filter(
+              (item) =>
+                item.collection === collection.id &&
+                (item.id !== "week" || look.ownedTrails.includes("week")),
+            )}
             owned={(id) => look.ownedTrails.includes(id)}
             equipped={(id) => look.trail === id}
             onAct={(id, owned) => act("trail", id, owned)}
