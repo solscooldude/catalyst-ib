@@ -75,19 +75,28 @@ export function NavMenus({ compact = false }: { compact?: boolean }) {
   }, []);
 
   return (
-    <div ref={rootRef} className={cn("flex items-center", compact ? "gap-1" : "gap-1")}>
-      {GROUPS.map((group) => {
+    <div
+      ref={rootRef}
+      className={cn(
+        "flex items-center",
+        compact ? "w-full justify-between gap-1" : "gap-1",
+      )}
+    >
+      {GROUPS.map((group, index) => {
         const active = groupActive(pathname, group.items);
         const open = openId === group.id;
+        const last = index === GROUPS.length - 1;
         return (
-          <div key={group.id} className="relative">
+          <div key={group.id} className={cn("relative", compact && "min-w-0 flex-1")}>
             <button
               type="button"
               aria-expanded={open}
               onClick={() => setOpenId(open ? null : group.id)}
               className={cn(
                 "inline-flex items-center gap-1 rounded-full text-foreground/90 transition-colors",
-                compact ? "px-3 py-1 text-xs" : "px-3 py-1.5 text-sm",
+                compact
+                  ? "w-full justify-center px-2 py-1.5 text-[13px]"
+                  : "px-3 py-1.5 text-sm",
                 active || open
                   ? "bg-white/6 text-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -100,7 +109,8 @@ export function NavMenus({ compact = false }: { compact?: boolean }) {
               <div
                 className={cn(
                   "absolute z-50 mt-2 min-w-44 rounded-2xl border border-white/8 bg-[#121218] p-1.5 shadow-[0_18px_40px_-24px_rgb(0_0_0_/_0.9)]",
-                  compact ? "left-0" : "left-0",
+                  last ? "right-0 left-auto" : "left-0",
+                  compact && "min-w-[11.5rem]",
                 )}
               >
                 {group.items.map((item) => {
@@ -115,10 +125,10 @@ export function NavMenus({ compact = false }: { compact?: boolean }) {
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        "block rounded-xl px-3 py-2 text-sm",
+                        "block rounded-xl px-3 py-2.5 text-sm text-zinc-100",
                         itemActive
                           ? "bg-primary/12 text-foreground"
-                          : "text-zinc-200 hover:bg-white/6 hover:text-foreground",
+                          : "hover:bg-white/6 hover:text-foreground",
                       )}
                     >
                       {item.label}

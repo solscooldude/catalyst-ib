@@ -38,8 +38,8 @@ export default function SetupPage() {
         Name the app that steals the block.
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Catalyst is personal. Pick the nemesis, then connect a mock ManageBac
-        so the demo has real IB work to prove.
+        Pick the nemesis once. Catalyst remembers it. Then connect a mock
+        ManageBac so the demo has real IB work to prove.
       </p>
 
       <section className="mt-10">

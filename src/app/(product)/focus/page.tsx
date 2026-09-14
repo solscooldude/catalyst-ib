@@ -64,10 +64,18 @@ export default function AppHomePage() {
           Pick the task. Then lock the phone.
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {nemesis
-            ? `${nemesis.name} is locked as your nemesis. Finish a ManageBac task, then buy that app back.`
-            : "Finish a ManageBac task, then buy phone time back."}
+          Pick a ManageBac task or start your own study block. The phone locks
+          after you begin.
         </p>
+        {nemesis ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Nemesis is {nemesis.name}.{" "}
+            <Link href={ROUTES.setup} className="text-primary/80 hover:text-primary">
+              Change it in Setup
+            </Link>
+            , not here.
+          </p>
+        ) : null}
 
         <div className="mt-8 space-y-3">
           {MOCK_TASKS.map((task) => {
