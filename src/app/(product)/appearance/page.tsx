@@ -42,8 +42,9 @@ export default function AppearancePage() {
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Starter pieces stay cheap. Night sky is mid. Elite gold is rare.
-            Focus scenes only change the lock and timer — rocket climbs toward
-            outer space, not a campus.
+            Focus scenes only change the lock and timer — rocket leaves the
+            ground and opens into the night sky. The spark also grows from
+            official study hours, not from shop buys.
           </p>
         </div>
         <Spark mood="idle" size={104} pettable className="hidden shrink-0 sm:block" />
@@ -89,7 +90,7 @@ export default function AppearancePage() {
             onAct={(id, owned) => act("sparkTint", id, owned)}
             blurb="Same spark, different light."
             swatch={(item) => (
-              <Spark mood="idle" tint={item.id} gear="none" trail="none" size={52} />
+              <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
             )}
           />
 
@@ -105,6 +106,7 @@ export default function AppearancePage() {
                 tint={look.sparkTint}
                 gear={item.id}
                 trail="none"
+                evolve={false}
                 size={52}
               />
             )}
@@ -117,7 +119,7 @@ export default function AppearancePage() {
             equipped={(id) => look.trail === id}
             onAct={(id, owned) => act("trail", id, owned)}
             swatch={(item) => (
-              <Spark mood="idle" gear="none" trail={item.id} size={52} />
+              <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
             )}
           />
 

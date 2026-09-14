@@ -234,7 +234,7 @@ export const FOCUS_THEMES = [
     name: "Rocket to space",
     cost: 120,
     collection: "focus" as const,
-    blurb: "Liftoff, then climb, then outer space — the universe, not a campus.",
+    blurb: "Liftoff, climb, then the open universe — stars and deep night sky.",
   },
 ] as const;
 
