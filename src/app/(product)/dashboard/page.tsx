@@ -189,7 +189,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MiniStat label="Time" value={formatHours(roundup.durationMs)} />
-          <MiniStat label="Top subject" value={roundup.topSubject?.label ?? "\u2014"} />
+          <MiniStat label="Top subject" value={roundup.topSubject?.label ?? "—"} />
           <MiniStat label="Sessions" value={String(roundup.sessions)} />
           <MiniStat
             label="Tokens earned"
