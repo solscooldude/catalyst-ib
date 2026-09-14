@@ -269,12 +269,12 @@ html[data-bg="aurora"] {
 
 @keyframes spark-flourish {
   0%,
-  62%,
+  18%,
   100% {
     opacity: 0;
   }
-  68%,
-  78% {
+  26%,
+  86% {
     opacity: 1;
   }
 }
@@ -857,8 +857,18 @@ html[data-bg="aurora"] {
 .spark-idle-pop .spark-dab,
 .spark-idle-pop .spark-note,
 .spark-idle-pop .spark-lens,
-.spark-idle-pop .spark-pulse {
+.spark-idle-pop .spark-pulse,
+.spark-idle-pop .spark-subject-ink,
+.spark-idle-pop .spark-subject-bits {
   animation-delay: -10.9s;
+}
+
+.spark-subject-ink {
+  color: inherit;
+}
+
+.spark-subject-bits {
+  animation: spark-flourish 16s ease-in-out infinite;
 }
 
 .scene-layer {
