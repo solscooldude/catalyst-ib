@@ -9,4 +9,5 @@ export const ROUTES = {
   setup: "/setup",
   profile: "/profile",
   motivation: "/motivation",
+  schedule: "/schedule",
 } as const;
