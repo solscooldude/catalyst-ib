@@ -13,6 +13,15 @@ import {
   type AppearanceState,
 } from "@/lib/appearance";
 import {
+  FEED_COST,
+  FEED_DAILY_LIMIT,
+  LOGIN_TOKEN,
+  QUIZ_TOKEN,
+  STREAK_REWARD_DAY,
+  dayKey,
+  yesterdayKey,
+} from "@/lib/care";
+import {
   COMPLETION_BONUS,
   DEMO_TOKEN_MS,
   DEMO_UNLOCK_MS,
@@ -113,6 +122,12 @@ export type CatalystState = {
   profile: ProfileState;
   motivation: MotivationState;
   schedule: LockWindow[];
+  lastLoginDay: string | null;
+  streakDays: number;
+  feedDay: string | null;
+  feedCount: number;
+  quizDay: string | null;
+  quizCorrect: number;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -135,6 +150,12 @@ export const defaultState: CatalystState = {
   profile: defaultProfile,
   motivation: defaultMotivation,
   schedule: [],
+  lastLoginDay: null,
+  streakDays: 0,
+  feedDay: null,
+  feedCount: 0,
+  quizDay: null,
+  quizCorrect: 0,
 };
 
 type Listener = () => void;
@@ -205,6 +226,7 @@ export function hydrateStore(userId: string | null = null) {
     if (!raw) {
       state = { ...defaultState, hydrated: true };
       emit();
+      claimDailyLogin();
       return;
     }
     const parsed = JSON.parse(raw) as Partial<CatalystState> & {
@@ -225,8 +247,15 @@ export function hydrateStore(userId: string | null = null) {
       motivation: normalizeMotivation(parsed.motivation),
       schedule: normalizeSchedule(parsed.schedule),
       session: normalizeSession(parsed.session ?? null),
+      lastLoginDay: parsed.lastLoginDay ?? null,
+      streakDays: parsed.streakDays ?? 0,
+      feedDay: parsed.feedDay ?? null,
+      feedCount: parsed.feedCount ?? 0,
+      quizDay: parsed.quizDay ?? null,
+      quizCorrect: parsed.quizCorrect ?? 0,
       hydrated: true,
     };
+    claimDailyLogin();
   } catch {
     state = { ...defaultState, hydrated: true };
   }
@@ -561,6 +590,63 @@ export function removeLockWindow(id: string) {
 
 export function clearSession() {
   setState((current) => ({ ...current, session: null }));
+}
+
+export function claimDailyLogin(now = new Date()) {
+  const today = dayKey(now);
+  if (state.lastLoginDay === today) {
+    return { ok: true as const, awarded: false, streakDays: state.streakDays };
+  }
+  const streakDays =
+    state.lastLoginDay === yesterdayKey(now) ? state.streakDays + 1 : 1;
+  const weekReward = streakDays > 0 && streakDays % STREAK_REWARD_DAY === 0;
+  setState((current) => ({
+    ...current,
+    lastLoginDay: today,
+    streakDays,
+    tokens: current.tokens + LOGIN_TOKEN,
+    appearance: weekReward
+      ? normalizeAppearance({
+          ...current.appearance,
+          ownedTrails: [...current.appearance.ownedTrails, "week"],
+          trail: "week",
+        })
+      : current.appearance,
+  }));
+  return { ok: true as const, awarded: true, streakDays, weekReward };
+}
+
+export function feedSpark() {
+  const today = dayKey();
+  const used = state.feedDay === today ? state.feedCount : 0;
+  if (used >= FEED_DAILY_LIMIT) {
+    return { ok: false as const, reason: "That's enough snacks for today." };
+  }
+  if (state.tokens < FEED_COST) {
+    return { ok: false as const, reason: "Need 1 token to feed." };
+  }
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens - FEED_COST,
+    feedDay: today,
+    feedCount: used + 1,
+  }));
+  return { ok: true as const, remaining: FEED_DAILY_LIMIT - used - 1 };
+}
+
+export function scoreQuiz(correct: number) {
+  const today = dayKey();
+  if (state.quizDay === today) {
+    return { ok: false as const, reason: "Quiz already done today." };
+  }
+  const gained = Math.max(0, correct) * QUIZ_TOKEN;
+  setState((current) => ({
+    ...current,
+    quizDay: today,
+    quizCorrect: correct,
+    tokens: current.tokens + gained,
+  }));
+  return { ok: true as const, gained };
 }
 
 export function grantFocusGift() {
