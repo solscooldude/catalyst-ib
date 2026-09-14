@@ -1,0 +1,103 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SUBJECTS, type SubjectId } from "@/lib/constants";
+import { studySubjectOptions } from "@/lib/ib";
+import { ROUTES } from "@/lib/routes";
+import { startStudySession, useCatalyst } from "@/lib/store";
+
+const selectClass =
+  "h-11 w-full rounded-xl border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
+
+const BLOCKS = [15, 25, 45, 60];
+
+export function StudyStartForm() {
+  const router = useRouter();
+  const state = useCatalyst();
+  const options = state.profile.complete
+    ? studySubjectOptions(state.profile)
+    : SUBJECTS.map((row) => ({
+        id: row.id,
+        label: row.label,
+        statId: row.id,
+      }));
+  const [subjectId, setSubjectId] = useState<SubjectId>(
+    (options[0]?.statId ?? "biology") as SubjectId,
+  );
+  const [title, setTitle] = useState("");
+  const [minutes, setMinutes] = useState(25);
+  const [error, setError] = useState<string | null>(null);
+
+  function begin(event: React.FormEvent) {
+    event.preventDefault();
+    const result = startStudySession({ subjectId, title, minutes });
+    if (!result.ok) {
+      setError(result.reason);
+      return;
+    }
+    router.push(ROUTES.lock);
+  }
+
+  return (
+    <form className="grid gap-4" onSubmit={begin}>
+      <div className="space-y-2">
+        <Label htmlFor="study-subject">Subject</Label>
+        <select
+          id="study-subject"
+          className={selectClass}
+          value={subjectId}
+          onChange={(event) => setSubjectId(event.target.value as SubjectId)}
+        >
+          {options.map((subject) => (
+            <option key={`${subject.id}-${subject.label}`} value={subject.statId}>
+              {subject.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="study-what">What are you studying</Label>
+        <Input
+          id="study-what"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="Paper 2 timing. Chapter 4 notes. IA data table."
+          className="h-11 rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Block length</Label>
+        <div className="flex flex-wrap gap-2">
+          {BLOCKS.map((block) => (
+            <button
+              key={block}
+              type="button"
+              onClick={() => setMinutes(block)}
+              className={`rounded-full px-3 py-1.5 text-sm ring-1 ${
+                minutes === block
+                  ? "bg-primary/15 text-foreground ring-primary/40"
+                  : "text-muted-foreground ring-white/10"
+              }`}
+            >
+              {block} min
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Phone locks for this block. Demo speed shortens the wait, not the
+          tokens-per-five-minutes math. No +5 — that is official tasks only.
+        </p>
+      </div>
+      {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+      <Button type="submit" className="h-11 rounded-full">
+        Lock and start
+        <ArrowRight className="size-4" />
+      </Button>
+    </form>
+  );
+}

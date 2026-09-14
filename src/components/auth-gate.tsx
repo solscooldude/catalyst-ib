@@ -1,20 +1,32 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { ROUTES } from "@/lib/routes";
 import { useCatalyst } from "@/lib/store";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const auth = useAuth();
   const store = useCatalyst();
 
   useEffect(() => {
     if (auth.hydrated && !auth.user) {
       router.replace("/login");
+      return;
     }
-  }, [auth.hydrated, auth.user, router]);
+    if (
+      auth.hydrated &&
+      store.hydrated &&
+      auth.user &&
+      !store.profile.complete &&
+      pathname !== ROUTES.profile
+    ) {
+      router.replace(ROUTES.profile);
+    }
+  }, [auth.hydrated, auth.user, store.hydrated, store.profile.complete, pathname, router]);
 
   if (!auth.hydrated || !store.hydrated || !auth.user) {
     return (

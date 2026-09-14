@@ -7,4 +7,6 @@ export const ROUTES = {
   unlocks: "/unlocks",
   appearance: "/appearance",
   setup: "/setup",
+  profile: "/profile",
+  motivation: "/motivation",
 } as const;

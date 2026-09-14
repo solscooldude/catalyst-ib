@@ -17,6 +17,7 @@ const NAV = [
   { href: ROUTES.stats, label: "Stats" },
   { href: ROUTES.unlocks, label: "Unlocks" },
   { href: ROUTES.appearance, label: "Appearance" },
+  { href: ROUTES.motivation, label: "Motivation" },
   { href: ROUTES.setup, label: "Setup" },
 ];
 
