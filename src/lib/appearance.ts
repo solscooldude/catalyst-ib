@@ -9,8 +9,8 @@ export const COLLECTIONS: {
   {
     id: "starter",
     name: "Starter",
-    range: "Free–24",
-    copy: "Cheap closet pieces. Pink bow, black glasses, red scarf, dark cap.",
+    range: "Free–46",
+    copy: "Cheap closet pieces, paper dust, and a mint vapor trail.",
   },
   {
     id: "aurora",
@@ -28,7 +28,7 @@ export const COLLECTIONS: {
     id: "focus",
     name: "Focus scenes",
     range: "Free–120",
-    copy: "Study rooms with a slow afternoon-to-night cycle. Equip one. Rocket stays on the shelf.",
+    copy: "Study rooms with a slow afternoon-to-night cycle, plus a lamp-ember trail. Equip one room. Rocket stays on the shelf.",
   },
 ];
 
@@ -206,11 +206,32 @@ export const SPARK_TRAILS = [
     blurb: "Tiny motes while the spark is on screen.",
   },
   {
+    id: "paper",
+    name: "Paper dust",
+    cost: 18,
+    collection: "starter" as const,
+    blurb: "Warm scrap motes. Like notes sliding off the desk.",
+  },
+  {
+    id: "vapor",
+    name: "Mint vapor",
+    cost: 46,
+    collection: "starter" as const,
+    blurb: "Soft mint wisps. Lo-fi, not neon.",
+  },
+  {
     id: "aurora",
     name: "Aurora glow",
     cost: 110,
     collection: "aurora" as const,
     blurb: "A soft mint-violet wake.",
+  },
+  {
+    id: "ember",
+    name: "Lamp ember",
+    cost: 72,
+    collection: "focus" as const,
+    blurb: "Warm desk-lamp specks rising off the spark.",
   },
   {
     id: "gold",
