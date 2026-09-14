@@ -163,6 +163,21 @@ html[data-bg="grove"] {
     font-weight: 400;
     letter-spacing: -0.03em;
   }
+
+  /* Closed select stays light-on-dark. Opened native menus must be dark text on white. */
+  select {
+    color: var(--foreground);
+  }
+
+  select option,
+  select optgroup {
+    color: #18181b;
+    background-color: #ffffff;
+  }
+
+  select optgroup {
+    font-weight: 600;
+  }
 }
 
 @keyframes spark-float {
