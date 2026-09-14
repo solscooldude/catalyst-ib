@@ -735,6 +735,9 @@ function equippedKey(kind: AppearanceKind): keyof AppearanceState {
 export function buyAppearance(kind: AppearanceKind, id: string) {
   const item = catalogFor(kind).find((row) => row.id === id);
   if (!item) return { ok: false as const, reason: "Unknown item." };
+  if (id === "week") {
+    return { ok: false as const, reason: "Login seven days in a row." };
+  }
   const owned = state.appearance[ownedKey(kind)] as string[];
   if (owned.includes(id)) {
     return { ok: false as const, reason: "Already in your closet." };
@@ -779,7 +782,7 @@ export function equipAppearance(kind: AppearanceKind, id: string) {
 }
 
 export function resetDemo() {
-  if (typeof window !== "undefined" && storageAccountId) {
+  if (typeof window === "undefined" && storageAccountId) {
     window.localStorage.removeItem(accountStorageKey(storageAccountId));
   }
   state = { ...defaultState, hydrated: true };
