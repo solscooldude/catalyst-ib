@@ -35,6 +35,7 @@ import {
   type UnlockSpendId,
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
+import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
 import {
   defaultMotivation,
   defaultProfile,
@@ -43,7 +44,14 @@ import {
   type MotivationState,
   type ProfileState,
 } from "@/lib/ib";
+import {
+  normalizePlannerEvents,
+  normalizePlannerTodos,
+  type PlannerEvent,
+  type PlannerTodo,
+} from "@/lib/planner";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
+import { sparkEvolutionFromState } from "@/lib/stats";
 
 export type TaskState = {
   id: TaskId;
@@ -123,6 +131,23 @@ export type CatalystState = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   dailyGoalMinutes: number;
+  spriteHatched: boolean;
+  careStage:
+    | "egg"
+    | "hatchling"
+    | "sparklet"
+    | "steady"
+    | "bright"
+    | "luminary";
+  careActions: number;
+  hatchBurstAt: number | null;
+  introSeen: boolean;
+  username: string;
+  avatarDataUrl: string | null;
+  soundMuted: boolean;
+  friendCode: string;
+  plannerTodos: PlannerTodo[];
+  plannerEvents: PlannerEvent[];
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -160,6 +185,17 @@ export function createDefaultState(): CatalystState {
     spriteRenameCount: 0,
     spriteAsleep: false,
     dailyGoalMinutes: DEFAULT_DAILY_GOAL_MINUTES,
+    spriteHatched: false,
+    careStage: "egg",
+    careActions: 0,
+    hatchBurstAt: null,
+    introSeen: false,
+    username: "",
+    avatarDataUrl: null,
+    soundMuted: false,
+    friendCode: makeFriendCode(),
+    plannerTodos: [],
+    plannerEvents: [],
   };
 }
 
@@ -193,8 +229,13 @@ function persist(next: CatalystState) {
   writeDeviceFocusStage(next.appearance.focusTheme);
 }
 
+function withGrowth(next: CatalystState): CatalystState {
+  const careStage = sparkEvolutionFromState(next).stage;
+  return next.careStage === careStage ? next : { ...next, careStage };
+}
+
 export function setState(updater: (current: CatalystState) => CatalystState) {
-  state = updater(state);
+  state = withGrowth(updater(state));
   persist(state);
   emit();
 }
@@ -378,8 +419,29 @@ export function hydrateStore(userId: string | null = null) {
       spriteRenameCount: parsed.spriteRenameCount ?? 0,
       spriteAsleep: Boolean(parsed.spriteAsleep),
       dailyGoalMinutes: clampDailyGoalMinutes(parsed.dailyGoalMinutes),
+      spriteHatched: Boolean(
+        parsed.spriteHatched ||
+          (parsed.logs?.length ?? 0) > 0 ||
+          (parsed.careActions ?? 0) > 0,
+      ),
+      careActions:
+        typeof parsed.careActions === "number"
+          ? Math.max(0, parsed.careActions)
+          : 0,
+      hatchBurstAt: null,
+      introSeen: Boolean(parsed.introSeen),
+      username: normalizeUsername(parsed.username),
+      avatarDataUrl: normalizeAvatar(parsed.avatarDataUrl),
+      soundMuted: Boolean(parsed.soundMuted),
+      friendCode:
+        typeof parsed.friendCode === "string" && parsed.friendCode.startsWith("CAT-")
+          ? parsed.friendCode
+          : makeFriendCode(),
+      plannerTodos: normalizePlannerTodos(parsed.plannerTodos),
+      plannerEvents: normalizePlannerEvents(parsed.plannerEvents),
       hydrated: true,
     };
+    state = withGrowth(state);
   } catch {
     state = {
       ...createDefaultState(),
@@ -452,4 +514,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
