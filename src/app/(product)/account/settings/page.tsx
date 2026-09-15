@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageFrame } from "@/components/page-frame";
 import { updateEmail, updatePassword, useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
@@ -34,8 +35,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-4">
-      <div className="flux-card px-6 py-8">
+    <PageFrame width="form">
+      <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Settings
         </p>
@@ -99,6 +100,6 @@ export default function SettingsPage() {
           Save password
         </Button>
       </form>
-    </div>
+    </PageFrame>
   );
 }

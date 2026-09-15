@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PRICING } from "@/lib/constants";
+import { PageFrame } from "@/components/page-frame";
 import {
   readSubscription,
   writeSubscription,
@@ -22,8 +23,8 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-4">
-      <div className="flux-card px-6 py-8">
+    <PageFrame width="form">
+      <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Subscription
         </p>
@@ -36,6 +37,6 @@ export default function SubscriptionPage() {
           {plan.status === "active" ? "Cancel monthly" : "Restart monthly"}
         </Button>
       </div>
-    </div>
+    </PageFrame>
   );
 }

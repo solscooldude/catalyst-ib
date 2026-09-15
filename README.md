@@ -31,7 +31,7 @@ npm run build
 
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only.
-3. `/dashboard` — greeting, Current Sprite / Streak / Study time, quiet hours, and inline app unlocks (spend without leaving Home).
+3. `/dashboard` — mint Home: greeting, three soft cards (Current Sprite / Streak / Study time), quiet hours, and inline app unlocks. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
 4. Avatar menu — Subscription ($2/mo), IB profile, Settings (email + password). Not Unlocks, Appearance, Focus, or Sprite.
 5. `/setup` — nemesis apps + mock ManageBac.
 6. `/focus` — pick a ManageBac task or start a study block. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
