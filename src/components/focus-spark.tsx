@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MintChip } from "@/components/mint-chip";
+import { SparkleMark } from "@/components/brand-marks";
 import { Spark, type SparkMood } from "@/components/spark";
 import { grantFocusGift } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -67,7 +67,7 @@ export function FocusSpark({
         />
         {act === "gift" ? (
           <span className="focus-token-drop" aria-live="polite">
-            <MintChip size={16} tone="soft" />
+            <SparkleMark size={16} />
             +1
           </span>
         ) : null}

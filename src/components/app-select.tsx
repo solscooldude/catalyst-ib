@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { nativeSelectClass } from "@/lib/select-class";
 import { cn } from "@/lib/utils";
 
@@ -69,7 +69,12 @@ export function AppSelect({
         onClick={() => setOpen((current) => !current)}
         className={cn(nativeSelectClass, "flex items-center justify-between gap-2 text-left")}
       >
-        <span className={cn(!selected && "text-muted-foreground")}>
+        <span
+          className={cn(
+            "truncate font-medium text-zinc-900 dark:text-zinc-100",
+            !selected && "font-normal text-zinc-500",
+          )}
+        >
           {selected?.label ?? placeholder}
         </span>
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
@@ -78,12 +83,12 @@ export function AppSelect({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-zinc-200 bg-white py-1 text-sm text-zinc-900 shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)]"
+          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-zinc-200 bg-white py-1 text-sm text-zinc-900 shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)] dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
         >
           {groups
             ? groups.map((group) => (
                 <li key={group.label}>
-                  <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-[0.12em] text-zinc-500 uppercase">
+                  <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-[0.12em] text-zinc-600 uppercase dark:text-zinc-400">
                     {group.label}
                   </p>
                   {group.options.map((option) => (
@@ -126,11 +131,12 @@ function OptionRow({
       aria-selected={selected}
       onClick={() => onPick(option.value)}
       className={cn(
-        "flex w-full px-3 py-2 text-left text-zinc-900 hover:bg-zinc-100",
-        selected && "bg-zinc-100 font-medium",
+        "flex min-h-11 w-full items-center justify-between px-3 py-2.5 text-left text-zinc-900 hover:bg-primary/15 dark:text-zinc-50 dark:hover:bg-primary/20",
+        selected && "bg-primary/20 font-medium text-zinc-900 dark:text-zinc-50",
       )}
     >
-      {option.label}
+      <span>{option.label}</span>
+      {selected ? <Check className="size-4 shrink-0 text-teal-700 dark:text-primary" /> : null}
     </button>
   );
 }
