@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { Monitor, Sparkles } from "lucide-react";
+import { ChevronDown, Monitor, Sparkles } from "lucide-react";
 import { BuyLabel, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
@@ -174,89 +174,27 @@ export default function AppearancePage() {
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <button
-          type="button"
-          onClick={() => openRealm("sprite")}
-          className={cn(
-            "min-h-[9.5rem] rounded-[1.75rem] px-6 py-7 text-left transition-colors sm:px-7",
-            shownRealm === "sprite"
-              ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
-              : "bg-card ring-2 ring-border hover:ring-primary/50",
-          )}
-        >
-          <span
-            className={cn(
-              "inline-flex size-11 items-center justify-center rounded-2xl",
-              shownRealm === "sprite" ? "bg-black/10" : "bg-primary/15 text-primary",
-            )}
-          >
-            <Sparkles className="size-5" />
-          </span>
-          <p className="mt-4 text-3xl font-semibold tracking-tight">
-            Sprite shop
-          </p>
-          <p
-            className={cn(
-              "mt-2 text-sm",
-              shownRealm === "sprite" ? "text-primary-foreground/80" : "text-zinc-500",
-            )}
-          >
-            Cosmetics, colours, gradients, auras, trails.
-          </p>
-        </button>
-        <button
-          type="button"
-          onClick={() => openRealm("app")}
-          className={cn(
-            "min-h-[9.5rem] rounded-[1.75rem] px-6 py-7 text-left transition-colors sm:px-7",
-            shownRealm === "app"
-              ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
-              : "bg-card ring-2 ring-border hover:ring-primary/50",
-          )}
-        >
-          <span
-            className={cn(
-              "inline-flex size-11 items-center justify-center rounded-2xl",
-              shownRealm === "app" ? "bg-black/10" : "bg-primary/15 text-primary",
-            )}
-          >
-            <Monitor className="size-5" />
-          </span>
-          <p className="mt-4 text-3xl font-semibold tracking-tight">
-            App appearance
-          </p>
-          <p
-            className={cn(
-              "mt-2 text-sm",
-              shownRealm === "app" ? "text-primary-foreground/80" : "text-zinc-500",
-            )}
-          >
-            Focus scenes and rooms.
-          </p>
-        </button>
+        <ShopRealmCard
+          title="Sprite shop"
+          copy="Clothes, colours, glow, and trails."
+          icon={Sparkles}
+          selected={shownRealm === "sprite"}
+          tabs={SPRITE_TABS}
+          tab={shownRealm === "sprite" ? tab : "cosmetics"}
+          onOpen={() => openRealm("sprite")}
+          onPick={openTab}
+        />
+        <ShopRealmCard
+          title="App appearance"
+          copy="Focus scenes and rooms."
+          icon={Monitor}
+          selected={shownRealm === "app"}
+          tabs={APP_TABS}
+          tab={shownRealm === "app" ? tab : "scenes"}
+          onOpen={() => openRealm("app")}
+          onPick={openTab}
+        />
       </div>
-
-      <label className="block">
-        <span className="mb-3 block text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-          {shownRealm === "sprite" ? "Sprite shop" : "App appearance"}
-        </span>
-        <select
-          className={cn(nativeSelectClass, "h-14 text-base")}
-          value={tab}
-          aria-label={
-            shownRealm === "sprite"
-              ? "Sprite shop section"
-              : "App appearance section"
-          }
-          onChange={(event) => openTab(event.target.value as ShopTab)}
-        >
-          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </label>
 
       <section className="flux-card scroll-mt-24 space-y-6 px-6 py-8">
         {tab === "cosmetics" ? (
@@ -458,6 +396,91 @@ export default function AppearancePage() {
         ) : null}
       </section>
     </PageFrame>
+  );
+}
+
+function ShopRealmCard({
+  title,
+  copy,
+  icon: Icon,
+  selected,
+  tabs,
+  tab,
+  onOpen,
+  onPick,
+}: {
+  title: string;
+  copy: string;
+  icon: typeof Sparkles;
+  selected: boolean;
+  tabs: readonly { id: ShopTab; label: string }[];
+  tab: ShopTab;
+  onOpen: () => void;
+  onPick: (next: ShopTab) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[1.75rem] px-6 py-6 sm:px-7",
+        selected
+          ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+          : "bg-card ring-2 ring-border",
+      )}
+    >
+      <button type="button" onClick={onOpen} className="w-full text-left">
+        <span
+          className={cn(
+            "inline-flex size-11 items-center justify-center rounded-2xl",
+            selected ? "bg-black/10" : "bg-primary/15 text-primary",
+          )}
+        >
+          <Icon className="size-5" />
+        </span>
+        <p className="mt-4 text-3xl font-semibold tracking-tight">{title}</p>
+        <p
+          className={cn(
+            "mt-2 text-sm",
+            selected ? "text-primary-foreground/80" : "text-zinc-500",
+          )}
+        >
+          {copy}
+        </p>
+      </button>
+      <label className="mt-5 block">
+        <span
+          className={cn(
+            "mb-2 inline-flex items-center gap-1 text-sm font-semibold",
+            selected ? "text-primary-foreground" : "text-foreground",
+          )}
+        >
+          {title}
+          <ChevronDown className="size-4" />
+        </span>
+        <span className="relative block">
+          <select
+            className={cn(
+              nativeSelectClass,
+              "h-14 appearance-none pr-10 text-base",
+              selected &&
+                "border-primary-foreground/40 bg-white text-zinc-900",
+            )}
+            value={tab}
+            aria-label={`${title} section`}
+            onChange={(event) => onPick(event.target.value as ShopTab)}
+          >
+            {tabs.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-zinc-500"
+            aria-hidden
+          />
+        </span>
+      </label>
+    </div>
   );
 }
 
