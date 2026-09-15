@@ -559,3 +559,232 @@ html[data-bg="aurora"] {
     stroke-dashoffset: -8;
   }
 }
+
+@keyframes spark-halo {
+  0%,
+  100% {
+    opacity: calc(0.22 * var(--spark-evo-glow, 1));
+    transform: scale(calc(0.9 + 0.06 * var(--spark-evo-glow, 1)));
+  }
+  50% {
+    opacity: calc(0.62 * var(--spark-evo-glow, 1));
+    transform: scale(calc(1 + 0.08 * var(--spark-evo-glow, 1)));
+  }
+}
+
+@keyframes spark-dot {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.spark-float {
+  animation: spark-float 3.8s ease-in-out infinite;
+}
+
+.spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 82%;
+  animation: spark-squish 5.6s ease-in-out infinite;
+}
+
+.spark-glance {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-glance 10s ease-in-out infinite;
+}
+
+.spark-blink {
+  transform-box: fill-box;
+  transform-origin: 50% 62%;
+  animation: spark-blink 7.4s ease-in-out infinite;
+}
+
+.spark-flourish {
+  animation: spark-flourish 16s ease-in-out infinite;
+}
+
+.spark-symbol {
+  animation: spark-symbol-drift 16s ease-in-out infinite;
+}
+
+.spark-symbol-b {
+  animation-delay: 0.28s;
+}
+
+.spark-symbol-c {
+  animation-delay: 0.56s;
+}
+
+.spark-leaf,
+.spark-cell {
+  transform-box: fill-box;
+  transform-origin: 20% 90%;
+  animation: spark-leaf-grow 16s ease-in-out infinite;
+}
+
+.spark-cell {
+  transform-origin: 50% 50%;
+  animation-delay: 0.35s;
+}
+
+.spark-cell-b {
+  animation-delay: 0.55s;
+}
+
+.spark-cell-c {
+  animation-delay: 0.2s;
+}
+
+.spark-book,
+.spark-crumb {
+  transform-box: fill-box;
+  transform-origin: 20% 80%;
+  animation: spark-book-read 16s ease-in-out infinite;
+}
+
+.spark-crumb {
+  transform-origin: 50% 50%;
+  animation-delay: 0.2s;
+}
+
+.spark-bubble,
+.spark-molecule {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: spark-bubble-rise 16s ease-in-out infinite;
+}
+
+.spark-bubble-b {
+  animation-delay: 0.22s;
+}
+
+.spark-bubble-c {
+  animation-delay: 0.4s;
+}
+
+.spark-molecule {
+  transform-origin: 50% 50%;
+  animation-delay: 0.18s;
+}
+
+.spark-orbit {
+  transform-box: fill-box;
+  transform-origin: 50% 46%;
+  animation: spark-orbit-spin 16s ease-in-out infinite;
+}
+
+.spark-hourglass {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-hourglass-flip 16s ease-in-out infinite;
+}
+
+.spark-globe {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-globe-spin 16s ease-in-out infinite;
+}
+
+.spark-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: spark-bar-grow 16s ease-in-out infinite;
+}
+
+.spark-bar-b {
+  animation-delay: 0.16s;
+}
+
+.spark-bar-c {
+  animation-delay: 0.32s;
+}
+
+.spark-thought {
+  transform-box: fill-box;
+  transform-origin: 30% 80%;
+  animation: spark-thought-pop 16s ease-in-out infinite;
+}
+
+.spark-bits {
+  animation: spark-bits-fade 16s ease-in-out infinite;
+}
+
+.spark-bits-b {
+  animation-delay: 0.24s;
+}
+
+.spark-cursor {
+  animation: spark-cursor-blink 16s ease-in-out infinite;
+}
+
+.spark-brush {
+  stroke-dasharray: 56;
+  animation: spark-brush-swoosh 16s ease-in-out infinite;
+}
+
+.spark-dab {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-thought-pop 16s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.spark-note {
+  animation: spark-note-bounce 16s ease-in-out infinite;
+}
+
+.spark-note-b {
+  animation-delay: 0.22s;
+}
+
+.spark-lens {
+  transform-box: fill-box;
+  transform-origin: 80% 30%;
+  animation: spark-lens-peek 16s ease-in-out infinite;
+}
+
+.spark-pulse {
+  stroke-dasharray: 48;
+  animation: spark-pulse-draw 16s ease-in-out infinite;
+}
+
+.spark-halo {
+  background: radial-gradient(circle, color-mix(in srgb, var(--spark-lo) 42%, transparent), transparent 68%);
+  animation: spark-halo 2.8s ease-in-out infinite;
+}
+
+.spark-has-aura .spark-halo {
+  /* Aura is the body silhouette glow — not a circular orb or ring. */
+  opacity: 0;
+  animation: none;
+}
+
+.spark-has-aura .spark-body {
+  filter: drop-shadow(
+      0 0 8px color-mix(in srgb, var(--spark-aura, #5eead4) 95%, transparent)
+    )
+    drop-shadow(
+      0 0 18px color-mix(in srgb, var(--spark-aura, #5eead4) 60%, transparent)
+    );
+}
+
+.spark-dot {
+  animation: spark-dot 1.5s ease-in-out infinite;
+}
+
+.spark-dot-b {
+  animation-delay: 0.2s;
+}
+
+.spark-dot-c {
+  animation-delay: 0.45s;
+}
+
+.spark-dot-d {
+  animation-delay: 0.7s;
+}
