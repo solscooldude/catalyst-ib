@@ -86,6 +86,14 @@
   touch-action: none;
   user-select: none;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.sprite-spark-stage .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 12%;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .sprite-spark-stage.is-held {
@@ -145,13 +153,13 @@
 
 @keyframes spark-scrunch-spring {
   0% {
-    transform: scale(1.16, 0.68);
+    transform: scale3d(1.18, 0.66, 1);
   }
   55% {
-    transform: scale(0.94, 1.12);
+    transform: scale3d(0.94, 1.12, 1);
   }
   100% {
-    transform: scale(1, 1);
+    transform: scale3d(1, 1, 1);
   }
 }
 
@@ -212,16 +220,13 @@
   animation: spark-boop-blink 0.42s ease-in-out;
 }
 
-.spark-scrunch .spark-body {
-  transform-box: fill-box;
-  transform-origin: 50% 12%;
-  transform: scale(1.14, 0.7);
+.spark-scrunch .spark-body,
+.sprite-spark-stage.is-scrunching .spark-body {
+  transform: scale3d(1.18, 0.66, 1);
 }
 
 .spark-scrunch-release .spark-body {
-  transform-box: fill-box;
-  transform-origin: 50% 12%;
-  animation: spark-scrunch-spring 0.55s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+  animation: spark-scrunch-spring 0.42s cubic-bezier(0.22, 1.4, 0.36, 1) both;
 }
 
 .spark-celebrate .spark-float,
@@ -282,16 +287,40 @@
 
 .sprite-highfive-hand {
   position: absolute;
-  top: 42%;
-  right: 8%;
+  top: 40%;
+  right: 6%;
   z-index: 4;
-  display: grid;
-  width: 3.2rem;
-  height: 3.2rem;
-  place-items: center;
+  display: flex;
+  width: auto;
+  height: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  border: 0;
+  border-radius: 1.15rem;
+  background: rgb(255 255 255 / 0.9);
+  padding: 0.35rem 0.5rem 0.4rem;
+  box-shadow: 0 1px 2px rgb(24 24 27 / 0.08);
   cursor: grab;
   touch-action: none;
   user-select: none;
+  will-change: transform;
+}
+
+.sprite-highfive-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #18181b;
+}
+
+.dark .sprite-highfive-hand {
+  background: rgb(24 24 27 / 0.92);
+  box-shadow: 0 0 0 1px rgb(244 244 245 / 0.08);
+}
+
+.dark .sprite-highfive-label {
+  color: #f4f4f5;
 }
 
 .sprite-highfive-hand.is-held {
