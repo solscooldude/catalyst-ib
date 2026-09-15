@@ -483,11 +483,19 @@ export function Spark({
             <stop offset="0%" stopColor={palette.lo} stopOpacity="0.55" />
             <stop offset="100%" stopColor={palette.lo} stopOpacity="0" />
           </radialGradient>
-          <radialGradient id={bodyId} cx="38%" cy="32%" r="72%">
-            <stop offset="0%" stopColor={palette.hi} />
-            <stop offset="42%" stopColor={palette.mid} />
-            <stop offset="100%" stopColor={palette.lo} />
-          </radialGradient>
+          {palette.kind === "gradient" ? (
+            <linearGradient id={bodyId} x1="16%" y1="6%" x2="88%" y2="94%">
+              <stop offset="0%" stopColor={palette.hi} />
+              <stop offset="48%" stopColor={palette.mid} />
+              <stop offset="100%" stopColor={palette.lo} />
+            </linearGradient>
+          ) : (
+            <radialGradient id={bodyId} cx="38%" cy="32%" r="72%">
+              <stop offset="0%" stopColor={palette.hi} />
+              <stop offset="42%" stopColor={palette.mid} />
+              <stop offset="100%" stopColor={palette.lo} />
+            </radialGradient>
+          )}
           <radialGradient id={specId} cx="35%" cy="30%" r="22%">
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
