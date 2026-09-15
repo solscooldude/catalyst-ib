@@ -30,7 +30,7 @@ const STEPS = [
   {
     n: "04",
     title: "Unlock",
-    copy: "School tools stay free. Tier 2 apps are 5 tokens per 10 minutes. Instagram, TikTok, Discord, and the rest of Tier 3 are 9.",
+    copy: "School tools stay free. Tier 2 apps are 5 tokens per 10 minutes. Instagram, TikTok, Discord, and the rest of Tier 3 are 10.",
     icon: Lock,
   },
 ];
