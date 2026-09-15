@@ -1,0 +1,140 @@
+@keyframes spark-eat-bounce {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(1.14, 0.84);
+  }
+  72% {
+    transform: scale(0.93, 1.1);
+  }
+}
+
+@keyframes spark-chew {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.2, 0.28);
+  }
+}
+
+@keyframes spark-crumb-pop {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(var(--crumb-x, 4px), var(--crumb-y, -6px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--crumb-x, 8px), var(--crumb-y, 10px)) scale(0.6);
+  }
+}
+
+.spark-eating .spark-body {
+  animation: spark-eat-bounce 0.32s ease-in-out infinite;
+}
+
+.spark-chew {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-chew 0.28s ease-in-out infinite;
+}
+
+.spark-crumb-bit {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-crumb-pop 0.95s ease-out both;
+}
+
+.spark-crumb-a {
+  --crumb-x: -10px;
+  --crumb-y: 8px;
+}
+
+.spark-crumb-b {
+  --crumb-x: 12px;
+  --crumb-y: 6px;
+  animation-delay: 0.12s;
+}
+
+.spark-crumb-c {
+  --crumb-x: 2px;
+  --crumb-y: 12px;
+  animation-delay: 0.22s;
+}
+
+.sprite-playpen {
+  position: relative;
+  display: flex;
+  min-height: 22rem;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sprite-spark-stage {
+  position: relative;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.sprite-spark-stage.is-held {
+  cursor: grabbing;
+}
+
+.sprite-spark-stage.is-held .spark-float,
+.sprite-spark-stage.is-held .spark-body {
+  animation: none;
+}
+
+.sprite-snack {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  width: 3.6rem;
+  height: 3.6rem;
+  place-items: center;
+  margin-left: -1.8rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.sprite-snack.is-held {
+  cursor: grabbing;
+  z-index: 5;
+}
+
+.sprite-snack.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.sprite-snack.is-eaten {
+  pointer-events: none;
+}
+
+.sprite-snack-art {
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 28%));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-eating .spark-body,
+  .spark-chew,
+  .spark-crumb-bit {
+    animation: none;
+  }
+}
