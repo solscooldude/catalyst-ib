@@ -84,11 +84,7 @@ export default function SpritePage() {
   }
 
   function onPet() {
-    if (mood === "eating") return;
-    if (mood === "sleepy") {
-      setMood("idle");
-      setNotice("Up.");
-    }
+    if (mood === "eating" || mood === "sleepy") return;
     setPetPulse((value) => value + 1);
     bumpIdle();
   }
@@ -144,19 +140,11 @@ export default function SpritePage() {
           My Sprite
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          Sit with {displaySpriteName(state.spriteName)}.
+          {displaySpriteName(state.spriteName)}
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
-          Pet, drag a snack onto it, poke, or let it doze. Official hours
-          grow the glow. Login streak {state.streakDays} day
-          {state.streakDays === 1 ? "" : "s"}
-          {state.streakDays > 0 && state.streakDays % 7 === 0
-            ? " · seven-day flare unlocked"
-            : ""}.
-        </p>
         <p className="mt-3 text-sm">
           <Link href={ROUTES.quiz} className="text-zinc-400 hover:text-foreground">
-            Ten-question diploma quiz
+            Quiz
           </Link>
         </p>
       </section>
@@ -177,11 +165,13 @@ export default function SpritePage() {
           onPet={onPet}
           onFeed={onFeedDrop}
           onSleep={() => {
+            window.clearTimeout(idleTimer.current);
             setMood("sleepy");
             setNotice("Tucked in.");
           }}
           onWake={() => {
             setMood(restMood());
+            bumpIdle();
             setNotice("Up.");
           }}
           onCelebrate={() => {
@@ -196,13 +186,13 @@ export default function SpritePage() {
             setNotice(ok ? "Caught a token." : (reason ?? "Missed it."));
           }}
         />
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Boop the face · scrunch the peaks · long-press to sleep · catch the
-          star · pick a snack and drag it on
-        </p>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Snack · <TokenAmount value={FEED_COST} /> · {feedsLeft} left today
-        </p>
+        {feedsLeft === 0 ? (
+          <p className="mt-2 text-center text-xs text-zinc-400">Snacks tomorrow.</p>
+        ) : (
+          <p className="mt-2 text-center text-xs text-zinc-400">
+            <TokenAmount value={FEED_COST} />
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Button variant="outline" className="h-10 rounded-full" onClick={onPoke}>
             Poke
