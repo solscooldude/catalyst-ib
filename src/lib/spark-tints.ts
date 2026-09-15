@@ -12,7 +12,7 @@ export const SPARK_TINTS = [
   {
     id: "rose",
     name: "Rose spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#FFE4F1",
@@ -22,7 +22,7 @@ export const SPARK_TINTS = [
   {
     id: "peach",
     name: "Peach spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#FFE8D6",
@@ -32,7 +32,7 @@ export const SPARK_TINTS = [
   {
     id: "lemon",
     name: "Lemon spark",
-    cost: 12,
+    cost: 10,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#FEF9C3",
@@ -42,7 +42,7 @@ export const SPARK_TINTS = [
   {
     id: "gold",
     name: "Gold spark",
-    cost: 16,
+    cost: 14,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#FFF4B8",
@@ -52,7 +52,7 @@ export const SPARK_TINTS = [
   {
     id: "sky",
     name: "Sky spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#DBEAFE",
@@ -62,7 +62,7 @@ export const SPARK_TINTS = [
   {
     id: "forest",
     name: "Forest spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#D1FAE5",
@@ -72,7 +72,7 @@ export const SPARK_TINTS = [
   {
     id: "lilac",
     name: "Lilac spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#EDE9FE",
@@ -82,7 +82,7 @@ export const SPARK_TINTS = [
   {
     id: "grape",
     name: "Grape spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#E0E7FF",
@@ -92,7 +92,7 @@ export const SPARK_TINTS = [
   {
     id: "ember",
     name: "Ember spark",
-    cost: 14,
+    cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#FFEDD5",
@@ -102,7 +102,7 @@ export const SPARK_TINTS = [
   {
     id: "ink",
     name: "Ink spark",
-    cost: 16,
+    cost: 14,
     collection: "starter" as const,
     kind: "solid" as const,
     hi: "#E4E4E7",
@@ -112,9 +112,10 @@ export const SPARK_TINTS = [
   {
     id: "sunset",
     name: "Sunset wash",
-    cost: 18,
+    cost: 44,
     collection: "starter" as const,
     kind: "gradient" as const,
+    blurb: "Premium two-tone. Costs more than a solid.",
     hi: "#FDBA74",
     mid: "#FB7185",
     lo: "#E879F9",
@@ -122,9 +123,10 @@ export const SPARK_TINTS = [
   {
     id: "ocean",
     name: "Ocean wash",
-    cost: 18,
+    cost: 44,
     collection: "starter" as const,
     kind: "gradient" as const,
+    blurb: "Premium two-tone. Costs more than a solid.",
     hi: "#5EEAD4",
     mid: "#38BDF8",
     lo: "#2563EB",
@@ -132,9 +134,10 @@ export const SPARK_TINTS = [
   {
     id: "twilight",
     name: "Twilight wash",
-    cost: 18,
+    cost: 44,
     collection: "starter" as const,
     kind: "gradient" as const,
+    blurb: "Premium two-tone. Costs more than a solid.",
     hi: "#C4B5FD",
     mid: "#818CF8",
     lo: "#1D4ED8",
@@ -142,9 +145,10 @@ export const SPARK_TINTS = [
   {
     id: "honey",
     name: "Honey wash",
-    cost: 16,
+    cost: 40,
     collection: "starter" as const,
     kind: "gradient" as const,
+    blurb: "Premium two-tone. Costs more than a solid.",
     hi: "#FDE68A",
     mid: "#FBBF24",
     lo: "#F97316",
@@ -152,9 +156,10 @@ export const SPARK_TINTS = [
   {
     id: "blossom",
     name: "Blossom wash",
-    cost: 16,
+    cost: 40,
     collection: "starter" as const,
     kind: "gradient" as const,
+    blurb: "Premium two-tone. Costs more than a solid.",
     hi: "#F9A8D4",
     mid: "#E9D5FF",
     lo: "#A78BFA",
@@ -165,6 +170,7 @@ export const SPARK_TINTS = [
     cost: 90,
     collection: "aurora" as const,
     kind: "gradient" as const,
+    blurb: "Premium mint-violet wash.",
     hi: "#E9D5FF",
     mid: "#5EEAD4",
     lo: "#A78BFA",
