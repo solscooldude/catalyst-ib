@@ -27,7 +27,7 @@ export const COLLECTIONS: {
   {
     id: "focus",
     name: "Focus scenes",
-    range: "Free–120",
+    range: "Free–18",
     copy: "Session backdrops only: night sky, deep blue sea, math drift. Trails live in Trails.",
   },
 ];
@@ -68,10 +68,106 @@ export const ACCENTS = [
   {
     id: "gold",
     name: "Elite gold",
-    hex: "#E4C56A",
+    hex: "#E8C547",
     cost: 220,
     collection: "gold" as const,
-    blurb: "Rare metal on buttons and chips.",
+    blurb: "Rare metal on buttons and chips. Shine + sparkle.",
+  },
+  {
+    id: "red",
+    name: "Red",
+    hex: "#F87171",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "A clear red for buttons and chips.",
+  },
+  {
+    id: "red-deep",
+    name: "Deep red",
+    hex: "#B91C1C",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Darker red. Buy after Red, or on its own.",
+  },
+  {
+    id: "orange",
+    name: "Orange",
+    hex: "#FB923C",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "Warm orange highlights.",
+  },
+  {
+    id: "orange-deep",
+    name: "Deep orange",
+    hex: "#C2410C",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Burnt orange, a shade down.",
+  },
+  {
+    id: "yellow",
+    name: "Yellow",
+    hex: "#FACC15",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "Bright yellow chrome.",
+  },
+  {
+    id: "yellow-deep",
+    name: "Deep yellow",
+    hex: "#CA8A04",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Mustard yellow.",
+  },
+  {
+    id: "green",
+    name: "Green",
+    hex: "#4ADE80",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "Leaf green, not mint.",
+  },
+  {
+    id: "green-deep",
+    name: "Deep green",
+    hex: "#15803D",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Forest green.",
+  },
+  {
+    id: "blue",
+    name: "Blue",
+    hex: "#60A5FA",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "Clear sky blue.",
+  },
+  {
+    id: "blue-deep",
+    name: "Deep blue",
+    hex: "#1D4ED8",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Ink blue.",
+  },
+  {
+    id: "indigo",
+    name: "Indigo",
+    hex: "#818CF8",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "The last rainbow stop.",
+  },
+  {
+    id: "indigo-deep",
+    name: "Deep indigo",
+    hex: "#3730A3",
+    cost: 10,
+    collection: "starter" as const,
+    blurb: "Night indigo.",
   },
 ] as const;
 
@@ -118,6 +214,27 @@ export const BACKGROUNDS = [
     collection: "aurora" as const,
     blurb: "Soft muted lavender chrome for the whole app. Not a Focus backdrop.",
   },
+  {
+    id: "lilac",
+    name: "Lilac room",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "A light lilac wash. Works in light chrome.",
+  },
+  {
+    id: "blush",
+    name: "Light pink",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "Baby pink paper. Soft, not neon.",
+  },
+  {
+    id: "babyblue",
+    name: "Baby blue",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "Pale blue room, like morning sky.",
+  },
 ] as const;
 
 export const SPARK_TINTS = [
@@ -144,9 +261,9 @@ export const SPARK_TINTS = [
     name: "Gold spark",
     cost: 16,
     collection: "starter" as const,
-    hi: "#FEF3C7",
-    mid: "#FCD34D",
-    lo: "#F59E0B",
+    hi: "#FFF4B8",
+    mid: "#F5D76A",
+    lo: "#D4A017",
   },
   {
     id: "lilac",
@@ -187,6 +304,27 @@ export const SPARK_GEAR = [
     cost: 240,
     collection: "gold" as const,
     blurb: "Mortarboard with a gold rim and tassel.",
+  },
+  {
+    id: "headband",
+    name: "Mint headband",
+    cost: 12,
+    collection: "starter" as const,
+    blurb: "A thin band across the peaks.",
+  },
+  {
+    id: "phones",
+    name: "Study headphones",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "Soft black cups. For the long block.",
+  },
+  {
+    id: "star",
+    name: "Star clip",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "A tiny gold star on the left peak.",
   },
 ] as const;
 
@@ -278,35 +416,9 @@ export const FOCUS_THEMES = [
     collection: "focus" as const,
     blurb: "No extra scene on the timer.",
   },
-  {
-    id: "cat",
-    name: "Cat study",
-    cost: 0,
-    collection: "focus" as const,
-    blurb: "A sleeping study cat. One window, afternoon into night.",
-  },
-  {
-    id: "desk",
-    name: "Desk window",
-    cost: 40,
-    collection: "focus" as const,
-    blurb: "Laptop at the glass. Hills go gold, then starlight.",
-  },
-  {
-    id: "library",
-    name: "Library attic",
-    cost: 48,
-    collection: "focus" as const,
-    blurb: "Books, a chair, and a skylight that turns to night.",
-  },
-  {
-    id: "rocket",
-    name: "Rocket to space",
-    cost: 120,
-    collection: "focus" as const,
-    blurb: "Older option. Liftoff into the open universe — kept, not the main scene.",
-  },
 ] as const;
+
+const RETIRED_FOCUS = new Set(["cat", "desk", "library", "rocket", "waves"]);
 
 /** Session backdrops sold under Focus scenes. Quiet spotlight stays off the shelf. */
 export const SHOP_FOCUS_SCENES = FOCUS_THEMES.filter((item) => item.id !== "none");
@@ -339,7 +451,7 @@ export const defaultAppearance: AppearanceState = {
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
   ownedTrails: ["none"],
-  ownedFocusThemes: ["none", "nightsky", "cat"],
+  ownedFocusThemes: ["none", "nightsky"],
   accent: "mint",
   background: "void",
   sparkTint: "mint",
@@ -347,6 +459,23 @@ export const defaultAppearance: AppearanceState = {
   trail: "none",
   focusTheme: "nightsky",
 };
+
+function knownAccent(id: string | undefined): AccentId {
+  return ACCENTS.some((row) => row.id === id) ? (id as AccentId) : "mint";
+}
+
+function knownBackground(id: string | undefined): BackgroundId {
+  return BACKGROUNDS.some((row) => row.id === id)
+    ? (id as BackgroundId)
+    : "void";
+}
+
+function mapFocusTheme(id: string | undefined): FocusThemeId {
+  if (!id || RETIRED_FOCUS.has(id) || id === "aurora") return "nightsky";
+  return FOCUS_THEMES.some((row) => row.id === id)
+    ? (id as FocusThemeId)
+    : "nightsky";
+}
 
 function unique<T extends string>(values: T[], fallback: T): T[] {
   const next = [...new Set(values.filter(Boolean))];
@@ -357,28 +486,43 @@ function unique<T extends string>(values: T[], fallback: T): T[] {
 export function normalizeAppearance(
   raw?: Partial<AppearanceState> | null,
 ): AppearanceState {
-  const ownedAccents = unique(raw?.ownedAccents ?? ["mint"], "mint");
-  const ownedBackgrounds = unique(raw?.ownedBackgrounds ?? ["void"], "void");
-  const ownedSparkTints = unique(raw?.ownedSparkTints ?? ["mint"], "mint");
-  const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
-  const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
-  const rawOwned = (raw?.ownedFocusThemes ?? ["none", "nightsky", "cat"]).map(
-    (id) => {
-      if ((id as string) === "waves") return "sea";
-      if ((id as string) === "aurora") return "nightsky";
-      return id;
-    },
+  const ownedAccents = unique(
+    (raw?.ownedAccents ?? ["mint"]).filter((id) =>
+      ACCENTS.some((row) => row.id === id),
+    ),
+    "mint",
   );
-  const ownedFocusThemes = unique(
-    [...rawOwned, "none", "nightsky", "cat"],
-    "nightsky",
+  const ownedBackgrounds = unique(
+    (raw?.ownedBackgrounds ?? ["void"]).filter((id) =>
+      BACKGROUNDS.some((row) => row.id === id),
+    ),
+    "void",
   );
-  const rawTheme =
-    (raw?.focusTheme as string) === "waves"
-      ? "sea"
-      : (raw?.focusTheme as string) === "aurora"
-        ? "nightsky"
-        : (raw?.focusTheme ?? "nightsky");
+  const ownedSparkTints = unique(
+    (raw?.ownedSparkTints ?? ["mint"]).filter((id) =>
+      SPARK_TINTS.some((row) => row.id === id),
+    ),
+    "mint",
+  );
+  const ownedGear = unique(
+    (raw?.ownedGear ?? ["none"]).filter((id) =>
+      SPARK_GEAR.some((row) => row.id === id),
+    ),
+    "none",
+  );
+  const ownedTrails = unique(
+    (raw?.ownedTrails ?? ["none"]).filter((id) =>
+      SPARK_TRAILS.some((row) => row.id === id),
+    ),
+    "none",
+  );
+  const rawOwned = (raw?.ownedFocusThemes ?? ["none", "nightsky"]).map((id) =>
+    mapFocusTheme(id),
+  );
+  const ownedFocusThemes = unique([...rawOwned, "none", "nightsky"], "nightsky");
+  const rawTheme = mapFocusTheme(raw?.focusTheme);
+  const accent = knownAccent(raw?.accent);
+  const background = knownBackground(raw?.background);
   return {
     ownedAccents,
     ownedBackgrounds,
@@ -386,12 +530,8 @@ export function normalizeAppearance(
     ownedGear,
     ownedTrails,
     ownedFocusThemes,
-    accent: ownedAccents.includes(raw?.accent ?? "mint")
-      ? (raw?.accent ?? "mint")
-      : "mint",
-    background: ownedBackgrounds.includes(raw?.background ?? "void")
-      ? (raw?.background ?? "void")
-      : "void",
+    accent: ownedAccents.includes(accent) ? accent : "mint",
+    background: ownedBackgrounds.includes(background) ? background : "void",
     sparkTint: ownedSparkTints.includes(raw?.sparkTint ?? "mint")
       ? (raw?.sparkTint ?? "mint")
       : "mint",
