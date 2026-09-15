@@ -3,6 +3,7 @@
 import "@/app/focus-stage.css";
 import type { FocusThemeId } from "@/lib/appearance";
 import { STAGE_THEMES, isStageFocusTheme } from "@/lib/focus-stages";
+import { TokenAmount } from "@/components/mint-chip";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -122,7 +123,11 @@ export function FocusStagePicker({
             <p className="text-sm font-medium">{item.name}</p>
             <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">{item.blurb}</p>
             <p className="mt-1 text-xs text-zinc-500">
-              {item.cost === 0 ? "Free" : `${item.cost} tokens`}
+              {item.cost === 0 ? (
+                "Free"
+              ) : (
+                <TokenAmount value={item.cost} />
+              )}
               {has ? " · owned" : ""}
             </p>
           </button>
