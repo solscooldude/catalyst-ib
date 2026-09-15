@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import "@/app/sprite-motion.css";
 import { SparkleMark } from "@/components/brand-marks";
 import { Spark, type SparkMood } from "@/components/spark";
+import type {
+  SparkGearId,
+  SparkTintId,
+  SparkTrailId,
+} from "@/lib/appearance";
 import {
   SNACKS,
   hitZone,
@@ -33,6 +38,9 @@ type SpritePlaypenProps = {
   onCelebrate?: () => void;
   onHighFive?: () => void;
   onCatch?: (ok: boolean, reason?: string) => void;
+  tint?: SparkTintId;
+  gear?: SparkGearId;
+  trail?: SparkTrailId;
 };
 
 export function SpritePlaypen({
@@ -48,6 +56,9 @@ export function SpritePlaypen({
   onCelebrate,
   onHighFive,
   onCatch,
+  tint,
+  gear,
+  trail,
 }: SpritePlaypenProps) {
   const sparkRef = useRef<HTMLDivElement>(null);
   const snackRef = useRef<HTMLButtonElement>(null);
@@ -319,6 +330,9 @@ export function SpritePlaypen({
           petPulse={petPulse}
           act={act}
           snack={snackId}
+          tint={tint}
+          gear={gear}
+          trail={trail}
           className="pointer-events-none"
         />
       </div>
