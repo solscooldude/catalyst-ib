@@ -3,17 +3,26 @@ import {
   type SparkFlavor,
 } from "@/lib/spark-flavor";
 
-/** Ring around the teardrop — never mint, never stacked at one point. */
-const RING = [
-  { deg: -90, r: 46, size: 2.2 },
-  { deg: -48, r: 49, size: 1.8 },
-  { deg: -8, r: 47, size: 2.0 },
-  { deg: 36, r: 50, size: 1.7 },
-  { deg: 82, r: 45, size: 2.1 },
-  { deg: 128, r: 48, size: 1.6 },
-  { deg: 172, r: 46, size: 1.9 },
-  { deg: 218, r: 47, size: 1.8 },
+/** Non-mint inks — never #5EEAD4 on the mint teardrop. */
+const PARTICLE_INK = [
+  "#F5C14A",
+  "#FB8A3C",
+  "#8BA4FF",
+  "#F47A9A",
+  "#4DB7F5",
+  "#E879F9",
+  "#8BD14A",
+  "#E8B86D",
+  "#D4A06A",
+  "#7EB6FF",
 ] as const;
+
+const RING = PARTICLE_INK.map((ink, index) => ({
+  deg: -90 + index * (360 / PARTICLE_INK.length),
+  r: 43 + (index % 3) * 5 + (index % 2) * 2,
+  size: 1.55 + (index % 4) * 0.22,
+  ink,
+}));
 
 export function SparkParticleRing({
   radius = 47,
@@ -23,21 +32,29 @@ export function SparkParticleRing({
   twist?: number;
 }) {
   return (
-    <g className="spark-subject-bits" fill="currentColor">
+    <g className="spark-subject-bits" fill="none">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 50 54"
+        to="360 50 54"
+        dur="26s"
+        repeatCount="indefinite"
+      />
       {RING.map((dot, index) => {
         const rad = ((dot.deg + twist) * Math.PI) / 180;
-        const x = 50 + Math.cos(rad) * (dot.r * (radius / 47));
-        const y = 54 + Math.sin(rad) * (dot.r * (radius / 47));
+        const reach = dot.r * (radius / 47);
+        const cx = 50 + Math.cos(rad) * reach;
+        const cy = 54 + Math.sin(rad) * reach * 0.92;
         return (
-          <g
-            key={`${dot.deg}-${twist}`}
-            transform={`translate(${x.toFixed(2)} ${y.toFixed(2)})`}
-          >
-            <circle
-              className={`spark-orbit-dot spark-orbit-n${index}`}
-              r={dot.size}
-            />
-          </g>
+          <circle
+            key={`${dot.ink}-${twist}`}
+            className={`spark-orbit-dot spark-orbit-n${index}`}
+            cx={Number(cx.toFixed(2))}
+            cy={Number(cy.toFixed(2))}
+            r={dot.size}
+            fill={dot.ink}
+          />
         );
       })}
     </g>
