@@ -5,6 +5,7 @@ import "@/app/sprite-motion.css";
 import { SparkleMark } from "@/components/brand-marks";
 import { Spark, type SparkMood } from "@/components/spark";
 import type {
+  SparkAuraId,
   SparkGearId,
   SparkTintId,
   SparkTrailId,
@@ -40,6 +41,7 @@ type SpritePlaypenProps = {
   onCatch?: (ok: boolean, reason?: string) => void;
   tint?: SparkTintId;
   gear?: SparkGearId;
+  aura?: SparkAuraId;
   trail?: SparkTrailId;
 };
 
@@ -57,6 +59,7 @@ export function SpritePlaypen({
   onCatch,
   tint,
   gear,
+  aura,
   trail,
 }: SpritePlaypenProps) {
   const sparkRef = useRef<HTMLDivElement>(null);
@@ -331,6 +334,7 @@ export function SpritePlaypen({
           snack={snackId}
           tint={tint}
           gear={gear}
+          aura={aura}
           trail={trail}
           trackEyes
           className="pointer-events-none"
