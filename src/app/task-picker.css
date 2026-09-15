@@ -1,4 +1,66 @@
-/* Hardcoded so theme tokens cannot wash out ManageBac task labels. */
+/* Theme-locked picker chrome. html.dark / html.light beat utility layers. */
+
+.app-select-trigger,
+.focus-field,
+.picker-empty,
+.task-option,
+.study-chip,
+.app-select-menu,
+.app-select-item {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.app-select-trigger {
+  display: flex;
+  height: 2.75rem;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 2px solid #d4d4d8;
+  background: #ffffff;
+  padding: 0 0.65rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #18181b;
+  outline: none;
+}
+
+.app-select-trigger:focus-visible {
+  border-color: #5eead4;
+  box-shadow: 0 0 0 3px rgb(94 234 212 / 0.4);
+}
+
+.focus-field {
+  height: 2.75rem;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 2px solid #d4d4d8;
+  background: #ffffff;
+  padding: 0 0.7rem;
+  color: #18181b;
+  outline: none;
+}
+
+.focus-field::placeholder {
+  color: #71717a;
+}
+
+.focus-field:focus-visible {
+  border-color: #5eead4;
+  box-shadow: 0 0 0 3px rgb(94 234 212 / 0.4);
+}
+
+.picker-empty {
+  border-radius: 1rem;
+  background: #f4f4f5;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+  color: #3f3f46;
+}
 
 .task-option {
   display: block;
@@ -113,87 +175,126 @@
   box-shadow: 0 0 0 2px #5eead4;
 }
 
-.dark .task-option {
-  background: #18181b;
-  color: #f4f4f5;
-  border-color: #3f3f46;
-  box-shadow: none;
+html.dark .app-select-trigger,
+html.dark .focus-field,
+html.dark .picker-empty,
+html.dark .task-option,
+html.dark .study-chip,
+html.dark .app-select-menu,
+html.dark .app-select-item,
+html.dark .task-option-check {
+  color-scheme: dark;
 }
 
-.dark .task-option .task-option-title {
-  color: #f4f4f5;
+html.dark .app-select-trigger,
+html.dark .focus-field {
+  background: #27272a !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
 }
 
-.dark .task-option .task-option-meta {
-  color: #a1a1aa;
-}
-
-.dark .task-option[data-selected="true"] {
-  background: #134e4a;
-  border-color: #2dd4bf;
+html.dark .app-select-trigger:focus-visible,
+html.dark .focus-field:focus-visible {
+  border-color: #5eead4 !important;
   box-shadow: 0 0 0 3px rgb(94 234 212 / 0.35);
 }
 
-.dark .task-option[data-selected="true"] .task-option-title,
-.dark .task-option[data-selected="true"] .task-option-meta {
-  color: #ccfbf1;
+html.dark .focus-field::placeholder {
+  color: #a1a1aa;
 }
 
-.dark .task-option-check {
-  border-color: #71717a;
-  background: #27272a;
+html.dark .picker-empty {
+  background: #27272a !important;
+  color: #e4e4e7 !important;
 }
 
-.dark .task-option[data-selected="true"] .task-option-check {
-  border-color: #5eead4;
-  background: #0f766e;
-  color: #ecfdf8;
+html.dark .task-option {
+  background: #27272a !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+  box-shadow: none;
 }
 
-.dark .selected-task-chip {
-  background: #134e4a;
-  border-color: #2dd4bf;
-  color: #ccfbf1;
+html.dark .task-option .task-option-title {
+  color: #f4f4f5 !important;
 }
 
-.dark .selected-task-chip .selected-task-label {
-  color: #5eead4;
+html.dark .task-option .task-option-meta {
+  color: #a1a1aa !important;
 }
 
-.dark .selected-task-chip .selected-task-name {
-  color: #f4f4f5;
+html.dark .task-option[data-selected="true"] {
+  background: #134e4a !important;
+  border-color: #5eead4 !important;
+  box-shadow: 0 0 0 3px rgb(94 234 212 / 0.35);
 }
 
-.dark .selected-task-chip .selected-task-meta {
-  color: #99f6e4;
+html.dark .task-option[data-selected="true"] .task-option-title,
+html.dark .task-option[data-selected="true"] .task-option-meta {
+  color: #ccfbf1 !important;
 }
 
-.dark .app-select-menu {
+html.dark .task-option-check {
+  border-color: #71717a !important;
+  background: #18181b !important;
+}
+
+html.dark .task-option[data-selected="true"] .task-option-check {
+  border-color: #5eead4 !important;
+  background: #0f766e !important;
+  color: #ecfdf8 !important;
+}
+
+html.dark .selected-task-chip {
+  background: #134e4a !important;
+  border-color: #5eead4 !important;
+  color: #ccfbf1 !important;
+}
+
+html.dark .selected-task-chip .selected-task-label {
+  color: #5eead4 !important;
+}
+
+html.dark .selected-task-chip .selected-task-name {
+  color: #f4f4f5 !important;
+}
+
+html.dark .selected-task-chip .selected-task-meta {
+  color: #99f6e4 !important;
+}
+
+html.dark .app-select-menu {
   background: #18181b !important;
   color: #f4f4f5 !important;
-  border: 1px solid #3f3f46;
+  border: 1px solid #3f3f46 !important;
 }
 
-.dark .app-select-item {
+html.dark .app-select-item {
   color: #f4f4f5 !important;
-  background: #18181b;
+  background: #18181b !important;
 }
 
-.dark .app-select-item[data-selected="true"],
-.dark .app-select-item:hover {
+html.dark .app-select-item[data-selected="true"],
+html.dark .app-select-item:hover {
   background: #134e4a !important;
   color: #ccfbf1 !important;
 }
 
-.dark .study-chip {
-  background: #18181b;
-  color: #f4f4f5;
-  border-color: #3f3f46;
+html.dark .study-chip {
+  background: #27272a !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
 }
 
-.dark .study-chip[data-selected="true"] {
-  background: #134e4a;
-  color: #ccfbf1;
-  border-color: #2dd4bf;
+html.dark .study-chip[data-selected="true"] {
+  background: #134e4a !important;
+  color: #ccfbf1 !important;
+  border-color: #5eead4 !important;
   box-shadow: 0 0 0 2px rgb(94 234 212 / 0.35);
+}
+
+html.dark select option,
+html.dark select optgroup {
+  background-color: #18181b;
+  color: #f4f4f5;
 }
