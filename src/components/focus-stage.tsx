@@ -27,17 +27,30 @@ export function FocusStage({
   className?: string;
 }) {
   const equipped = useCatalyst().appearance.focusTheme;
-  const id = theme ?? equipped;
-  if (!isStageFocusTheme(id) || id === "none") return null;
+  const raw = theme ?? equipped;
+  const id = (raw as string) === "waves" ? "sea" : raw;
+
+  if (id === "none" || !isStageFocusTheme(id)) {
+    return (
+      <div
+        className={cn("focus-stage focus-stage-spotlight", className)}
+        aria-hidden
+      />
+    );
+  }
 
   return (
     <div
-      className={cn("focus-stage", `focus-stage-${id === "nightsky" ? "night" : id}`, className)}
+      className={cn(
+        "focus-stage",
+        `focus-stage-${id === "nightsky" ? "night" : id}`,
+        className,
+      )}
       aria-hidden
     >
       {id === "nightsky" ? <NightSky /> : null}
-      {id === "waves" ? <GentleWaves /> : null}
       {id === "sea" ? <Sea /> : null}
+      {id === "aurora" ? <Aurora /> : null}
       {id === "math" ? <MathDrift /> : null}
     </div>
   );
@@ -60,18 +73,22 @@ function NightSky() {
         />
       ))}
       <span className="focus-stage-shoot" style={{ top: "22%", left: "10%" }} />
-      <span className="focus-stage-shoot" style={{ top: "58%", left: "42%", animationDelay: "5.5s" }} />
+      <span
+        className="focus-stage-shoot"
+        style={{ top: "58%", left: "42%", animationDelay: "5.5s" }}
+      />
     </>
   );
 }
 
-function GentleWaves() {
+function Aurora() {
   return (
     <>
-      <div className="focus-stage-band focus-stage-band-a" />
-      <div className="focus-stage-band focus-stage-band-b" />
-      <div className="focus-stage-band focus-stage-band-c" />
-      <div className="focus-stage-band focus-stage-band-d" />
+      <div className="focus-stage-ribbon focus-stage-ribbon-a" />
+      <div className="focus-stage-ribbon focus-stage-ribbon-b" />
+      <div className="focus-stage-ribbon focus-stage-ribbon-c" />
+      <div className="focus-stage-ribbon focus-stage-ribbon-d" />
+      <div className="focus-stage-ribbon focus-stage-ribbon-e" />
     </>
   );
 }
@@ -156,11 +173,12 @@ export function FocusStagePicker({
   owned: (id: string) => boolean;
   onPick: (id: FocusThemeId, owned: boolean) => void;
 }) {
+  const current = (value as string) === "waves" ? "sea" : value;
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {STAGE_THEMES.map((item) => {
-        const has = owned(item.id);
-        const on = value === item.id;
+        const has = owned(item.id) || item.cost === 0;
+        const on = current === item.id;
         return (
           <TaskOption
             key={item.id}
