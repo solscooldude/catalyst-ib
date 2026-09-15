@@ -1,6 +1,10 @@
 export const SPRITE_NAME_KEY = "catalyst-v1:sprite-name";
-const DEFAULT_NAME = "Spark";
+const DEFAULT_NAME = "Sprite";
 const NAME_MAX = 16;
+
+function isUnsetName(name: string) {
+  return !name || /^(spark|sprite|flux)$/i.test(name);
+}
 
 function cleanName(raw?: string | null) {
   const trimmed = (raw ?? "").replace(/\s+/g, " ").trim().slice(0, NAME_MAX);
@@ -31,9 +35,9 @@ export function pickPersistedSpriteName(
   stored?: string | null,
   device?: string | null,
 ) {
-  const fromStore = cleanName(stored);
-  const fromDevice = device ? cleanName(device) : DEFAULT_NAME;
-  if (fromStore !== DEFAULT_NAME) return fromStore;
-  if (fromDevice !== DEFAULT_NAME) return fromDevice;
+  const fromStore = stored ? cleanName(stored) : "";
+  const fromDevice = device ? cleanName(device) : "";
+  if (fromStore && !isUnsetName(fromStore)) return fromStore;
+  if (fromDevice && !isUnsetName(fromDevice)) return fromDevice;
   return DEFAULT_NAME;
 }

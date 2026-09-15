@@ -1,7 +1,11 @@
 import { writeDeviceSpriteName } from "@/lib/sprite-name-persist";
 import { getSnapshot, setState } from "@/lib/store-core";
 
-export const DEFAULT_SPRITE_NAME = "Spark";
+export const DEFAULT_SPRITE_NAME = "Sprite";
+
+export function isDefaultSpriteName(name?: string | null) {
+  return /^(spark|sprite|flux)$/i.test((name ?? "").trim());
+}
 export const SPRITE_NAME_MAX = 16;
 export const SPRITE_RENAME_COST = 2;
 
@@ -13,7 +17,7 @@ export function normalizeSpriteName(raw?: string | null) {
 
 export function displaySpriteName(raw?: string | null) {
   const name = normalizeSpriteName(raw);
-  return /^flux$/i.test(name) ? DEFAULT_SPRITE_NAME : name;
+  return isDefaultSpriteName(name) ? DEFAULT_SPRITE_NAME : name;
 }
 
 export function commitSpriteName(next: string) {

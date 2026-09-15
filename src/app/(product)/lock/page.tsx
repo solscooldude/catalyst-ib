@@ -2,13 +2,10 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PhoneLock } from "@/components/phone-lock";
-import { DemoBadge } from "@/components/demo-badge";
-import { MotivationNudge } from "@/components/motivation-nudge";
-import { Spark } from "@/components/spark";
 import { ROUTES } from "@/lib/routes";
-import { enterFocus, sessionHint, sessionTitle, useCatalyst } from "@/lib/store";
+import { enterFocus, useCatalyst } from "@/lib/store";
 
+/** Legacy /lock bookmarks skip the iPhone preview and enter the session. */
 export default function LockPage() {
   const router = useRouter();
   const state = useCatalyst();
@@ -23,65 +20,15 @@ export default function LockPage() {
       router.replace(ROUTES.focus);
       return;
     }
-    if (state.session.status === "focus") {
-      router.replace(ROUTES.session);
-    }
     if (state.session.status === "completed") {
       router.replace(`${ROUTES.home}#unlocks`);
+      return;
     }
+    if (state.session.status === "locked") {
+      enterFocus();
+    }
+    router.replace(ROUTES.session);
   }, [state.hydrated, state.setupComplete, state.session, router]);
 
-  if (!state.session || state.session.status !== "locked") return null;
-
-  const title = sessionTitle(state.session);
-
-  function begin() {
-    enterFocus();
-    router.push(ROUTES.session);
-  }
-
-  return (
-    <div className="relative mx-auto grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <div className="flux-card px-6 py-8 sm:px-8">
-        <DemoBadge>Simulated phone lock</DemoBadge>
-        <h1 className="mt-4 text-4xl text-foreground sm:text-5xl">
-          Phone is locked
-        </h1>
-        <div className="mt-6 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900">
-          <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
-            Working on
-          </p>
-          <p className="mt-2 text-lg text-foreground">{title}</p>
-          {state.session.kind === "study" ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Study block
-              {state.session.plannedMinutes
-                ? ` · ${state.session.plannedMinutes} min`
-                : ""}
-            </p>
-          ) : state.session.goal ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {state.session.goal}
-            </p>
-          ) : null}
-        </div>
-        <MotivationNudge motivation={state.motivation} />
-      </div>
-      <div className="flex flex-col items-center">
-        <Spark
-          mood="locked"
-          taskId={state.session.taskId}
-          subject={state.session.subjectId}
-          hint={sessionHint(state.session)}
-          size={88}
-          className="mb-3"
-        />
-        <PhoneLock
-          nemeses={state.nemeses}
-          unlocks={state.unlocks}
-          onBeginFocus={begin}
-        />
-      </div>
-    </div>
-  );
+  return null;
 }
