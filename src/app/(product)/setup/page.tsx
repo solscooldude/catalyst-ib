@@ -43,20 +43,11 @@ export default function SetupPage() {
     <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-10">
       <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-        Name the apps that steal the block.
+        Nemesis apps
       </h1>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Pick one or more nemesis apps. Catalyst remembers the set — you do not
-        re-pick at the start of every focus. Change the list here when you
-        need to. Then connect a mock ManageBac so the demo has IB work to
-        prove.
-      </p>
 
       <section className="mt-10">
-        <h2 className="text-sm font-medium text-foreground">Your nemesis apps</h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Tap to add or remove. At least one.
-        </p>
+        <h2 className="text-sm font-medium text-foreground">Apps to lock</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {NEMESIS_APPS.map((app) => {
             const selected = nemeses.includes(app.id);
@@ -76,7 +67,6 @@ export default function SetupPage() {
                   <span className="text-base text-foreground">{app.name}</span>
                   {selected ? <Check className="size-4 text-primary" /> : null}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{app.blurb}</p>
               </button>
             );
           })}
@@ -87,9 +77,6 @@ export default function SetupPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base text-foreground">Connect ManageBac</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Simulated school tasks. Nothing leaves this browser.
-            </p>
           </div>
           <DemoBadge>Simulated ManageBac</DemoBadge>
         </div>
