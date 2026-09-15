@@ -17,8 +17,8 @@ export const ESSENTIAL_APPS = [
 
 export type EssentialAppId = (typeof ESSENTIAL_APPS)[number]["id"];
 
-export const TIER2_COST = 5;
-export const TIER3_COST = 10;
+export const TIER2_COST = 10;
+export const TIER3_COST = 15;
 
 export const TIER2_APPS = [
   { id: "whatsapp", name: "WhatsApp", glyph: "WA", blurb: "Group chats that wait ten minutes." },
@@ -137,6 +137,20 @@ export const UNLOCK_CATALOG = [
 
 export type UnlockCatalogId = (typeof UNLOCK_CATALOG)[number]["id"];
 export type UnlockTier = 2 | 3;
+export type UnlockTierSpendId = "tier2" | "tier3";
+export type UnlockSpendId = UnlockCatalogId | UnlockTierSpendId;
+
+export function unlockTierSpendId(tier: UnlockTier): UnlockTierSpendId {
+  return tier === 2 ? "tier2" : "tier3";
+}
+
+export function isUnlockTierSpendId(id: string): id is UnlockTierSpendId {
+  return id === "tier2" || id === "tier3";
+}
+
+export function isUnlockSpendId(id: string): id is UnlockSpendId {
+  return isUnlockTierSpendId(id) || isUnlockCatalogId(id);
+}
 
 export const UNLOCK_TIER_ROWS = [
   {
@@ -151,14 +165,14 @@ export const UNLOCK_TIER_ROWS = [
     name: "Tier 2",
     intensity: "Medium",
     cost: TIER2_COST,
-    blurb: "WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera.",
+    blurb: "10 tokens per 10 minutes for the whole tier. WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera.",
   },
   {
     id: "tier3",
     name: "Tier 3 — nemesis set",
     intensity: "High",
     cost: TIER3_COST,
-    blurb: "Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord. Setup picks which of these are yours.",
+    blurb: "15 tokens per 10 minutes for the whole tier. Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord. Setup picks which of these are yours.",
   },
 ] as const;
 

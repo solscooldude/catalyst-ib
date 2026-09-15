@@ -10,18 +10,18 @@ export type SparkAct =
   | null;
 
 export const SPARK_HOW_TO = [
-  { name: "Pet", how: "Drag Spark around." },
+  { name: "Pet", how: "Drag the sprite around." },
   { name: "Poke", how: "Tap a side — bigger squash." },
   { name: "Boop", how: "Tap the face." },
   { name: "Peak scrunch", how: "Drag the twin peaks." },
   { name: "Spin", how: "Double-tap for a twirl." },
   { name: "Tickle", how: "Drag across the belly." },
-  { name: "Mirror pose", how: "Wave the cursor nearby — Spark copies." },
+  { name: "Mirror pose", how: "Wave the cursor nearby — the sprite copies." },
   { name: "Sleep", how: "Long-press to tuck in. Long-press again to wake." },
-  { name: "Feed", how: "Drag a snack onto Spark." },
-  { name: "Gift", how: "Drag a cosmetic from the tray onto Spark." },
+  { name: "Feed", how: "Drag a snack onto the sprite." },
+  { name: "Gift", how: "Drag a cosmetic from the tray onto the sprite." },
   { name: "Catch a token", how: "Tap the floating mint star." },
-  { name: "Study buddy sit", how: "On Focus, sit Spark beside the timer." },
+  { name: "Study buddy sit", how: "On Focus, sit the sprite beside the timer." },
 ] as const;
 
 export type SnackId = "cookie" | "berry" | "mint";
