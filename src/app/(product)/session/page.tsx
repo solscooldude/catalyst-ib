@@ -11,9 +11,14 @@ import { UnlockPanel } from "@/components/unlock-panel";
 import { type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
+import {
+  COMPLETION_BONUS,
+  DEMO_TIME_COMPRESS_MS,
+  DEMO_TOKENS_PER_BLOCK,
+  REAL_TIME_COMPRESS_MS,
+  REAL_TOKEN_MS,
+} from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
-import { displaySpriteName } from "@/lib/sprite-name";
 import {
   completeSession,
   markTaskDone,
@@ -66,38 +71,29 @@ export default function FocusPage() {
   const paused = Boolean(session?.pausedAt);
   const elapsed = session ? sessionElapsedMs(session, now) : 0;
   const demoMode = session?.demoMode ?? state.demoMode;
-  const interval = demoMode ? DEMO_TOKEN_MS : REAL_TOKEN_MS;
-  const earned = tokensFromElapsed(elapsed, demoMode);
-  const tokenProgress = Math.min(1, (elapsed % interval) / interval);
+  const pending = tokensFromElapsed(elapsed, demoMode);
   const title = session ? sessionTitle(session) : "";
   const goalMs = session?.plannedMinutes
     ? session.demoMode
-      ? Math.round(session.plannedMinutes * 60 * 1000 * (DEMO_TOKEN_MS / REAL_TOKEN_MS))
+      ? Math.round(
+          session.plannedMinutes *
+            60 *
+            1000 *
+            (DEMO_TIME_COMPRESS_MS / REAL_TIME_COMPRESS_MS),
+        )
       : session.plannedMinutes * 60 * 1000
     : null;
   const taskMarkedDone = session?.taskMarkedDone ?? false;
-  const justEarned = earned >= 1 && tokenProgress < 0.12;
   const mood: SparkMood = paused
     ? "idle"
-    : session?.kind === "study"
-      ? justEarned
-        ? "earning"
-        : "locked"
-      : taskMarkedDone
-        ? "done"
-        : justEarned
-          ? "earning"
-          : "locked";
-
-  const liveTokens =
-    state.tokens +
-    earned +
-    (session?.kind === "verified" && taskMarkedDone ? COMPLETION_BONUS : 0);
+    : session?.kind === "verified" && taskMarkedDone
+      ? "done"
+      : "locked";
 
   if (!session || session.status !== "focus") return null;
 
   function finish() {
-    const result = completeSession(earned);
+    const result = completeSession(pending);
     if (!result.ok) {
       setError(result.reason);
       return;
@@ -119,9 +115,8 @@ export default function FocusPage() {
       />
       <FocusHud
         time={formatElapsed(elapsed)}
-        progress={tokenProgress}
-        tokens={liveTokens}
-        name={displaySpriteName(state.spriteName)}
+        progress={goalMs ? Math.min(1, elapsed / goalMs) : null}
+        tokens={state.tokens}
         task={title}
       />
 
@@ -161,10 +156,12 @@ export default function FocusPage() {
         ) : null}
 
         {demoMode ? (
-          <DemoBadge className="mt-4">Demo speed · 30s = 1 token</DemoBadge>
+          <DemoBadge className="mt-4">
+            Demo · {DEMO_TOKENS_PER_BLOCK} tokens / 20s, paid on End
+          </DemoBadge>
         ) : (
           <p className="mt-4 text-xs text-muted-foreground">
-            Real pace · 5 minutes = 1 token
+            {REAL_TOKEN_MS / 60000} minutes = 1 token, paid on End
           </p>
         )}
 

@@ -151,7 +151,7 @@ export default function AppHomePage() {
             <span>
               <span className="text-foreground">Demo speed</span>
               <span className="mt-0.5 block text-xs text-muted-foreground">
-                30 seconds = 1 token. Real pace is 5 minutes = 1 token.
+                Demo: 10 tokens / 20s, paid on End. Real: 1 token / 2 min.
               </span>
             </span>
           </label>
