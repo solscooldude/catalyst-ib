@@ -1,26 +1,57 @@
-/* Isolated from theme tokens so light chrome cannot wipe the session backdrop. */
+/* Session canvas is isolated from theme tokens. Light chrome must not wash it out. */
 
-.focus-quiet-stage {
-  background: radial-gradient(
-    ellipse at 50% 42%,
-    rgb(255 255 255 / 0.06),
-    transparent 46%
-  ) !important;
+html:has([data-focus-canvas]),
+html:has([data-focus-canvas]) body {
+  background-color: #070b14 !important;
 }
 
-.focus-stage {
+.focus-session,
+.focus-session-stage,
+.light .focus-session,
+.light .focus-session-stage,
+html.light .focus-session,
+html.light .focus-session-stage {
+  background: transparent !important;
+  background-color: transparent !important;
+  isolation: isolate;
+}
+
+.focus-quiet-stage,
+.light .focus-quiet-stage,
+html.light .focus-quiet-stage {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.focus-stage,
+.light .focus-stage,
+html.light .focus-stage {
   pointer-events: none;
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   overflow: hidden;
-  background: #070b14;
+  isolation: isolate;
+  color-scheme: only dark;
+  background-color: #070b14 !important;
+  background: #070b14 !important;
 }
 
-.focus-stage-night {
+.focus-stage-spotlight,
+.light .focus-stage-spotlight,
+html.light .focus-stage-spotlight {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgb(94 234 212 / 0.08), transparent 42%),
+    radial-gradient(ellipse at 50% 100%, #070b14 0%, #0b0b0f 55%),
+    #0b0b0f !important;
+}
+
+.focus-stage-night,
+.light .focus-stage-night,
+html.light .focus-stage-night {
   background:
     radial-gradient(ellipse at 50% 120%, #1a2744 0%, transparent 55%),
-    linear-gradient(180deg, #070b16 0%, #101935 48%, #1b2440 100%);
+    linear-gradient(180deg, #070b16 0%, #101935 48%, #1b2440 100%) !important;
 }
 
 .focus-stage-star {
@@ -40,53 +71,13 @@
   animation: focus-stage-shoot 11s linear infinite;
 }
 
-.focus-stage-waves {
-  background:
-    radial-gradient(ellipse at 50% 110%, #141820 0%, transparent 50%),
-    linear-gradient(180deg, #0b0d12 0%, #12161c 100%);
-}
-
-.focus-stage-band {
-  position: absolute;
-  left: -22%;
-  width: 144%;
-  height: 28%;
-  border-radius: 50%;
-  filter: blur(22px);
-  animation: focus-stage-band 18s ease-in-out infinite;
-}
-
-.focus-stage-band-a {
-  top: 22%;
-  background: rgb(94 234 212 / 0.16);
-}
-
-.focus-stage-band-b {
-  top: 42%;
-  background: rgb(196 181 253 / 0.14);
-  animation-duration: 24s;
-  animation-delay: -8s;
-}
-
-.focus-stage-band-c {
-  top: 58%;
-  background: rgb(94 234 212 / 0.1);
-  animation-duration: 20s;
-  animation-delay: -4s;
-}
-
-.focus-stage-band-d {
-  top: 74%;
-  background: rgb(167 139 250 / 0.1);
-  animation-duration: 26s;
-  animation-delay: -12s;
-}
-
-.focus-stage-sea {
+.focus-stage-sea,
+.light .focus-stage-sea,
+html.light .focus-stage-sea {
   background:
     radial-gradient(ellipse at 18% 18%, #123a62 0%, transparent 42%),
     radial-gradient(ellipse at 82% 8%, #0a1c38 0%, transparent 46%),
-    linear-gradient(180deg, #020812 0%, #04182c 24%, #0a3a68 58%, #0b5a86 100%);
+    linear-gradient(180deg, #020812 0%, #04182c 24%, #0a3a68 58%, #0b5a86 100%) !important;
 }
 
 .focus-stage-swell {
@@ -172,9 +163,64 @@
   opacity: 0.85;
 }
 
-.focus-stage-math {
+.focus-stage-aurora,
+.light .focus-stage-aurora,
+html.light .focus-stage-aurora {
   background:
-    radial-gradient(ellipse at 50% 40%, #12161f 0%, #0b0d12 70%);
+    radial-gradient(ellipse at 18% 12%, #5b21b6 0%, transparent 46%),
+    radial-gradient(ellipse at 82% 8%, #9d174d 0%, transparent 42%),
+    linear-gradient(180deg, #0b0614 0%, #1a0a2e 38%, #2e1065 100%) !important;
+}
+
+.focus-stage-ribbon {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 38%;
+  border-radius: 50%;
+  filter: blur(18px);
+  mix-blend-mode: plus-lighter;
+  animation: focus-stage-aurora 7s ease-in-out infinite;
+}
+
+.focus-stage-ribbon-a {
+  top: 8%;
+  background: rgb(192 38 211 / 0.55);
+}
+
+.focus-stage-ribbon-b {
+  top: 22%;
+  background: rgb(124 58 237 / 0.5);
+  animation-duration: 9s;
+  animation-delay: -2s;
+}
+
+.focus-stage-ribbon-c {
+  top: 40%;
+  background: rgb(244 63 94 / 0.38);
+  animation-duration: 6.2s;
+  animation-delay: -3.4s;
+}
+
+.focus-stage-ribbon-d {
+  top: 52%;
+  background: rgb(45 212 191 / 0.42);
+  animation-duration: 8.4s;
+  animation-delay: -1.2s;
+}
+
+.focus-stage-ribbon-e {
+  top: 68%;
+  background: rgb(167 139 250 / 0.4);
+  animation-duration: 10s;
+  animation-delay: -5s;
+}
+
+.focus-stage-math,
+.light .focus-stage-math,
+html.light .focus-stage-math {
+  background:
+    radial-gradient(ellipse at 50% 40%, #12161f 0%, #0b0d12 70%) !important;
 }
 
 .focus-stage-symbol {
@@ -265,13 +311,13 @@
   }
 }
 
-@keyframes focus-stage-band {
+@keyframes focus-stage-aurora {
   0%,
   100% {
-    transform: translate3d(-6%, 4%, 0);
+    transform: translate3d(-8%, 6%, 0) rotate(-6deg) scaleY(1);
   }
   50% {
-    transform: translate3d(8%, -6%, 0);
+    transform: translate3d(10%, -10%, 0) rotate(8deg) scaleY(1.25);
   }
 }
 
@@ -293,14 +339,14 @@
 @media (prefers-reduced-motion: reduce) {
   .focus-stage-star,
   .focus-stage-shoot,
-  .focus-stage-band,
   .focus-stage-wave,
   .focus-stage-swell,
   .focus-stage-caustic,
   .focus-stage-foam,
   .focus-stage-wave-svg,
+  .focus-stage-ribbon,
   .focus-stage-symbol {
     animation: none;
-    opacity: 0.45;
+    opacity: 0.55;
   }
 }
