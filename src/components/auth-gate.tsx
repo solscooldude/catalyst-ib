@@ -21,24 +21,36 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       auth.hydrated &&
       store.hydrated &&
       auth.user &&
+      !store.introSeen &&
+      pathname !== ROUTES.intro
+    ) {
+      router.replace(ROUTES.intro);
+      return;
+    }
+    if (
+      auth.hydrated &&
+      store.hydrated &&
+      auth.user &&
+      store.introSeen &&
       !store.profile.complete &&
       pathname !== ROUTES.profile
     ) {
       router.replace(ROUTES.profile);
     }
-  }, [auth.hydrated, auth.user, store.hydrated, store.profile.complete, pathname, router]);
+  }, [auth.hydrated, auth.user, store.hydrated, store.introSeen, store.profile.complete, pathname, router]);
 
   const waiting =
     !auth.hydrated ||
     !store.hydrated ||
     !auth.user ||
-    (!store.profile.complete && pathname !== ROUTES.profile);
+    (!store.introSeen && pathname !== ROUTES.intro) ||
+    (store.introSeen && !store.profile.complete && pathname !== ROUTES.profile);
 
   if (waiting) {
     return (
       <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-12">
         <div className="grid gap-4">
-          <div className="h-8 w-48 animate-pulse rounded-full bg-white/6" />
+          <div className="h-8 w-48 animate-pulse rounded-full bg-muted" />
           <div className="h-48 animate-pulse rounded-3xl bg-white/4" />
         </div>
       </div>

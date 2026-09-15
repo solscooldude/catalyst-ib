@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Info } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SPARK_HOW_TO } from "@/lib/spark-play";
 
 export function SparkHowTo() {
@@ -24,16 +24,13 @@ export function SparkHowTo() {
       >
         <Info className="size-4" />
       </button>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="bottom"
-          className="z-50 mx-auto max-h-[70dvh] max-w-md gap-0 overflow-y-auto rounded-t-[1.5rem]"
-        >
-          <SheetHeader>
-            <SheetTitle>Play with the sprite</SheetTitle>
-            <SheetDescription>Short taps. No extra copy on the page.</SheetDescription>
-          </SheetHeader>
-          <ul className="space-y-2.5 px-4 pb-8">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="flex max-h-[min(82dvh,36rem)] w-[min(28rem,calc(100vw-1.5rem))] max-w-md flex-col overflow-hidden p-0 sm:max-w-md">
+          <DialogHeader className="shrink-0 px-5 pt-5 pr-12">
+            <DialogTitle>Play with the sprite</DialogTitle>
+            <DialogDescription>Short taps. No extra copy on the page.</DialogDescription>
+          </DialogHeader>
+          <ul className="min-h-0 flex-1 space-y-2.5 overflow-y-auto px-5 pb-6">
             {SPARK_HOW_TO.map((row) => (
               <li key={row.name} className="flex gap-3 text-sm">
                 <span className="w-28 shrink-0 font-medium text-foreground">
@@ -43,8 +40,8 @@ export function SparkHowTo() {
               </li>
             ))}
           </ul>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

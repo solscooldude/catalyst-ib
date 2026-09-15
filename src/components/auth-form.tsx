@@ -37,7 +37,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       setError(result.reason);
       return;
     }
-    router.push(mode === "signup" ? "/profile" : "/dashboard");
+    router.push("/intro");
   }
 
   const isSignup = mode === "signup";

@@ -5,16 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { logOut, useAuth } from "@/lib/auth";
-import { resetDemo } from "@/lib/store";
+import { resetDemo, useCatalyst } from "@/lib/store";
 import { setUiTheme, useUiTheme } from "@/lib/ui-theme";
 
 export function AccountMenu() {
   const router = useRouter();
   const auth = useAuth();
   const theme = useUiTheme();
+  const store = useCatalyst();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  const label = auth.user?.email?.slice(0, 1).toUpperCase() ?? "A";
+  const label =
+    store.username.slice(0, 1).toUpperCase() ||
+    auth.user?.email?.slice(0, 1).toUpperCase() ||
+    "A";
 
   useEffect(() => {
     function onDoc(event: PointerEvent) {
@@ -34,6 +38,7 @@ export function AccountMenu() {
   const items = [
     { href: ROUTES.profile, label: "IB profile" },
     { href: ROUTES.settings, label: "Account settings" },
+    { href: ROUTES.friends, label: "Friends" },
   ];
 
   return (
@@ -44,9 +49,13 @@ export function AccountMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
-        className="font-heading grid size-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
+        className="font-heading grid size-9 place-items-center overflow-hidden rounded-full bg-primary text-sm font-semibold text-primary-foreground"
       >
-        {label}
+        {store.avatarDataUrl ? (
+          <img src={store.avatarDataUrl} alt="" className="size-full object-cover" />
+        ) : (
+          label
+        )}
       </button>
       {open ? (
         <div
