@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Spark, type SparkMood } from "@/components/spark";
+import { SpritePlaypen } from "@/components/sprite-playpen";
 import { TokenAmount } from "@/components/mint-chip";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
@@ -26,12 +27,7 @@ export default function SpritePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
   const [mood, setMood] = useState<SparkMood>("idle");
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const drag = useRef<{ x: number; y: number; dragging: boolean }>({
-    x: 0,
-    y: 0,
-    dragging: false,
-  });
+  const [petPulse, setPetPulse] = useState(0);
   const idleTimer = useRef(0);
   const pokeAt = useRef(0);
   const look = state.appearance;
@@ -75,13 +71,40 @@ export default function SpritePage() {
     window.setTimeout(() => setMood((current) => (current === next ? "idle" : current)), ms);
   }
 
-  function onFeed() {
+  function onPet() {
+    if (mood === "eating") return;
+    if (mood === "sleepy") {
+      setMood("idle");
+      setNotice("Up.");
+    }
+    setPetPulse((value) => value + 1);
+    bumpIdle();
+  }
+
+  function onFeedDrop() {
+    if (mood === "eating") return false;
     const result = feedSpark();
-    setNotice(result.ok ? "Snack time." : result.reason);
-    if (result.ok) react("done", 1800);
+    if (!result.ok) {
+      setNotice(result.reason);
+      return false;
+    }
+    setMood("eating");
+    setNotice("Nom.");
+    bumpIdle();
+    window.setTimeout(() => {
+      setMood("done");
+      setPetPulse((value) => value + 1);
+      setNotice("Snack time.");
+      bumpIdle();
+      window.setTimeout(() => {
+        setMood((current) => (current === "done" ? "idle" : current));
+      }, 1800);
+    }, 1200);
+    return true;
   }
 
   function onPoke() {
+    if (mood === "eating") return;
     const now = Date.now();
     if (now - pokeAt.current < 2400) {
       setNotice("Give it a second.");
@@ -93,20 +116,13 @@ export default function SpritePage() {
   }
 
   function onHighFive() {
+    if (mood === "eating") return;
     if (!canHighFive) {
       setNotice("Finish a session first, then come high-five.");
       return;
     }
     react("done", 2000);
     setNotice("Nice work.");
-  }
-
-  function wake() {
-    if (mood === "sleepy") {
-      setMood("idle");
-      setNotice("Up.");
-    }
-    bumpIdle();
   }
 
   return (
@@ -120,8 +136,8 @@ export default function SpritePage() {
             Sit with your spark.
           </h1>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-            Pet, feed, poke, drag, or let it doze. Official hours grow the
-            glow. Login streak {state.streakDays} day
+            Pet, drag a snack onto it, poke, or let it doze. Official hours
+            grow the glow. Login streak {state.streakDays} day
             {state.streakDays === 1 ? "" : "s"}
             {state.streakDays > 0 && state.streakDays % 7 === 0
               ? " · seven-day flare unlocked"
@@ -131,42 +147,23 @@ export default function SpritePage() {
         <TokenChip tokens={state.tokens} />
       </div>
 
-      <section className="flex flex-col items-center rounded-[2rem] bg-card px-5 py-10 ring-1 ring-white/6">
-        <div
-          className="touch-none"
-          style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-          onPointerDown={(event) => {
-            drag.current = { x: event.clientX, y: event.clientY, dragging: true };
-            event.currentTarget.setPointerCapture(event.pointerId);
-            wake();
-          }}
-          onPointerMove={(event) => {
-            if (!drag.current.dragging) return;
-            setOffset({
-              x: event.clientX - drag.current.x,
-              y: event.clientY - drag.current.y,
-            });
-          }}
-          onPointerUp={() => {
-            drag.current.dragging = false;
-            setOffset({ x: 0, y: 0 });
-          }}
-        >
-          <Spark
-            mood={mood}
-            size={268}
-            pettable
-            className="transition-transform duration-500 ease-out"
-          />
-        </div>
-        <p className="mt-5 text-center text-xs text-muted-foreground">
-          Tap to pet · drag and it springs back · idle and it sleeps
+      <section className="flex flex-col items-center rounded-[2rem] bg-card px-5 py-8 ring-1 ring-white/6">
+        <SpritePlaypen
+          mood={mood}
+          petPulse={petPulse}
+          canFeed={
+            feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating"
+          }
+          onPet={onPet}
+          onFeed={onFeedDrop}
+        />
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Tap to pet · drag it for a bounce · drop the snack on the spark
+        </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Snack · <TokenAmount value={FEED_COST} /> · {feedsLeft} left today
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <Button className="h-10 rounded-full" onClick={onFeed}>
-            Feed · <TokenAmount value={FEED_COST} />
-            <span className="ml-1 text-xs opacity-80">{feedsLeft} left</span>
-          </Button>
           <Button variant="outline" className="h-10 rounded-full" onClick={onPoke}>
             Poke
           </Button>
