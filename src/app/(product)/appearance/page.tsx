@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { BuyLabel, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
@@ -9,7 +9,6 @@ import {
   ACCENTS,
   ACCENT_SHADE_OPTIONS,
   BACKGROUNDS,
-  COLLECTIONS,
   SHOP_FOCUS_SCENES,
   SPARK_AURAS,
   SPARK_GEAR,
@@ -44,10 +43,34 @@ type Preview = {
   trail?: SparkTrailId;
 };
 
+const SHOP_TABS = [
+  { id: "cosmetics", label: "Cosmetics" },
+  { id: "colours", label: "Colours" },
+  { id: "gradients", label: "Gradients" },
+  { id: "auras", label: "Auras" },
+  { id: "trails", label: "Trails" },
+  { id: "scenes", label: "Focus scenes" },
+  { id: "room", label: "Room" },
+] as const;
+
+type ShopTab = (typeof SHOP_TABS)[number]["id"];
+
+function tabFromHash(hash: string): ShopTab {
+  const key = hash.replace(/^#/, "");
+  if (key === "colours" || key === "accents") return "colours";
+  if (key === "gradients" || key === "spark-gradient") return "gradients";
+  if (key === "auras") return "auras";
+  if (key === "trails") return "trails";
+  if (key === "scenes") return "scenes";
+  if (key === "room") return "room";
+  return "cosmetics";
+}
+
 export default function AppearancePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
   const [preview, setPreview] = useState<Preview>({});
+  const [tab, setTab] = useState<ShopTab>("cosmetics");
   const look = state.appearance;
   const shownTint = preview.sparkTint ?? look.sparkTint;
   const shownGear = preview.gear ?? look.gear;
@@ -63,6 +86,21 @@ export default function AppearancePage() {
     const result = owned ? equipAppearance(kind, id) : buyAppearance(kind, id);
     setNotice(result.ok ? (owned ? "Equipped." : "Bought and equipped.") : result.reason);
     if (result.ok) setPreview({});
+  }
+
+  useEffect(() => {
+    function sync() {
+      setTab(tabFromHash(window.location.hash));
+    }
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+
+  function openTab(next: ShopTab) {
+    setTab(next);
+    const url = `${ROUTES.appearance}#${next}`;
+    window.history.replaceState(null, "", url);
   }
 
   function tryOn(kind: AppearanceKind, id: string) {
@@ -121,171 +159,230 @@ export default function AppearancePage() {
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
 
-      <section id="scenes" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Focus scenes</h2>
-        <Group
-          title="Behind Spark in a session"
-          items={SHOP_FOCUS_SCENES}
-          owned={(id) => look.ownedFocusThemes.includes(id)}
-          equipped={(id) => look.focusTheme === id}
-          onAct={(id, owned) => act("focusTheme", id, owned)}
-          equipLabel="Use"
-          swatch={(item) => <SceneSwatch id={item.id} />}
-        />
-      </section>
+      <div
+        role="tablist"
+        aria-label="Shop categories"
+        className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {SHOP_TABS.map((item) => {
+          const on = tab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              className={cn(
+                "shrink-0 rounded-full px-3.5 py-2 text-sm font-medium ring-1 transition-colors",
+                on
+                  ? "bg-primary/15 text-foreground ring-primary/40"
+                  : "bg-card text-zinc-500 ring-border hover:text-foreground",
+              )}
+              onClick={() => openTab(item.id)}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
 
-      <section id="snacks" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Snacks</h2>
-        <p className="text-sm text-zinc-400">
-          <TokenAmount value={FEED_COST} /> · {FEED_DAILY_LIMIT} a day
-        </p>
-        <p className="text-sm">
-          <Link href={`${ROUTES.sprite}#snacks`} className="text-foreground underline">
-            Open the snack bowl
-          </Link>
-        </p>
-      </section>
-
-      <section id="auras" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Auras</h2>
-        <p className="text-sm text-zinc-500">
-          Soft halo. One at a time. Quiet on Focus.
-        </p>
-        <Group
-          title="Glow"
-          items={SPARK_AURAS}
-          owned={(id) => look.ownedAuras.includes(id)}
-          equipped={(id) => look.aura === id}
-          previewing={(id) => preview.aura === id}
-          onAct={(id, owned) => act("aura", id, owned)}
-          onTry={(id) => tryOn("aura", id)}
-          swatch={(item) => (
-            <Spark
-              mood="idle"
-              tint={look.sparkTint}
-              gear="none"
-              aura={item.id}
-              trail="none"
-              evolve={false}
-              size={52}
+      <section className="flux-card scroll-mt-24 space-y-6 px-6 py-8">
+        {tab === "cosmetics" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Cosmetics</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Clothes and solid Spark body colours. Try before you buy.
+              </p>
+            </div>
+            <Group
+              title="Clothes"
+              items={SPARK_GEAR}
+              owned={(id) => look.ownedGear.includes(id)}
+              equipped={(id) => look.gear === id}
+              previewing={(id) => preview.gear === id}
+              onAct={(id, owned) => act("gear", id, owned)}
+              onTry={(id) => tryOn("gear", id)}
+              swatch={(item) => (
+                <Spark
+                  mood="idle"
+                  tint={look.sparkTint}
+                  gear={item.id}
+                  aura="none"
+                  trail="none"
+                  evolve={false}
+                  size={52}
+                />
+              )}
             />
-          )}
-        />
-      </section>
-
-      <section id="trails" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Trails</h2>
-        <Group
-          title="Spark trail only"
-          items={SPARK_TRAILS.filter(
-            (item) => item.id !== "week" || look.ownedTrails.includes("week"),
-          )}
-          owned={(id) => look.ownedTrails.includes(id)}
-          equipped={(id) => look.trail === id}
-          previewing={(id) => preview.trail === id}
-          onAct={(id, owned) => act("trail", id, owned)}
-          onTry={(id) => tryOn("trail", id)}
-          swatch={(item) => (
-            <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
-          )}
-        />
-      </section>
-
-      <section id="spark-color" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Spark color</h2>
-        <p className="text-sm text-zinc-500">Solid body colours. 10–14 tokens.</p>
-        <Group
-          title="Solids"
-          items={SPARK_TINTS.filter((item) => item.kind === "solid")}
-          owned={(id) => look.ownedSparkTints.includes(id)}
-          equipped={(id) => look.sparkTint === id}
-          previewing={(id) => preview.sparkTint === id}
-          onAct={(id, owned) => act("sparkTint", id, owned)}
-          onTry={(id) => tryOn("sparkTint", id)}
-          swatch={(item) => (
-            <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
-          )}
-        />
-      </section>
-
-      <section id="spark-gradient" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
-        <h2 className="text-2xl text-foreground">Spark gradient</h2>
-        <p className="text-sm text-zinc-500">
-          Premium two-tone washes. 40–44, Aurora 90.
-        </p>
-        <Group
-          title="Premium"
-          items={SPARK_TINTS.filter((item) => item.kind === "gradient")}
-          owned={(id) => look.ownedSparkTints.includes(id)}
-          equipped={(id) => look.sparkTint === id}
-          previewing={(id) => preview.sparkTint === id}
-          onAct={(id, owned) => act("sparkTint", id, owned)}
-          onTry={(id) => tryOn("sparkTint", id)}
-          swatch={(item) => (
-            <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
-          )}
-        />
-      </section>
-
-      <section className="scroll-mt-24 space-y-6">
-      {COLLECTIONS.filter((collection) => collection.id !== "focus").map((collection) => (
-        <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
-          <div>
-            <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.16em] text-primary uppercase">
-              {collection.range}
+            <Group
+              title="Solid body colours"
+              items={SPARK_TINTS.filter((item) => item.kind === "solid")}
+              owned={(id) => look.ownedSparkTints.includes(id)}
+              equipped={(id) => look.sparkTint === id}
+              previewing={(id) => preview.sparkTint === id}
+              onAct={(id, owned) => act("sparkTint", id, owned)}
+              onTry={(id) => tryOn("sparkTint", id)}
+              swatch={(item) => (
+                <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+              )}
+            />
+            <p className="text-sm text-zinc-400">
+              Snacks are on{" "}
+              <Link href={`${ROUTES.sprite}#snacks`} className="text-foreground underline">
+                My Sprite
+              </Link>
+              {" · "}
+              <TokenAmount value={FEED_COST} /> · {FEED_DAILY_LIMIT} a day
             </p>
-            <h2 className="mt-1 text-2xl text-foreground">{collection.name}</h2>
-          </div>
+          </>
+        ) : null}
 
-          <AccentGroup
-            items={ACCENTS.filter((item) => item.collection === collection.id)}
-            owned={(id) => look.ownedAccents.includes(id)}
-            equipped={(id) => look.accent === id}
-            shade={look.accentShade}
-            onAct={(id, owned) => act("accent", id, owned)}
-            onShade={(id, shade) => {
-              const result = setAccentShade(shade, id);
-              setNotice(
-                result.ok ? "Shade saved." : result.reason,
-              );
-            }}
-          />
+        {tab === "colours" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Colours</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Accent hues for buttons and chrome. Buy the colour once, then
+                Pastel / Normal / Deep.
+              </p>
+            </div>
+            <AccentGroup
+              items={ACCENTS}
+              owned={(id) => look.ownedAccents.includes(id)}
+              equipped={(id) => look.accent === id}
+              shade={look.accentShade}
+              onAct={(id, owned) => act("accent", id, owned)}
+              onShade={(id, shade) => {
+                const result = setAccentShade(shade, id);
+                setNotice(result.ok ? "Shade saved." : result.reason);
+              }}
+            />
+          </>
+        ) : null}
 
-          <RoomGroup
-            items={BACKGROUNDS.filter((item) => item.collection === collection.id)}
-            owned={(id) => look.ownedBackgrounds.includes(id)}
-            equipped={(id) => look.background === id}
-            shade={look.backgroundShade}
-            onAct={(id, owned) => act("background", id, owned)}
-            onShade={(id, next) => {
-              const result = setBackgroundShade(next, id);
-              setNotice(result.ok ? "Shade saved." : result.reason);
-            }}
-          />
+        {tab === "gradients" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Gradients</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Premium two-tone Spark washes. 40–44, Aurora 90. No shade dropdown.
+              </p>
+            </div>
+            <Group
+              title="Spark body"
+              items={SPARK_TINTS.filter((item) => item.kind === "gradient")}
+              owned={(id) => look.ownedSparkTints.includes(id)}
+              equipped={(id) => look.sparkTint === id}
+              previewing={(id) => preview.sparkTint === id}
+              onAct={(id, owned) => act("sparkTint", id, owned)}
+              onTry={(id) => tryOn("sparkTint", id)}
+              swatch={(item) => (
+                <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+              )}
+            />
+          </>
+        ) : null}
 
-          <Group
-            title="Clothes"
-            items={SPARK_GEAR.filter((item) => item.collection === collection.id)}
-            owned={(id) => look.ownedGear.includes(id)}
-            equipped={(id) => look.gear === id}
-            previewing={(id) => preview.gear === id}
-            onAct={(id, owned) => act("gear", id, owned)}
-            onTry={(id) => tryOn("gear", id)}
-            swatch={(item) => (
-              <Spark
-                mood="idle"
-                tint={look.sparkTint}
-                gear={item.id}
-                aura="none"
-                trail="none"
-                evolve={false}
-                size={52}
-              />
-            )}
-          />
+        {tab === "auras" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Auras</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Soft halo. One at a time. Quiet on Focus.
+              </p>
+            </div>
+            <Group
+              title="Glow"
+              items={SPARK_AURAS}
+              owned={(id) => look.ownedAuras.includes(id)}
+              equipped={(id) => look.aura === id}
+              previewing={(id) => preview.aura === id}
+              onAct={(id, owned) => act("aura", id, owned)}
+              onTry={(id) => tryOn("aura", id)}
+              swatch={(item) => (
+                <Spark
+                  mood="idle"
+                  tint={look.sparkTint}
+                  gear="none"
+                  aura={item.id}
+                  trail="none"
+                  evolve={false}
+                  size={52}
+                />
+              )}
+            />
+          </>
+        ) : null}
 
-        </section>
-      ))}
+        {tab === "trails" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Trails</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Spark trail only. No Pastel / Normal / Deep — that dropdown is
+                for colours and rooms.
+              </p>
+            </div>
+            <Group
+              title="Motion"
+              items={SPARK_TRAILS.filter(
+                (item) => item.id !== "week" || look.ownedTrails.includes("week"),
+              )}
+              owned={(id) => look.ownedTrails.includes(id)}
+              equipped={(id) => look.trail === id}
+              previewing={(id) => preview.trail === id}
+              onAct={(id, owned) => act("trail", id, owned)}
+              onTry={(id) => tryOn("trail", id)}
+              swatch={(item) => (
+                <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
+              )}
+            />
+          </>
+        ) : null}
+
+        {tab === "scenes" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Focus scenes</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Behind Spark in a session. Night sky is free.
+              </p>
+            </div>
+            <Group
+              title="Session backdrop"
+              items={SHOP_FOCUS_SCENES}
+              owned={(id) => look.ownedFocusThemes.includes(id)}
+              equipped={(id) => look.focusTheme === id}
+              onAct={(id, owned) => act("focusTheme", id, owned)}
+              equipLabel="Use"
+              swatch={(item) => <SceneSwatch id={item.id} />}
+            />
+          </>
+        ) : null}
+
+        {tab === "room" ? (
+          <>
+            <div>
+              <h2 className="text-2xl text-foreground">Room</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                App chrome hue. Buy once, then Pastel / Normal / Deep. Void and
+                star dots stay as they are.
+              </p>
+            </div>
+            <RoomGroup
+              items={BACKGROUNDS}
+              owned={(id) => look.ownedBackgrounds.includes(id)}
+              equipped={(id) => look.background === id}
+              shade={look.backgroundShade}
+              onAct={(id, owned) => act("background", id, owned)}
+              onShade={(id, next) => {
+                const result = setBackgroundShade(next, id);
+                setNotice(result.ok ? "Shade saved." : result.reason);
+              }}
+            />
+          </>
+        ) : null}
       </section>
     </PageFrame>
   );
