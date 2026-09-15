@@ -231,6 +231,7 @@ export function FocusSpark({
           ref={handRef}
           type="button"
           aria-label="High-five Spark"
+          title="Drag onto Spark"
           className={cn("sprite-highfive-hand focus-highfive-hand", handHeld && "is-held")}
           onPointerDown={handDown}
           onPointerMove={handMove}
