@@ -13,6 +13,7 @@ export type SparkScrunch = {
   move: (clientY: number) => void;
   release: () => void;
   active: () => boolean;
+  dispose: () => void;
 };
 
 export function createSparkScrunch(): SparkScrunch {
@@ -24,6 +25,7 @@ export function createSparkScrunch(): SparkScrunch {
   let originY = 0;
   let span = 120;
   let raf = 0;
+  let listening = false;
 
   function paint() {
     if (!node) return;
@@ -31,11 +33,31 @@ export function createSparkScrunch(): SparkScrunch {
     node.style.setProperty("--scrunch-y", String(1 - (1 - MAX_Y) * amount));
   }
 
+  function onWinMove(event: PointerEvent) {
+    if (mode !== "press") return;
+    const down = Math.max(0, event.clientY - originY);
+    target = Math.min(1, 0.36 + down / span);
+    schedule();
+  }
+
+  function bindMove() {
+    if (listening) return;
+    listening = true;
+    window.addEventListener("pointermove", onWinMove, { passive: true });
+  }
+
+  function unbindMove() {
+    if (!listening) return;
+    listening = false;
+    window.removeEventListener("pointermove", onWinMove);
+  }
+
   function stop() {
     amount = 0;
     vel = 0;
     target = 0;
     mode = "idle";
+    unbindMove();
     if (raf) {
       window.cancelAnimationFrame(raf);
       raf = 0;
@@ -79,6 +101,7 @@ export function createSparkScrunch(): SparkScrunch {
       mode = "press";
       node?.classList.remove("is-scrunch-release");
       node?.classList.add("is-scrunching");
+      bindMove();
       schedule();
     },
     move(clientY) {
@@ -89,12 +112,17 @@ export function createSparkScrunch(): SparkScrunch {
     },
     release() {
       if (mode === "idle") return;
+      unbindMove();
       mode = "spring";
       node?.classList.add("is-scrunch-release");
       schedule();
     },
     active() {
       return mode !== "idle";
+    },
+    dispose() {
+      stop();
+      node = null;
     },
   };
 }
