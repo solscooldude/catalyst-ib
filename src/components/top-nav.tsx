@@ -20,6 +20,7 @@ const GROUPS = [
     href: ROUTES.home,
     items: [
       { href: ROUTES.home, label: "Dashboard" },
+      { href: ROUTES.planner, label: "Planner" },
       { href: ROUTES.stats, label: "Stats" },
       { href: ROUTES.schedule, label: "Schedule" },
     ],
@@ -40,6 +41,7 @@ const GROUPS = [
     items: [
       { href: ROUTES.sprite, label: "My Sprite" },
       { href: ROUTES.quiz, label: "Quiz" },
+      { href: ROUTES.friends, label: "Friends" },
     ],
   },
   {
