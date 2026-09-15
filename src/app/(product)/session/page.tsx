@@ -15,6 +15,7 @@ import {
   COMPLETION_BONUS,
   DEMO_TOKENS_PER_BLOCK,
   REAL_TOKEN_MS,
+  SUBJECTS,
 } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -75,6 +76,9 @@ export default function FocusPage() {
   const elapsed = session ? sessionElapsedMs(session, now) : 0;
   const demoMode = session?.demoMode ?? state.demoMode;
   const title = session ? sessionTitle(session) : "";
+  const subjectLabel = session
+    ? (SUBJECTS.find((row) => row.id === session.subjectId)?.label ?? null)
+    : null;
   const goalMs = session ? plannedLockMs(session) : null;
   const taskMarkedDone = session?.taskMarkedDone ?? false;
   const mood: SparkMood = paused
@@ -111,15 +115,18 @@ export default function FocusPage() {
         task={title}
       />
 
-      <div className="focus-session-panel">
-        <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
+      <div className="focus-session-panel" data-focus-board="">
+        <p className="focus-board-kicker">
           {paused ? "Paused" : "Focus session"}
         </p>
-        <h1 className="mt-2 font-heading text-2xl text-white sm:text-3xl">
+        <h1 className="focus-board-title mt-2 font-heading text-2xl sm:text-3xl">
           {title}
         </h1>
+        {subjectLabel ? (
+          <p className="focus-board-subject mt-1 text-sm">{subjectLabel}</p>
+        ) : null}
         {session.goal && session.kind === "verified" ? (
-          <p className="mt-3 text-sm text-foreground/90">{session.goal}</p>
+          <p className="focus-board-copy mt-3 text-sm">{session.goal}</p>
         ) : null}
 
         <label className="focus-board-row mt-5 flex items-start gap-3">
@@ -149,8 +156,12 @@ export default function FocusPage() {
               <span className="text-sm text-white">
                 Mark ManageBac task done
               </span>
-              <span className="mt-1 block text-xs text-zinc-100">
-                Adds <TokenAmount value={COMPLETION_BONUS} />
+              <span className="focus-board-copy mt-1 block text-xs">
+                Adds{" "}
+                <TokenAmount
+                  value={COMPLETION_BONUS}
+                  className="text-white"
+                />
               </span>
             </span>
           </label>

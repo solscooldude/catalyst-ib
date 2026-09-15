@@ -313,18 +313,24 @@ html.light .focus-stage-math {
 }
 
 .focus-session-panel,
+.focus-session-panel[data-focus-board],
 .focus-session-panel h1,
-.focus-session-panel .text-foreground,
+.focus-session-panel p,
+.focus-session-panel span,
 .focus-session-panel label,
 .focus-board-row,
-.focus-board-row span {
+.focus-board-row span,
+.focus-board-kicker,
+.focus-board-title,
+.focus-board-subject,
+.focus-board-copy,
+.focus-session-panel .token-amount,
+.focus-session-panel .token-amount span {
   color: #ffffff !important;
 }
 
-.focus-session-panel .text-muted-foreground,
-.focus-session-panel .text-primary,
-.focus-session-panel .text-xs {
-  color: #f4f4f5 !important;
+.focus-hud-task {
+  color: #ffffff !important;
 }
 
 .focus-session-panel [data-slot="checkbox"] {

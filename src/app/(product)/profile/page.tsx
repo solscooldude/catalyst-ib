@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppSelect } from "@/components/app-select";
 import { CoreSubjects } from "@/components/core-subjects";
@@ -18,6 +18,7 @@ import { SpriteRename } from "@/components/sprite-rename";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
 import { PageFrame } from "@/components/page-frame";
+import { commitSpriteName, displaySpriteName } from "@/lib/sprite-name";
 import { saveMotivation, saveProfile, useCatalyst } from "@/lib/store";
 
 export default function ProfilePage() {
@@ -67,7 +68,15 @@ export default function ProfilePage() {
   const [course, setCourse] = useState(state.motivation.course);
   const [why, setWhy] = useState(state.motivation.why);
   const [error, setError] = useState<string | null>(null);
-  const [spriteDraft, setSpriteDraft] = useState(state.spriteName);
+  const [spriteDraft, setSpriteDraft] = useState(() =>
+    displaySpriteName(state.spriteName),
+  );
+  const [spriteDirty, setSpriteDirty] = useState(false);
+
+  useEffect(() => {
+    if (spriteDirty) return;
+    setSpriteDraft(displaySpriteName(state.spriteName));
+  }, [state.hydrated, state.spriteName, spriteDirty]);
 
   const requiredIds = useMemo(
     () => Object.values(required).filter(Boolean),
@@ -83,6 +92,7 @@ export default function ProfilePage() {
   );
 
   function save() {
+    commitSpriteName(spriteDraft);
     const result = saveProfile({
       classYear,
       subjects,
@@ -113,7 +123,12 @@ export default function ProfilePage() {
       </div>
 
       <div className="flux-card space-y-6 px-6 py-8">
-      <SpriteRename onDraft={setSpriteDraft} />
+      <SpriteRename
+        onDraft={(name) => {
+          setSpriteDirty(true);
+          setSpriteDraft(name);
+        }}
+      />
       <div className="space-y-2">
         <Label htmlFor="class-year">Graduating class</Label>
         <AppSelect
