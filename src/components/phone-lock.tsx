@@ -16,6 +16,7 @@ import {
   NEMESIS_APPS,
   TIER2_APPS,
   TIER2_COST,
+  TIER3_COST,
   formatNemesisList,
   type NemesisId,
 } from "@/lib/constants";
@@ -154,7 +155,7 @@ export function PhoneLock({
             </div>
 
             <p className="mt-4 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
-              Tier 3 — nemesis set
+              Tier 3 — {TIER3_COST} tokens / 10 min
             </p>
             <div className="grid grid-cols-3 gap-2">
               {tier3.map((app) => (

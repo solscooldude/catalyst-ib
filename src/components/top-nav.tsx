@@ -49,8 +49,6 @@ const GROUPS = [
     items: [
       { href: ROUTES.appearance, label: "Appearance" },
       { href: `${ROUTES.appearance}#scenes`, label: "Focus scenes" },
-      { href: `${ROUTES.appearance}#trails`, label: "Trails" },
-      { href: `${ROUTES.appearance}#snacks`, label: "Snacks" },
     ],
   },
 ] as const;
