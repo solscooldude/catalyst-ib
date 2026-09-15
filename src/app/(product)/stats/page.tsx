@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { TokenAmount } from "@/components/mint-chip";
 import { CoreSubjects } from "@/components/core-subjects";
@@ -8,8 +8,10 @@ import { Spark } from "@/components/spark";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudyCalendar } from "@/components/study-calendar";
 import { StudyStartForm } from "@/components/study-start-form";
+import { WeekStoryPanel } from "@/components/week-story-share";
 import { SUBJECTS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
+import { displaySpriteName } from "@/lib/sprite-name";
 import {
   formatDuration,
   formatHours,
@@ -23,6 +25,7 @@ import {
 import { PageFrame } from "@/components/page-frame";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { buildWeekStory } from "@/lib/week-story";
 
 export default function StatsPage() {
   const router = useRouter();
@@ -36,6 +39,16 @@ export default function StatsPage() {
   }, [state.hydrated, state.setupComplete, router]);
 
   const [now] = useState(() => new Date());
+  const story = useMemo(
+    () =>
+      buildWeekStory(
+        state.logs,
+        state.streakDays,
+        displaySpriteName(state.spriteName),
+        now,
+      ),
+    [state.logs, state.streakDays, state.spriteName, now],
+  );
   const roundup = monthlyRoundup(state.logs, now);
   const rangedLogs = logsInRange(
     state.logs,
@@ -73,6 +86,8 @@ export default function StatsPage() {
       </div>
 
       <CoreSubjects />
+
+      <WeekStoryPanel story={story} />
 
       <StudyCalendar logs={state.logs} now={now} />
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Check, Clock3, Flame, Heart } from "lucide-react";
 import { SparkleMark } from "@/components/brand-marks";
@@ -23,7 +23,9 @@ import {
 } from "@/lib/stats";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
+import { WeekStoryShareDialog } from "@/components/week-story-share";
 import { sessionHint, useCatalyst } from "@/lib/store";
+import { buildWeekStory } from "@/lib/week-story";
 import { cn } from "@/lib/utils";
 
 function greeting(now: Date) {
@@ -36,11 +38,22 @@ function greeting(now: Date) {
 export default function DashboardPage() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => new Date());
+  const [storyNow] = useState(() => new Date());
 
   useEffect(() => {
     const tick = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(tick);
   }, []);
+  const story = useMemo(
+    () =>
+      buildWeekStory(
+        state.logs,
+        state.streakDays,
+        displaySpriteName(state.spriteName),
+        storyNow,
+      ),
+    [state.logs, state.streakDays, state.spriteName, storyNow],
+  );
   const roundup = monthlyRoundup(state.logs, now);
   const stacks = subjectStacks(
     state.logs.filter((log) => log.endedAt >= startOfMonth(now).getTime()),
@@ -69,9 +82,12 @@ export default function DashboardPage() {
 
   return (
     <PageFrame>
-      <p className="font-heading px-1 pt-1 text-2xl text-foreground sm:text-3xl">
-        {greeting(now)}.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-3 px-1 pt-1">
+        <p className="font-heading text-2xl text-foreground sm:text-3xl">
+          {greeting(now)}.
+        </p>
+        <WeekStoryShareDialog story={story} />
+      </div>
 
       <div className="grid gap-5 lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
         <section className="flux-card px-6 py-8 sm:px-8">
