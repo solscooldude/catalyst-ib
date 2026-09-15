@@ -36,7 +36,7 @@ npm run build
 5. `/setup` — nemesis apps + mock ManageBac. Quiet hours live on `/schedule`; Home shows today’s lock window as one chip.
 6. `/focus` — pick a ManageBac task or start a study block. Last Focus stage (night sky / deep blue sea / math drift) is remembered on this device. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
 7. `/session` — timer counts up in the center of the HUD (no sprite name). Pause or End anytime. Tokens are not awarded mid-session. Compact unlocks panel stays on the board.
-8. `/unlocks` — dedicated spend route (also in Shop). After End, a recap card shows minutes and tokens and Spark celebrates. Day-to-day spend is the Home App unlocks card; the token pill jumps there.
+8. `/unlocks` — the one dedicated Unlocks route (linked from Home and Focus only). After End, a recap card shows minutes and tokens and Spark celebrates. Day-to-day spend is the Home App unlocks card; Focus has a compact panel. The token pill jumps to Home.
 9. `/sprite` — My Sprite. `/appearance` is the closet. Try cosmetics on Spark before you buy. `/quiz` is a daily IB-style check.
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
 11. `/account/settings` — account basics. `/account/subscription` is a free-demo stub, not a checkout.
