@@ -8,7 +8,7 @@ Spark play on Focus and My Sprite: boop the face, scrunch the twin peaks, long-p
 
 ## Palette
 
-Default chrome is a soft light paper (`#F4F1EA` / `#FFFCF7`) with charcoal type. Dark mode is the same layout in `#0B0B0F` / `#121218`. Muted `#A1A1AA` (dark) / `#78716C` (light), mint cyan accent `#5EEAD4` on the one primary CTA. The spark mascot stays mint teardrop with eyes and closet cosmetics.
+Default chrome is pale gray (`#F4F4F5`) with white cards and mint `#5EEAD4`. Dark mode is `#0B0B0F` / `#18181B`. Muted zinc `#A1A1AA`. Aurora is an optional quiet purple room skin, not the default. Headlines use Plus Jakarta Sans; body copy stays the existing sans. Spark keeps a cohesive twin-peak silhouette.
 
 ## Run locally
 
@@ -27,7 +27,7 @@ npm run build
 
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only (password is hashed locally). After auth you land on `/dashboard`.
-3. `/dashboard` — signed-in home: the spark, streak, study time, and one Start focus button. Top nav is Home · Focus · Sprite · Shop. Light/dark toggle sits in the header. After signup (or any account without a diploma profile) you hit `/profile` first. Calendar and subject stack live on `/stats`.
+3. `/dashboard` — signed-in home: greeting, Current Sprite / Streak / Study time cards, and an App unlocks card with countdown. Top nav is Home · Focus · Sprite · Shop. Token sparkle pill and the account avatar open Unlocks and Profile / Account / Appearance. After signup (or any account without a diploma profile) you hit `/profile` first. Calendar and subject stack live on `/stats`.
 4. `/setup` — pick one or more nemesis apps (edit the set here later; you do not re-pick at each focus start), connect mock ManageBac (Bio IA, TOK essay, Math AA PS, Chem study, EE chapter).
 5. `/focus` — choose a task and optional goal. Demo speed is on by default: **30 seconds = 1 token** (real pace is 5 minutes).
 6. `/lock` — simulated lock screen. Emergency stays; social apps are grey.
