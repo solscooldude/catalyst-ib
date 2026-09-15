@@ -1,10 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { Wordmark } from "@/components/wordmark";
 import { AccountMenu } from "@/components/account-menu";
-import { TokenChip } from "@/components/token-chip";
+import { NavTokenPill } from "@/components/nav-token-pill";
 import { IdleSubjectPopup } from "@/components/idle-subject-popup";
 import { SceneBackground } from "@/components/scene-background";
 import { TopNav } from "@/components/top-nav";
@@ -40,13 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Wordmark href={ROUTES.home} />
             <TopNav />
             <div className="flex items-center justify-end gap-2">
-              <Link
-                href={ROUTES.unlocks}
-                aria-label="Open unlocks"
-                className="rounded-full transition-opacity hover:opacity-80"
-              >
-                <TokenChip tokens={state.tokens} />
-              </Link>
+              <NavTokenPill />
               <AccountMenu />
             </div>
           </div>
