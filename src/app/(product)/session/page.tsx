@@ -7,6 +7,7 @@ import { FocusHud } from "@/components/focus-hud";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
 import { TokenAmount } from "@/components/mint-chip";
+import { UnlockPanel } from "@/components/unlock-panel";
 import { type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -131,11 +132,6 @@ export default function FocusPage() {
         <h1 className="mt-2 font-heading text-2xl text-foreground sm:text-3xl">
           {title}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {session.kind === "study"
-            ? "Personal study block. Time counts up. Time tokens only."
-            : "Official ManageBac task."}
-        </p>
         {session.goal && session.kind === "verified" ? (
           <p className="mt-3 text-sm text-foreground/90">{session.goal}</p>
         ) : null}
@@ -151,16 +147,11 @@ export default function FocusPage() {
                 Mark ManageBac task done
               </span>
               <span className="mt-1 block text-xs text-muted-foreground">
-                Required to finish. Official tasks add{" "}
-                <TokenAmount value={COMPLETION_BONUS} /> on top of time earned.
+                Adds <TokenAmount value={COMPLETION_BONUS} />
               </span>
             </span>
           </label>
-        ) : (
-          <p className="mt-5 text-sm text-muted-foreground">
-            End whenever you want. Tokens come from elapsed time.
-          </p>
-        )}
+        ) : null}
 
         {goalMs ? (
           <p className="mt-3 text-xs text-muted-foreground">
@@ -177,15 +168,11 @@ export default function FocusPage() {
           </p>
         )}
 
-        {error ? (
-          <p className="mt-3 text-sm text-rose-300">{error}</p>
-        ) : (
-          <p className="mt-3 text-xs text-muted-foreground">
-            {session.kind === "study"
-              ? "Tokens land with time. No completion bonus on personal blocks."
-              : "Stay until a token lands, tick the task, then collect."}
-          </p>
-        )}
+        {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+
+        <div className="mt-5">
+          <UnlockPanel compact />
+        </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
           <Button

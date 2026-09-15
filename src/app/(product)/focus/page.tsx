@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { StudyStartForm } from "@/components/study-start-form";
 import { SelectedTaskChip, TaskOption } from "@/components/task-option";
-import { MOCK_TASKS, formatNemesisList, type TaskId } from "@/lib/constants";
+import { MOCK_TASKS, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
   buyAppearance,
@@ -61,35 +61,24 @@ export default function AppHomePage() {
     <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
-          Laptop first
+          Focus
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          Pick the task. Then lock the phone.
+          Pick the task.
         </h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Pick a ManageBac task or start your own study block. The phone locks
-          after you begin. Focus is a large spark on a quiet stage — tap it
-          to pet it.
-        </p>
         {nemesisApps.length > 0 ? (
-          <div className="mt-3">
-            <div className="flex flex-wrap gap-1.5">
-              {nemesisApps.map((app) => (
-                <span
-                  key={app.id}
-                  className="rounded-full border border-white/10 bg-white/4 px-2.5 py-0.5 text-[11px] text-foreground"
-                >
-                  {app.name}
-                </span>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Locked set: {formatNemesisList(state.nemeses)}.{" "}
-              <Link href={ROUTES.setup} className="text-primary/80 hover:text-primary">
-                Edit in Setup
-              </Link>
-              . You do not re-pick when a session starts.
-            </p>
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            {nemesisApps.map((app) => (
+              <span
+                key={app.id}
+                className="rounded-full border border-white/10 bg-white/4 px-2.5 py-0.5 text-[11px] text-foreground"
+              >
+                {app.name}
+              </span>
+            ))}
+            <Link href={ROUTES.setup} className="text-xs text-zinc-400 hover:text-foreground">
+              Edit
+            </Link>
           </div>
         ) : null}
 
@@ -101,7 +90,7 @@ export default function AppHomePage() {
                 ? `${selectedTask.subject} · due ${selectedTask.due}`
                 : undefined
             }
-            empty="Pick a ManageBac task below. The name stays visible here after you choose."
+            empty="Pick a ManageBac task."
           />
         </div>
 
@@ -130,10 +119,7 @@ export default function AppHomePage() {
       </div>
 
       <div className="flux-card h-fit p-6 sm:p-8">
-        <h2 className="text-lg font-semibold text-foreground">Start a session</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Optional goal, then the simulated lock screen.
-        </p>
+        <h2 className="text-lg font-semibold text-foreground">Start</h2>
         <div className="mt-4">
           <SelectedTaskChip
             title={selectedTask?.title}
@@ -178,9 +164,6 @@ export default function AppHomePage() {
             Enter lock
             <ArrowRight className="size-4" />
           </Button>
-          <Button asChild variant="outline" className="h-11 w-full rounded-full">
-            <Link href={ROUTES.unlocks}>Spend tokens instead</Link>
-          </Button>
           <Button asChild variant="ghost" className="h-11 w-full rounded-full">
             <Link href={ROUTES.stats}>Stats</Link>
           </Button>
@@ -191,19 +174,12 @@ export default function AppHomePage() {
         id="study"
         className="flux-card h-fit p-6 sm:p-8 lg:col-span-2"
       >
-        <h2 className="text-lg text-foreground">Start your own study block</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Same lock as a ManageBac task. You pick the subject and what you are
-          working on. Time tokens only — no +5.
-        </p>
+        <h2 className="text-lg text-foreground">Study block</h2>
         <div className="mt-5 max-w-xl">
           <StudyStartForm />
         </div>
         <div className="mt-8">
           <h3 className="text-base text-foreground">Focus stage</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Stays behind Spark in light and dark. Night sky is free.
-          </p>
           <div className="mt-4">
             <FocusStagePicker
               value={state.appearance.focusTheme}
