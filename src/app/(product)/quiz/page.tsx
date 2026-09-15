@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Spark } from "@/components/spark";
+import { type SparkAct } from "@/lib/spark-play";
 import { TokenAmount } from "@/components/mint-chip";
 import { Button } from "@/components/ui/button";
 import { pickQuiz, quizItemCaption, QUIZ_LENGTH } from "@/lib/care";
@@ -23,6 +24,7 @@ export default function QuizPage() {
   );
   const [gained, setGained] = useState(0);
   const [mood, setMood] = useState<"idle" | "done" | "tempted">("idle");
+  const [act, setAct] = useState<SparkAct>(null);
 
   const item = items[index];
   const already = state.quizDay === todayLocal();
@@ -40,6 +42,7 @@ export default function QuizPage() {
         const result = scoreQuiz(nextCorrect);
         setGained(result.ok ? result.gained : 0);
         setDone(true);
+        setAct("celebrate");
         return;
       }
       setIndex((value) => value + 1);
@@ -64,7 +67,16 @@ export default function QuizPage() {
       </div>
 
       <div className="flex justify-center">
-        <Spark mood={mood} size={160} pettable />
+        <button
+          type="button"
+          className="border-0 bg-transparent p-0"
+          aria-label="Replay Spark celebration"
+          onClick={() => {
+            if (done) setAct("celebrate");
+          }}
+        >
+          <Spark mood={mood} size={160} pettable act={act} />
+        </button>
       </div>
 
       {already && !done ? (

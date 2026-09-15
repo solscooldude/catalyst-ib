@@ -16,6 +16,7 @@ import {
   todayStudyMs,
   weekDayMarks,
 } from "@/lib/stats";
+import { careMood } from "@/lib/spark-play";
 import { sessionHint, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -74,7 +75,11 @@ export default function DashboardPage() {
           </div>
           <div className="flex justify-center sm:justify-end">
             <Spark
-              mood={session?.status === "focus" ? "locked" : "idle"}
+              mood={
+                session?.status === "focus"
+                  ? "locked"
+                  : careMood(state.streakDays, todayMs)
+              }
               taskId={session?.taskId}
               subject={
                 session?.subjectId ?? roundup.topSubject?.id ?? stacks[0]?.id

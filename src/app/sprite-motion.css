@@ -99,7 +99,7 @@
 
 .sprite-snack {
   position: absolute;
-  bottom: 1.1rem;
+  bottom: 4.4rem;
   left: 50%;
   z-index: 3;
   display: grid;
@@ -131,10 +131,197 @@
   filter: drop-shadow(0 6px 10px rgb(0 0 0 / 28%));
 }
 
+@keyframes spark-boop-blink {
+  0%,
+  18%,
+  100% {
+    transform: scaleY(1);
+  }
+  8%,
+  12% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes spark-scrunch-spring {
+  0% {
+    transform: scale(1.16, 0.68);
+  }
+  55% {
+    transform: scale(0.94, 1.12);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes spark-celebrate {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  28% {
+    transform: translateY(-18px) rotate(-12deg);
+  }
+  52% {
+    transform: translateY(-4px) rotate(16deg);
+  }
+  74% {
+    transform: translateY(-12px) rotate(-6deg);
+  }
+}
+
+@keyframes spark-highfive-lean {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(14deg) translate(6px, -4px);
+  }
+}
+
+@keyframes spark-zzz {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate(0, 4px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(4px, -6px);
+  }
+}
+
+@keyframes spark-star-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -56px) scale(0.8);
+  }
+}
+
+.spark-boop .spark-blink {
+  animation: spark-boop-blink 0.42s ease-in-out;
+}
+
+.spark-scrunch .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 12%;
+  transform: scale(1.14, 0.7);
+}
+
+.spark-scrunch-release .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 12%;
+  animation: spark-scrunch-spring 0.55s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+}
+
+.spark-celebrate .spark-float,
+.spark-celebrate {
+  animation: spark-celebrate 0.9s ease-in-out;
+}
+
+.spark-highfive .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: spark-highfive-lean 0.7s ease-in-out;
+}
+
+.spark-z {
+  animation: spark-zzz 1.6s ease-in-out infinite;
+}
+
+.spark-z-b {
+  animation-delay: 0.2s;
+}
+
+.spark-z-c {
+  animation-delay: 0.4s;
+}
+
+.spark-eat-berry .spark-body {
+  animation: spark-eat-bounce 0.22s ease-in-out infinite;
+}
+
+.spark-eat-mint .spark-body {
+  animation: spark-eat-bounce 0.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgb(94 234 212 / 0.55));
+}
+
+.sprite-snack-row {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  gap: 0.55rem;
+  transform: translateX(-50%);
+}
+
+.sprite-snack-pick {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.86);
+  box-shadow: 0 0 0 1px rgb(24 24 27 / 0.06);
+}
+
+.sprite-snack-pick.is-on {
+  box-shadow: 0 0 0 2px #5eead4;
+}
+
+.sprite-highfive-hand {
+  position: absolute;
+  top: 42%;
+  right: 8%;
+  z-index: 4;
+  display: grid;
+  width: 3.2rem;
+  height: 3.2rem;
+  place-items: center;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.sprite-highfive-hand.is-held {
+  cursor: grabbing;
+  z-index: 6;
+}
+
+.sprite-catch-star {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  animation: spark-star-float 3.4s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spark-eating .spark-body,
   .spark-chew,
-  .spark-crumb-bit {
+  .spark-crumb-bit,
+  .spark-boop .spark-blink,
+  .spark-scrunch-release .spark-body,
+  .spark-celebrate,
+  .spark-highfive .spark-body,
+  .spark-z,
+  .sprite-catch-star {
     animation: none;
   }
 }
