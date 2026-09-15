@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
 import {
   getSparkTint,
@@ -50,6 +50,7 @@ type SparkProps = {
   evolve?: boolean;
   act?: SparkAct;
   snack?: SnackId | null;
+  trackEyes?: boolean;
 };
 
 function OpenEyes({
@@ -69,6 +70,7 @@ function OpenEyes({
       <ellipse cx="38.2" cy="63.6" rx={rx} ry={ry} fill={fill} />
       <ellipse cx="61.8" cy="63.6" rx={rx} ry={ry} fill={fill} />
       <ellipse
+        className="spark-pupil"
         cx={39.6 + pupil}
         cy="62.1"
         rx="1.55"
@@ -77,6 +79,7 @@ function OpenEyes({
         fillOpacity="0.88"
       />
       <ellipse
+        className="spark-pupil"
         cx={63.2 + pupil}
         cy="62.1"
         rx="1.55"
@@ -272,7 +275,9 @@ export function Spark({
   evolve = true,
   act = null,
   snack = null,
+  trackEyes = false,
 }: SparkProps) {
+  const wrapRef = useRef<HTMLDivElement | HTMLButtonElement | null>(null);
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
   const bodyId = `spark-body-${uid}`;
@@ -349,11 +354,38 @@ export function Spark({
         : act === "celebrate" || act === "highfive" || petted
           ? "done"
           : mood;
+  const asleep = shownMood === "sleepy";
   const canGlance =
+    !trackEyes &&
     !petted &&
     act !== "sleep" &&
     act !== "celebrate" &&
     (mood === "idle" || mood === "locked");
+
+  useEffect(() => {
+    if (!trackEyes) return;
+    function look(event: PointerEvent) {
+      const el = wrapRef.current;
+      if (!el || asleep) {
+        el?.style.setProperty("--eye-x", "0px");
+        el?.style.setProperty("--eye-y", "0px");
+        return;
+      }
+      const box = el.getBoundingClientRect();
+      const nx = (event.clientX - (box.left + box.width / 2)) / (box.width / 2);
+      const ny = (event.clientY - (box.top + box.height * 0.48)) / (box.height / 2);
+      el.style.setProperty(
+        "--eye-x",
+        `${Math.max(-3.2, Math.min(3.2, nx * 3.1))}px`,
+      );
+      el.style.setProperty(
+        "--eye-y",
+        `${Math.max(-2.4, Math.min(2.4, ny * 2.2))}px`,
+      );
+    }
+    window.addEventListener("pointermove", look, { passive: true });
+    return () => window.removeEventListener("pointermove", look);
+  }, [trackEyes, asleep]);
   const evo = evolve ? sparkEvolution(store.logs) : { scale: 1, glow: 1 };
   const drawn = size * evo.scale;
   const frameClass = cn(
@@ -370,6 +402,7 @@ export function Spark({
     mood === "eating" && "spark-eating",
     mood === "eating" && snack && `spark-eat-${snack}`,
     flourish === "now" && "spark-idle-pop",
+    trackEyes && "spark-track-eyes",
     className,
   );
   const frameStyle = {
@@ -463,6 +496,7 @@ export function Spark({
   if (canPet) {
     return (
       <button
+        ref={wrapRef as Ref<HTMLButtonElement>}
         type="button"
         onClick={pet}
         onPointerUp={(event) => {
@@ -481,7 +515,12 @@ export function Spark({
   }
 
   return (
-    <div aria-hidden className={frameClass} style={frameStyle}>
+    <div
+      ref={wrapRef as Ref<HTMLDivElement>}
+      aria-hidden
+      className={frameClass}
+      style={frameStyle}
+    >
       {body}
     </div>
   );
