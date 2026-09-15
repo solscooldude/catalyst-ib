@@ -1,10 +1,21 @@
 export type SparkAct =
   | "boop"
+  | "poke"
   | "scrunch"
   | "sleep"
   | "celebrate"
   | "highfive"
   | null;
+
+export const SPARK_HOW_TO = [
+  { name: "Pet", how: "Drag Spark around." },
+  { name: "Poke", how: "Tap a side — bigger squash." },
+  { name: "Boop", how: "Tap the face." },
+  { name: "Peak scrunch", how: "Drag the twin peaks." },
+  { name: "Sleep", how: "Long-press to tuck in. Long-press again to wake." },
+  { name: "Feed", how: "Drag a snack onto Spark." },
+  { name: "Catch a token", how: "Tap the floating mint star." },
+] as const;
 
 export type SnackId = "cookie" | "berry" | "mint";
 
