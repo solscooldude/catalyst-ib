@@ -66,10 +66,50 @@ function NightSky() {
 function Sea() {
   return (
     <>
-      <div className="focus-stage-wave" style={{ bottom: "8%" }} />
-      <div className="focus-stage-wave focus-stage-wave-b" style={{ bottom: "-4%" }} />
-      <div className="focus-stage-wave focus-stage-wave-c" style={{ bottom: "-16%" }} />
+      <div className="focus-stage-swell" />
+      <div className="focus-stage-caustic" />
+      <div className="focus-stage-wave" style={{ bottom: "18%" }} />
+      <div className="focus-stage-wave focus-stage-wave-b" style={{ bottom: "4%" }} />
+      <div className="focus-stage-wave focus-stage-wave-c" style={{ bottom: "-10%" }} />
+      <div className="focus-stage-wave focus-stage-wave-d" style={{ bottom: "28%" }} />
+      <SeaWave className="focus-stage-wave-svg" bottom="12%" fill="rgb(12 74 128 / 0.55)" />
+      <SeaWave
+        className="focus-stage-wave-svg focus-stage-wave-svg-b"
+        bottom="-2%"
+        fill="rgb(8 47 92 / 0.7)"
+      />
+      <SeaWave
+        className="focus-stage-wave-svg focus-stage-wave-svg-foam"
+        bottom="22%"
+        fill="rgb(186 230 253 / 0.28)"
+      />
+      <div className="focus-stage-foam" style={{ bottom: "26%" }} />
     </>
+  );
+}
+
+function SeaWave({
+  className,
+  bottom,
+  fill,
+}: {
+  className: string;
+  bottom: string;
+  fill: string;
+}) {
+  return (
+    <svg
+      className={className}
+      style={{ bottom }}
+      viewBox="0 0 1200 160"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <path
+        d="M0 92c80-28 140 28 220 8 90-22 140-48 230-18 88 28 150 8 220-16 86-28 150 22 230 6 70-14 140-36 300 12v76H0Z"
+        fill={fill}
+      />
+    </svg>
   );
 }
 

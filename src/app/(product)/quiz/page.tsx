@@ -56,13 +56,10 @@ export default function QuizPage() {
       <div className="flux-card px-6 py-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Quiz</p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-          Ten checks from your diploma.
+          Daily quiz
         </h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Catalyst-original practice mapped to your IB subjects
-          {state.profile.subjects.length ? "" : " and the core"}. Not past
-          papers, not a revision-site dump. Right answers pay{" "}
-          <TokenAmount value={1} /> each. Once a day.
+        <p className="mt-3 text-sm text-zinc-400">
+          <TokenAmount value={1} /> each · once a day
         </p>
       </div>
 
