@@ -1,4 +1,5 @@
 import { SPARK_TINTS, type SparkTintId } from "./spark-tints";
+import { SPARK_AURAS, type SparkAuraId } from "./spark-auras";
 import {
   BACKGROUNDS,
   migrateBackground,
@@ -7,6 +8,8 @@ import {
 
 export { SPARK_TINTS, getSparkTint } from "./spark-tints";
 export type { SparkTintId } from "./spark-tints";
+export { SPARK_AURAS, getSparkAura } from "./spark-auras";
+export type { SparkAuraId } from "./spark-auras";
 export {
   BACKGROUNDS,
   getBackground,
@@ -188,10 +191,38 @@ export const SPARK_GEAR = [
   },
   {
     id: "phones",
-    name: "Study headphones",
+    name: "Headphones",
     cost: 16,
     collection: "starter" as const,
-    blurb: "Soft black cups. For the long block.",
+    blurb: "Over-ear cups and a band over the peaks.",
+  },
+  {
+    id: "cape",
+    name: "Mini cape",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "A short indigo cloak at the shoulders.",
+  },
+  {
+    id: "bowtie",
+    name: "Bow tie",
+    cost: 12,
+    collection: "starter" as const,
+    blurb: "A rust bow at the neck. Not the crown knot.",
+  },
+  {
+    id: "hearts",
+    name: "Heart sunglasses",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "Pink heart lenses over the eyes.",
+  },
+  {
+    id: "beanie",
+    name: "Beanie",
+    cost: 14,
+    collection: "starter" as const,
+    blurb: "A slate knit with a folded brim and pom.",
   },
   {
     id: "star",
@@ -316,6 +347,7 @@ export type AppearanceState = {
   ownedBackgrounds: BackgroundId[];
   ownedSparkTints: SparkTintId[];
   ownedGear: SparkGearId[];
+  ownedAuras: SparkAuraId[];
   ownedTrails: SparkTrailId[];
   ownedFocusThemes: FocusThemeId[];
   accent: AccentId;
@@ -324,6 +356,7 @@ export type AppearanceState = {
   backgroundShade: AccentShadeId;
   sparkTint: SparkTintId;
   gear: SparkGearId;
+  aura: SparkAuraId;
   trail: SparkTrailId;
   focusTheme: FocusThemeId;
 };
@@ -333,6 +366,7 @@ export const defaultAppearance: AppearanceState = {
   ownedBackgrounds: ["void"],
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
+  ownedAuras: ["none"],
   ownedTrails: ["none"],
   ownedFocusThemes: ["none", "nightsky"],
   accent: "mint",
@@ -341,6 +375,7 @@ export const defaultAppearance: AppearanceState = {
   backgroundShade: "normal",
   sparkTint: "mint",
   gear: "none",
+  aura: "none",
   trail: "none",
   focusTheme: "nightsky",
 };
@@ -397,6 +432,12 @@ export function normalizeAppearance(
     ),
     "none",
   );
+  const ownedAuras = unique(
+    (raw?.ownedAuras ?? ["none"]).filter((id) =>
+      SPARK_AURAS.some((row) => row.id === id),
+    ),
+    "none",
+  );
   const ownedTrails = unique(
     (raw?.ownedTrails ?? ["none"]).filter((id) =>
       SPARK_TRAILS.some((row) => row.id === id),
@@ -423,6 +464,7 @@ export function normalizeAppearance(
     ownedBackgrounds,
     ownedSparkTints,
     ownedGear,
+    ownedAuras,
     ownedTrails,
     ownedFocusThemes,
     accent,
@@ -433,6 +475,9 @@ export function normalizeAppearance(
       ? (raw?.sparkTint ?? "mint")
       : "mint",
     gear: ownedGear.includes(raw?.gear ?? "none") ? (raw?.gear ?? "none") : "none",
+    aura: ownedAuras.includes(raw?.aura ?? "none")
+      ? (raw?.aura ?? "none")
+      : "none",
     trail: ownedTrails.includes(raw?.trail ?? "none")
       ? (raw?.trail ?? "none")
       : "none",

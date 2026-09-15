@@ -59,6 +59,7 @@ export type AppearanceLegacy = Partial<AppearanceState> & {
   ownedBackgrounds?: AppearanceState["ownedBackgrounds"];
   ownedSparkTints?: AppearanceState["ownedSparkTints"];
   ownedGear?: AppearanceState["ownedGear"];
+  ownedAuras?: AppearanceState["ownedAuras"];
   ownedTrails?: AppearanceState["ownedTrails"];
   ownedFocusThemes?: AppearanceState["ownedFocusThemes"];
 };
@@ -95,6 +96,11 @@ export function mergeAppearance(
       closet?.ownedGear,
       legacy?.ownedGear,
       parsed?.ownedGear,
+    ),
+    ownedAuras: unionOwned(
+      closet?.ownedAuras,
+      legacy?.ownedAuras,
+      parsed?.ownedAuras,
     ),
     ownedTrails: unionOwned(
       closet?.ownedTrails,
