@@ -66,10 +66,10 @@ export default function SetupPage() {
                 type="button"
                 onClick={() => toggle(app.id)}
                 className={cn(
-                  "rounded-2xl bg-card p-4 text-left ring-1 transition-colors",
+                  "rounded-2xl bg-zinc-50 p-4 text-left ring-1 transition-colors dark:bg-zinc-900",
                   selected
                     ? "ring-primary/50"
-                    : "ring-border hover:ring-white/12",
+                    : "ring-transparent hover:ring-primary/20",
                 )}
               >
                 <div className="flex items-center justify-between">
@@ -83,7 +83,7 @@ export default function SetupPage() {
         </div>
       </section>
 
-      <section className="mt-10 rounded-3xl bg-card p-6 ring-1 ring-border">
+      <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base text-foreground">Connect ManageBac</h2>

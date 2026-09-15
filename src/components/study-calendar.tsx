@@ -33,7 +33,7 @@ export function StudyCalendar({
   );
 
   return (
-    <section className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6">
+    <section className="flux-card p-6 sm:p-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs tracking-[0.16em] text-primary uppercase">
@@ -89,7 +89,7 @@ export function StudyCalendar({
                 }
                 className={cn(
                   "size-3.5 rounded-[5px] sm:size-4",
-                  level === 0 && "bg-white/6",
+                  level === 0 && "bg-muted",
                   level === 1 && "bg-primary/25",
                   level === 2 && "bg-primary/45",
                   level === 3 && "bg-primary/70",

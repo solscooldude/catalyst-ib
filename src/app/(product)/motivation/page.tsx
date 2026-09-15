@@ -53,7 +53,7 @@ export default function MotivationPage() {
         <Spark mood="idle" size={88} pettable className="hidden shrink-0 sm:block" />
       </div>
 
-      <form className="space-y-5" onSubmit={save}>
+      <form className="flux-card space-y-5 px-6 py-8" onSubmit={save}>
         <Field
           id="colleges"
           label="Dream college(s)"

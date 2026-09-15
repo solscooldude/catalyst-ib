@@ -27,7 +27,7 @@ export function ScheduleStatus() {
 
   if (state.schedule.length === 0) {
     return (
-      <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
+      <div className="flux-card p-5">
         <p className="text-xs tracking-[0.16em] text-primary uppercase">
           Lock schedule
         </p>
@@ -47,7 +47,7 @@ export function ScheduleStatus() {
 
   if (next?.active) {
     return (
-      <div className="rounded-3xl bg-card p-5 ring-1 ring-primary/25">
+      <div className="flux-card p-5 ring-1 ring-primary/25">
         <p className="text-xs tracking-[0.16em] text-primary uppercase">
           Lock window on
         </p>
@@ -74,7 +74,7 @@ export function ScheduleStatus() {
   }
 
   return (
-    <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
+    <div className="flux-card p-5">
       <p className="text-xs tracking-[0.16em] text-primary uppercase">
         Next lock window
       </p>

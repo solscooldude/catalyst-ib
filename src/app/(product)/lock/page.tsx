@@ -51,7 +51,7 @@ export default function LockPage() {
           Social apps are grey. Emergency still works. This is a web mock —
           Catalyst is not talking to Screen Time.
         </p>
-        <div className="mt-6 rounded-2xl bg-card p-4 ring-1 ring-border">
+        <div className="mt-6 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900">
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
             Working on
           </p>
