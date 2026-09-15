@@ -27,11 +27,15 @@ import {
   isEssentialAppId,
   isNemesisId,
   isUnlockCatalogId,
+  isUnlockSpendId,
+  isUnlockTierSpendId,
   type NemesisId,
   type SubjectId,
   type TaskId,
-  type UnlockCatalogId,
+  type UnlockSpendId,
 } from "@/lib/constants";
+import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
+import { DEFAULT_SPRITE_NAME } from "@/lib/sprite-name";
 import {
   defaultMotivation,
   defaultProfile,
@@ -88,7 +92,7 @@ export type SessionLog = {
 
 export type Unlock = {
   id: string;
-  catalogId: UnlockCatalogId;
+  catalogId: UnlockSpendId;
   label: string;
   cost: number;
   startedAt: number;
@@ -119,6 +123,7 @@ export type CatalystState = {
   spriteName: string;
   spriteRenameCount: number;
   spriteAsleep: boolean;
+  dailyGoalMinutes: number;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -152,9 +157,10 @@ export function createDefaultState(): CatalystState {
     feedCount: 0,
     quizDay: null,
     quizCorrect: 0,
-    spriteName: "Spark",
+    spriteName: DEFAULT_SPRITE_NAME,
     spriteRenameCount: 0,
     spriteAsleep: false,
+    dailyGoalMinutes: DEFAULT_DAILY_GOAL_MINUTES,
   };
 }
 
@@ -205,9 +211,9 @@ function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
 }
 
 export function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
-  const byCatalog = new Map<UnlockCatalogId, Unlock>();
+  const byCatalog = new Map<UnlockSpendId, Unlock>();
   for (const unlock of pruneUnlocks(unlocks, now)) {
-    if (!isUnlockCatalogId(unlock.catalogId)) continue;
+    if (!isUnlockSpendId(unlock.catalogId)) continue;
     const existing = byCatalog.get(unlock.catalogId);
     if (!existing) {
       byCatalog.set(unlock.catalogId, unlock);
@@ -255,6 +261,17 @@ export function normalizeUnlocks(
           expiresAt: unlock.expiresAt ?? now,
         });
       }
+      continue;
+    }
+    if (isUnlockTierSpendId(catalogId)) {
+      migrated.push({
+        id: unlock.id ?? catalogId,
+        catalogId,
+        label: unlock.label ?? (catalogId === "tier2" ? "Tier 2" : "Tier 3"),
+        cost: unlock.cost ?? 0,
+        startedAt: unlock.startedAt ?? now,
+        expiresAt: unlock.expiresAt ?? now,
+      });
       continue;
     }
     if (!isUnlockCatalogId(catalogId)) continue;
@@ -361,6 +378,7 @@ export function hydrateStore(userId: string | null = null) {
       ),
       spriteRenameCount: parsed.spriteRenameCount ?? 0,
       spriteAsleep: Boolean(parsed.spriteAsleep),
+      dailyGoalMinutes: clampDailyGoalMinutes(parsed.dailyGoalMinutes),
       hydrated: true,
     };
   } catch {
@@ -415,7 +433,7 @@ export function getNemeses(ids: readonly NemesisId[]) {
 
 export function isUnlockActive(
   unlocks: Unlock[],
-  catalogId: UnlockCatalogId,
+  catalogId: UnlockSpendId,
   now = Date.now(),
 ) {
   return coalesceUnlocks(unlocks, now).some(
@@ -430,6 +448,8 @@ export function isAppUnlocked(
 ) {
   if (isEssentialAppId(appId)) return true;
   if (!isUnlockCatalogId(appId)) return false;
-  return isUnlockActive(unlocks, appId, now);
+  const item = getUnlockItem(appId);
+  if (!item) return false;
+  const tierId = item.tier === 2 ? "tier2" : "tier3";
+  return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
