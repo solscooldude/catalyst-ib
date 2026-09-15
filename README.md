@@ -41,4 +41,6 @@ npm run build
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
 11. `/account/settings` — account basics. `/account/subscription` is a free-demo stub, not a checkout.
 
-Focus stages sit behind Spark and never cover the HUD: Night sky (free default), Deep blue sea, and Math drift. Aurora is an optional quiet lavender room skin for the whole app — not a session backdrop. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a stage on Focus setup or in the Shop. Last stage is remembered on this device.
+Shop → Focus scenes sells session backdrops only (night sky, deep blue sea, math drift, plus cat study / desk window / library attic / rocket). Shop → Trails sells spark trail cosmetics only. Aurora and star dots are app chrome, not Focus scenes.
+
+Focus stages sit behind Spark and never cover the HUD. Night sky is the free default. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a backdrop on Focus setup or in the Shop. Last scene is remembered on this device.
