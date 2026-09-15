@@ -165,3 +165,46 @@ html[data-bg="aurora"] {
   --muted: #162420;
   --sidebar: #101a18;
 }
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans bg-background text-foreground;
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-dvh bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--primary) 10%, transparent), transparent);
+  }
+
+  h1,
+  h2,
+  .font-heading {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  select {
+    color: var(--foreground);
+  }
+
+  select option,
+  select optgroup {
+    color: #18181b;
+    background-color: #ffffff;
+  }
+
+  select optgroup {
+    font-weight: 600;
+  }
+}
