@@ -110,6 +110,7 @@ export type CatalystState = {
   quizCorrect: number;
   spriteName: string;
   spriteRenameCount: number;
+  spriteAsleep: boolean;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -145,6 +146,7 @@ export function createDefaultState(): CatalystState {
     quizCorrect: 0,
     spriteName: "Spark",
     spriteRenameCount: 0,
+    spriteAsleep: false,
   };
 }
 
@@ -181,6 +183,12 @@ export function setState(updater: (current: CatalystState) => CatalystState) {
   state = updater(state);
   persist(state);
   emit();
+}
+
+export function setSpriteAsleep(asleep: boolean) {
+  setState((current) =>
+    current.spriteAsleep === asleep ? current : { ...current, spriteAsleep: asleep },
+  );
 }
 
 function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
@@ -291,6 +299,7 @@ export function hydrateStore(userId: string | null = null) {
           ? "Spark"
           : (parsed.spriteName ?? "Spark"),
       spriteRenameCount: parsed.spriteRenameCount ?? 0,
+      spriteAsleep: Boolean(parsed.spriteAsleep),
       hydrated: true,
     };
   } catch {
