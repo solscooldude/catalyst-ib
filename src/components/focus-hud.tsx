@@ -21,7 +21,7 @@ export function FocusHud({
     <div className={cn("focus-hud", className)}>
       <div className="focus-hud-timer" aria-label={`Session time ${time}`}>
         {task ? (
-          <p className="mb-1 text-center text-xs font-medium text-zinc-100/90">
+          <p className="focus-hud-task mb-1 text-center text-xs font-medium">
             {task}
           </p>
         ) : null}
