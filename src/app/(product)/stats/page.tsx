@@ -8,7 +8,7 @@ import { Spark } from "@/components/spark";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudyCalendar } from "@/components/study-calendar";
 import { StudyStartForm } from "@/components/study-start-form";
-import { COMPLETION_BONUS, SUBJECTS } from "@/lib/constants";
+import { SUBJECTS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
   formatDuration,
@@ -58,10 +58,6 @@ export default function StatsPage() {
           <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
             Time by subject
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Official tasks and personal study blocks both add minutes. Only
-            ManageBac completions get +{COMPLETION_BONUS} tokens.
-          </p>
         </div>
         <Spark
           mood="idle"
@@ -76,19 +72,16 @@ export default function StatsPage() {
         />
       </div>
 
-      <CoreSubjects compact />
+      <CoreSubjects />
 
       <StudyCalendar logs={state.logs} now={now} />
 
       <section className="flux-card p-6 sm:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs tracking-[0.16em] text-primary uppercase">
-              Monthly roundup
-            </p>
-            <h2 className="mt-2 text-2xl text-foreground">{roundup.monthLabel}</h2>
-          </div>
-          <p className="text-xs text-muted-foreground">Current month · live</p>
+        <div>
+          <p className="text-xs tracking-[0.16em] text-primary uppercase">
+            Monthly roundup
+          </p>
+          <h2 className="mt-2 text-2xl text-foreground">{roundup.monthLabel}</h2>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <RoundupStat label="Time" value={formatHours(roundup.durationMs)} />
@@ -122,8 +115,7 @@ export default function StatsPage() {
         </p>
         {stacks.length === 0 ? (
           <p className="mt-6 rounded-2xl bg-muted/60 px-4 py-6 text-sm text-muted-foreground">
-            No time logged in this range yet. Finish a focus session or start
-            a study block below.
+            No time in this range.
           </p>
         ) : (
           <ul className="mt-5 space-y-3">
@@ -151,10 +143,6 @@ export default function StatsPage() {
 
       <section id="study" className="flux-card p-6 sm:p-8">
         <h2 className="text-lg text-foreground">Start a study block</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Locks the phone for the block you choose. Time tokens only. No +
-          {COMPLETION_BONUS}.
-        </p>
         <div className="mt-5">
           <StudyStartForm />
         </div>
