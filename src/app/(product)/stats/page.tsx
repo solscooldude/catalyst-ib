@@ -48,10 +48,10 @@ export default function StatsPage() {
   if (!state.setupComplete) return null;
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-10">
-      <div className="flex items-start justify-between gap-4">
+    <div className="mx-auto w-full max-w-3xl space-y-4">
+      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8">
         <div>
-          <p className="text-xs tracking-[0.2em] text-primary uppercase">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Stats
           </p>
           <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
@@ -79,7 +79,7 @@ export default function StatsPage() {
 
       <StudyCalendar logs={state.logs} now={now} />
 
-      <section className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6 sm:p-8">
+      <section className="flux-card p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs tracking-[0.16em] text-primary uppercase">
@@ -103,7 +103,7 @@ export default function StatsPage() {
         </div>
       </section>
 
-      <section>
+      <section className="flux-card p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg text-foreground">Subject stack</h2>
           <Tabs
@@ -120,7 +120,7 @@ export default function StatsPage() {
           {range === "week" ? weekLabel(now) : roundup.monthLabel}
         </p>
         {stacks.length === 0 ? (
-          <p className="mt-6 rounded-2xl bg-card px-4 py-6 text-sm text-muted-foreground ring-1 ring-white/6">
+          <p className="mt-6 rounded-2xl bg-muted/60 px-4 py-6 text-sm text-muted-foreground">
             No time logged in this range yet. Finish a focus session or start
             a study block below.
           </p>
@@ -134,7 +134,7 @@ export default function StatsPage() {
                     {formatDuration(row.durationMs)}
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-white/6">
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-primary"
                     style={{
@@ -148,7 +148,7 @@ export default function StatsPage() {
         )}
       </section>
 
-      <section id="study" className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6">
+      <section id="study" className="flux-card p-6 sm:p-8">
         <h2 className="text-lg text-foreground">Start a study block</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Locks the phone for the block you choose. Time tokens only. No +
@@ -159,7 +159,7 @@ export default function StatsPage() {
         </div>
       </section>
 
-      <section>
+      <section className="flux-card p-6 sm:p-8">
         <h2 className="text-lg text-foreground">Recent</h2>
         {recent.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
@@ -170,7 +170,7 @@ export default function StatsPage() {
             {recent.map((log) => (
               <li
                 key={log.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-white/6"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-muted/50 px-4 py-3 text-sm"
               >
                 <div>
                   <p className="text-foreground">{log.subjectLabel}</p>

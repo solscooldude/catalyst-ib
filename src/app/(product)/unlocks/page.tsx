@@ -63,8 +63,8 @@ function UnlockInner() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-      <div>
+    <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="flux-card px-6 py-8">
         {earned && lastEarned > 0 ? (
           <div className="mb-8 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/20">
             <p className="text-xs tracking-[0.16em] text-primary uppercase">
@@ -85,10 +85,15 @@ function UnlockInner() {
 
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs tracking-[0.2em] text-primary uppercase">
-              Unlock shop
+            <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+              Shop
             </p>
             <h1 className="mt-3 text-4xl text-foreground">Spend the proof.</h1>
+            <p className="mt-2 text-sm">
+              <Link href={ROUTES.appearance} className="text-muted-foreground hover:text-foreground">
+                Closet
+              </Link>
+            </p>
           </div>
           <TokenChip tokens={state.tokens} />
         </div>
@@ -108,7 +113,7 @@ function UnlockInner() {
             return (
               <div
                 key={item.id}
-                className="flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-white/6 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-border sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <p className="text-sm text-foreground">{label}</p>
@@ -157,7 +162,7 @@ function UnlockInner() {
                 return (
                   <li
                     key={unlock.id}
-                    className="flex items-center justify-between rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-white/6"
+                    className="flex items-center justify-between rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-border"
                   >
                     <span>{unlock.label}</span>
                     <span className="font-mono text-primary">
