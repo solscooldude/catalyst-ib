@@ -39,7 +39,7 @@ npm run build
 8. `/unlocks` — the one dedicated Unlocks route (linked from Home and Focus only). After End, a recap card shows minutes and tokens and Spark celebrates. Day-to-day spend is the Home App unlocks card; Focus has a compact panel. The token pill jumps to Home.
 9. `/sprite` — My Sprite. `/appearance` is the closet. Try cosmetics on Spark before you buy. `/quiz` is a daily IB-style check.
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
-11. `/account/settings` — account basics. `/account/subscription` is a free-demo stub, not a checkout.
+11. `/account/settings` — account basics. `/account/subscription` redirects there. Billing is stubbed; this demo is free.
 
 Shop → Focus scenes sells session backdrops only (night sky, deep blue sea, math drift, plus cat study / desk window / library attic / rocket). Shop → Trails sells spark trail cosmetics only. Aurora and star dots are app chrome, not Focus scenes.
 
