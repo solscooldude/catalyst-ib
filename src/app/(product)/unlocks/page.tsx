@@ -18,7 +18,12 @@ import {
   spendUnlockTier,
   useCatalyst,
 } from "@/lib/store";
-import type { UnlockTier } from "@/lib/constants";
+import {
+  ESSENTIAL_APPS,
+  NEMESIS_APPS,
+  TIER2_APPS,
+  type UnlockTier,
+} from "@/lib/constants";
 
 function UnlockInner() {
   const router = useRouter();
@@ -122,10 +127,29 @@ function UnlockInner() {
         </div>
 
         <p className="mt-6 text-sm leading-6 text-muted-foreground">
-          School / essentials stay allowed during lock and are not sold here:
-          Chrome, Drive, Docs/Classroom, Gmail, ManageBac, Calculator,
-          Phone/SOS/Clock, Spotify, ChatGPT/Gemini, Maps.
+          Buying unlocks a whole tier for the time block — not one app.
         </p>
+
+        <div className="mt-5 space-y-3 text-sm">
+          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
+            <p className="font-medium text-foreground">School / allowed</p>
+            <p className="mt-1 text-muted-foreground">
+              Stay free. {ESSENTIAL_APPS.map((app) => app.name).join(", ")}.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
+            <p className="font-medium text-foreground">Tier 2 includes</p>
+            <p className="mt-1 text-muted-foreground">
+              {TIER2_APPS.map((app) => app.name).join(", ")}.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
+            <p className="font-medium text-foreground">Tier 3 includes</p>
+            <p className="mt-1 text-muted-foreground">
+              {NEMESIS_APPS.map((app) => app.name).join(", ")}.
+            </p>
+          </div>
+        </div>
 
         <div className="mt-6">
           <UnlockTierShop
