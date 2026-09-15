@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
@@ -151,6 +151,42 @@ export default function AppearancePage() {
         />
       </section>
 
+      <section id="spark-color" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <h2 className="text-2xl text-foreground">Spark color</h2>
+        <p className="text-sm text-zinc-500">Solid body colours. 10–14 tokens.</p>
+        <Group
+          title="Solids"
+          items={SPARK_TINTS.filter((item) => item.kind === "solid")}
+          owned={(id) => look.ownedSparkTints.includes(id)}
+          equipped={(id) => look.sparkTint === id}
+          previewing={(id) => preview.sparkTint === id}
+          onAct={(id, owned) => act("sparkTint", id, owned)}
+          onTry={(id) => tryOn("sparkTint", id)}
+          swatch={(item) => (
+            <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+          )}
+        />
+      </section>
+
+      <section id="spark-gradient" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <h2 className="text-2xl text-foreground">Spark gradient</h2>
+        <p className="text-sm text-zinc-500">
+          Premium two-tone washes. 40–44, Aurora 90.
+        </p>
+        <Group
+          title="Premium"
+          items={SPARK_TINTS.filter((item) => item.kind === "gradient")}
+          owned={(id) => look.ownedSparkTints.includes(id)}
+          equipped={(id) => look.sparkTint === id}
+          previewing={(id) => preview.sparkTint === id}
+          onAct={(id, owned) => act("sparkTint", id, owned)}
+          onTry={(id) => tryOn("sparkTint", id)}
+          swatch={(item) => (
+            <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+          )}
+        />
+      </section>
+
       <section className="scroll-mt-24 space-y-6">
       {COLLECTIONS.filter((collection) => collection.id !== "focus").map((collection) => (
         <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
@@ -185,38 +221,6 @@ export default function AppearancePage() {
               const result = setBackgroundShade(next, id);
               setNotice(result.ok ? "Shade saved." : result.reason);
             }}
-          />
-
-          <Group
-            title="Spark color · 10–14"
-            items={SPARK_TINTS.filter(
-              (item) =>
-                item.collection === collection.id && item.kind === "solid",
-            )}
-            owned={(id) => look.ownedSparkTints.includes(id)}
-            equipped={(id) => look.sparkTint === id}
-            previewing={(id) => preview.sparkTint === id}
-            onAct={(id, owned) => act("sparkTint", id, owned)}
-            onTry={(id) => tryOn("sparkTint", id)}
-            swatch={(item) => (
-              <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
-            )}
-          />
-
-          <Group
-            title="Spark gradient · premium 40–44"
-            items={SPARK_TINTS.filter(
-              (item) =>
-                item.collection === collection.id && item.kind === "gradient",
-            )}
-            owned={(id) => look.ownedSparkTints.includes(id)}
-            equipped={(id) => look.sparkTint === id}
-            previewing={(id) => preview.sparkTint === id}
-            onAct={(id, owned) => act("sparkTint", id, owned)}
-            onTry={(id) => tryOn("sparkTint", id)}
-            swatch={(item) => (
-              <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
-            )}
           />
 
           <Group
