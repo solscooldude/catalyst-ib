@@ -154,26 +154,6 @@ export default function DashboardPage() {
         </p>
       ) : null}
 
-      <nav className="flex flex-wrap gap-x-4 gap-y-2 px-2 text-sm text-zinc-400">
-        <Link href={ROUTES.quiz} className="hover:text-foreground">
-          Quiz
-        </Link>
-        <Link href={ROUTES.stats} className="hover:text-foreground">
-          Stats
-        </Link>
-        <Link href={ROUTES.schedule} className="hover:text-foreground">
-          Schedule
-        </Link>
-        <Link href={ROUTES.profile} className="hover:text-foreground">
-          Profile
-        </Link>
-        <Link href={ROUTES.motivation} className="hover:text-foreground">
-          Motivation
-        </Link>
-        <Link href={ROUTES.unlocks} className="hover:text-foreground">
-          Unlocks
-        </Link>
-      </nav>
     </div>
   );
 }
