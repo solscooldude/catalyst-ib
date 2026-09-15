@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { CatalystProvider } from "@/components/catalyst-provider";
 import "./globals.css";
+import "./shell-theme.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +30,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`light ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var t=localStorage.getItem("catalyst-v1:ui-theme");if(t==="dark"){document.documentElement.classList.remove("light");document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark";}}catch(e){}',
+          }}
+        />
         <CatalystProvider>{children}</CatalystProvider>
       </body>
     </html>
