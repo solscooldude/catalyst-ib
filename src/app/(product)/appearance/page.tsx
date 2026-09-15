@@ -13,6 +13,7 @@ import {
   SPARK_TRAILS,
   SPARK_TINTS,
 } from "@/lib/appearance";
+import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
 import { ROUTES } from "@/lib/routes";
 import {
   buyAppearance,
@@ -58,10 +59,25 @@ export default function AppearancePage() {
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
-      <p className="text-sm text-muted-foreground">
-        Room backgrounds are parked. Focus is a large spark on a quiet stage.
-      </p>
 
+      <section id="snacks" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+          Snacks
+        </p>
+        <h2 className="text-2xl text-foreground">Feed Flux on My Sprite</h2>
+        <p className="text-sm leading-6 text-muted-foreground">
+          Snacks stay in the shop list so they are easy to find. They cost{" "}
+          <TokenAmount value={FEED_COST} /> each, {FEED_DAILY_LIMIT} a day.
+          Drag one onto the spark — they are not a closet tint.
+        </p>
+        <p className="text-sm">
+          <Link href={`${ROUTES.sprite}#snacks`} className="text-foreground underline">
+            Open the snack bowl
+          </Link>
+        </p>
+      </section>
+
+      <section id="trails" className="scroll-mt-24 space-y-4">
       {COLLECTIONS.map((collection) => (
         <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
           <div>
@@ -140,6 +156,7 @@ export default function AppearancePage() {
 
         </section>
       ))}
+      </section>
     </div>
   );
 }
