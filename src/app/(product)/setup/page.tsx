@@ -43,11 +43,18 @@ export default function SetupPage() {
     <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-10">
       <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-        Nemesis apps
+        Your Tier 3 nemeses
       </h1>
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        Pick the apps that pull you off the IA. These are the highest-cost
+        unlocks — Instagram, TikTok, Snapchat, Reddit, X, BeReal. School tools
+        stay allowed. Discord and YouTube sit in Tier 2.
+      </p>
 
       <section className="mt-10">
-        <h2 className="text-sm font-medium text-foreground">Apps to lock</h2>
+        <h2 className="text-sm font-medium text-foreground">
+          Multi-select your nemesis set
+        </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {NEMESIS_APPS.map((app) => {
             const selected = nemeses.includes(app.id);
@@ -67,6 +74,7 @@ export default function SetupPage() {
                   <span className="text-base text-foreground">{app.name}</span>
                   {selected ? <Check className="size-4 text-primary" /> : null}
                 </div>
+                <p className="mt-1 text-xs text-muted-foreground">{app.blurb}</p>
               </button>
             );
           })}

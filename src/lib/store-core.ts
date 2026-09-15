@@ -18,7 +18,10 @@ import {
   NEMESIS_APPS,
   STORAGE_KEY,
   TASK_SUBJECT,
+  getUnlockItem,
+  isEssentialAppId,
   isNemesisId,
+  isUnlockCatalogId,
   type NemesisId,
   type SubjectId,
   type TaskId,
@@ -198,6 +201,7 @@ function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
 export function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
   const byCatalog = new Map<UnlockCatalogId, Unlock>();
   for (const unlock of pruneUnlocks(unlocks, now)) {
+    if (!isUnlockCatalogId(unlock.catalogId)) continue;
     const existing = byCatalog.get(unlock.catalogId);
     if (!existing) {
       byCatalog.set(unlock.catalogId, unlock);
@@ -213,6 +217,52 @@ export function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
     });
   }
   return [...byCatalog.values()];
+}
+
+type RawUnlock = {
+  id?: string;
+  catalogId?: string;
+  label?: string;
+  cost?: number;
+  startedAt?: number;
+  expiresAt?: number;
+};
+
+export function normalizeUnlocks(
+  unlocks: RawUnlock[] | Unlock[] | undefined,
+  nemeses: readonly NemesisId[] = [],
+  now = Date.now(),
+): Unlock[] {
+  const migrated: Unlock[] = [];
+  for (const unlock of unlocks ?? []) {
+    const catalogId = unlock.catalogId;
+    if (!catalogId || catalogId === "notes") continue;
+    if (catalogId === "nemesis") {
+      for (const nemesisId of nemeses) {
+        const item = getUnlockItem(nemesisId);
+        migrated.push({
+          id: `${unlock.id ?? "legacy"}-${nemesisId}`,
+          catalogId: nemesisId,
+          label: item?.name ?? nemesisId,
+          cost: unlock.cost ?? item?.cost ?? 0,
+          startedAt: unlock.startedAt ?? now,
+          expiresAt: unlock.expiresAt ?? now,
+        });
+      }
+      continue;
+    }
+    if (!isUnlockCatalogId(catalogId)) continue;
+    const item = getUnlockItem(catalogId);
+    migrated.push({
+      id: unlock.id ?? catalogId,
+      catalogId,
+      label: unlock.label ?? item?.name ?? catalogId,
+      cost: unlock.cost ?? item?.cost ?? 0,
+      startedAt: unlock.startedAt ?? now,
+      expiresAt: unlock.expiresAt ?? now,
+    });
+  }
+  return coalesceUnlocks(migrated, now);
 }
 
 function normalizeNemeses(
@@ -281,7 +331,7 @@ export function hydrateStore(userId: string | null = null) {
         parsed.tasks && parsed.tasks.length === defaultTasks.length
           ? parsed.tasks
           : defaultTasks.map((task) => ({ ...task })),
-      unlocks: coalesceUnlocks(parsed.unlocks ?? []),
+      unlocks: normalizeUnlocks(parsed.unlocks ?? [], normalizeNemeses(parsed)),
       logs: parsed.logs ?? [],
       appearance: mergeAppearance(parsed.appearance, id),
       profile: normalizeProfile(parsed.profile),
@@ -360,4 +410,14 @@ export function isUnlockActive(
   return coalesceUnlocks(unlocks, now).some(
     (unlock) => unlock.catalogId === catalogId,
   );
+}
+
+export function isAppUnlocked(
+  unlocks: Unlock[],
+  appId: string,
+  now = Date.now(),
+) {
+  if (isEssentialAppId(appId)) return true;
+  if (!isUnlockCatalogId(appId)) return false;
+  return isUnlockActive(unlocks, appId, now);
 }
