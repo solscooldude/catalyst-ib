@@ -18,6 +18,7 @@ import {
 } from "@/lib/spark-flavor";
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
 import { type SnackId, type SparkAct } from "@/lib/spark-play";
+import { displaySpriteName } from "@/lib/sprite-name";
 import { sparkEvolution } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -289,11 +290,41 @@ export function Spark({
     });
   const canPet = pettable;
   const [petted, setPetted] = useState(false);
+  const [orbit, setOrbit] = useState(false);
   const petTimer = useRef<number>(0);
   const lastPet = useRef(0);
+  const firstOrbit = useRef(true);
+  const flavorKey = `${resolved}:${subject ?? ""}:${taskId ?? ""}`;
 
   useEffect(() => {
     return () => window.clearTimeout(petTimer.current);
+  }, []);
+
+  useEffect(() => {
+    if (firstOrbit.current) {
+      firstOrbit.current = false;
+      if (flourish !== "now") return;
+    }
+    setOrbit(true);
+    const hide = window.setTimeout(() => setOrbit(false), 3600);
+    return () => window.clearTimeout(hide);
+  }, [flavorKey, flourish]);
+
+  useEffect(() => {
+    let hide = 0;
+    let wait = 0;
+    function burst() {
+      setOrbit(true);
+      hide = window.setTimeout(() => {
+        setOrbit(false);
+        wait = window.setTimeout(burst, 52000 + Math.floor(Math.random() * 40000));
+      }, 3400);
+    }
+    wait = window.setTimeout(burst, 22000 + Math.floor(Math.random() * 28000));
+    return () => {
+      window.clearTimeout(hide);
+      window.clearTimeout(wait);
+    };
   }, []);
 
   function pet() {
@@ -418,7 +449,7 @@ export function Spark({
           </g>
         ) : null}
 
-        {mood === "earning" ? (
+        {orbit || mood === "earning" ? (
           <g className="spark-particles" fill={SPARK_FLAVOR_INK[resolved]}>
             <SparkParticleRing radius={40} twist={22} />
           </g>
@@ -440,7 +471,7 @@ export function Spark({
             pet();
           }
         }}
-        aria-label="Pet the spark"
+        aria-label={`Pet ${displaySpriteName(store.spriteName)}`}
         className={frameClass}
         style={frameStyle}
       >
