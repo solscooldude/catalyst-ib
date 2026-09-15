@@ -47,7 +47,7 @@ const GROUPS = [
     label: "Shop",
     href: ROUTES.appearance,
     items: [
-      { href: `${ROUTES.appearance}#sprite`, label: "Sprite appearance" },
+      { href: `${ROUTES.appearance}#sprite`, label: "Sprite shop" },
       { href: `${ROUTES.appearance}#app`, label: "App appearance" },
     ],
   },

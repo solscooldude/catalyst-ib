@@ -187,7 +187,7 @@ export default function AppearancePage() {
             Closet
           </p>
           <p className="mt-2 text-2xl font-semibold text-foreground">
-            Sprite appearance
+            Sprite shop
           </p>
           <p className="mt-2 text-sm text-zinc-500">
             Cosmetics, colours, gradients, auras, trails.
@@ -215,32 +215,23 @@ export default function AppearancePage() {
         </button>
       </div>
 
-      <div
-        role="tablist"
-        aria-label={shownRealm === "sprite" ? "Sprite appearance" : "App appearance"}
-        className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => {
-          const on = tab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={on}
-              className={cn(
-                "shrink-0 rounded-full px-3.5 py-2 text-sm font-medium ring-1 transition-colors",
-                on
-                  ? "bg-primary/15 text-foreground ring-primary/40"
-                  : "bg-card text-zinc-500 ring-border hover:text-foreground",
-              )}
-              onClick={() => openTab(item.id)}
-            >
+      <label className="block">
+        <span className="mb-2 block text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+          {shownRealm === "sprite" ? "Sprite shop" : "App appearance"}
+        </span>
+        <select
+          className={cn(nativeSelectClass, "h-12 text-base")}
+          value={tab}
+          aria-label={shownRealm === "sprite" ? "Sprite shop section" : "App appearance section"}
+          onChange={(event) => openTab(event.target.value as ShopTab)}
+        >
+          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => (
+            <option key={item.id} value={item.id}>
               {item.label}
-            </button>
-          );
-        })}
-      </div>
+            </option>
+          ))}
+        </select>
+      </label>
 
       <section className="flux-card scroll-mt-24 space-y-6 px-6 py-8">
         {tab === "cosmetics" ? (
