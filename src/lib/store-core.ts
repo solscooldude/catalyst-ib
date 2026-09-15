@@ -112,28 +112,36 @@ const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
   done: false,
 }));
 
-export const defaultState: CatalystState = {
-  hydrated: false,
-  setupComplete: false,
-  nemeses: [],
-  manageBacConnected: false,
-  demoMode: true,
-  tokens: 0,
-  tasks: defaultTasks,
-  session: null,
-  unlocks: [],
-  logs: [],
-  appearance: normalizeAppearance(defaultAppearance),
-  profile: defaultProfile,
-  motivation: defaultMotivation,
-  schedule: [],
-  lastLoginDay: null,
-  streakDays: 0,
-  feedDay: null,
-  feedCount: 0,
-  quizDay: null,
-  quizCorrect: 0,
-};
+export function createDefaultState(): CatalystState {
+  return {
+    hydrated: false,
+    setupComplete: false,
+    nemeses: [],
+    manageBacConnected: false,
+    demoMode: true,
+    tokens: 0,
+    tasks: defaultTasks.map((task) => ({ ...task })),
+    session: null,
+    unlocks: [],
+    logs: [],
+    appearance: normalizeAppearance(defaultAppearance),
+    profile: {
+      ...defaultProfile,
+      subjects: [...defaultProfile.subjects],
+      core: [...defaultProfile.core],
+    },
+    motivation: { ...defaultMotivation },
+    schedule: [],
+    lastLoginDay: null,
+    streakDays: 0,
+    feedDay: null,
+    feedCount: 0,
+    quizDay: null,
+    quizCorrect: 0,
+  };
+}
+
+export const defaultState: CatalystState = createDefaultState();
 
 type Listener = () => void;
 
@@ -222,7 +230,7 @@ export function hydrateStore(userId: string | null = null) {
   const id = userId ?? sessionAccountId();
   storageAccountId = id;
   if (!id) {
-    state = { ...defaultState, hydrated: true };
+    state = { ...createDefaultState(), hydrated: true };
     emit();
     return;
   }
@@ -230,10 +238,11 @@ export function hydrateStore(userId: string | null = null) {
     const raw = window.localStorage.getItem(accountStorageKey(id));
     if (!raw) {
       state = {
-        ...defaultState,
+        ...createDefaultState(),
         appearance: mergeAppearance(undefined, id),
         hydrated: true,
       };
+      persist(state);
       emit();
       return;
     }
@@ -241,13 +250,13 @@ export function hydrateStore(userId: string | null = null) {
       nemesis?: NemesisId | null;
     };
     state = {
-      ...defaultState,
+      ...createDefaultState(),
       ...parsed,
       nemeses: normalizeNemeses(parsed),
       tasks:
         parsed.tasks && parsed.tasks.length === defaultTasks.length
           ? parsed.tasks
-          : defaultTasks,
+          : defaultTasks.map((task) => ({ ...task })),
       unlocks: coalesceUnlocks(parsed.unlocks ?? []),
       logs: parsed.logs ?? [],
       appearance: mergeAppearance(parsed.appearance, id),
@@ -265,11 +274,12 @@ export function hydrateStore(userId: string | null = null) {
     };
   } catch {
     state = {
-      ...defaultState,
+      ...createDefaultState(),
       appearance: mergeAppearance(undefined, id),
       hydrated: true,
     };
   }
+  persist(state);
   emit();
 }
 
@@ -296,7 +306,7 @@ export function resetDemo() {
     window.localStorage.removeItem(accountStorageKey(userId));
     clearCloset(userId);
   }
-  state = { ...defaultState, hydrated: true };
+  state = { ...createDefaultState(), hydrated: true };
   emit();
 }
 
