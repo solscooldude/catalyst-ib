@@ -152,18 +152,6 @@
   }
 }
 
-@keyframes spark-scrunch-spring {
-  0% {
-    transform: scale3d(1.18, 0.66, 1);
-  }
-  55% {
-    transform: scale3d(0.94, 1.12, 1);
-  }
-  100% {
-    transform: scale3d(1, 1, 1);
-  }
-}
-
 @keyframes spark-celebrate {
   0%,
   100% {
@@ -241,10 +229,7 @@
   top: 36%;
 }
 
-.spark-scrunch-release:not(.is-scrunching) .spark-body,
-.spark-scrunch-host.is-scrunch-release:not(.is-scrunching) .spark-body {
-  animation: spark-scrunch-spring 0.42s cubic-bezier(0.22, 1.4, 0.36, 1) both;
-}
+/* Release bounce is the rAF spring writing --scrunch-x / --scrunch-y. */
 
 .spark-celebrate .spark-float,
 .spark-celebrate {
@@ -363,7 +348,6 @@
   .spark-chew,
   .spark-crumb-bit,
   .spark-boop .spark-blink,
-  .spark-scrunch-release .spark-body,
   .spark-celebrate,
   .spark-highfive .spark-body,
   .spark-z,
