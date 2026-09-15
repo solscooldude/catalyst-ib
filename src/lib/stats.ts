@@ -112,6 +112,12 @@ export function subjectStacks(logs: SessionLog[]) {
     .sort((a, b) => b.durationMs - a.durationMs);
 }
 
+export function endOfDay(now = new Date()) {
+  const date = new Date(now);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
 export function monthlyRoundup(logs: SessionLog[], now = new Date()) {
   const monthLogs = logsInRange(logs, startOfMonth(now), endOfMonth(now));
   const stacks = subjectStacks(monthLogs);
@@ -128,6 +134,24 @@ export function monthlyRoundup(logs: SessionLog[], now = new Date()) {
     tokensEarned,
     topSubject: stacks[0] ?? null,
     monthLabel: now.toLocaleDateString([], { month: "long", year: "numeric" }),
+  };
+}
+
+export function weeklyRoundup(logs: SessionLog[], now = new Date()) {
+  const weekLogs = logsInRange(logs, startOfWeek(now), endOfDay(now));
+  const stacks = subjectStacks(weekLogs);
+  const durationMs = weekLogs.reduce((sum, log) => sum + log.durationMs, 0);
+  const tokensEarned = weekLogs.reduce(
+    (sum, log) => sum + log.timeTokens + log.completionTokens,
+    0,
+  );
+  return {
+    durationMs,
+    sessions: weekLogs.length,
+    tokensEarned,
+    topSubject: stacks[0] ?? null,
+    weekLabel: weekLabel(now),
+    empty: weekLogs.length === 0,
   };
 }
 
