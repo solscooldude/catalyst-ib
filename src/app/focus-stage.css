@@ -312,6 +312,41 @@ html.light .focus-stage-math {
   }
 }
 
+.focus-session-panel,
+.focus-session-panel h1,
+.focus-session-panel .text-foreground,
+.focus-session-panel label,
+.focus-board-row,
+.focus-board-row span {
+  color: #ffffff !important;
+}
+
+.focus-session-panel .text-muted-foreground,
+.focus-session-panel .text-primary,
+.focus-session-panel .text-xs,
+.focus-session-panel .text-[11px] {
+  color: #f4f4f5 !important;
+}
+
+.focus-session-panel [data-slot="checkbox"] {
+  border-color: #ffffff;
+  background: transparent;
+  color: #070b14;
+}
+
+.focus-session-panel [data-slot="checkbox"][data-checked] {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .focus-spark-stage.is-buddy-sit {
+    margin-right: auto;
+    margin-left: 0.15rem;
+    margin-top: 5.4rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .focus-stage-star,
   .focus-stage-shoot,
