@@ -234,7 +234,34 @@ export function tokensFromElapsed(elapsedMs: number, demoMode: boolean) {
   return Math.floor(ms / REAL_TOKEN_MS);
 }
 
+/** Credit newly earned time tokens to the wallet while the timer keeps counting. */
+export function creditLiveSessionTokens(now = Date.now()) {
+  setState((current) => {
+    const session = current.session;
+    if (!session || session.status !== "focus" || session.pausedAt) {
+      return current;
+    }
+    const earned = tokensFromElapsed(
+      sessionElapsedMs(session, now),
+      session.demoMode,
+    );
+    const already = session.timeTokens ?? 0;
+    const delta = earned - already;
+    if (delta <= 0) return current;
+    return {
+      ...current,
+      tokens: current.tokens + delta,
+      session: {
+        ...session,
+        timeTokens: earned,
+        tokensEarned: earned + session.completionTokens,
+      },
+    };
+  });
+}
+
 export function completeSession(tokensEarned?: number) {
+  creditLiveSessionTokens();
   const session = state.session;
   if (!session) {
     return { ok: false as const, reason: "No session to complete." };
@@ -244,10 +271,12 @@ export function completeSession(tokensEarned?: number) {
   }
   const startedAt = session.focusStartedAt ?? session.lockedAt;
   const elapsed = sessionElapsedMs(session);
+  const computed = tokensFromElapsed(elapsed, session.demoMode);
   const timeTokens = Math.max(
     0,
-    tokensEarned ?? tokensFromElapsed(elapsed, session.demoMode),
+    tokensEarned ?? Math.max(session.timeTokens ?? 0, computed),
   );
+  const leftover = Math.max(0, timeTokens - (session.timeTokens ?? 0));
   const completionTokens = session.kind === "verified" ? COMPLETION_BONUS : 0;
   const totalTokens = timeTokens + completionTokens;
   const endedAt = Date.now();
@@ -272,6 +301,7 @@ export function completeSession(tokensEarned?: number) {
   writeSessionRecap({
     title: session.title,
     minutes: Math.max(0, Math.round(elapsed / 60000)),
+    elapsedMs: elapsed,
     tokens: totalTokens,
     timeTokens,
     completionTokens,
@@ -281,7 +311,7 @@ export function completeSession(tokensEarned?: number) {
 
   setState((current) => ({
     ...current,
-    tokens: current.tokens + totalTokens,
+    tokens: current.tokens + leftover + completionTokens,
     tasks:
       session.kind === "verified" && session.taskId
         ? current.tasks.map((task) =>
