@@ -297,32 +297,37 @@
   height: auto;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0.2rem;
   border: 0;
-  border-radius: 1.15rem;
-  background: rgb(255 255 255 / 0.9);
-  padding: 0.35rem 0.5rem 0.4rem;
-  box-shadow: 0 1px 2px rgb(24 24 27 / 0.08);
+  background: transparent;
+  padding: 0.1rem;
   cursor: grab;
   touch-action: none;
   user-select: none;
   will-change: transform;
 }
 
+.sprite-highfive-hand svg {
+  filter: drop-shadow(0 8px 10px rgb(0 0 0 / 28%));
+}
+
 .sprite-highfive-label {
+  border-radius: 999px;
+  background: #5eead4;
+  padding: 0.12rem 0.45rem;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #18181b;
+  color: #0b0b0f;
 }
 
 .dark .sprite-highfive-hand {
-  background: rgb(24 24 27 / 0.92);
-  box-shadow: 0 0 0 1px rgb(244 244 245 / 0.08);
+  background: transparent;
+  box-shadow: none;
 }
 
 .dark .sprite-highfive-label {
-  color: #f4f4f5;
+  color: #0b0b0f;
 }
 
 .sprite-highfive-hand.is-held {
