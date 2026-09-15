@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Spark, type SparkMood } from "@/components/spark";
 import { SpritePlaypen } from "@/components/sprite-playpen";
 import { TokenAmount } from "@/components/mint-chip";
-import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import {
   SPARK_GEAR,
@@ -126,28 +125,30 @@ export default function SpritePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs tracking-[0.2em] text-primary uppercase">
-            My Sprite
-          </p>
-          <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-            Sit with your spark.
-          </h1>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-            Pet, drag a snack onto it, poke, or let it doze. Official hours
-            grow the glow. Login streak {state.streakDays} day
-            {state.streakDays === 1 ? "" : "s"}
-            {state.streakDays > 0 && state.streakDays % 7 === 0
-              ? " · seven-day flare unlocked"
-              : ""}.
-          </p>
-        </div>
-        <TokenChip tokens={state.tokens} />
-      </div>
+    <div className="mx-auto w-full max-w-3xl space-y-4">
+      <section className="flux-card px-6 py-8 sm:px-10">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+          My Sprite
+        </p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Sit with Flux.
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
+          Pet, drag a snack onto it, poke, or let it doze. Official hours
+          grow the glow. Login streak {state.streakDays} day
+          {state.streakDays === 1 ? "" : "s"}
+          {state.streakDays > 0 && state.streakDays % 7 === 0
+            ? " · seven-day flare unlocked"
+            : ""}.
+        </p>
+        <p className="mt-3 text-sm">
+          <Link href={ROUTES.quiz} className="text-zinc-400 hover:text-foreground">
+            Ten-question diploma quiz
+          </Link>
+        </p>
+      </section>
 
-      <section className="flex flex-col items-center rounded-[2rem] bg-card px-5 py-8 ring-1 ring-white/6">
+      <section className="flux-card flex flex-col items-center px-5 py-8">
         <SpritePlaypen
           mood={mood}
           petPulse={petPulse}
@@ -276,7 +277,7 @@ function StatusCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-3xl bg-card px-4 py-4 ring-1 ring-white/6">
+    <div className="flux-card px-4 py-4">
       <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {label}
       </p>
@@ -311,8 +312,8 @@ function EquipRow({
             type="button"
             onClick={() => onWear(item.id, item.owned)}
             className={cn(
-              "flex items-center gap-3 rounded-2xl bg-card px-3 py-2 text-left ring-1",
-              item.on ? "ring-primary/45" : "ring-white/6",
+              "flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-left shadow-[0_1px_2px_rgb(24_24_27/0.05)] dark:bg-zinc-900",
+              item.on ? "ring-primary/45" : "ring-border",
               !item.owned && "opacity-60",
             )}
           >
