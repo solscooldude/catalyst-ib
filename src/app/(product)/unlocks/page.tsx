@@ -127,28 +127,26 @@ function UnlockInner() {
         </div>
 
         <p className="mt-6 text-sm leading-6 text-muted-foreground">
-          Buying unlocks a whole tier for the time block — not one app.
+          Buying unlocks a whole tier for the time block — not one app. Home
+          only shows Unlock Tier 2 and Unlock Tier 3.
         </p>
 
         <div className="mt-5 space-y-3 text-sm">
-          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
-            <p className="font-medium text-foreground">School / allowed</p>
-            <p className="mt-1 text-muted-foreground">
-              Stay free. {ESSENTIAL_APPS.map((app) => app.name).join(", ")}.
-            </p>
-          </div>
-          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
-            <p className="font-medium text-foreground">Tier 2 includes</p>
-            <p className="mt-1 text-muted-foreground">
-              {TIER2_APPS.map((app) => app.name).join(", ")}.
-            </p>
-          </div>
-          <div className="rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
-            <p className="font-medium text-foreground">Tier 3 includes</p>
-            <p className="mt-1 text-muted-foreground">
-              {NEMESIS_APPS.map((app) => app.name).join(", ")}.
-            </p>
-          </div>
+          <TierDescribe
+            title="School / allowed"
+            note="Stay free. Not sold."
+            apps={ESSENTIAL_APPS}
+          />
+          <TierDescribe
+            title="Tier 2 includes"
+            note="10 tokens / 10 min for the whole tier."
+            apps={TIER2_APPS}
+          />
+          <TierDescribe
+            title="Tier 3 includes"
+            note="15 tokens / 10 min for the whole tier. Setup picks which of these are yours."
+            apps={NEMESIS_APPS}
+          />
         </div>
 
         <div className="mt-6">
@@ -156,7 +154,6 @@ function UnlockInner() {
             tokens={state.tokens}
             active={active}
             now={now}
-            detailed
             onBuy={buy}
           />
         </div>
@@ -221,6 +218,33 @@ function UnlockInner() {
         </div>
       </div>
     </PageFrame>
+  );
+}
+
+function TierDescribe({
+  title,
+  note,
+  apps,
+}: {
+  title: string;
+  note: string;
+  apps: readonly { id: string; name: string }[];
+}) {
+  return (
+    <div className="rounded-2xl bg-card px-4 py-4 ring-1 ring-border">
+      <p className="font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-muted-foreground">{note}</p>
+      <ul className="mt-3 flex flex-wrap gap-1.5">
+        {apps.map((app) => (
+          <li
+            key={app.id}
+            className="rounded-full bg-background px-2.5 py-1 text-xs text-foreground ring-1 ring-border"
+          >
+            {app.name}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

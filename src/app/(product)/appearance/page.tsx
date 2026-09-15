@@ -193,7 +193,7 @@ export default function AppearancePage() {
             <Sparkles className="size-5" />
           </span>
           <p className="mt-4 text-3xl font-semibold tracking-tight">
-            Sprite appearance
+            Sprite shop
           </p>
           <p
             className={cn(
@@ -236,41 +236,27 @@ export default function AppearancePage() {
         </button>
       </div>
 
-      <div>
-        <p className="mb-3 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-          {shownRealm === "sprite" ? "Sprite appearance" : "App appearance"}
-        </p>
-        <div
-          className="flex flex-wrap gap-2"
-          role="tablist"
+      <label className="block">
+        <span className="mb-3 block text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+          {shownRealm === "sprite" ? "Sprite shop" : "App appearance"}
+        </span>
+        <select
+          className={cn(nativeSelectClass, "h-14 text-base")}
+          value={tab}
           aria-label={
             shownRealm === "sprite"
-              ? "Sprite appearance section"
+              ? "Sprite shop section"
               : "App appearance section"
           }
+          onChange={(event) => openTab(event.target.value as ShopTab)}
         >
-          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => {
-            const on = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => openTab(item.id)}
-                className={cn(
-                  "h-11 rounded-full px-4 text-sm font-medium ring-2 transition-colors",
-                  on
-                    ? "bg-primary text-primary-foreground ring-primary"
-                    : "bg-card text-foreground ring-border hover:ring-primary/45",
-                )}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <section className="flux-card scroll-mt-24 space-y-6 px-6 py-8">
         {tab === "cosmetics" ? (
