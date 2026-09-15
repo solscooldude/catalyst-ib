@@ -49,7 +49,7 @@ export function SelectedTaskChip({
 }) {
   if (!title) {
     return (
-      <p className="rounded-2xl bg-zinc-100 px-3.5 py-3 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+      <p className="picker-empty">
         {empty ?? "Pick a task so you can see what you are locking in."}
       </p>
     );
