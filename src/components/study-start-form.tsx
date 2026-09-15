@@ -59,7 +59,7 @@ export function StudyStartForm() {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="Paper 2 timing. Chapter 4 notes. IA data table."
-          className="h-11 rounded-xl border-2 border-zinc-300 bg-white text-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100"
+          className="focus-field"
         />
       </div>
       {title.trim().length >= 3 ? (
