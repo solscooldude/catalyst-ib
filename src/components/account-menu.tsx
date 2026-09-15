@@ -34,7 +34,6 @@ export function AccountMenu() {
   const items = [
     { href: ROUTES.profile, label: "IB profile" },
     { href: ROUTES.settings, label: "Account settings" },
-    { href: ROUTES.subscription, label: "Subscription" },
   ];
 
   return (
