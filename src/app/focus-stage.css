@@ -323,8 +323,7 @@ html.light .focus-stage-math {
 
 .focus-session-panel .text-muted-foreground,
 .focus-session-panel .text-primary,
-.focus-session-panel .text-xs,
-.focus-session-panel .text-[11px] {
+.focus-session-panel .text-xs {
   color: #f4f4f5 !important;
 }
 
