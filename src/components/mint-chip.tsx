@@ -26,8 +26,17 @@ export function TokenAmount({
         className,
       )}
     >
-      <SparkleMark size={13} />
+      <SparkleMark size={13} className="text-zinc-800 dark:text-zinc-100" />
       <span className="tabular-nums">{value}</span>
+    </span>
+  );
+}
+
+export function BuyLabel({ cost }: { cost: number }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      Buy
+      <TokenAmount value={cost} />
     </span>
   );
 }
