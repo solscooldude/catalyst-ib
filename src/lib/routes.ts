@@ -11,6 +11,9 @@ export const ROUTES = {
   subscription: "/account/subscription",
   settings: "/account/settings",
   schedule: "/schedule",
+  planner: "/planner",
+  intro: "/intro",
+  friends: "/friends",
   sprite: "/sprite",
   quiz: "/quiz",
 } as const;
