@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
 import { FocusSpark } from "@/components/focus-spark";
+import { FocusStage } from "@/components/focus-stage";
 import { TokenAmount } from "@/components/mint-chip";
 import { type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
@@ -103,6 +104,7 @@ export default function FocusPage() {
 
   return (
     <div className="focus-session focus-session-stage">
+      <FocusStage />
       <FocusSpark
         mood={mood}
         taskId={session.taskId}
