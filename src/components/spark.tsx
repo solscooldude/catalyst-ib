@@ -3,7 +3,9 @@
 import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
 import {
+  getSparkAura,
   getSparkTint,
+  type SparkAuraId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
@@ -41,6 +43,7 @@ type SparkProps = {
   hint?: string | null;
   tint?: SparkTintId;
   gear?: SparkGearId;
+  aura?: SparkAuraId;
   trail?: SparkTrailId;
   size?: number;
   className?: string;
@@ -168,7 +171,70 @@ function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
   return <OpenEyes fill={fill} />;
 }
 
+function SparkAuraMark({ id }: { id: SparkAuraId }) {
+  if (id === "none") return null;
+  const spec = getSparkAura(id);
+  return (
+    <g aria-hidden>
+      {spec.washes.map((wash, index) => (
+        <ellipse
+          key={`w${index}`}
+          cx={wash.cx}
+          cy={wash.cy}
+          rx={wash.rx}
+          ry={wash.ry}
+          fill={wash.fill}
+          fillOpacity={wash.fillOpacity}
+        />
+      ))}
+      {spec.rings.map((ring, index) => (
+        <ellipse
+          key={`r${index}`}
+          cx={ring.cx}
+          cy={ring.cy}
+          rx={ring.rx}
+          ry={ring.ry}
+          fill="none"
+          stroke={ring.stroke}
+          strokeOpacity={ring.strokeOpacity}
+          strokeWidth={ring.strokeWidth}
+        />
+      ))}
+    </g>
+  );
+}
+
 function GearBack({ id }: { id: SparkGearId }) {
+  if (id === "cape") {
+    return (
+      <g>
+        <path
+          d="M12 70c-4 16 1 30 12 38 5 2 8-5 6-13-2-10-4-18-8-22-4-3-8-4-10-3Z"
+          fill="#1E1B4B"
+        />
+        <path
+          d="M88 70c4 16-1 30-12 38-5 2-8-5-6-13 2-10 4-18 8-22 4-3 8-4 10-3Z"
+          fill="#1E1B4B"
+        />
+        <path
+          d="M16 76c8 18 8 28 4 36"
+          fill="none"
+          stroke="#312E81"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        <path
+          d="M84 76c-8 18-8 28-4 36"
+          fill="none"
+          stroke="#312E81"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+      </g>
+    );
+  }
   if (id !== "scarf") return null;
   return (
     <g>
@@ -328,13 +394,61 @@ function Gear({ id }: { id: SparkGearId }) {
     return (
       <g>
         <path
-          d="M24 52c0-18 10-28 26-28s26 10 26 28"
+          d="M22 48c0-20 12-30 28-30s28 10 28 30"
           fill="none"
           stroke="#18181B"
-          strokeWidth="3.2"
+          strokeWidth="3.6"
+          strokeLinecap="round"
         />
-        <rect x="18" y="50" width="10" height="16" rx="4" fill="#18181B" />
-        <rect x="72" y="50" width="10" height="16" rx="4" fill="#18181B" />
+        <rect x="16" y="46" width="12" height="22" rx="6" fill="#18181B" />
+        <rect x="18.5" y="50" width="7" height="14" rx="3.5" fill="#3F3F46" />
+        <rect x="72" y="46" width="12" height="22" rx="6" fill="#18181B" />
+        <rect x="74.5" y="50" width="7" height="14" rx="3.5" fill="#3F3F46" />
+      </g>
+    );
+  }
+  if (id === "cape") {
+    return (
+      <g>
+        <path
+          d="M34 76c5-3 27-3 32 0-2 4-8 6-16 6s-14-2-16-6Z"
+          fill="#312E81"
+        />
+        <circle cx="50" cy="78.4" r="2.3" fill="#A78BFA" />
+      </g>
+    );
+  }
+  if (id === "bowtie") {
+    return (
+      <g>
+        <path
+          d="M36 80c-7-5-9 3-2 7 5 2 9 1 14-1 5 2 9 3 14 1 7-4 5-12-2-7-5 2-9 2-14 1-5 1-9 1-14-1Z"
+          fill="#9A3412"
+        />
+        <rect x="46.6" y="78.2" width="6.8" height="6.4" rx="1.3" fill="#7C2D12" />
+      </g>
+    );
+  }
+  if (id === "beanie") {
+    return (
+      <g>
+        <path
+          d="M29 30C34 12 43 6 50 6c8 0 17 5 23 22-10 5-34 6-44 2Z"
+          fill="#334155"
+        />
+        <path
+          d="M27 28c8 5 38 6 48 0-2 7-12 10-24 10S29 35 27 28Z"
+          fill="#1E293B"
+        />
+        <circle cx="50" cy="7.4" r="3.3" fill="#F8FAFC" />
+        <path
+          d="M34 24c8 3 24 3 32 0"
+          fill="none"
+          stroke="#475569"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
       </g>
     );
   }
@@ -347,6 +461,33 @@ function Gear({ id }: { id: SparkGearId }) {
     );
   }
   return null;
+}
+
+function GearFront({ id }: { id: SparkGearId }) {
+  if (id !== "hearts") return null;
+  return (
+    <g>
+      <path
+        d="M38.2 58c-1.6-2.4-5.2-2.6-6.8-.2-2.1 3.1-.1 6.6 6.8 11.8 6.9-5.2 8.9-8.7 6.8-11.8-1.6-2.4-5.2-2.2-6.8.2Z"
+        fill="#DB2777"
+        stroke="#9D174D"
+        strokeWidth="0.7"
+      />
+      <path
+        d="M61.8 58c-1.6-2.4-5.2-2.6-6.8-.2-2.1 3.1-.1 6.6 6.8 11.8 6.9-5.2 8.9-8.7 6.8-11.8-1.6-2.4-5.2-2.2-6.8.2Z"
+        fill="#DB2777"
+        stroke="#9D174D"
+        strokeWidth="0.7"
+      />
+      <path
+        d="M45.6 64.2h8.8"
+        fill="none"
+        stroke="#9D174D"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </g>
+  );
 }
 
 function Trail({ id }: { id: SparkTrailId }) {
@@ -368,6 +509,7 @@ export function Spark({
   hint,
   tint,
   gear,
+  aura,
   trail,
   size = 72,
   className,
@@ -387,6 +529,7 @@ export function Spark({
   const store = useCatalyst();
   const tintId = tint ?? store.appearance.sparkTint;
   const gearId = gear ?? store.appearance.gear;
+  const auraId = aura ?? store.appearance.aura;
   const trailId = trail ?? store.appearance.trail;
   const palette = getSparkTint(tintId);
   const resolved =
@@ -578,6 +721,7 @@ export function Spark({
         <ellipse cx="50" cy="72" rx="28" ry="24" fill={`url(#${glowId})`} />
 
         <g className="spark-body">
+          <SparkAuraMark id={auraId} />
           <GearBack id={gearId} />
           <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
           <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
@@ -585,6 +729,7 @@ export function Spark({
           <g className={canGlance ? "spark-glance" : undefined}>
             <Eyes mood={shownMood} fill="#0B0B0F" />
           </g>
+          <GearFront id={gearId} />
         </g>
 
         {(petted || act === "boop") && mood !== "eating" ? <PetHearts /> : null}
