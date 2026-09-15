@@ -12,6 +12,8 @@ import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
 import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
+import { SessionRecapCard } from "@/components/session-recap";
+import { readSessionRecap } from "@/lib/session-recap";
 import {
   spendUnlock,
   useCatalyst,
@@ -36,12 +38,44 @@ function UnlockInner() {
     return () => window.clearInterval(id);
   }, []);
 
-  const mood = earned && now - arrivedAt < 3200 ? "done" : "tempted";
-
-  const nemesisLabel = formatNemesisList(state.nemeses);
   const lastSession =
     state.session?.status === "completed" ? state.session : null;
-  const lastEarned = lastSession?.tokensEarned ?? 0;
+  const lastLog = state.logs[state.logs.length - 1];
+  const stored = readSessionRecap();
+  const paramMinutes = Number(params.get("minutes"));
+  const paramTokens = Number(params.get("tokens"));
+  const recap =
+    earned
+      ? {
+          title:
+            lastSession?.title ??
+            stored?.title ??
+            lastLog?.subjectLabel ??
+            "Focus session",
+          minutes:
+            Number.isFinite(paramMinutes) && paramMinutes >= 0
+              ? paramMinutes
+              : (stored?.minutes ??
+                (lastLog ? Math.round(lastLog.durationMs / 60000) : 0)),
+          tokens:
+            Number.isFinite(paramTokens) && paramTokens >= 0
+              ? paramTokens
+              : (lastSession?.tokensEarned ?? stored?.tokens ?? 0),
+          timeTokens:
+            lastSession?.timeTokens ?? stored?.timeTokens ?? lastLog?.timeTokens ?? 0,
+          completionTokens:
+            lastSession?.completionTokens ??
+            stored?.completionTokens ??
+            lastLog?.completionTokens ??
+            0,
+          kind: lastSession?.kind ?? stored?.kind ?? "study",
+          endedAt: lastSession?.completedAt ?? stored?.endedAt ?? Date.now(),
+        }
+      : null;
+  const mood =
+    recap && now - arrivedAt < 5200 ? "done" : "tempted";
+
+  const nemesisLabel = formatNemesisList(state.nemeses);
   const active = useMemo(
     () => state.unlocks.filter((unlock) => unlock.expiresAt > now),
     [state.unlocks, now],
@@ -65,23 +99,7 @@ function UnlockInner() {
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="flux-card px-6 py-8">
-        {earned && lastEarned > 0 ? (
-          <div className="mb-8 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/20">
-            <p className="text-xs tracking-[0.16em] text-primary uppercase">
-              Session paid out
-            </p>
-            <p className="mt-2 inline-flex items-center gap-2 font-heading text-3xl text-foreground">
-              +<TokenAmount value={lastEarned} />
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {lastSession?.timeTokens ?? 0} from time
-              {lastSession?.completionTokens
-                ? ` + ${lastSession.completionTokens} official completion`
-                : ""}
-              . Logged to Stats.
-            </p>
-          </div>
-        ) : null}
+        {recap ? <SessionRecapCard recap={recap} /> : null}
 
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
