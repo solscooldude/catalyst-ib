@@ -45,12 +45,8 @@ export default function LockPage() {
       <div className="flux-card px-6 py-8 sm:px-8">
         <DemoBadge>Simulated phone lock</DemoBadge>
         <h1 className="mt-4 text-4xl text-foreground sm:text-5xl">
-          Phone is locked. Laptop is the only door.
+          Phone is locked
         </h1>
-        <p className="mt-4 text-sm leading-6 text-muted-foreground">
-          Social apps are grey. Emergency still works. This is a web mock —
-          Catalyst is not talking to Screen Time.
-        </p>
         <div className="mt-6 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900">
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
             Working on
@@ -58,11 +54,10 @@ export default function LockPage() {
           <p className="mt-2 text-lg text-foreground">{title}</p>
           {state.session.kind === "study" ? (
             <p className="mt-1 text-sm text-muted-foreground">
-              Study block · counts up
+              Study block
               {state.session.plannedMinutes
-                ? ` · soft goal ${state.session.plannedMinutes} min`
-                : ""}{" "}
-              · no +5 bonus
+                ? ` · ${state.session.plannedMinutes} min`
+                : ""}
             </p>
           ) : state.session.goal ? (
             <p className="mt-1 text-sm text-muted-foreground">
