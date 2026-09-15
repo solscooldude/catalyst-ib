@@ -105,7 +105,7 @@ export default function FocusPage() {
   }
 
   return (
-    <div className="focus-session focus-session-stage">
+    <div className="focus-session focus-session-stage" data-focus-canvas="">
       <FocusStage />
       <FocusSpark
         mood={mood}
