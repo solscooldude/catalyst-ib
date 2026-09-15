@@ -27,7 +27,7 @@ export default function LockPage() {
       router.replace(ROUTES.session);
     }
     if (state.session.status === "completed") {
-      router.replace(ROUTES.unlocks);
+      router.replace(`${ROUTES.home}#unlocks`);
     }
   }, [state.hydrated, state.setupComplete, state.session, router]);
 
