@@ -13,9 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   COMPLETION_BONUS,
-  DEMO_TIME_COMPRESS_MS,
   DEMO_TOKENS_PER_BLOCK,
-  REAL_TIME_COMPRESS_MS,
   REAL_TOKEN_MS,
 } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
@@ -23,6 +21,7 @@ import {
   completeSession,
   markTaskDone,
   pauseSession,
+  plannedLockMs,
   resumeSession,
   sessionElapsedMs,
   sessionHint,
@@ -30,13 +29,7 @@ import {
   tokensFromElapsed,
   useCatalyst,
 } from "@/lib/store";
-
-function formatElapsed(ms: number) {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const minutes = Math.floor(total / 60);
-  const seconds = total % 60;
-  return `${minutes}:${String(seconds).padStart(2, "0")}`;
-}
+import { formatElapsed } from "@/lib/session-recap";
 
 export default function FocusPage() {
   const router = useRouter();
@@ -73,16 +66,7 @@ export default function FocusPage() {
   const demoMode = session?.demoMode ?? state.demoMode;
   const pending = tokensFromElapsed(elapsed, demoMode);
   const title = session ? sessionTitle(session) : "";
-  const goalMs = session?.plannedMinutes
-    ? session.demoMode
-      ? Math.round(
-          session.plannedMinutes *
-            60 *
-            1000 *
-            (DEMO_TIME_COMPRESS_MS / REAL_TIME_COMPRESS_MS),
-        )
-      : session.plannedMinutes * 60 * 1000
-    : null;
+  const goalMs = session ? plannedLockMs(session) : null;
   const taskMarkedDone = session?.taskMarkedDone ?? false;
   const mood: SparkMood = paused
     ? "idle"
@@ -100,7 +84,7 @@ export default function FocusPage() {
     }
     const minutes = Math.max(0, Math.round(elapsed / 60000));
     router.push(
-      `${ROUTES.unlocks}?earned=1&minutes=${minutes}&tokens=${result.totalTokens}`,
+      `${ROUTES.unlocks}?earned=1&elapsed=${Math.floor(elapsed)}&minutes=${minutes}&tokens=${result.totalTokens}`,
     );
   }
 
@@ -151,7 +135,9 @@ export default function FocusPage() {
         {goalMs ? (
           <p className="mt-3 text-xs text-muted-foreground">
             Soft goal {session.plannedMinutes} min
-            {elapsed >= goalMs ? " · reached" : ` · ${formatElapsed(elapsed)} in`}
+            {elapsed >= goalMs
+              ? " · reached"
+              : ` · ${formatElapsed(elapsed)}`}
           </p>
         ) : null}
 
