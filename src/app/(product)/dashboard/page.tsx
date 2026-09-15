@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Clock3, Flame, Heart, Unlock } from "lucide-react";
+import { QuietHoursChip } from "@/components/quiet-hours-chip";
 import { Spark } from "@/components/spark";
 import { TokenAmount } from "@/components/mint-chip";
 import { Button } from "@/components/ui/button";
@@ -163,6 +164,8 @@ export default function DashboardPage() {
           </p>
         </section>
       </div>
+
+      <QuietHoursChip />
 
       <section className="flux-card flex flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
