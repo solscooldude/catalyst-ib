@@ -96,6 +96,21 @@ html.dark {
   color-scheme: dark;
 }
 
+html[data-bg="aurora"],
+html.light[data-bg="aurora"] {
+  --background: #f3eef7;
+  --card: #fbf8fd;
+  --accent: #efe8f6;
+  --secondary: #efe8f6;
+}
+
+html.dark[data-bg="aurora"] {
+  --background: #14111a;
+  --card: #1f1a27;
+  --accent: #2a2233;
+  --secondary: #2a2233;
+}
+
 @keyframes spark-orbit-dot {
   0%,
   100% {
