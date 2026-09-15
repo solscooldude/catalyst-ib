@@ -14,6 +14,7 @@ import { SelectedTaskChip, TaskOption } from "@/components/task-option";
 import { MOCK_TASKS, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { PageFrame } from "@/components/page-frame";
+import { UnlockPanel } from "@/components/unlock-panel";
 import {
   buyAppearance,
   equipAppearance,
@@ -168,6 +169,9 @@ export default function AppHomePage() {
           <Button asChild variant="ghost" className="h-11 w-full rounded-full">
             <Link href={ROUTES.stats}>Stats</Link>
           </Button>
+        </div>
+        <div className="mt-6">
+          <UnlockPanel compact />
         </div>
       </div>
 
