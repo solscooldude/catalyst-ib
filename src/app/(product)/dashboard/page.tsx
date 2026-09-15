@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Check, Clock3, Flame, Heart } from "lucide-react";
+import { Check, Clock3, Flame, Heart, Minus, Plus } from "lucide-react";
 import { SparkleMark } from "@/components/brand-marks";
 import { QuietHoursChip } from "@/components/quiet-hours-chip";
 import { Spark, type SparkMood } from "@/components/spark";
@@ -24,7 +24,13 @@ import {
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
 import { WeekStoryShareDialog } from "@/components/week-story-share";
-import { sessionHint, useCatalyst } from "@/lib/store";
+import { sessionHint, setDailyGoalMinutes, useCatalyst } from "@/lib/store";
+import {
+  DAILY_GOAL_STEP_MINUTES,
+  MAX_DAILY_GOAL_MINUTES,
+  MIN_DAILY_GOAL_MINUTES,
+  formatDailyGoal,
+} from "@/lib/daily-goal";
 import { buildWeekStory } from "@/lib/week-story";
 import { cn } from "@/lib/utils";
 
@@ -62,16 +68,14 @@ export default function DashboardPage() {
   const evo = sparkEvolution(state.logs);
   const todayMs = todayStudyMs(state.logs, now);
   const week = weekDayMarks(state.logs, now);
-  const dailyGoalMs = 2 * 60 * 60 * 1000;
+  const dailyGoalMs = state.dailyGoalMinutes * 60 * 1000;
   const progress = Math.min(1, todayMs / dailyGoalMs);
   const continueHref =
-    session?.status === "locked"
-      ? ROUTES.lock
-      : session?.status === "focus"
-        ? ROUTES.session
-        : state.setupComplete
-          ? ROUTES.focus
-          : ROUTES.setup;
+    session?.status === "locked" || session?.status === "focus"
+      ? ROUTES.session
+      : state.setupComplete
+        ? ROUTES.focus
+        : ROUTES.setup;
   const lastDone = state.logs[state.logs.length - 1];
   const continueLabel =
     session?.status === "locked" || session?.status === "focus"
@@ -108,9 +112,9 @@ export default function DashboardPage() {
                 asChild
                 className="mt-5 h-11 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-none hover:bg-primary/85"
               >
-                <Link href={continueHref}>
+                <Link href={ROUTES.sprite}>
                   <Heart className="size-4 fill-current" />
-                  {continueLabel}
+                  My Sprite
                 </Link>
               </Button>
             </div>
@@ -173,12 +177,48 @@ export default function DashboardPage() {
           <p className="font-heading mt-3 text-4xl tracking-tight text-foreground">
             {formatClock(todayMs)}
           </p>
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <p className="mt-2 text-sm text-zinc-500">
+            Goal {formatDailyGoal(state.dailyGoalMinutes)}
+          </p>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
             <div
               className="h-full rounded-full bg-primary"
               style={{ width: `${Math.max(todayMs > 0 ? 8 : 0, progress * 100)}%` }}
             />
           </div>
+          <div className="mt-4 flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex size-9 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
+              aria-label="Lower daily goal"
+              disabled={state.dailyGoalMinutes <= MIN_DAILY_GOAL_MINUTES}
+              onClick={() =>
+                setDailyGoalMinutes(state.dailyGoalMinutes - DAILY_GOAL_STEP_MINUTES)
+              }
+            >
+              <Minus className="size-4" />
+            </button>
+            <span className="min-w-[4.5rem] text-center text-sm text-foreground">
+              {formatDailyGoal(state.dailyGoalMinutes)}
+            </span>
+            <button
+              type="button"
+              className="inline-flex size-9 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
+              aria-label="Raise daily goal"
+              disabled={state.dailyGoalMinutes >= MAX_DAILY_GOAL_MINUTES}
+              onClick={() =>
+                setDailyGoalMinutes(state.dailyGoalMinutes + DAILY_GOAL_STEP_MINUTES)
+              }
+            >
+              <Plus className="size-4" />
+            </button>
+          </div>
+          <Button
+            asChild
+            className="mt-5 h-11 w-full rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-none hover:bg-primary/85"
+          >
+            <Link href={continueHref}>{continueLabel}</Link>
+          </Button>
         </section>
       </div>
 
