@@ -1,7 +1,7 @@
 /* Light chrome from Sols' Home mock. Spark body styles stay in globals.css. */
 
-:root,
-.light {
+html.light,
+html:not(.dark) {
   --background: #f4f4f5;
   --foreground: #18181b;
   --card: #ffffff;
@@ -38,7 +38,7 @@
   --spark-lo: #5eead4;
 }
 
-.dark {
+html.dark {
   --background: #0b0b0f;
   --foreground: #f4f4f5;
   --card: #18181b;
@@ -199,8 +199,9 @@ html[data-bg="aurora"] .scene-aurora-c {
     0 22px 48px -30px rgb(24 24 27 / 0.16);
 }
 
-.dark .flux-card,
-.dark .soft-panel {
+html.dark .flux-card,
+html.dark .soft-panel {
+  background: #18181b;
   box-shadow: 0 0 0 1px var(--border);
 }
 
