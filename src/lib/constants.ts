@@ -18,7 +18,7 @@ export const ESSENTIAL_APPS = [
 export type EssentialAppId = (typeof ESSENTIAL_APPS)[number]["id"];
 
 export const TIER2_COST = 5;
-export const TIER3_COST = 9;
+export const TIER3_COST = 10;
 
 export const TIER2_APPS = [
   { id: "whatsapp", name: "WhatsApp", glyph: "WA", blurb: "Group chats that wait ten minutes." },
