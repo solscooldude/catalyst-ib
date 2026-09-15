@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import { useSyncExternalStore } from "react";
 import {
@@ -35,7 +35,6 @@ import {
   type UnlockSpendId,
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
-import { DEFAULT_SPRITE_NAME } from "@/lib/sprite-name";
 import {
   defaultMotivation,
   defaultProfile,
@@ -157,7 +156,7 @@ export function createDefaultState(): CatalystState {
     feedCount: 0,
     quizDay: null,
     quizCorrect: 0,
-    spriteName: DEFAULT_SPRITE_NAME,
+    spriteName: "Sprite",
     spriteRenameCount: 0,
     spriteAsleep: false,
     dailyGoalMinutes: DEFAULT_DAILY_GOAL_MINUTES,
