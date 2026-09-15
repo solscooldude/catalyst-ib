@@ -9,118 +9,74 @@ type AuraWash = {
   fillOpacity: number;
 };
 
-type AuraRing = {
-  cx: number;
-  cy: number;
-  rx: number;
-  ry: number;
-  stroke: string;
-  strokeOpacity: number;
-  strokeWidth: number;
-};
-
 export const SPARK_AURAS = [
   {
     id: "none",
-    name: "No aura",
+    name: "No glow",
     cost: 0,
     collection: "starter" as const,
-    blurb: "Just the body glow.",
+    blurb: "No extra colour around the body.",
+    glow: "transparent",
     washes: [] as AuraWash[],
-    rings: [] as AuraRing[],
   },
   {
     id: "mint",
-    name: "Mint halo",
+    name: "Mint glow",
     cost: 22,
     collection: "starter" as const,
-    blurb: "A quiet mint ring. Soft enough for Focus.",
+    blurb: "A soft mint halo around Spark.",
+    glow: "#5EEAD4",
     washes: [
-      { cx: 50, cy: 64, rx: 36, ry: 40, fill: "#5EEAD4", fillOpacity: 0.1 },
-    ],
-    rings: [
-      {
-        cx: 50,
-        cy: 64,
-        rx: 40,
-        ry: 44,
-        stroke: "#5EEAD4",
-        strokeOpacity: 0.28,
-        strokeWidth: 4.5,
-      },
+      { cx: 50, cy: 66, rx: 46, ry: 50, fill: "#5EEAD4", fillOpacity: 0.22 },
+      { cx: 50, cy: 64, rx: 32, ry: 36, fill: "#99F6E4", fillOpacity: 0.16 },
     ],
   },
   {
     id: "lavender",
-    name: "Lavender halo",
+    name: "Lavender glow",
     cost: 24,
     collection: "starter" as const,
-    blurb: "A pale violet wash. One at a time.",
+    blurb: "A pale violet halo. One colour at a time.",
+    glow: "#A78BFA",
     washes: [
-      { cx: 50, cy: 64, rx: 36, ry: 40, fill: "#C4B5FD", fillOpacity: 0.12 },
+      { cx: 50, cy: 66, rx: 46, ry: 50, fill: "#A78BFA", fillOpacity: 0.22 },
+      { cx: 50, cy: 64, rx: 32, ry: 36, fill: "#C4B5FD", fillOpacity: 0.16 },
     ],
-    rings: [
-      {
-        cx: 50,
-        cy: 64,
-        rx: 40,
-        ry: 44,
-        stroke: "#A78BFA",
-        strokeOpacity: 0.3,
-        strokeWidth: 4.5,
-      },
+  },
+  {
+    id: "pink",
+    name: "Pink glow",
+    cost: 24,
+    collection: "starter" as const,
+    blurb: "A blush halo around the silhouette.",
+    glow: "#F9A8D4",
+    washes: [
+      { cx: 50, cy: 66, rx: 46, ry: 50, fill: "#F9A8D4", fillOpacity: 0.24 },
+      { cx: 50, cy: 64, rx: 32, ry: 36, fill: "#FBCFE8", fillOpacity: 0.16 },
     ],
   },
   {
     id: "gold",
-    name: "Gold halo",
+    name: "Gold glow",
     cost: 40,
     collection: "gold" as const,
-    blurb: "Warm metal light. Still quiet on Focus.",
+    blurb: "Warm metal light around the body.",
+    glow: "#E8C547",
     washes: [
-      { cx: 50, cy: 64, rx: 35, ry: 39, fill: "#E8C547", fillOpacity: 0.1 },
-    ],
-    rings: [
-      {
-        cx: 50,
-        cy: 64,
-        rx: 39,
-        ry: 43,
-        stroke: "#E8C547",
-        strokeOpacity: 0.32,
-        strokeWidth: 4.2,
-      },
+      { cx: 50, cy: 66, rx: 45, ry: 49, fill: "#E8C547", fillOpacity: 0.2 },
+      { cx: 50, cy: 64, rx: 31, ry: 35, fill: "#FDE68A", fillOpacity: 0.16 },
     ],
   },
   {
     id: "aurora",
-    name: "Aurora halo",
+    name: "Aurora glow",
     cost: 80,
     collection: "aurora" as const,
-    blurb: "Mint and violet, barely there.",
+    blurb: "Mint-to-violet wash around Spark.",
+    glow: "#5EEAD4",
     washes: [
-      { cx: 44, cy: 66, rx: 30, ry: 34, fill: "#5EEAD4", fillOpacity: 0.1 },
-      { cx: 58, cy: 62, rx: 28, ry: 32, fill: "#A78BFA", fillOpacity: 0.1 },
-    ],
-    rings: [
-      {
-        cx: 50,
-        cy: 64,
-        rx: 41,
-        ry: 45,
-        stroke: "#5EEAD4",
-        strokeOpacity: 0.2,
-        strokeWidth: 3.4,
-      },
-      {
-        cx: 52,
-        cy: 62,
-        rx: 37,
-        ry: 41,
-        stroke: "#A78BFA",
-        strokeOpacity: 0.22,
-        strokeWidth: 3.2,
-      },
+      { cx: 42, cy: 68, rx: 40, ry: 46, fill: "#5EEAD4", fillOpacity: 0.2 },
+      { cx: 60, cy: 60, rx: 38, ry: 44, fill: "#A78BFA", fillOpacity: 0.2 },
     ],
   },
 ] as const;

@@ -1,3 +1,4 @@
+import { writeDeviceSpriteName } from "@/lib/sprite-name-persist";
 import { getSnapshot, setState } from "@/lib/store-core";
 
 export const DEFAULT_SPRITE_NAME = "Spark";
@@ -37,5 +38,6 @@ export function renameSprite(next: string) {
     spriteRenameCount: (state.spriteRenameCount ?? 0) + 1,
     tokens: first ? state.tokens : state.tokens - SPRITE_RENAME_COST,
   }));
+  writeDeviceSpriteName(name);
   return { ok: true as const, cost: first ? 0 : SPRITE_RENAME_COST };
 }
