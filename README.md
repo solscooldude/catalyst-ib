@@ -1,6 +1,6 @@
 # Catalyst
 
-A personal focus tool for IB DP students. Lock the apps that steal the block, finish a ManageBac task, earn tokens from that session, then buy phone time. First month free, then $2 a month.
+A personal focus tool for IB DP students. Lock the apps that steal the block, finish a ManageBac task, earn tokens from that session, then buy phone time. This web demo is free — no subscribe or checkout.
 
 This repo is a **web demo**. Phone lock and ManageBac are simulated — there is no real Screen Time or school integration.
 
@@ -32,13 +32,13 @@ npm run build
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only.
 3. `/dashboard` — mint Home: greeting, three soft cards (Current Sprite / Streak / Study time), a dedicated App unlocks card (spend + live countdown), then quiet hours. Token pill jumps to that card and shows remaining time when something is on. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
-4. Avatar menu — IB profile, Account settings, Subscription ($2/mo), light/dark chrome. Not Unlocks, Appearance, Focus, or Sprite. Aurora lives in Shop → Room.
+4. Avatar menu — IB profile, Account settings, light/dark chrome. Not Unlocks, Appearance, Focus, Sprite, or subscribe. Aurora lives in Shop → Room.
 5. `/setup` — nemesis apps + mock ManageBac. Quiet hours live on `/schedule`; Home shows today’s lock window as one chip.
 6. `/focus` — pick a ManageBac task or start a study block. Last Focus stage (night sky / deep blue sea / math drift) is remembered on this device. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
 7. `/session` — timer counts up in the center of the HUD (no sprite name). Pause or End anytime. Tokens are not awarded mid-session. Compact unlocks panel stays on the board.
 8. `/unlocks` — dedicated spend route (also in Shop). After End, a recap card shows minutes and tokens and Spark celebrates. Day-to-day spend is the Home App unlocks card; the token pill jumps there.
 9. `/sprite` — My Sprite. `/appearance` is the closet. Try cosmetics on Spark before you buy. `/quiz` is a daily IB-style check.
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
-11. `/account/subscription` and `/account/settings` — plan and account basics.
+11. `/account/settings` — account basics. `/account/subscription` is a free-demo stub, not a checkout.
 
 Focus stages sit behind Spark and never cover the HUD: Night sky (free default), Deep blue sea, and Math drift. Aurora is an optional quiet lavender room skin for the whole app — not a session backdrop. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a stage on Focus setup or in the Shop. Last stage is remembered on this device.
