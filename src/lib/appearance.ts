@@ -28,7 +28,7 @@ export const COLLECTIONS: {
     id: "focus",
     name: "Focus scenes",
     range: "Free–120",
-    copy: "Lamp ember trail. Room plates are parked — focus is the spark on a quiet stage.",
+    copy: "Session backdrops: night sky, deep blue sea, math drift. Room plates stay parked.",
   },
 ];
 
@@ -116,7 +116,7 @@ export const BACKGROUNDS = [
     name: "Aurora",
     cost: 100,
     collection: "aurora" as const,
-    blurb: "A slow mint-and-violet wash across the room.",
+    blurb: "Quiet lavender chrome for the whole app. Not a focus backdrop.",
   },
 ] as const;
 
@@ -251,8 +251,29 @@ export const SPARK_TRAILS = [
 
 export const FOCUS_THEMES = [
   {
+    id: "nightsky",
+    name: "Night sky",
+    cost: 0,
+    collection: "focus" as const,
+    blurb: "Free default. Soft indigo, twinkle, a rare shooting star.",
+  },
+  {
+    id: "sea",
+    name: "Deep blue sea",
+    cost: 18,
+    collection: "focus" as const,
+    blurb: "Navy and cobalt water rolling behind the spark.",
+  },
+  {
+    id: "math",
+    name: "Math drift",
+    cost: 18,
+    collection: "focus" as const,
+    blurb: "Faint equations floating at low contrast.",
+  },
+  {
     id: "none",
-    name: "Clear desk",
+    name: "Quiet spotlight",
     cost: 0,
     collection: "focus" as const,
     blurb: "No extra scene on the timer.",
@@ -315,13 +336,13 @@ export const defaultAppearance: AppearanceState = {
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
   ownedTrails: ["none"],
-  ownedFocusThemes: ["none", "cat"],
+  ownedFocusThemes: ["none", "nightsky", "cat"],
   accent: "mint",
   background: "void",
   sparkTint: "mint",
   gear: "none",
   trail: "none",
-  focusTheme: "none",
+  focusTheme: "nightsky",
 };
 
 function unique<T extends string>(values: T[], fallback: T): T[] {
@@ -339,7 +360,7 @@ export function normalizeAppearance(
   const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
   const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
   const ownedFocusThemes = unique(
-    [...(raw?.ownedFocusThemes ?? ["none", "cat"]), "cat"],
+    [...(raw?.ownedFocusThemes ?? ["none", "nightsky", "cat"]), "nightsky", "cat"],
     "none",
   );
   return {
@@ -362,9 +383,9 @@ export function normalizeAppearance(
     trail: ownedTrails.includes(raw?.trail ?? "none")
       ? (raw?.trail ?? "none")
       : "none",
-    focusTheme: ownedFocusThemes.includes(raw?.focusTheme ?? "none")
-      ? (raw?.focusTheme ?? "none")
-      : "none",
+    focusTheme: ownedFocusThemes.includes(raw?.focusTheme ?? "nightsky")
+      ? (raw?.focusTheme ?? "nightsky")
+      : "nightsky",
   };
 }
 
