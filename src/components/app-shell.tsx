@@ -41,8 +41,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SceneBackground id={state.appearance.background} />
       )}
       {sessionView ? null : (
-        <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl">
-          <div className="mx-auto grid h-16 max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:h-[4.5rem]">
+        <header className="sticky top-0 z-50 overflow-visible bg-background/90 backdrop-blur-xl">
+          <div className="mx-auto grid h-16 max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-visible px-4 sm:h-[4.5rem]">
             <Wordmark href={ROUTES.home} />
             <TopNav />
             <div className="flex items-center justify-end gap-1.5">
