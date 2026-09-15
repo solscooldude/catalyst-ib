@@ -114,8 +114,7 @@ export default function AppHomePage() {
 
         {openTasks.length === 0 ? (
           <p className="mt-6 text-sm text-muted-foreground">
-            Every mock task is marked done. Reset the demo to run the loop
-            again.
+            All mock tasks are done.
           </p>
         ) : null}
       </div>
@@ -150,12 +149,7 @@ export default function AppHomePage() {
               checked={state.demoMode}
               onCheckedChange={(value) => setDemoMode(Boolean(value))}
             />
-            <span>
-              <span className="text-foreground">Demo speed</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">
-                Demo: 10 tokens / 20s, paid on End. Real: 1 token / 2 min.
-              </span>
-            </span>
+            <span className="text-foreground">Demo speed</span>
           </label>
 
           <Button
