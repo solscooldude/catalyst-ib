@@ -44,7 +44,18 @@ function UnlockInner() {
   const lastLog = state.logs[state.logs.length - 1];
   const stored = readSessionRecap();
   const paramMinutes = Number(params.get("minutes"));
+  const paramElapsed = Number(params.get("elapsed"));
   const paramTokens = Number(params.get("tokens"));
+  const elapsedMs =
+    Number.isFinite(paramElapsed) && paramElapsed >= 0
+      ? paramElapsed
+      : (stored?.elapsedMs ?? lastLog?.durationMs ?? null);
+  const minutes =
+    Number.isFinite(paramMinutes) && paramMinutes >= 0
+      ? paramMinutes
+      : elapsedMs != null
+        ? Math.round(elapsedMs / 60000)
+        : (stored?.minutes ?? 0);
   const recap =
     earned
       ? {
@@ -53,11 +64,8 @@ function UnlockInner() {
             stored?.title ??
             lastLog?.subjectLabel ??
             "Focus session",
-          minutes:
-            Number.isFinite(paramMinutes) && paramMinutes >= 0
-              ? paramMinutes
-              : (stored?.minutes ??
-                (lastLog ? Math.round(lastLog.durationMs / 60000) : 0)),
+          minutes,
+          elapsedMs: elapsedMs ?? minutes * 60_000,
           tokens:
             Number.isFinite(paramTokens) && paramTokens >= 0
               ? paramTokens
