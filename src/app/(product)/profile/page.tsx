@@ -13,6 +13,7 @@ import {
   takenCourses,
   validateDiploma,
 } from "@/lib/ib";
+import { SpriteRename } from "@/components/sprite-rename";
 import { ROUTES } from "@/lib/routes";
 import { saveProfile, useCatalyst } from "@/lib/store";
 
@@ -99,6 +100,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="flux-card space-y-6 px-6 py-8">
+      <SpriteRename />
       <div className="space-y-2">
         <Label htmlFor="class-year">Graduating class</Label>
         <AppSelect
