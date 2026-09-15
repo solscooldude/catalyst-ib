@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SparkleMark } from "@/components/brand-marks";
-import { HighFiveHand } from "@/components/high-five-hand";
 import { Spark, type SparkMood } from "@/components/spark";
 import { hitZone, type SparkAct } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
@@ -25,7 +24,6 @@ export function FocusSpark({
   hint?: string;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const handRef = useRef<HTMLButtonElement>(null);
   const [act, setAct] = useState<SparkAct>(null);
   const [idle, setIdle] = useState<IdleAct>("rest");
   const gifted = useRef(false);
@@ -34,8 +32,6 @@ export function FocusSpark({
   const zone = useRef<"peak" | "face" | "body">("body");
   const scrunch = useRef(createSparkScrunch());
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
-  const [handHeld, setHandHeld] = useState(false);
-  const hand = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const controller = scrunch.current;
@@ -147,43 +143,6 @@ export function FocusSpark({
     }
   }
 
-  function handDown(event: React.PointerEvent<HTMLButtonElement>) {
-    event.stopPropagation();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setHandHeld(true);
-    hand.current = { x: 0, y: 0 };
-  }
-
-  function handMove(event: React.PointerEvent<HTMLButtonElement>) {
-    event.stopPropagation();
-    if (!handHeld) return;
-    const node = handRef.current;
-    if (!node) return;
-    const box = node.getBoundingClientRect();
-    const x = event.clientX - (box.left + box.width / 2);
-    const y = event.clientY - (box.top + box.height / 2);
-    hand.current = { x, y };
-    node.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-  }
-
-  function handUp(event?: React.PointerEvent<HTMLButtonElement>) {
-    event?.stopPropagation();
-    const sparkBox = stageRef.current?.getBoundingClientRect();
-    const handBox = handRef.current?.getBoundingClientRect();
-    const hit =
-      sparkBox &&
-      handBox &&
-      handBox.left + handBox.width / 2 > sparkBox.left - 20 &&
-      handBox.left + handBox.width / 2 < sparkBox.right + 20 &&
-      handBox.top + handBox.height / 2 > sparkBox.top - 20 &&
-      handBox.top + handBox.height / 2 < sparkBox.bottom + 20;
-    if (hit || !handHeld || (hand.current.x === 0 && hand.current.y === 0)) {
-      play("highfive", 800);
-    }
-    setHandHeld(false);
-    if (handRef.current) handRef.current.style.transform = "";
-  }
-
   return (
     <div className="focus-quiet-stage">
       <div
@@ -227,20 +186,6 @@ export function FocusSpark({
             <SparkleMark size={22} />
           </button>
         ) : null}
-        <button
-          ref={handRef}
-          type="button"
-          aria-label="High-five Spark"
-          title="Drag onto Spark"
-          className={cn("sprite-highfive-hand focus-highfive-hand", handHeld && "is-held")}
-          onPointerDown={handDown}
-          onPointerMove={handMove}
-          onPointerUp={handUp}
-          onPointerCancel={handUp}
-        >
-          <HighFiveHand />
-          <span className="sprite-highfive-label">High-five</span>
-        </button>
       </div>
     </div>
   );
