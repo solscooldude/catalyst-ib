@@ -258,18 +258,18 @@ export const FOCUS_THEMES = [
     blurb: "Free default. Soft indigo, twinkle, a rare shooting star.",
   },
   {
-    id: "waves",
-    name: "Gentle waves",
-    cost: 0,
-    collection: "focus" as const,
-    blurb: "Slow mint and lilac bands drifting behind the spark.",
-  },
-  {
     id: "sea",
     name: "Deep blue sea",
     cost: 18,
     collection: "focus" as const,
     blurb: "Navy and cobalt water rolling behind the spark.",
+  },
+  {
+    id: "aurora",
+    name: "Aurora",
+    cost: 22,
+    collection: "focus" as const,
+    blurb: "Violet and magenta ribbons with teal. Moving, behind Spark.",
   },
   {
     id: "math",
@@ -343,7 +343,7 @@ export const defaultAppearance: AppearanceState = {
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
   ownedTrails: ["none"],
-  ownedFocusThemes: ["none", "nightsky", "waves", "cat"],
+  ownedFocusThemes: ["none", "nightsky", "cat"],
   accent: "mint",
   background: "void",
   sparkTint: "mint",
@@ -366,16 +366,17 @@ export function normalizeAppearance(
   const ownedSparkTints = unique(raw?.ownedSparkTints ?? ["mint"], "mint");
   const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
   const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
-  const ownedFocusThemes = unique(
-    [
-      ...(raw?.ownedFocusThemes ?? ["none", "nightsky", "waves", "cat"]),
-      "none",
-      "nightsky",
-      "waves",
-      "cat",
-    ],
-    "none",
+  const rawOwned = (raw?.ownedFocusThemes ?? ["none", "nightsky", "cat"]).map(
+    (id) => ((id as string) === "waves" ? "sea" : id),
   );
+  const ownedFocusThemes = unique(
+    [...rawOwned, "none", "nightsky", "cat"],
+    "nightsky",
+  );
+  const rawTheme =
+    (raw?.focusTheme as string) === "waves"
+      ? "sea"
+      : (raw?.focusTheme ?? "nightsky");
   return {
     ownedAccents,
     ownedBackgrounds,
@@ -396,9 +397,7 @@ export function normalizeAppearance(
     trail: ownedTrails.includes(raw?.trail ?? "none")
       ? (raw?.trail ?? "none")
       : "none",
-    focusTheme: ownedFocusThemes.includes(raw?.focusTheme ?? "nightsky")
-      ? (raw?.focusTheme ?? "nightsky")
-      : "nightsky",
+    focusTheme: ownedFocusThemes.includes(rawTheme) ? rawTheme : "nightsky",
   };
 }
 
