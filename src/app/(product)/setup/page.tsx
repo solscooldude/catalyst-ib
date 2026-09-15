@@ -40,7 +40,7 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-10">
       <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
         Name the apps that steal the block.

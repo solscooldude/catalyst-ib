@@ -80,13 +80,21 @@ html.light .focus-stage-sea {
     linear-gradient(180deg, #020812 0%, #04182c 24%, #0a3a68 58%, #0b5a86 100%) !important;
 }
 
+.focus-stage-horizon {
+  position: absolute;
+  inset: 18% -20% 42%;
+  background: radial-gradient(ellipse at 50% 80%, rgb(56 189 248 / 0.18), transparent 62%);
+  filter: blur(28px);
+  animation: focus-stage-horizon 9s ease-in-out infinite;
+}
+
 .focus-stage-swell {
   position: absolute;
   inset: 28% -12% -8%;
   background:
-    radial-gradient(ellipse at 28% 70%, rgb(56 189 248 / 0.22), transparent 48%),
-    radial-gradient(ellipse at 74% 88%, rgb(14 116 180 / 0.3), transparent 42%);
-  animation: focus-stage-swell 7.5s ease-in-out infinite;
+    radial-gradient(ellipse at 28% 70%, rgb(56 189 248 / 0.28), transparent 48%),
+    radial-gradient(ellipse at 74% 88%, rgb(14 116 180 / 0.36), transparent 42%);
+  animation: focus-stage-swell 6.4s ease-in-out infinite;
 }
 
 .focus-stage-caustic {
@@ -104,32 +112,39 @@ html.light .focus-stage-sea {
 
 .focus-stage-wave {
   position: absolute;
-  left: -30%;
-  width: 160%;
-  height: 34%;
+  left: -38%;
+  width: 176%;
+  height: 38%;
   border-radius: 48% 52% 50% 50%;
-  background: rgb(20 90 150 / 0.34);
+  background: rgb(20 90 150 / 0.4);
   filter: blur(6px);
-  animation: focus-stage-wave 8s ease-in-out infinite;
+  animation: focus-stage-wave 6.2s ease-in-out infinite;
 }
 
 .focus-stage-wave-b {
-  animation-duration: 11s;
-  animation-delay: -3s;
-  background: rgb(12 64 118 / 0.4);
+  animation-duration: 8.8s;
+  animation-delay: -2.4s;
+  background: rgb(12 64 118 / 0.46);
 }
 
 .focus-stage-wave-c {
-  animation-duration: 14s;
-  animation-delay: -7s;
-  background: rgb(8 42 88 / 0.48);
+  animation-duration: 11.5s;
+  animation-delay: -5.2s;
+  background: rgb(8 42 88 / 0.54);
 }
 
 .focus-stage-wave-d {
-  animation-duration: 6.5s;
-  animation-delay: -1.4s;
-  background: rgb(36 140 196 / 0.22);
+  animation-duration: 5.2s;
+  animation-delay: -1.1s;
+  background: rgb(36 140 196 / 0.28);
   filter: blur(3px);
+}
+
+.focus-stage-wave-e {
+  animation-duration: 7.1s;
+  animation-delay: -3.8s;
+  background: rgb(8 90 140 / 0.2);
+  filter: blur(8px);
 }
 
 .focus-stage-foam {
@@ -138,17 +153,17 @@ html.light .focus-stage-sea {
   width: 180%;
   height: 16%;
   border-radius: 50%;
-  background: rgb(224 242 254 / 0.22);
+  background: rgb(224 242 254 / 0.28);
   filter: blur(4px);
-  animation: focus-stage-foam 5.4s ease-in-out infinite;
+  animation: focus-stage-foam 4.2s ease-in-out infinite;
 }
 
 .focus-stage-wave-svg {
   position: absolute;
-  left: -25%;
-  width: 150%;
-  height: 28%;
-  animation: focus-stage-roll 9s linear infinite;
+  left: -32%;
+  width: 168%;
+  height: 30%;
+  animation: focus-stage-roll 7.2s linear infinite;
 }
 
 .focus-stage-wave-svg-b {
@@ -206,10 +221,22 @@ html.light .focus-stage-math {
 @keyframes focus-stage-wave {
   0%,
   100% {
-    transform: translate3d(-8%, 4%, 0) scaleY(1);
+    transform: translate3d(-16%, 8%, 0) scaleY(0.92) rotate(-1.4deg);
   }
   50% {
-    transform: translate3d(10%, -10%, 0) scaleY(1.18);
+    transform: translate3d(14%, -16%, 0) scaleY(1.32) rotate(1.2deg);
+  }
+}
+
+@keyframes focus-stage-horizon {
+  0%,
+  100% {
+    transform: translate3d(-4%, 6%, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(6%, -8%, 0) scale(1.12);
+    opacity: 1;
   }
 }
 
@@ -248,13 +275,13 @@ html.light .focus-stage-math {
 
 @keyframes focus-stage-roll {
   0% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(8%, 4%, 0);
   }
   50% {
-    transform: translate3d(-10%, -6%, 0);
+    transform: translate3d(-14%, -12%, 0);
   }
   100% {
-    transform: translate3d(-20%, 0, 0);
+    transform: translate3d(-30%, 2%, 0);
   }
 }
 
@@ -278,6 +305,7 @@ html.light .focus-stage-math {
   .focus-stage-shoot,
   .focus-stage-wave,
   .focus-stage-swell,
+  .focus-stage-horizon,
   .focus-stage-caustic,
   .focus-stage-foam,
   .focus-stage-wave-svg,
