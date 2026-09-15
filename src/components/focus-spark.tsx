@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { SparkleMark } from "@/components/brand-marks";
 import { Spark, type SparkMood } from "@/components/spark";
 import { hitZone, type SparkAct } from "@/lib/spark-play";
-import { catchSparkToken, grantFocusGift } from "@/lib/store";
+import { catchSparkToken } from "@/lib/spark-gift";
+import { grantFocusGift } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { SubjectId, TaskId } from "@/lib/constants";
 
