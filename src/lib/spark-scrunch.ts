@@ -1,8 +1,8 @@
 /** Peak squash driven by CSS vars + rAF. No React state on pointer move. */
 
-const FOLLOW = 0.36;
-const STIFFNESS = 0.24;
-const DAMPING = 0.74;
+const FOLLOW = 0.28;
+const STIFFNESS = 0.16;
+const DAMPING = 0.84;
 const SETTLE = 0.01;
 const MAX_X = 1.2;
 const MAX_Y = 0.64;

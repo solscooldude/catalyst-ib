@@ -17,10 +17,10 @@ export function ThemeApplier() {
     if (!hydrated) return;
     const root = document.documentElement;
     root.dataset.accent = appearance.accent;
-    if (uiTheme === "dark" || appearance.background === "aurora") {
-      root.dataset.bg = appearance.background;
-    } else {
+    if (appearance.background === "void") {
       delete root.dataset.bg;
+    } else {
+      root.dataset.bg = appearance.background;
     }
     const tint = getSparkTint(appearance.sparkTint);
     root.style.setProperty("--spark-hi", tint.hi);
