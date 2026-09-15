@@ -9,3 +9,36 @@ The currency mark is the mint four-point sparkle everywhere (nav pill, price row
 Spark play on Focus, My Sprite, and Home: boop the face, scrunch the twin peaks (they stay one silhouette), long-press to sleep (long-press again to wake), catch a floating mint star, high-five the labeled hand, and pick a cookie / berry / mint puff to feed. Mood follows streak and study time. Eyes glance toward the cursor only on My Sprite, and not while asleep. Subject / rainbow particles are rare short orbit bursts (subject change, session start, then long idle gaps) — not a constant ring.
 
 Mini-game ideas only — not in this build: memory/flip cards, streak balloon. Soft focus washes (spotlight / gradient / subject tint) are next after these interactions. Planner is deferred.
+
+## Palette
+
+Default chrome is pale gray (`#F4F4F5`) with white cards and mint `#5EEAD4`. Dark mode is `#0B0B0F` / `#18181B`. Muted zinc `#A1A1AA`. Aurora is an optional quiet purple room skin, not the default. Headlines use Plus Jakarta Sans; body copy stays Geist. Spark keeps a cohesive twin-peak silhouette.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:43127](http://localhost:43127).
+
+```bash
+npm run build
+```
+
+## Demo path
+
+1. Landing at `/` — public marketing page. Log in / Sign up in the header.
+2. `/signup` or `/login` — demo accounts live in this browser only.
+3. `/dashboard` — mint Home: greeting, three soft cards (Current Sprite / Streak / Study time), a dedicated App unlocks card (spend + live countdown), then quiet hours. Token pill jumps to that card and shows remaining time when something is on. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
+4. Avatar menu — IB profile, Account settings, Subscription ($2/mo), light/dark chrome. Not Unlocks, Appearance, Focus, or Sprite. Aurora lives in Shop → Room.
+5. `/setup` — nemesis apps + mock ManageBac. Quiet hours live on `/schedule`; Home shows today’s lock window as one chip.
+6. `/focus` — pick a ManageBac task or start a study block. Last Focus stage (night sky / deep blue sea / math drift) is remembered on this device. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
+7. `/session` — timer counts up in the center of the HUD (no sprite name). Pause or End anytime. Tokens are not awarded mid-session. Compact unlocks panel stays on the board.
+8. `/unlocks` — dedicated spend route (also in Shop). After End, a recap card shows minutes and tokens and Spark celebrates. Day-to-day spend is the Home App unlocks card; the token pill jumps there.
+9. `/sprite` — My Sprite. `/appearance` is the closet. Try cosmetics on Spark before you buy. `/quiz` is a daily IB-style check.
+10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
+11. `/account/subscription` and `/account/settings` — plan and account basics.
+
+Focus stages sit behind Spark and never cover the HUD: Night sky (free default), Deep blue sea, and Math drift. Aurora is an optional quiet lavender room skin for the whole app — not a session backdrop. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a stage on Focus setup or in the Shop. Last stage is remembered on this device.
