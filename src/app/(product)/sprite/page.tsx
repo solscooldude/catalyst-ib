@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Spark, type SparkMood } from "@/components/spark";
 import { SpritePlaypen } from "@/components/sprite-playpen";
 import {
@@ -23,21 +23,23 @@ import { careMood } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
+import { setSpriteAsleep } from "@/lib/store-core";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function SpritePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
-  const [mood, setMood] = useState<SparkMood>(() => "idle");
+  const tucked = state.spriteAsleep;
+  const [mood, setMood] = useState<SparkMood>(() =>
+    tucked ? "sleepy" : "idle",
+  );
   const [petPulse, setPetPulse] = useState(0);
   const [tryOn, setTryOn] = useState<{
     tint?: SparkTintId;
     gear?: SparkGearId;
     trail?: SparkTrailId;
   }>({});
-  const idleTimer = useRef(0);
-  const tucked = useRef(false);
   const look = state.appearance;
   const evo = sparkEvolution(state.logs);
   const official = verifiedStudyMs(state.logs);
@@ -51,23 +53,20 @@ export default function SpritePage() {
       ? Math.max(0, FEED_DAILY_LIMIT - state.feedCount)
       : FEED_DAILY_LIMIT;
   const snacksOnStage =
-    feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating";
+    !tucked && feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating";
 
-  function restMood() {
-    return careMood(state.streakDays, todayMs);
-  }
-
-  function bumpIdle() {
-    window.clearTimeout(idleTimer.current);
-    idleTimer.current = window.setTimeout(() => setMood("sleepy"), 40000);
+  function restMood(): SparkMood {
+    const next = careMood(state.streakDays, todayMs);
+    return next === "sleepy" ? "idle" : next;
   }
 
   useEffect(() => {
-    if (tucked.current) return;
-    setMood(careMood(state.streakDays, todayMs));
-    bumpIdle();
-    return () => window.clearTimeout(idleTimer.current);
-  }, [state.streakDays, todayMs]);
+    if (tucked) {
+      setMood("sleepy");
+      return;
+    }
+    setMood((current) => (current === "eating" ? current : restMood()));
+  }, [tucked, state.streakDays, todayMs]);
 
   function wear(
     kind: "sparkTint" | "gear" | "trail",
@@ -91,19 +90,18 @@ export default function SpritePage() {
   }
 
   function react(next: SparkMood, ms = 1600) {
+    if (tucked) return;
     setMood(next);
-    bumpIdle();
     window.setTimeout(() => setMood((current) => (current === next ? restMood() : current)), ms);
   }
 
   function onPet() {
-    if (mood === "eating" || mood === "sleepy") return;
+    if (tucked || mood === "eating") return;
     setPetPulse((value) => value + 1);
-    bumpIdle();
   }
 
   function onFeedDrop() {
-    if (mood === "eating") return false;
+    if (tucked || mood === "eating") return false;
     const result = feedSpark();
     if (!result.ok) {
       setNotice(result.reason);
@@ -111,11 +109,9 @@ export default function SpritePage() {
     }
     setMood("eating");
     setNotice(null);
-    bumpIdle();
     window.setTimeout(() => {
       setMood("done");
       setPetPulse((value) => value + 1);
-      bumpIdle();
       window.setTimeout(() => {
         setMood((current) => (current === "done" ? restMood() : current));
       }, 1800);
@@ -146,19 +142,12 @@ export default function SpritePage() {
           gear={tryOn.gear}
           trail={tryOn.trail}
           canFeed={snacksOnStage}
-          celebrate={canCelebrate}
+          celebrate={canCelebrate && !tucked}
+          asleep={tucked}
           onPet={onPet}
           onFeed={onFeedDrop}
-          onSleep={() => {
-            tucked.current = true;
-            window.clearTimeout(idleTimer.current);
-            setMood("sleepy");
-          }}
-          onWake={() => {
-            tucked.current = false;
-            setMood(restMood());
-            bumpIdle();
-          }}
+          onSleep={() => setSpriteAsleep(true)}
+          onWake={() => setSpriteAsleep(false)}
           onCelebrate={() => react("done", 900)}
           onHighFive={() => react("done", 2000)}
           onCatch={(ok, reason) => {
