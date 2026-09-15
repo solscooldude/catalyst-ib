@@ -14,6 +14,7 @@ import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { SessionRecapCard } from "@/components/session-recap";
 import { readSessionRecap } from "@/lib/session-recap";
+import { PageFrame } from "@/components/page-frame";
 import {
   spendUnlock,
   useCatalyst,
@@ -97,8 +98,8 @@ function UnlockInner() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="flux-card px-6 py-8">
+    <PageFrame className="grid gap-6 space-y-0 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="flux-card px-6 py-8 sm:px-8">
         {recap ? <SessionRecapCard recap={recap} /> : null}
 
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -201,7 +202,7 @@ function UnlockInner() {
           <DemoBadge>Unlocks are simulated</DemoBadge>
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }
 
