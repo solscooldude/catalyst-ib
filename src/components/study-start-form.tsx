@@ -84,9 +84,6 @@ export function StudyStartForm() {
             </StudyChip>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">
-          Counts up until you End. A goal never auto-stops the block.
-        </p>
       </div>
       {error ? <p className="text-sm text-rose-300">{error}</p> : null}
       <Button type="submit" className="h-11 rounded-full">
