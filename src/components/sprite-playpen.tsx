@@ -19,9 +19,9 @@ import { catchSparkToken } from "@/lib/spark-gift";
 import { cn } from "@/lib/utils";
 
 const TAP_SLOP = 9;
-const FOLLOW = 0.34;
-const STIFFNESS = 0.18;
-const DAMPING = 0.78;
+const FOLLOW = 0.82;
+const STIFFNESS = 0.22;
+const DAMPING = 0.76;
 const SNAP = 0.18;
 const HOLD_SLEEP_MS = 620;
 
@@ -29,7 +29,6 @@ type SpritePlaypenProps = {
   mood: SparkMood;
   petPulse: number;
   canFeed: boolean;
-  canHighFive?: boolean;
   celebrate?: boolean;
   onPet: () => void;
   onFeed: () => boolean;
@@ -47,7 +46,6 @@ export function SpritePlaypen({
   mood,
   petPulse,
   canFeed,
-  canHighFive = false,
   celebrate = false,
   onPet,
   onFeed,
@@ -153,9 +151,11 @@ export function SpritePlaypen({
     event: React.PointerEvent<HTMLElement>,
   ) {
     if (kind === "snack" && (!canFeed || eaten || mood === "eating")) return;
-    if (kind === "hand" && !canHighFive) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     const zone = kind === "spark" ? zoneFromEvent(event) : "body";
+    if (kind === "spark" && zone === "peak") {
+      sparkRef.current?.classList.add("is-scrunching");
+    }
     hold.current = {
       kind,
       pointerId: event.pointerId,
@@ -196,7 +196,7 @@ export function SpritePlaypen({
       active.dragged = true;
       window.clearTimeout(holdTimer.current);
       if (active.kind === "spark" && active.zone === "peak") {
-        setAct("scrunch");
+        sparkRef.current?.classList.add("is-scrunching");
       }
     }
     if (!active.dragged) return;
@@ -229,6 +229,12 @@ export function SpritePlaypen({
       /* already released */
     }
     if (!active.dragged) {
+      sparkRef.current?.classList.remove("is-scrunching");
+      if (active.kind === "hand") {
+        play("highfive", 800);
+        onHighFive?.();
+        return;
+      }
       if (active.kind === "spark") {
         if (act === "sleep" || mood === "sleepy") {
           return;
@@ -243,12 +249,11 @@ export function SpritePlaypen({
       return;
     }
     if (active.kind === "spark" && active.zone === "peak") {
-      setAct("scrunch");
-      window.setTimeout(() => setAct(null), 80);
+      sparkRef.current?.classList.remove("is-scrunching");
       sparkRef.current?.classList.add("spark-scrunch-release");
       window.setTimeout(
         () => sparkRef.current?.classList.remove("spark-scrunch-release"),
-        560,
+        480,
       );
     }
     if (active.kind === "snack") {
@@ -336,23 +341,19 @@ export function SpritePlaypen({
           className="pointer-events-none"
         />
       </div>
-      {canHighFive ? (
-        <button
-          ref={handRef}
-          type="button"
-          aria-label="Drag to high-five Spark"
-          className={cn(
-            "sprite-highfive-hand border-0 bg-transparent p-0",
-            held === "hand" && "is-held",
-          )}
-          onPointerDown={(event) => begin("hand", event)}
-          onPointerMove={move}
-          onPointerUp={end}
-          onPointerCancel={end}
-        >
-          <HighFiveHand />
-        </button>
-      ) : null}
+      <button
+        ref={handRef}
+        type="button"
+        aria-label="High-five Spark"
+        className={cn("sprite-highfive-hand", held === "hand" && "is-held")}
+        onPointerDown={(event) => begin("hand", event)}
+        onPointerMove={move}
+        onPointerUp={end}
+        onPointerCancel={end}
+      >
+        <HighFiveHand />
+        <span className="sprite-highfive-label">High-five</span>
+      </button>
       {star ? (
         <button
           type="button"
@@ -415,8 +416,8 @@ function step(
   if (held) {
     body.x += (body.tx - body.x) * FOLLOW;
     body.y += (body.ty - body.y) * FOLLOW;
-    body.vx *= 0.86;
-    body.vy *= 0.86;
+    body.vx *= 0.5;
+    body.vy *= 0.5;
   } else {
     body.vx += (body.tx - body.x) * STIFFNESS;
     body.vy += (body.ty - body.y) * STIFFNESS;
@@ -441,15 +442,18 @@ function apply(
   scale = 1,
 ) {
   if (!node) return;
+  const scrunching = node.classList.contains("is-scrunching");
   const speed = Math.hypot(body.vx, body.vy);
-  const stretch = 1 + Math.min(speed * 0.045, 0.34);
-  const squash = 1 - Math.min(speed * 0.028, 0.2);
+  const stretch = 1 + Math.min(speed * 0.03, 0.18);
+  const squash = 1 - Math.min(speed * 0.018, 0.12);
   const angle = Math.atan2(body.vy, body.vx);
-  const lively = held ? speed > 0.35 : Math.hypot(body.x - 0, body.y) > 2 || speed > 0.6;
+  const lively =
+    !scrunching &&
+    (held ? speed > 0.8 : Math.hypot(body.x, body.y) > 4 || speed > 1.2);
   const squashStretch = lively
     ? `rotate(${angle}rad) scale(${stretch}, ${squash}) rotate(${-angle}rad)`
-    : "scale(1, 1)";
-  node.style.transform = `translate(${body.x}px, ${body.y}px) ${squashStretch} scale(${scale})`;
+    : "";
+  node.style.transform = `translate3d(${body.x}px, ${body.y}px, 0) ${squashStretch} scale(${scale})`;
   node.style.opacity = scale < 1 ? String(Math.max(0, scale * 4)) : "1";
 }
 
