@@ -301,7 +301,7 @@ export default function SpritePage() {
               aura={item.id}
               trail="none"
               evolve={false}
-              size={52}
+              size={64}
             />
           ),
         }))}
