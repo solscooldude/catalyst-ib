@@ -165,6 +165,11 @@ export function SpritePlaypen({
     if (kind === "spark" && mood !== "eating") {
       holdTimer.current = window.setTimeout(() => {
         if (!hold.current || hold.current.dragged) return;
+        if (act === "sleep" || mood === "sleepy") {
+          setAct(null);
+          onWake?.();
+          return;
+        }
         setAct("sleep");
         onSleep?.();
       }, HOLD_SLEEP_MS);
@@ -215,8 +220,6 @@ export function SpritePlaypen({
     if (!active.dragged) {
       if (active.kind === "spark") {
         if (act === "sleep" || mood === "sleepy") {
-          setAct(null);
-          onWake?.();
           return;
         }
         if (celebrate) {
@@ -347,41 +350,44 @@ export function SpritePlaypen({
           <SparkleMark size={22} />
         </button>
       ) : null}
-      <div className="sprite-snack-row">
-        {SNACKS.map((item) => (
+      {canFeed ? (
+        <>
+          <div className="sprite-snack-row">
+            {SNACKS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-label={item.label}
+                aria-pressed={snackId === item.id}
+                className={cn(
+                  "sprite-snack-pick border-0",
+                  snackId === item.id && "is-on",
+                )}
+                onClick={() => setSnackId(item.id)}
+              >
+                <SnackArt id={item.id} small />
+              </button>
+            ))}
+          </div>
           <button
-            key={item.id}
+            ref={snackRef}
             type="button"
-            aria-label={item.label}
-            aria-pressed={snackId === item.id}
+            aria-label={`Drag ${snackId} onto the spark`}
+            disabled={eaten || mood === "eating"}
             className={cn(
-              "sprite-snack-pick border-0",
-              snackId === item.id && "is-on",
+              "sprite-snack border-0 bg-transparent p-0",
+              held === "snack" && "is-held",
+              eaten && "is-eaten",
             )}
-            onClick={() => setSnackId(item.id)}
+            onPointerDown={(event) => begin("snack", event)}
+            onPointerMove={move}
+            onPointerUp={end}
+            onPointerCancel={end}
           >
-            <SnackArt id={item.id} small />
+            <SnackArt id={snackId} />
           </button>
-        ))}
-      </div>
-      <button
-        ref={snackRef}
-        type="button"
-        aria-label={canFeed ? `Drag ${snackId} onto the spark` : "No snacks left"}
-        disabled={!canFeed || eaten || mood === "eating"}
-        className={cn(
-          "sprite-snack border-0 bg-transparent p-0",
-          held === "snack" && "is-held",
-          (!canFeed || eaten) && "is-disabled",
-          eaten && "is-eaten",
-        )}
-        onPointerDown={(event) => begin("snack", event)}
-        onPointerMove={move}
-        onPointerUp={end}
-        onPointerCancel={end}
-      >
-        <SnackArt id={snackId} />
-      </button>
+        </>
+      ) : null}
     </div>
   );
 }
