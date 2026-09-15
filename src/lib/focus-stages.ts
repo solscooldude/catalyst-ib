@@ -11,7 +11,7 @@ export const STAGE_THEMES = [
     id: "sea" as const,
     name: "Deep blue sea",
     cost: 18,
-    blurb: "Navy and cobalt water rolling behind the spark.",
+    blurb: "Rolling navy swells and foam behind Spark.",
   },
   {
     id: "math" as const,
