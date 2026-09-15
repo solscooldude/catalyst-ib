@@ -148,7 +148,7 @@ export default function SpritePage() {
         </p>
       </section>
 
-      <section className="flux-card flex flex-col items-center px-5 py-8">
+      <section id="snacks" className="flux-card scroll-mt-24 flex flex-col items-center px-5 py-8">
         <SpritePlaypen
           mood={mood}
           petPulse={petPulse}
@@ -303,7 +303,7 @@ function EquipRow({
   onWear: (id: string, owned: boolean) => void;
 }) {
   return (
-    <section>
+    <section className="flux-card px-6 py-6">
       <h2 className="text-lg text-foreground">{title}</h2>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         {items.map((item) => (
