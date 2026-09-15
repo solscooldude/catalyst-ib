@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
+import { alphaByLabel } from "@/lib/alpha";
 import { nativeSelectClass } from "@/lib/select-class";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +36,12 @@ export function AppSelect({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
-  const flat = groups?.flatMap((group) => group.options) ?? options;
+  const sortedOptions = alphaByLabel(options);
+  const sortedGroups = groups?.map((group) => ({
+    ...group,
+    options: alphaByLabel(group.options),
+  }));
+  const flat = sortedGroups?.flatMap((group) => group.options) ?? sortedOptions;
   const selected = flat.find((row) => row.value === value);
 
   useEffect(() => {
@@ -85,8 +91,8 @@ export function AppSelect({
           role="listbox"
           className="app-select-menu absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl py-1 text-sm shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)]"
         >
-          {groups
-            ? groups.map((group) => (
+          {sortedGroups
+            ? sortedGroups.map((group) => (
                 <li key={group.label}>
                   <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-[0.12em] text-zinc-600 uppercase dark:text-zinc-400">
                     {group.label}
@@ -101,7 +107,7 @@ export function AppSelect({
                   ))}
                 </li>
               ))
-            : options.map((option) => (
+            : sortedOptions.map((option) => (
                 <OptionRow
                   key={option.value}
                   option={option}
