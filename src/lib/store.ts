@@ -313,12 +313,6 @@ export function saveProfile(input: { classYear: number; subjects: string[] }) {
 
 export function saveMotivation(input: MotivationState) {
   const motivation = normalizeMotivation(input);
-  if (!motivation.colleges || !motivation.course || !motivation.why) {
-    return {
-      ok: false as const,
-      reason: "Colleges, course, and why it matters are required.",
-    };
-  }
   setState((current) => ({ ...current, motivation }));
   return { ok: true as const, motivation };
 }
