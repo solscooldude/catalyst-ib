@@ -35,7 +35,7 @@ export function StudyStartForm() {
       setError(result.reason);
       return;
     }
-    router.push(ROUTES.lock);
+    router.push(ROUTES.session);
   }
 
   return (
@@ -87,7 +87,7 @@ export function StudyStartForm() {
       </div>
       {error ? <p className="text-sm text-rose-300">{error}</p> : null}
       <Button type="submit" className="h-11 rounded-full">
-        Lock and start
+        Start focus
         <ArrowRight className="size-4" />
       </Button>
     </form>

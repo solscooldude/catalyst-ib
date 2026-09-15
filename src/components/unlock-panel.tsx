@@ -6,10 +6,13 @@ import { TokenAmount } from "@/components/mint-chip";
 import { ROUTES } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import {
-  unlocksByTier,
-  type UnlockCatalogId,
+  TIER2_COST,
+  TIER3_COST,
+  UNLOCK_TIER_ROWS,
+  unlockTierSpendId,
+  type UnlockTier,
 } from "@/lib/constants";
-import { spendUnlock, useCatalyst } from "@/lib/store";
+import { spendUnlockTier, useCatalyst } from "@/lib/store";
 import { formatUnlockLeft } from "@/lib/unlock-time";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +43,8 @@ export function UnlockPanel({
     [state.unlocks, now],
   );
 
-  function buy(id: UnlockCatalogId) {
-    const result = spendUnlock(id);
+  function buy(tier: UnlockTier) {
+    const result = spendUnlockTier(tier);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -99,20 +102,19 @@ export function UnlockPanel({
             </div>
           )}
           <p className="mt-3 text-xs leading-5 text-muted-foreground">
-            School tools stay allowed during lock — Chrome, Drive,
-            Docs/Classroom, Gmail, ManageBac, Calculator, Phone/SOS/Clock,
-            Spotify, ChatGPT/Gemini, Maps. They are not in this shop.
+            School tools stay allowed during lock. Spend unlocks a whole tier
+            — not one app at a time.
           </p>
         </div>
       ) : (
         <div>
           {collapsible ? null : (
-          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-            Unlocks
-          </p>
+            <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+              Unlocks
+            </p>
           )}
           <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-            School / essentials stay allowed — not in this shop.
+            School / essentials stay allowed. Unlock a whole tier.
           </p>
           {active.length > 0 ? (
             <p className="mt-1 font-mono text-xs text-primary">
@@ -129,30 +131,28 @@ export function UnlockPanel({
 
       {collapsible && !open ? null : (
         <>
-      <UnlockShopList
-        tokens={state.tokens}
-        nemeses={state.nemeses}
-        active={active}
-        now={now}
-        compact={compact}
-        onBuy={buy}
-      />
-      {notice ? <p className="text-sm text-primary">{notice}</p> : null}
-        <Link
-          href={ROUTES.unlocks}
-          className="inline-block text-xs text-zinc-400 hover:text-foreground"
-        >
-          Unlocks page
-        </Link>
+          <UnlockTierShop
+            tokens={state.tokens}
+            active={active}
+            now={now}
+            compact={compact}
+            onBuy={buy}
+          />
+          {notice ? <p className="text-sm text-primary">{notice}</p> : null}
+          <Link
+            href={ROUTES.unlocks}
+            className="inline-block text-xs text-zinc-400 hover:text-foreground"
+          >
+            Unlocks page
+          </Link>
         </>
       )}
     </div>
   );
 }
 
-export function UnlockShopList({
+export function UnlockTierShop({
   tokens,
-  nemeses,
   active,
   now,
   compact = false,
@@ -160,74 +160,63 @@ export function UnlockShopList({
   onBuy,
 }: {
   tokens: number;
-  nemeses: readonly string[];
-  active: { id: string; catalogId: string; expiresAt: number }[];
+  active: { id: string; catalogId: string; expiresAt: number; label?: string }[];
   now: number;
   compact?: boolean;
   detailed?: boolean;
-  onBuy: (id: UnlockCatalogId) => void;
+  onBuy: (tier: UnlockTier) => void;
 }) {
   return (
-    <div className={cn("space-y-4", compact && "space-y-3")}>
+    <div className={cn("grid gap-3", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
       {([2, 3] as const).map((tier) => {
-        const items = unlocksByTier(tier);
+        const spendId = unlockTierSpendId(tier);
+        const cost = tier === 2 ? TIER2_COST : TIER3_COST;
+        const row = UNLOCK_TIER_ROWS.find((item) => item.id === spendId);
+        const current = active.find((unlock) => unlock.catalogId === spendId);
+        const left = current ? Math.max(0, current.expiresAt - now) : 0;
+        const affordable = tokens >= cost;
         return (
-          <div key={tier}>
-            <p className="mb-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-              {tier === 2 ? "Tier 2 · medium" : "Tier 3 · nemesis set"}
-            </p>
-            <div className={cn("space-y-2", compact && "space-y-1.5")}>
-              {items.map((item) => {
-                const affordable = tokens >= item.cost;
-                const current = active.find((unlock) => unlock.catalogId === item.id);
-                const left = current ? Math.max(0, current.expiresAt - now) : 0;
-                const yours = nemeses.includes(item.id);
-                return (
-                  <div
-                    key={item.id}
-                    className={cn(
-                      "flex items-center justify-between gap-3 rounded-2xl bg-card ring-1",
-                      left > 0 ? "ring-primary/50" : "ring-border",
-                      compact ? "px-3 py-2" : "px-4 py-3",
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm text-foreground">
-                        {item.name}
-                        {yours ? (
-                          <span className="ml-2 text-[10px] tracking-wide text-primary uppercase">
-                            Yours
-                          </span>
-                        ) : null}
-                      </p>
-                      {detailed ? (
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {item.blurb}
-                        </p>
-                      ) : null}
-                      {left > 0 ? (
-                        <p className="font-heading font-mono text-sm tabular-nums text-primary">
-                          {formatUnlockLeft(left)} left
-                        </p>
-                      ) : null}
-                    </div>
-                    <Button
-                      className={cn("rounded-full", compact ? "h-9 px-3" : "h-10")}
-                      disabled={!affordable}
-                      onClick={() => onBuy(item.id)}
-                    >
-                      <span className="inline-flex items-center gap-1.5">
-                        {left > 0 ? "Add time" : "Unlock"}
-                        <TokenAmount value={item.cost} mark="ink" />
-                      </span>
-                    </Button>
-                  </div>
-                );
-              })}
+          <div
+            key={tier}
+            className={cn(
+              "flex flex-col gap-3 rounded-2xl bg-card ring-1",
+              left > 0 ? "ring-primary/50" : "ring-border",
+              compact ? "px-3 py-3" : "px-4 py-4",
+            )}
+          >
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {tier === 2 ? "Unlock Tier 2" : "Unlock Tier 3"}
+              </p>
+              {detailed && row ? (
+                <p className="mt-1 text-xs text-muted-foreground">{row.blurb}</p>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {cost} tokens / 10 min · whole tier
+                </p>
+              )}
+              {left > 0 ? (
+                <p className="font-heading mt-1 font-mono text-sm tabular-nums text-primary">
+                  {formatUnlockLeft(left)} left
+                </p>
+              ) : null}
             </div>
+            <Button
+              className={cn("rounded-full", compact ? "h-10" : "h-11")}
+              disabled={!affordable}
+              onClick={() => onBuy(tier)}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                {left > 0 ? "Add time" : tier === 2 ? "Unlock Tier 2" : "Unlock Tier 3"}
+                <TokenAmount value={cost} mark="ink" />
+              </span>
+            </Button>
           </div>
         );
       })}
     </div>
   );
 }
+
+/** @deprecated Use UnlockTierShop — kept so older imports still type-check. */
+export const UnlockShopList = UnlockTierShop;

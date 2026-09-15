@@ -29,7 +29,7 @@ export function WeekStoryPanel({ story }: { story: WeekStoryStats }) {
           <h2 className="mt-2 text-2xl text-foreground">Share a Story card</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
             A 9:16 image for Instagram Stories — top subject, streak, study
-            time, tokens, Spark peeking in, and the mint Catalyst mark.
+            time, tokens, the sprite peeking in, and the mint Catalyst mark.
           </p>
           <p className="mt-4 text-sm text-foreground">
             {story.empty
