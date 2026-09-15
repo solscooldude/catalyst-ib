@@ -20,10 +20,8 @@ const GROUPS = [
     href: ROUTES.home,
     items: [
       { href: ROUTES.home, label: "Dashboard" },
-      { href: ROUTES.motivation, label: "Motivation" },
       { href: ROUTES.stats, label: "Stats" },
       { href: ROUTES.schedule, label: "Schedule" },
-      { href: ROUTES.profile, label: "Profile" },
     ],
   },
   {
