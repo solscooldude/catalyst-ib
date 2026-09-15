@@ -88,3 +88,124 @@
   --spark-mid: #7af0dc;
   --spark-lo: #5eead4;
 }
+
+html[data-accent="pink"] {
+  --primary: #f9a8d4;
+  --ring: #f9a8d4;
+  --chart-1: #f9a8d4;
+  --sidebar-primary: #f9a8d4;
+  --sidebar-ring: #f9a8d4;
+}
+
+html[data-accent="violet"] {
+  --primary: #c4b5fd;
+  --ring: #c4b5fd;
+  --chart-1: #c4b5fd;
+  --sidebar-primary: #c4b5fd;
+  --sidebar-ring: #c4b5fd;
+}
+
+html[data-accent="amber"] {
+  --primary: #fbbf24;
+  --ring: #fbbf24;
+  --chart-1: #fbbf24;
+  --sidebar-primary: #fbbf24;
+  --sidebar-ring: #fbbf24;
+}
+
+html[data-accent="gold"] {
+  --primary: #e4c56a;
+  --ring: #e4c56a;
+  --chart-1: #e4c56a;
+  --sidebar-primary: #e4c56a;
+  --sidebar-ring: #e4c56a;
+}
+
+html[data-bg="dusk"] {
+  --background: #120e18;
+  --card: #1b1524;
+  --popover: #1b1524;
+  --secondary: #241c30;
+  --muted: #241c30;
+  --sidebar: #1b1524;
+}
+
+html[data-bg="mist"] {
+  --background: #101318;
+  --card: #171c24;
+  --popover: #171c24;
+  --secondary: #1e2530;
+  --muted: #1e2530;
+  --sidebar: #171c24;
+}
+
+html[data-bg="grove"] {
+  --background: #0c120f;
+  --card: #141c18;
+  --popover: #141c18;
+  --secondary: #1a2420;
+  --muted: #1a2420;
+  --sidebar: #141c18;
+}
+
+html[data-bg="stars"] {
+  --background: #07080d;
+  --card: #101018;
+  --popover: #101018;
+  --secondary: #17171f;
+  --muted: #17171f;
+  --sidebar: #101018;
+}
+
+html[data-bg="aurora"] {
+  --background: #08110f;
+  --card: #101a18;
+  --popover: #101a18;
+  --secondary: #162420;
+  --muted: #162420;
+  --sidebar: #101a18;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans bg-background text-foreground;
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-dvh bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--primary) 10%, transparent), transparent);
+  }
+
+  h1,
+  h2,
+  .font-heading {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  /* Closed select stays light-on-dark. Opened native menus must be dark text on white. */
+  select {
+    color: var(--foreground);
+  }
+
+  select option,
+  select optgroup {
+    color: #18181b;
+    background-color: #ffffff;
+  }
+
+  select optgroup {
+    font-weight: 600;
+  }
+}
