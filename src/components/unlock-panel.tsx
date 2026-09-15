@@ -120,9 +120,7 @@ export function UnlockPanel({
                   <p className="font-heading font-mono text-sm tabular-nums text-primary">
                     {formatUnlockLeft(left)} left
                   </p>
-                ) : compact ? null : (
-                  <p className="text-xs text-muted-foreground">{item.intensity}</p>
-                )}
+                ) : null}
               </div>
               <Button
                 className={cn("rounded-full", compact ? "h-9 px-3" : "h-10")}
