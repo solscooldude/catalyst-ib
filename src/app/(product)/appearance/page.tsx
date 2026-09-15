@@ -211,7 +211,7 @@ export default function AppearancePage() {
                   aura="none"
                   trail="none"
                   evolve={false}
-                  size={52}
+                  size={64}
                 />
               )}
             />
@@ -664,7 +664,9 @@ function ShopCard({
             : "",
       )}
     >
-      <div className="flex size-14 items-center justify-center">{children}</div>
+      <div className="flex size-16 items-center justify-center overflow-visible">
+        {children}
+      </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm text-foreground">{name}</p>
         {blurb ? <p className="mt-0.5 text-xs text-zinc-500">{blurb}</p> : null}
