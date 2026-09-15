@@ -171,7 +171,7 @@ export default function SpritePage() {
       </section>
 
       <EquipRow
-        title="Color"
+        title="Sprite colour"
         items={ownedColors
           .filter((item) => item.kind === "solid")
           .map((item) => ({
@@ -192,7 +192,7 @@ export default function SpritePage() {
         onWear={(id) => wear("sparkTint", id)}
       />
       <EquipRow
-        title="Gradient · premium"
+        title="Sprite gradient"
         items={ownedColors
           .filter((item) => item.kind === "gradient")
           .map((item) => ({
