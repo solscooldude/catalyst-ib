@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
+import { SpriteRename } from "@/components/sprite-rename";
 import { updateEmail, updatePassword, useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
@@ -41,6 +42,10 @@ export default function SettingsPage() {
           Settings
         </p>
         <h1 className="mt-3 text-4xl text-foreground">Account</h1>
+      </div>
+
+      <div className="flux-card px-6 py-8">
+        <SpriteRename />
       </div>
 
       <form className="flux-card space-y-4 px-6 py-8" onSubmit={saveEmail}>
