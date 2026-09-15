@@ -292,7 +292,7 @@ export function SpritePlaypen({
   ) {
     const sparkBox = a.current?.getBoundingClientRect();
     const other = b.current?.getBoundingClientRect();
-    if (!sparkBox || other == null) return false;
+    if (!sparkBox || !other) return false;
     const x = other.left + other.width / 2;
     const y = other.top + other.height / 2;
     const pad = 28;
