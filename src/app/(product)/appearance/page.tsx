@@ -75,17 +75,11 @@ export default function AppearancePage() {
             Shop
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            A small closet. Four collections.
+            Closet
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Starter pieces stay cheap. Night sky is mid. Elite gold is rare.
-            Focus is the spark on a quiet stage — room plates are parked.
-            Dress the spark on My Sprite. It grows from official study hours,
-            not shop buys.
-          </p>
           <p className="mt-3 text-sm">
-            <Link href={ROUTES.sprite} className="text-foreground underline">
-              Care and equip on My Sprite
+            <Link href={ROUTES.sprite} className="text-zinc-400 hover:text-foreground">
+              My Sprite
             </Link>
           </p>
         </div>
@@ -110,12 +104,7 @@ export default function AppearancePage() {
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Focus stages
         </p>
-        <h2 className="text-2xl text-foreground">Behind Spark on a session</h2>
-        <p className="text-sm leading-6 text-muted-foreground">
-          Night sky is free. Deep blue sea and math drift stay behind the
-          spark and the timer in both light and dark chrome. Aurora is a
-          quiet app skin in Rooms, not a session backdrop.
-        </p>
+        <h2 className="text-2xl text-foreground">Focus stages</h2>
         <FocusStagePicker
           value={look.focusTheme}
           owned={(id) => look.ownedFocusThemes.includes(id as typeof look.focusTheme)}
@@ -127,11 +116,9 @@ export default function AppearancePage() {
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Snacks
         </p>
-        <h2 className="text-2xl text-foreground">Feed Spark on My Sprite</h2>
-        <p className="text-sm leading-6 text-muted-foreground">
-          Snacks stay in the shop list so they are easy to find. They cost{" "}
-          <TokenAmount value={FEED_COST} /> each, {FEED_DAILY_LIMIT} a day.
-          Drag one onto the spark — they are not a closet tint.
+        <h2 className="text-2xl text-foreground">Snacks</h2>
+        <p className="text-sm text-zinc-400">
+          <TokenAmount value={FEED_COST} /> · {FEED_DAILY_LIMIT} a day
         </p>
         <p className="text-sm">
           <Link href={`${ROUTES.sprite}#snacks`} className="text-foreground underline">
