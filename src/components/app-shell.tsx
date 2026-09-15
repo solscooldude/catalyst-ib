@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
 import { TokenChip } from "@/components/token-chip";
-import { DemoBadge } from "@/components/demo-badge";
 import { IdleSubjectPopup } from "@/components/idle-subject-popup";
 import { SceneBackground } from "@/components/scene-background";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -42,29 +41,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SceneBackground id={state.appearance.background} />
       )}
       {sessionView ? null : (
-        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
+        <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl">
+          <div className="mx-auto grid h-16 max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:h-[4.5rem]">
             <Wordmark href={ROUTES.home} />
             <TopNav />
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center justify-end gap-1.5">
               <TokenChip tokens={state.tokens} />
               <ThemeToggle />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden text-muted-foreground xl:inline-flex"
-                onClick={handleReset}
-              >
-                Reset demo
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden text-muted-foreground sm:inline-flex"
-                onClick={handleLogout}
-              >
-                Log out
-              </Button>
             </div>
           </div>
         </header>
@@ -74,27 +57,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           "relative z-10 flex w-full flex-1 flex-col",
           sessionView
             ? "max-w-none px-0 py-0"
-            : "mx-auto max-w-5xl px-4 py-8 sm:py-12",
+            : "mx-auto w-full max-w-5xl px-4 pb-10 pt-2 sm:pt-4",
         )}
       >
         {!state.hydrated || !auth.hydrated ? (
           <div className="grid gap-4">
             <div className="h-8 w-48 animate-pulse rounded-full bg-muted" />
-            <div className="h-48 animate-pulse rounded-3xl bg-muted" />
+            <div className="h-48 animate-pulse rounded-[1.75rem] bg-muted" />
           </div>
         ) : (
           children
         )}
       </main>
       {sessionView ? null : (
-        <footer className="relative z-10 border-t border-border px-4 py-4">
+        <footer className="relative z-10 px-4 py-5">
           <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-            <DemoBadge>Demo accounts · no real Screen Time</DemoBadge>
+            <p>Demo accounts · no real Screen Time</p>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="sm:hidden"
+                className="text-muted-foreground"
                 onClick={handleLogout}
               >
                 Log out
@@ -102,7 +85,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="xl:hidden"
+                className="text-muted-foreground"
                 onClick={handleReset}
               >
                 Reset demo
