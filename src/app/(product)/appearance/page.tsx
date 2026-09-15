@@ -7,12 +7,15 @@ import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import {
   ACCENTS,
+  ACCENT_SHADE_OPTIONS,
   BACKGROUNDS,
   COLLECTIONS,
   SHOP_FOCUS_SCENES,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  type AccentId,
+  type AccentShadeId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
@@ -22,9 +25,11 @@ import { ROUTES } from "@/lib/routes";
 import {
   buyAppearance,
   equipAppearance,
+  setAccentShade,
   type AppearanceKind,
   useCatalyst,
 } from "@/lib/store";
+import { nativeSelectClass } from "@/lib/select-class";
 import { PageFrame } from "@/components/page-frame";
 import { cn } from "@/lib/utils";
 
@@ -154,15 +159,18 @@ export default function AppearancePage() {
             <h2 className="mt-1 text-2xl text-foreground">{collection.name}</h2>
           </div>
 
-          <Group
-            title="Accent"
+          <AccentGroup
             items={ACCENTS.filter((item) => item.collection === collection.id)}
             owned={(id) => look.ownedAccents.includes(id)}
             equipped={(id) => look.accent === id}
+            shade={look.accentShade}
             onAct={(id, owned) => act("accent", id, owned)}
-            swatch={(item) => (
-              <span className="size-8 rounded-full" style={{ background: item.hex }} />
-            )}
+            onShade={(id, shade) => {
+              const result = setAccentShade(shade, id);
+              setNotice(
+                result.ok ? "Shade saved." : result.reason,
+              );
+            }}
           />
 
           <Group
@@ -176,7 +184,26 @@ export default function AppearancePage() {
 
           <Group
             title="Spark color"
-            items={SPARK_TINTS.filter((item) => item.collection === collection.id)}
+            items={SPARK_TINTS.filter(
+              (item) =>
+                item.collection === collection.id && item.kind === "solid",
+            )}
+            owned={(id) => look.ownedSparkTints.includes(id)}
+            equipped={(id) => look.sparkTint === id}
+            previewing={(id) => preview.sparkTint === id}
+            onAct={(id, owned) => act("sparkTint", id, owned)}
+            onTry={(id) => tryOn("sparkTint", id)}
+            swatch={(item) => (
+              <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+            )}
+          />
+
+          <Group
+            title="Spark gradient"
+            items={SPARK_TINTS.filter(
+              (item) =>
+                item.collection === collection.id && item.kind === "gradient",
+            )}
             owned={(id) => look.ownedSparkTints.includes(id)}
             equipped={(id) => look.sparkTint === id}
             previewing={(id) => preview.sparkTint === id}
@@ -211,6 +238,84 @@ export default function AppearancePage() {
       ))}
       </section>
     </PageFrame>
+  );
+}
+
+function AccentGroup({
+  items,
+  owned,
+  equipped,
+  shade,
+  onAct,
+  onShade,
+}: {
+  items: readonly (typeof ACCENTS)[number][];
+  owned: (id: AccentId) => boolean;
+  equipped: (id: AccentId) => boolean;
+  shade: AccentShadeId;
+  onAct: (id: AccentId, owned: boolean) => void;
+  onShade: (id: AccentId, shade: AccentShadeId) => void;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm text-muted-foreground">Accent colour</h3>
+      <p className="mt-1 text-xs text-zinc-500">
+        Buy the colour once. Then pick Pastel, Normal, or Deep.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const has = owned(item.id);
+          const on = equipped(item.id);
+          return (
+            <ShopCard
+              key={item.id}
+              name={item.name}
+              blurb={item.blurb}
+              cost={item.cost}
+              owned={has}
+              equipped={on}
+              extra={
+                has ? (
+                  <label className="block">
+                    <span className="sr-only">Shade for {item.name}</span>
+                    <select
+                      className={cn(nativeSelectClass, "h-8 min-w-[7.25rem] text-xs")}
+                      value={shade}
+                      onChange={(event) =>
+                        onShade(item.id, event.target.value as AccentShadeId)
+                      }
+                    >
+                      {ACCENT_SHADE_OPTIONS.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null
+              }
+              onClick={() => onAct(item.id, has)}
+            >
+              <span className="flex size-8 overflow-hidden rounded-full ring-1 ring-zinc-200/80">
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.pastel.hex }}
+                />
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.normal.hex }}
+                />
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.deep.hex }}
+                />
+              </span>
+            </ShopCard>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -309,6 +414,7 @@ function ShopCard({
   equipped,
   previewing = false,
   equipLabel = "Wear",
+  extra,
   onClick,
   onTry,
   children,
@@ -320,6 +426,7 @@ function ShopCard({
   equipped: boolean;
   previewing?: boolean;
   equipLabel?: string;
+  extra?: ReactNode;
   onClick: () => void;
   onTry?: () => void;
   children: React.ReactNode;
@@ -341,6 +448,7 @@ function ShopCard({
         {blurb ? <p className="mt-0.5 text-xs text-zinc-500">{blurb}</p> : null}
       </div>
       <div className="flex flex-col items-end gap-1.5">
+        {extra}
         {!owned && onTry ? (
           <Button
             size="sm"
