@@ -256,6 +256,7 @@ export function SpritePlaypen({
           onCelebrate?.();
         }
         if (active.zone === "face") play("boop", 700);
+        else if (active.zone === "body") play("poke", 720);
         onPet();
       }
       return;
