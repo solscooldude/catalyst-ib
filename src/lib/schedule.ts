@@ -185,6 +185,16 @@ function nextStart(window: LockWindow, now: Date) {
   return null;
 }
 
+export function todaysLockWindow(windows: LockWindow[], now = new Date()) {
+  const today = now.getDay();
+  const active = activeWindow(windows, now);
+  if (active) return active;
+  return (
+    windows.find((window) => window.enabled && window.days.includes(today)) ??
+    null
+  );
+}
+
 export function upcomingWindow(windows: LockWindow[], now = new Date()) {
   const current = activeWindow(windows, now);
   if (current) {
