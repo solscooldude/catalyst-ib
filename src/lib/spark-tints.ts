@@ -1,7 +1,7 @@
 export const SPARK_TINTS = [
   {
     id: "mint",
-    name: "Mint spark",
+    name: "Mint sprite",
     cost: 0,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -11,7 +11,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "rose",
-    name: "Rose spark",
+    name: "Rose sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -21,7 +21,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "peach",
-    name: "Peach spark",
+    name: "Peach sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -31,7 +31,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "lemon",
-    name: "Lemon spark",
+    name: "Lemon sprite",
     cost: 10,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -41,7 +41,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "gold",
-    name: "Gold spark",
+    name: "Gold sprite",
     cost: 14,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -51,7 +51,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "sky",
-    name: "Sky spark",
+    name: "Sky sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -61,7 +61,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "forest",
-    name: "Forest spark",
+    name: "Forest sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -71,7 +71,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "lilac",
-    name: "Lilac spark",
+    name: "Lilac sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -81,7 +81,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "grape",
-    name: "Grape spark",
+    name: "Grape sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -91,7 +91,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "ember",
-    name: "Ember spark",
+    name: "Ember sprite",
     cost: 12,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -101,7 +101,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "ink",
-    name: "Ink spark",
+    name: "Ink sprite",
     cost: 14,
     collection: "starter" as const,
     kind: "solid" as const,
@@ -166,7 +166,7 @@ export const SPARK_TINTS = [
   },
   {
     id: "aurora",
-    name: "Aurora spark",
+    name: "Aurora sprite",
     cost: 90,
     collection: "aurora" as const,
     kind: "gradient" as const,
