@@ -36,10 +36,10 @@ export default function MotivationPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
-      <div className="flex items-start justify-between gap-4">
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8">
         <div>
-          <p className="text-xs tracking-[0.2em] text-primary uppercase">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Motivation
           </p>
           <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">

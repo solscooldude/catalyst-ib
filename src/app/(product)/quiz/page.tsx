@@ -49,9 +49,9 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
-      <div>
-        <p className="text-xs tracking-[0.2em] text-primary uppercase">Quiz</p>
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <div className="flux-card px-6 py-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Quiz</p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
           Ten checks from your diploma.
         </h1>
@@ -73,7 +73,7 @@ export default function QuizPage() {
           of {QUIZ_LENGTH} right.
         </p>
       ) : done ? (
-        <div className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
+        <div className="flux-card p-6">
           <p className="text-lg text-foreground">
             {correct} of {items.length} right.
           </p>
@@ -91,7 +91,7 @@ export default function QuizPage() {
           </Button>
         </div>
       ) : item ? (
-        <div className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
+        <div className="flux-card p-6">
           <p className="text-xs text-muted-foreground">
             {index + 1} / {items.length}
             {caption ? (

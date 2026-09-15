@@ -40,8 +40,8 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <p className="text-xs tracking-[0.2em] text-primary uppercase">Setup</p>
+    <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-8">
+      <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
         Name the apps that steal the block.
       </h1>
@@ -69,7 +69,7 @@ export default function SetupPage() {
                   "rounded-2xl bg-card p-4 text-left ring-1 transition-colors",
                   selected
                     ? "ring-primary/50"
-                    : "ring-white/6 hover:ring-white/12",
+                    : "ring-border hover:ring-white/12",
                 )}
               >
                 <div className="flex items-center justify-between">
@@ -83,7 +83,7 @@ export default function SetupPage() {
         </div>
       </section>
 
-      <section className="mt-10 rounded-3xl bg-card p-6 ring-1 ring-white/6">
+      <section className="mt-10 rounded-3xl bg-card p-6 ring-1 ring-border">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base text-foreground">Connect ManageBac</h2>

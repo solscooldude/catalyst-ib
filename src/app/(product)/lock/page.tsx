@@ -42,7 +42,7 @@ export default function LockPage() {
 
   return (
     <div className="relative mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <div>
+      <div className="flux-card px-6 py-8">
         <DemoBadge>Simulated phone lock</DemoBadge>
         <h1 className="mt-4 text-4xl text-foreground sm:text-5xl">
           Phone is locked. Laptop is the only door.
@@ -51,7 +51,7 @@ export default function LockPage() {
           Social apps are grey. Emergency still works. This is a web mock —
           Catalyst is not talking to Screen Time.
         </p>
-        <div className="mt-6 rounded-2xl bg-card p-4 ring-1 ring-white/6">
+        <div className="mt-6 rounded-2xl bg-card p-4 ring-1 ring-border">
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
             Working on
           </p>
