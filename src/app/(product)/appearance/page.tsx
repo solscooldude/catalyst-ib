@@ -9,6 +9,7 @@ import {
   ACCENTS,
   BACKGROUNDS,
   COLLECTIONS,
+  SHOP_FOCUS_SCENES,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
@@ -16,7 +17,6 @@ import {
   type SparkTintId,
   type SparkTrailId,
 } from "@/lib/appearance";
-import { FocusStagePicker } from "@/components/focus-stage";
 import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -101,12 +101,16 @@ export default function AppearancePage() {
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
 
-      <section id="stages" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+      <section id="scenes" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
         <h2 className="text-2xl text-foreground">Focus scenes</h2>
-        <FocusStagePicker
-          value={look.focusTheme}
-          owned={(id) => look.ownedFocusThemes.includes(id as typeof look.focusTheme)}
-          onPick={(id, owned) => act("focusTheme", id, owned)}
+        <Group
+          title="Behind Spark in a session"
+          items={SHOP_FOCUS_SCENES}
+          owned={(id) => look.ownedFocusThemes.includes(id)}
+          equipped={(id) => look.focusTheme === id}
+          onAct={(id, owned) => act("focusTheme", id, owned)}
+          equipLabel="Use"
+          swatch={(item) => <SceneSwatch id={item.id} />}
         />
       </section>
 
@@ -125,7 +129,7 @@ export default function AppearancePage() {
       <section id="trails" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
         <h2 className="text-2xl text-foreground">Trails</h2>
         <Group
-          title="Spark trail"
+          title="Spark trail only"
           items={SPARK_TRAILS.filter(
             (item) => item.id !== "week" || look.ownedTrails.includes("week"),
           )}
@@ -245,6 +249,7 @@ function Group<
             <ShopCard
               key={item.id}
               name={item.name}
+              blurb={item.blurb}
               cost={item.cost}
               owned={has}
               equipped={on}
@@ -280,8 +285,26 @@ function BgSwatch({ id }: { id: string }) {
   );
 }
 
+function SceneSwatch({ id }: { id: string }) {
+  return (
+    <span
+      className={cn(
+        "size-8 rounded-full ring-1 ring-white/15",
+        id === "nightsky" && "bg-[#0b1224]",
+        id === "sea" && "bg-[#0a3a70]",
+        id === "math" && "bg-[#1a1a22]",
+        id === "cat" && "bg-[#3f2a1e]",
+        id === "desk" && "bg-[#2a3340]",
+        id === "library" && "bg-[#2c241c]",
+        id === "rocket" && "bg-[#07080d]",
+      )}
+    />
+  );
+}
+
 function ShopCard({
   name,
+  blurb,
   cost,
   owned,
   equipped,
@@ -292,6 +315,7 @@ function ShopCard({
   children,
 }: {
   name: string;
+  blurb?: string;
   cost: number;
   owned: boolean;
   equipped: boolean;
@@ -315,6 +339,7 @@ function ShopCard({
       <div className="flex size-14 items-center justify-center">{children}</div>
       <div className="min-w-0 flex-1">
         <p className="text-sm text-foreground">{name}</p>
+        {blurb ? <p className="mt-0.5 text-xs text-zinc-500">{blurb}</p> : null}
       </div>
       <div className="flex flex-col items-end gap-1.5">
         {!owned && onTry ? (
