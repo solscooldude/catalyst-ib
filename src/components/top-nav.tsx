@@ -258,7 +258,8 @@ export function TopNav() {
 
       <nav aria-label="Main" className="flex items-center md:hidden">
         <button
-          type="button"n          className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 py-2.5 text-sm text-foreground ring-1 ring-border"
+          type="button"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 py-2.5 text-sm text-foreground ring-1 ring-border"
           aria-expanded={sheet}
           onClick={() => setSheet(true)}
         >
