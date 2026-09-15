@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
-import { FocusScene } from "@/components/focus-scene";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
-import { isStageFocusTheme } from "@/lib/focus-stages";
 import { TokenAmount } from "@/components/mint-chip";
 import { UnlockPanel } from "@/components/unlock-panel";
 import { type SparkMood } from "@/components/spark";
@@ -21,6 +19,7 @@ import {
 import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
+  creditLiveSessionTokens,
   markTaskDone,
   pauseSession,
   plannedLockMs,
@@ -28,7 +27,6 @@ import {
   sessionElapsedMs,
   sessionHint,
   sessionTitle,
-  tokensFromElapsed,
   useCatalyst,
 } from "@/lib/store";
 import { formatElapsed } from "@/lib/session-recap";
@@ -53,12 +51,16 @@ export default function FocusPage() {
       router.replace(ROUTES.lock);
     }
     if (state.session.status === "completed") {
-      router.replace(`${ROUTES.home}#unlocks`);
+      router.replace(ROUTES.focus);
     }
   }, [state.hydrated, state.setupComplete, state.session, router]);
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 250);
+    const id = window.setInterval(() => {
+      const stamp = Date.now();
+      setNow(stamp);
+      creditLiveSessionTokens(stamp);
+    }, 250);
     return () => window.clearInterval(id);
   }, []);
 
@@ -66,7 +68,6 @@ export default function FocusPage() {
   const paused = Boolean(session?.pausedAt);
   const elapsed = session ? sessionElapsedMs(session, now) : 0;
   const demoMode = session?.demoMode ?? state.demoMode;
-  const pending = tokensFromElapsed(elapsed, demoMode);
   const title = session ? sessionTitle(session) : "";
   const goalMs = session ? plannedLockMs(session) : null;
   const taskMarkedDone = session?.taskMarkedDone ?? false;
@@ -79,29 +80,17 @@ export default function FocusPage() {
   if (!session || session.status !== "focus") return null;
 
   function finish() {
-    const result = completeSession(pending);
+    const result = completeSession();
     if (!result.ok) {
       setError(result.reason);
       return;
     }
-    const minutes = Math.max(0, Math.round(elapsed / 60000));
-    router.push(
-      `${ROUTES.unlocks}?earned=1&elapsed=${Math.floor(elapsed)}&minutes=${minutes}&tokens=${result.totalTokens}`,
-    );
+    router.push(ROUTES.focus);
   }
 
   return (
     <div className="focus-session focus-session-stage" data-focus-canvas="">
-      {isStageFocusTheme(state.appearance.focusTheme) ||
-      state.appearance.focusTheme === "none" ? (
-        <FocusStage />
-      ) : (
-        <FocusScene
-          elapsedMs={elapsed}
-          demoMode={demoMode}
-          plannedMs={goalMs}
-        />
-      )}
+      <FocusStage />
       <FocusSpark
         mood={mood}
         taskId={session.taskId}
@@ -154,18 +143,18 @@ export default function FocusPage() {
 
         {demoMode ? (
           <DemoBadge className="mt-4">
-            Demo · {DEMO_TOKENS_PER_BLOCK} tokens / 20s, paid on End
+            Demo · {DEMO_TOKENS_PER_BLOCK} tokens / 20s, live
           </DemoBadge>
         ) : (
           <p className="mt-4 text-xs text-muted-foreground">
-            {REAL_TOKEN_MS / 60000} minutes = 1 token, paid on End
+            {REAL_TOKEN_MS / 60000} minutes = 1 token, live
           </p>
         )}
 
         {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
 
         <div className="mt-5">
-          <UnlockPanel compact />
+          <UnlockPanel compact collapsible />
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
