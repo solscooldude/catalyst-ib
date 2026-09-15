@@ -24,7 +24,7 @@ const STEPS = [
   {
     n: "03",
     title: "Tokens",
-    copy: "You earn 1 token every 5 minutes of a session that actually ran. This demo can use 30 seconds so you can try the loop.",
+    copy: "This demo pays 10 tokens per 20 seconds when you End. The production target is 1 token per 2 minutes.",
     icon: "chip" as const,
   },
   {
@@ -148,8 +148,8 @@ export default function LandingPage() {
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-                Earn 1 token per 5 minutes of focus. In this demo, 30 seconds
-                can equal 1 token so you can try it without waiting.
+                This demo pays 10 tokens per 20 seconds when you End. Production
+                target is 1 token per 2 minutes.
               </p>
             </div>
             <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-border">
