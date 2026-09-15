@@ -3,7 +3,7 @@ import {
   type SparkFlavor,
 } from "@/lib/spark-flavor";
 
-/** Non-mint inks — never #5EEAD4 on the mint teardrop. */
+/** Non-mint inks — never #5EEAD4 on the mint spark body. */
 const PARTICLE_INK = [
   "#F5C14A",
   "#FB8A3C",
@@ -394,7 +394,6 @@ export function SubjectFlourish({ flavor }: { flavor: SparkFlavor }) {
     ) : null;
   return (
     <g className="spark-subject-ink" style={{ color: SPARK_FLAVOR_INK[flavor] }}>
-      <SparkParticleRing />
       {mark}
     </g>
   );
