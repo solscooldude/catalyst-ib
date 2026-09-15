@@ -219,3 +219,343 @@ html[data-bg="aurora"] {
     transform: translateY(-6px);
   }
 }
+
+@keyframes spark-squish {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  38% {
+    transform: scale(1.045, 0.955);
+  }
+  56% {
+    transform: scale(0.96, 1.05);
+  }
+  74% {
+    transform: scale(1.015, 0.985);
+  }
+}
+
+@keyframes spark-blink {
+  0%,
+  82%,
+  100% {
+    transform: scaleY(1);
+  }
+  86%,
+  89% {
+    transform: scaleY(0.14);
+  }
+}
+
+@keyframes spark-glance {
+  0%,
+  16%,
+  100% {
+    transform: translateX(0);
+  }
+  22%,
+  30% {
+    transform: translateX(-2.6px);
+  }
+  36%,
+  54% {
+    transform: translateX(0);
+  }
+  60%,
+  70% {
+    transform: translateX(3px);
+  }
+  76% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spark-flourish {
+  0%,
+  18%,
+  100% {
+    opacity: 0;
+  }
+  26%,
+  86% {
+    opacity: 1;
+  }
+}
+
+@keyframes spark-symbol-drift {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  68%,
+  76% {
+    opacity: 0.92;
+    transform: translateY(-3px);
+  }
+  84%,
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes spark-leaf-grow {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.35) translateY(6px);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-2px);
+  }
+}
+
+@keyframes spark-book-read {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(5px) rotate(-8deg);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) rotate(4deg);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-3px) rotate(0deg);
+  }
+}
+
+@keyframes spark-bubble-rise {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.6);
+  }
+  70%,
+  76% {
+    opacity: 0.85;
+    transform: translateY(-4px) scale(1);
+  }
+  84%,
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.7);
+  }
+}
+
+@keyframes spark-orbit-spin {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(0deg);
+  }
+  68% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+    transform: rotate(110deg);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(150deg);
+  }
+}
+
+@keyframes spark-hourglass-flip {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.85);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: rotate(180deg) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.9);
+  }
+}
+
+@keyframes spark-globe-spin {
+  0%,
+  62% {
+    opacity: 0;
+    transform: rotate(-12deg) scale(0.7);
+  }
+  68%,
+  78% {
+    opacity: 1;
+    transform: rotate(16deg) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: rotate(28deg) scale(0.85);
+  }
+}
+
+@keyframes spark-bar-grow {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes spark-thought-pop {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.4) translateY(4px);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-3px);
+  }
+}
+
+@keyframes spark-bits-fade {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  70%,
+  76% {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spark-cursor-blink {
+  0%,
+  62%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  68%,
+  72%,
+  76%,
+  80% {
+    opacity: 1;
+  }
+  70%,
+  74%,
+  78% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes spark-brush-swoosh {
+  0%,
+  62% {
+    opacity: 0;
+    stroke-dashoffset: 48;
+  }
+  70%,
+  76% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -12;
+  }
+}
+
+@keyframes spark-note-bounce {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  76% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spark-lens-peek {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translate(4px, 3px) scale(0.8);
+  }
+  70%,
+  76% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translate(-2px, -2px) scale(0.9);
+  }
+}
+
+@keyframes spark-pulse-draw {
+  0%,
+  62% {
+    opacity: 0;
+    stroke-dashoffset: 42;
+  }
+  70%,
+  76% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -8;
+  }
+}
