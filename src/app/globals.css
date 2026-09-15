@@ -913,3 +913,167 @@ html.light .focus-star {
   background: #18181b;
   box-shadow: 0 0 7px 1px rgb(24 24 27 / 38%);
 }
+
+@keyframes scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.65);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+.scene-aurora-band {
+  position: absolute;
+  inset: -18% -12% auto;
+  height: 52%;
+  filter: blur(42px);
+  opacity: 0.58;
+  animation: scene-aurora 18s ease-in-out infinite;
+}
+
+.scene-aurora-a {
+  background: radial-gradient(
+    ellipse at 28% 40%,
+    rgb(94 234 212 / 0.34),
+    transparent 62%
+  );
+}
+
+.scene-aurora-b {
+  background: radial-gradient(
+    ellipse at 78% 18%,
+    rgb(167 139 250 / 0.28),
+    transparent 58%
+  );
+  animation-delay: -6s;
+}
+
+.scene-aurora-c {
+  background: radial-gradient(
+    ellipse at 48% 72%,
+    rgb(45 212 191 / 0.16),
+    transparent 60%
+  );
+  animation-delay: -11s;
+}
+
+@keyframes scene-aurora {
+  0%,
+  100% {
+    transform: translate3d(-5%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7%, 5%, 0) scale(1.08);
+  }
+}
+
+.spark-trail {
+  pointer-events: none;
+  position: absolute;
+  inset: -18%;
+}
+
+.spark-trail-dot {
+  position: absolute;
+  border-radius: 999px;
+  animation: spark-trail-drift 2.8s ease-in-out infinite;
+}
+
+.spark-trail-sparkle .spark-trail-dot {
+  background: #f4f4f5;
+  box-shadow: 0 0 6px rgb(94 234 212 / 0.55);
+  width: 3px;
+  height: 3px;
+}
+
+.spark-trail-aurora .spark-trail-dot {
+  background: linear-gradient(180deg, #5eead4, #a78bfa);
+  width: 3px;
+  height: 10px;
+  border-radius: 999px;
+  opacity: 0.7;
+  filter: blur(0.4px);
+}
+
+.spark-trail-gold .spark-trail-dot {
+  background: #e4c56a;
+  box-shadow: 0 0 8px rgb(228 197 106 / 0.7);
+  width: 3px;
+  height: 3px;
+}
+
+.spark-trail-paper .spark-trail-dot {
+  background: #f4efe4;
+  width: 4px;
+  height: 3px;
+  border-radius: 1px;
+  box-shadow: none;
+  animation-name: spark-trail-paper;
+  animation-duration: 3.6s;
+}
+
+.spark-trail-vapor .spark-trail-dot {
+  background: rgb(94 234 212 / 0.38);
+  width: 16px;
+  height: 7px;
+  filter: blur(2.2px);
+  animation-name: spark-trail-vapor;
+  animation-duration: 4.4s;
+}
+
+.spark-trail-week .spark-trail-dot {
+  background: #f3c14b;
+  box-shadow: 0 0 10px rgb(243 193 75 / 0.85);
+  width: 3px;
+  height: 4px;
+}
+
+.spark-trail-ember .spark-trail-dot {
+  background: #fb923c;
+  box-shadow: 0 0 10px rgb(251 146 60 / 0.8);
+  width: 2px;
+  height: 6px;
+  animation-name: spark-trail-ember;
+  animation-duration: 2.1s;
+}
+
+html.light .spark-trail-sparkle .spark-trail-dot {
+  background: #18181b;
+  box-shadow: 0 0 6px rgb(24 24 27 / 0.4);
+}
+
+html.light .spark-trail-paper .spark-trail-dot {
+  background: #3f3f46;
+}
+
+html.light .spark-trail-vapor .spark-trail-dot {
+  background: rgb(15 118 110 / 0.55);
+}
+
+html.light .spark-trail-aurora .spark-trail-dot {
+  background: linear-gradient(180deg, #0f766e, #5b21b6);
+}
+
+html.light .spark-trail-gold .spark-trail-dot {
+  background: #854d0e;
+  box-shadow: 0 0 8px rgb(133 77 14 / 0.45);
+}
+
+html.light .spark-trail-week .spark-trail-dot {
+  background: #a16207;
+  box-shadow: 0 0 8px rgb(161 98 7 / 0.45);
+}
+
+html.light .spark-trail-ember .spark-trail-dot {
+  background: #c2410c;
+  box-shadow: 0 0 8px rgb(194 65 12 / 0.45);
+}
+
+html.light .spark-particles,
+html.light .spark-dot {
+  filter: brightness(0.42) saturate(1.15);
+}
