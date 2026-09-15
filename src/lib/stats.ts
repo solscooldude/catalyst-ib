@@ -56,22 +56,22 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "egg",
     label: "Egg",
-    how: "Closed shell. First real focus block or snack hatches it into Hatchling.",
+    how: "Closed egg. First real focus or snack hatches it into Hatchling.",
   },
   {
     stage: "hatchling",
     label: "Hatchling",
-    how: "Tiny body, dim glow. A little study time or a care action.",
+    how: "Just out. Tiny body, dim glow.",
   },
   {
     stage: "sparklet",
     label: "Sparklet",
-    how: "Growing. Keep a short streak and log a few hours.",
+    how: "Growing. Study hours plus a short streak or snacks.",
   },
   {
     stage: "steady",
     label: "Steady",
-    how: "Baseline size. Regular study plus snacks or quiz.",
+    how: "Baseline size and glow. Regular blocks and care.",
   },
   {
     stage: "bright",
@@ -81,7 +81,7 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "luminary",
     label: "Luminary",
-    how: "Largest glow. Deep study weeks, a long streak, and ongoing care.",
+    how: "Largest body and brightest glow.",
   },
 ];
 
