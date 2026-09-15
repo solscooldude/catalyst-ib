@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COMPLETION_BONUS, DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
+import { displaySpriteName } from "@/lib/sprite-name";
 import {
   completeSession,
   markTaskDone,
@@ -115,6 +116,7 @@ export default function FocusPage() {
         time={formatElapsed(elapsed)}
         progress={sessionProgress}
         tokens={liveTokens}
+        name={displaySpriteName(state.spriteName)}
       />
 
       <div className="focus-session-panel">
