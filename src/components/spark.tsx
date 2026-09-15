@@ -298,9 +298,21 @@ export function Spark({
   const [orbit, setOrbit] = useState(false);
   const petTimer = useRef<number>(0);
   const lastPet = useRef(0);
+  const hideOrbit = useRef(0);
   const firstOrbit = useRef(true);
   const flavorKey = `${resolved}:${subject ?? ""}:${taskId ?? ""}`;
   const canSparkle = evolve && size >= 80;
+  const ORBIT_MS = 2600;
+
+  function idleGap() {
+    return 180_000 + Math.floor(Math.random() * 120_000);
+  }
+
+  function fireOrbit() {
+    setOrbit(true);
+    window.clearTimeout(hideOrbit.current);
+    hideOrbit.current = window.setTimeout(() => setOrbit(false), ORBIT_MS);
+  }
 
   useEffect(() => {
     return () => window.clearTimeout(petTimer.current);
@@ -312,32 +324,22 @@ export function Spark({
       firstOrbit.current = false;
       return;
     }
-    setOrbit(true);
-    const hide = window.setTimeout(() => setOrbit(false), 2600);
-    return () => window.clearTimeout(hide);
+    fireOrbit();
   }, [flavorKey, canSparkle]);
 
   useEffect(() => {
     if (!canSparkle) return;
-    let hide = 0;
     let wait = 0;
-    function burst(nextGap: number) {
-      setOrbit(true);
-      hide = window.setTimeout(() => {
-        setOrbit(false);
-        wait = window.setTimeout(
-          () => burst(150_000 + Math.floor(Math.random() * 90_000)),
-          nextGap,
-        );
-      }, 2600);
+    function schedule(delay: number) {
+      wait = window.setTimeout(() => {
+        fireOrbit();
+        schedule(idleGap());
+      }, delay);
     }
-    wait = window.setTimeout(
-      () => burst(150_000 + Math.floor(Math.random() * 90_000)),
-      flourish === "now" ? 200 : 8_000 + Math.floor(Math.random() * 6_000),
-    );
+    schedule(flourish === "now" ? 200 : idleGap());
     return () => {
-      window.clearTimeout(hide);
       window.clearTimeout(wait);
+      window.clearTimeout(hideOrbit.current);
     };
   }, [canSparkle, flourish]);
 
