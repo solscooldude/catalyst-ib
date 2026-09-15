@@ -9,6 +9,8 @@ export const ROUTES = {
   setup: "/setup",
   profile: "/profile",
   motivation: "/motivation",
+  subscription: "/account/subscription",
+  settings: "/account/settings",
   schedule: "/schedule",
   sprite: "/sprite",
   quiz: "/quiz",

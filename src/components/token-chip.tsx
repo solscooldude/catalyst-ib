@@ -16,7 +16,7 @@ export function TokenChip({
       )}
       aria-label={`${tokens} tokens`}
     >
-      <SparkleMark size={13} />
+      <SparkleMark size={13} className="text-[#5EEAD4]" />
       <span className="tabular-nums">{tokens.toLocaleString()}</span>
     </div>
   );
