@@ -1,7 +1,8 @@
-"use client";
+use client";
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { Monitor, Sparkles } from "lucide-react";
 import { BuyLabel, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
@@ -172,24 +173,34 @@ export default function AppearancePage() {
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <button
           type="button"
           onClick={() => openRealm("sprite")}
           className={cn(
-            "rounded-3xl px-5 py-6 text-left transition-colors",
+            "min-h-[9.5rem] rounded-[1.75rem] px-6 py-7 text-left transition-colors sm:px-7",
             shownRealm === "sprite"
-              ? "bg-primary/18 ring-2 ring-primary"
-              : "bg-card ring-1 ring-border hover:ring-primary/40",
+              ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+              : "bg-card ring-2 ring-border hover:ring-primary/50",
           )}
         >
-          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-            Closet
+          <span
+            className={cn(
+              "inline-flex size-11 items-center justify-center rounded-2xl",
+              shownRealm === "sprite" ? "bg-black/10" : "bg-primary/15 text-primary",
+            )}
+          >
+            <Sparkles className="size-5" />
+          </span>
+          <p className="mt-4 text-3xl font-semibold tracking-tight">
+            Sprite appearance
           </p>
-          <p className="mt-2 text-2xl font-semibold text-foreground">
-            Sprite shop
-          </p>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p
+            className={cn(
+              "mt-2 text-sm",
+              shownRealm === "sprite" ? "text-primary-foreground/80" : "text-zinc-500",
+            )}
+          >
             Cosmetics, colours, gradients, auras, trails.
           </p>
         </button>
@@ -197,41 +208,69 @@ export default function AppearancePage() {
           type="button"
           onClick={() => openRealm("app")}
           className={cn(
-            "rounded-3xl px-5 py-6 text-left transition-colors",
+            "min-h-[9.5rem] rounded-[1.75rem] px-6 py-7 text-left transition-colors sm:px-7",
             shownRealm === "app"
-              ? "bg-primary/18 ring-2 ring-primary"
-              : "bg-card ring-1 ring-border hover:ring-primary/40",
+              ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+              : "bg-card ring-2 ring-border hover:ring-primary/50",
           )}
         >
-          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-            Chrome
-          </p>
-          <p className="mt-2 text-2xl font-semibold text-foreground">
+          <span
+            className={cn(
+              "inline-flex size-11 items-center justify-center rounded-2xl",
+              shownRealm === "app" ? "bg-black/10" : "bg-primary/15 text-primary",
+            )}
+          >
+            <Monitor className="size-5" />
+          </span>
+          <p className="mt-4 text-3xl font-semibold tracking-tight">
             App appearance
           </p>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p
+            className={cn(
+              "mt-2 text-sm",
+              shownRealm === "app" ? "text-primary-foreground/80" : "text-zinc-500",
+            )}
+          >
             Focus scenes and rooms.
           </p>
         </button>
       </div>
 
-      <label className="block">
-        <span className="mb-2 block text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-          {shownRealm === "sprite" ? "Sprite shop" : "App appearance"}
-        </span>
-        <select
-          className={cn(nativeSelectClass, "h-12 text-base")}
-          value={tab}
-          aria-label={shownRealm === "sprite" ? "Sprite shop section" : "App appearance section"}
-          onChange={(event) => openTab(event.target.value as ShopTab)}
+      <div>
+        <p className="mb-3 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+          {shownRealm === "sprite" ? "Sprite appearance" : "App appearance"}
+        </p>
+        <div
+          className="flex flex-wrap gap-2"
+          role="tablist"
+          aria-label={
+            shownRealm === "sprite"
+              ? "Sprite appearance section"
+              : "App appearance section"
+          }
         >
-          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </label>
+          {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => {
+            const on = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => openTab(item.id)}
+                className={cn(
+                  "h-11 rounded-full px-4 text-sm font-medium ring-2 transition-colors",
+                  on
+                    ? "bg-primary text-primary-foreground ring-primary"
+                    : "bg-card text-foreground ring-border hover:ring-primary/45",
+                )}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <section className="flux-card scroll-mt-24 space-y-6 px-6 py-8">
         {tab === "cosmetics" ? (
