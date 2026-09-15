@@ -300,37 +300,50 @@ export function Spark({
   const lastPet = useRef(0);
   const firstOrbit = useRef(true);
   const flavorKey = `${resolved}:${subject ?? ""}:${taskId ?? ""}`;
+  const canSparkle = evolve && size >= 80;
 
   useEffect(() => {
     return () => window.clearTimeout(petTimer.current);
   }, []);
 
   useEffect(() => {
+    if (!canSparkle) return;
     if (firstOrbit.current) {
       firstOrbit.current = false;
-      if (flourish !== "now") return;
+      return;
     }
     setOrbit(true);
-    const hide = window.setTimeout(() => setOrbit(false), 3600);
+    const hide = window.setTimeout(() => setOrbit(false), 2600);
     return () => window.clearTimeout(hide);
-  }, [flavorKey, flourish]);
+  }, [flavorKey, canSparkle]);
 
   useEffect(() => {
+    if (!canSparkle) return;
     let hide = 0;
     let wait = 0;
-    function burst() {
+    function burst(nextGap: number) {
       setOrbit(true);
       hide = window.setTimeout(() => {
         setOrbit(false);
-        wait = window.setTimeout(burst, 52000 + Math.floor(Math.random() * 40000));
-      }, 3400);
+        wait = window.setTimeout(
+          () => burst(150_000 + Math.floor(Math.random() * 90_000)),
+          nextGap,
+        );
+      }, 2600);
     }
-    wait = window.setTimeout(burst, 22000 + Math.floor(Math.random() * 28000));
+    wait = window.setTimeout(
+      () => burst(150_000 + Math.floor(Math.random() * 90_000)),
+      flourish === "now" ? 200 : 8_000 + Math.floor(Math.random() * 6_000),
+    );
     return () => {
       window.clearTimeout(hide);
       window.clearTimeout(wait);
     };
-  }, []);
+  }, [canSparkle, flourish]);
+
+  useEffect(() => {
+    if (act === "sleep" || mood === "sleepy") setOrbit(false);
+  }, [act, mood]);
 
   function pet() {
     const now = Date.now();
@@ -482,13 +495,12 @@ export function Spark({
           </g>
         ) : null}
 
-        {orbit || mood === "earning" ? (
+        {orbit && mood !== "tempted" && mood !== "sleepy" && act !== "sleep" ? (
           <g className="spark-particles" fill={SPARK_FLAVOR_INK[resolved]}>
             <SparkParticleRing radius={40} twist={22} />
+            <SubjectFlourish flavor={resolved} />
           </g>
         ) : null}
-
-        {mood !== "tempted" ? <SubjectFlourish flavor={resolved} /> : null}
       </svg>
     </>
   );
