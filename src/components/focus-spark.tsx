@@ -90,7 +90,9 @@ export function FocusSpark({
       : "body";
     window.clearTimeout(holdTimer.current);
     holdTimer.current = window.setTimeout(() => {
-      if (!moved.current) play("sleep", 8000);
+      if (!moved.current) {
+        setAct((current) => (current === "sleep" ? null : "sleep"));
+      }
     }, 620);
   }
 
@@ -108,7 +110,6 @@ export function FocusSpark({
     }
     if (!moved.current) {
       if (act === "sleep") {
-        setAct(null);
         return;
       }
       if (mood === "done") play("celebrate", 900);
