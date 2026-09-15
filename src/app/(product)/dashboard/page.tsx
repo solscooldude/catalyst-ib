@@ -56,7 +56,7 @@ export default function DashboardPage() {
               Current sprite
             </p>
             <h1 className="mt-3 text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
-              Flux
+              Spark
             </h1>
             <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-400">
               Your focus buddy. Soft glow, calm energy

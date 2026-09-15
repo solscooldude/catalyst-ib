@@ -131,7 +131,7 @@ export default function SpritePage() {
           My Sprite
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          Sit with Flux.
+          Sit with Spark.
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
           Pet, drag a snack onto it, poke, or let it doze. Official hours

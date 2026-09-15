@@ -64,7 +64,7 @@ export default function AppearancePage() {
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Snacks
         </p>
-        <h2 className="text-2xl text-foreground">Feed Flux on My Sprite</h2>
+        <h2 className="text-2xl text-foreground">Feed Spark on My Sprite</h2>
         <p className="text-sm leading-6 text-muted-foreground">
           Snacks stay in the shop list so they are easy to find. They cost{" "}
           <TokenAmount value={FEED_COST} /> each, {FEED_DAILY_LIMIT} a day.

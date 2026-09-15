@@ -75,6 +75,19 @@
   --spark-lo: #5eead4;
 }
 
+html,
+body {
+  font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+.font-heading {
+  font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
 html {
   color-scheme: light;
 }
