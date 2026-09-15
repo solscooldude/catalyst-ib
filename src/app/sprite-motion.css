@@ -156,14 +156,14 @@
   0% {
     transform: scale3d(1, 1, 1) rotate(0deg);
   }
-  16% {
-    transform: scale3d(1.24, 0.74, 1) rotate(-5deg);
+  18% {
+    transform: scale3d(1.14, 0.86, 1) rotate(-3deg);
   }
-  38% {
-    transform: scale3d(0.88, 1.18, 1) rotate(4deg);
+  42% {
+    transform: scale3d(0.94, 1.1, 1) rotate(2.5deg);
   }
-  62% {
-    transform: scale3d(1.1, 0.92, 1) rotate(-2deg);
+  68% {
+    transform: scale3d(1.05, 0.96, 1) rotate(-1deg);
   }
   100% {
     transform: scale3d(1, 1, 1) rotate(0deg);
@@ -195,21 +195,21 @@
 .spark-boop .spark-body {
   transform-box: fill-box;
   transform-origin: 50% 80%;
-  animation: spark-pet-punch 0.58s cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: spark-pet-punch 0.78s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
 
 @keyframes spark-poke-punch {
   0% {
     transform: scale3d(1, 1, 1) rotate(0deg) translateX(0);
   }
-  12% {
-    transform: scale3d(1.36, 0.58, 1) rotate(-12deg) translateX(10px);
+  16% {
+    transform: scale3d(1.22, 0.74, 1) rotate(-7deg) translateX(6px);
   }
-  34% {
-    transform: scale3d(0.72, 1.32, 1) rotate(9deg) translateX(-8px);
+  38% {
+    transform: scale3d(0.84, 1.18, 1) rotate(5deg) translateX(-5px);
   }
-  58% {
-    transform: scale3d(1.18, 0.86, 1) rotate(-5deg) translateX(4px);
+  64% {
+    transform: scale3d(1.08, 0.94, 1) rotate(-2deg) translateX(2px);
   }
   100% {
     transform: scale3d(1, 1, 1) rotate(0deg) translateX(0);
@@ -219,7 +219,7 @@
 .spark-poke .spark-body {
   transform-box: fill-box;
   transform-origin: 50% 80%;
-  animation: spark-poke-punch 0.64s cubic-bezier(0.18, 0.7, 0.28, 1);
+  animation: spark-poke-punch 0.86s cubic-bezier(0.2, 0.72, 0.28, 1);
 }
 
 @keyframes spark-spin-twirl {
@@ -243,7 +243,7 @@
 .spark-spin .spark-body {
   transform-box: fill-box;
   transform-origin: 50% 62%;
-  animation: spark-spin-twirl 0.78s cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: spark-spin-twirl 0.98s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @keyframes spark-tickle-giggle {
@@ -271,7 +271,7 @@
 .spark-tickle .spark-body {
   transform-box: fill-box;
   transform-origin: 50% 78%;
-  animation: spark-tickle-giggle 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: spark-tickle-giggle 0.92s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
 
 @keyframes spark-wave-pose {
@@ -293,7 +293,7 @@
 .spark-wave .spark-body {
   transform-box: fill-box;
   transform-origin: 50% 82%;
-  animation: spark-wave-pose 0.72s ease-in-out;
+  animation: spark-wave-pose 0.96s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
 
 .spark-sit {
@@ -311,7 +311,28 @@
 }
 
 .spark-float {
-  animation: spark-float 5.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation: spark-float 7.2s cubic-bezier(0.42, 0.08, 0.52, 0.96) infinite;
+}
+
+@keyframes spark-hatch-crack {
+  0% {
+    transform: scale(1, 1) rotate(0deg);
+  }
+  28% {
+    transform: scale(1.06, 0.94) rotate(-4deg);
+  }
+  56% {
+    transform: scale(0.96, 1.06) rotate(5deg);
+  }
+  100% {
+    transform: scale(1, 1) rotate(0deg);
+  }
+}
+
+.spark-hatch {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: spark-hatch-crack 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @keyframes spark-celebrate {
@@ -522,6 +543,7 @@
   .spark-sit,
   .spark-celebrate,
   .spark-z,
+  .spark-hatch,
   .sprite-catch-star {
     animation: none;
   }
