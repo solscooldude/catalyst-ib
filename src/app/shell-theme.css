@@ -169,11 +169,11 @@ html[data-bg="aurora"] .scene-aurora-c {
 }
 
 .spark-orbit-dot {
-  animation: spark-orbit-dot 2.8s ease-in-out infinite;
+  animation: spark-orbit-dot 2.6s ease-in-out 1;
 }
 
 .spark-particles {
-  animation: spark-orbit-dot 3.4s ease-in-out 1;
+  animation: spark-orbit-dot 2.6s ease-in-out 1;
 }
 
 .spark-orbit-n1 { animation-delay: 0.18s; }
