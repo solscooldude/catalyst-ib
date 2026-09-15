@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       { source: "/app/lock", destination: "/lock", permanent: false },
       { source: "/app/focus", destination: "/session", permanent: false },
       { source: "/motivation", destination: "/profile", permanent: false },
+      {
+        source: "/account/subscription",
+        destination: "/account/settings",
+        permanent: false,
+      },
     ];
   },
 };
