@@ -21,20 +21,6 @@ export const MOCK_TASKS = [
     detail: "Write the exploration and methodology. 1,200 words left.",
   },
   {
-    id: "tok-essay",
-    title: "TOK essay — knowledge & technology",
-    subject: "Theory of Knowledge",
-    due: "Mon",
-    detail: "Finish object 2 analysis and the conclusion.",
-  },
-  {
-    id: "math-aa",
-    title: "Math AA problem set 8",
-    subject: "Mathematics AA HL",
-    due: "Tomorrow",
-    detail: "Integration by parts, questions 4–9.",
-  },
-  {
     id: "chem-study",
     title: "Chemistry SL — energetics review",
     subject: "Chemistry SL",
@@ -47,6 +33,20 @@ export const MOCK_TASKS = [
     subject: "Extended Essay",
     due: "Next week",
     detail: "Annotate four sources and write 800 words.",
+  },
+  {
+    id: "math-aa",
+    title: "Math AA problem set 8",
+    subject: "Mathematics AA HL",
+    due: "Tomorrow",
+    detail: "Integration by parts, questions 4–9.",
+  },
+  {
+    id: "tok-essay",
+    title: "TOK essay — knowledge & technology",
+    subject: "Theory of Knowledge",
+    due: "Mon",
+    detail: "Finish object 2 analysis and the conclusion.",
   },
 ] as const;
 
