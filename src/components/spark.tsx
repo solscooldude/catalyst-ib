@@ -1,4 +1,4 @@
-use client";
+"use client";
 
 import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
