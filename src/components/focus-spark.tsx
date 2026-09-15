@@ -140,6 +140,7 @@ export function FocusSpark({
       if (act === "sleep") return;
       if (mood === "done") play("celebrate", 900);
       else if (zone.current === "face") play("boop", 700);
+      else if (zone.current === "body") play("poke", 720);
     }
   }
 
