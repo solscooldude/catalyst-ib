@@ -12,6 +12,9 @@ import {
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  type SparkGearId,
+  type SparkTintId,
+  type SparkTrailId,
 } from "@/lib/appearance";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
@@ -24,14 +27,44 @@ import {
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+type Preview = {
+  sparkTint?: SparkTintId;
+  gear?: SparkGearId;
+  trail?: SparkTrailId;
+};
+
 export default function AppearancePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
+  const [preview, setPreview] = useState<Preview>({});
   const look = state.appearance;
+  const shownTint = preview.sparkTint ?? look.sparkTint;
+  const shownGear = preview.gear ?? look.gear;
+  const shownTrail = preview.trail ?? look.trail;
+  const trying =
+    preview.sparkTint != null || preview.gear != null || preview.trail != null;
 
   function act(kind: AppearanceKind, id: string, owned: boolean) {
     const result = owned ? equipAppearance(kind, id) : buyAppearance(kind, id);
     setNotice(result.ok ? (owned ? "Equipped." : "Bought and equipped.") : result.reason);
+    if (result.ok) setPreview({});
+  }
+
+  function tryOn(kind: AppearanceKind, id: string) {
+    if (kind === "sparkTint") {
+      setPreview((current) => ({ ...current, sparkTint: id as SparkTintId }));
+      setNotice("Trying this color. Buy to keep it.");
+      return;
+    }
+    if (kind === "gear") {
+      setPreview((current) => ({ ...current, gear: id as SparkGearId }));
+      setNotice("Trying this outfit. Buy to keep it.");
+      return;
+    }
+    if (kind === "trail") {
+      setPreview((current) => ({ ...current, trail: id as SparkTrailId }));
+      setNotice("Trying this trail. Buy to keep it.");
+    }
   }
 
   return (
@@ -56,7 +89,19 @@ export default function AppearancePage() {
             </Link>
           </p>
         </div>
-        <Spark mood="idle" size={132} pettable className="hidden shrink-0 sm:block" />
+        <div className="hidden shrink-0 text-center sm:block">
+          <Spark
+            mood="idle"
+            tint={shownTint}
+            gear={shownGear}
+            trail={shownTrail}
+            size={132}
+            pettable
+          />
+          {trying ? (
+            <p className="mt-2 text-xs text-zinc-500">Preview — not bought</p>
+          ) : null}
+        </div>
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
@@ -132,6 +177,7 @@ export default function AppearancePage() {
             owned={(id) => look.ownedSparkTints.includes(id)}
             equipped={(id) => look.sparkTint === id}
             onAct={(id, owned) => act("sparkTint", id, owned)}
+            onTry={(id) => tryOn("sparkTint", id)}
             blurb="Same spark, different light."
             swatch={(item) => (
               <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
@@ -144,6 +190,7 @@ export default function AppearancePage() {
             owned={(id) => look.ownedGear.includes(id)}
             equipped={(id) => look.gear === id}
             onAct={(id, owned) => act("gear", id, owned)}
+            onTry={(id) => tryOn("gear", id)}
             swatch={(item) => (
               <Spark
                 mood="idle"
@@ -166,6 +213,7 @@ export default function AppearancePage() {
             owned={(id) => look.ownedTrails.includes(id)}
             equipped={(id) => look.trail === id}
             onAct={(id, owned) => act("trail", id, owned)}
+            onTry={(id) => tryOn("trail", id)}
             swatch={(item) => (
               <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
             )}
@@ -186,6 +234,7 @@ function Group<
   owned,
   equipped,
   onAct,
+  onTry,
   swatch,
   blurb,
   equipLabel = "Wear",
@@ -195,6 +244,7 @@ function Group<
   owned: (id: T["id"]) => boolean;
   equipped: (id: T["id"]) => boolean;
   onAct: (id: T["id"], owned: boolean) => void;
+  onTry?: (id: T["id"]) => void;
   swatch: (item: T) => ReactNode;
   blurb?: string;
   equipLabel?: string;
@@ -217,6 +267,7 @@ function Group<
               equipped={on}
               equipLabel={equipLabel}
               onClick={() => onAct(item.id, has)}
+              onTry={onTry ? () => onTry(item.id) : undefined}
             >
               {swatch(item)}
             </ShopCard>
@@ -253,6 +304,7 @@ function ShopCard({
   equipped,
   equipLabel = "Wear",
   onClick,
+  onTry,
   children,
 }: {
   name: string;
@@ -262,6 +314,7 @@ function ShopCard({
   equipped: boolean;
   equipLabel?: string;
   onClick: () => void;
+  onTry?: () => void;
   children: React.ReactNode;
 }) {
   return (
@@ -276,23 +329,35 @@ function ShopCard({
         <p className="text-sm text-foreground">{name}</p>
         <p className="text-xs text-muted-foreground">{blurb}</p>
       </div>
-      <Button
-        size="sm"
-        variant={equipped ? "outline" : "default"}
-        className="h-9 rounded-full"
-        disabled={equipped}
-        onClick={onClick}
-      >
-        {equipped ? (
-          "On"
-        ) : owned ? (
-          equipLabel
-        ) : cost === 0 ? (
-          "Take"
-        ) : (
-          <BuyLabel cost={cost} />
-        )}
-      </Button>
+      <div className="flex flex-col items-end gap-1.5">
+        {!owned && onTry ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 rounded-full"
+            onClick={onTry}
+          >
+            Try
+          </Button>
+        ) : null}
+        <Button
+          size="sm"
+          variant={equipped ? "outline" : "default"}
+          className="h-9 rounded-full"
+          disabled={equipped}
+          onClick={onClick}
+        >
+          {equipped ? (
+            "On"
+          ) : owned ? (
+            equipLabel
+          ) : cost === 0 ? (
+            "Take"
+          ) : (
+            <BuyLabel cost={cost} />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
