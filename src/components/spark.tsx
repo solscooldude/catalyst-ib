@@ -662,6 +662,7 @@ export function Spark({
       : "pointer-events-none",
     petted && mood !== "eating" && "spark-petted",
     (act === "boop" || petted) && mood !== "eating" && "spark-boop",
+    act === "poke" && mood !== "eating" && "spark-poke",
     act === "scrunch" && "spark-scrunch",
     act === "celebrate" && "spark-celebrate",
     act === "highfive" && "spark-highfive",
