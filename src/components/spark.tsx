@@ -168,6 +168,86 @@ function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
   return <OpenEyes fill={fill} />;
 }
 
+function GearBack({ id }: { id: SparkGearId }) {
+  if (id !== "scarf") return null;
+  return (
+    <g>
+      <path
+        d="M16 80c-3 10 2 20 12 24 3-2 4-8 2-14-2-7-5-12-9-14-3-1-5 1-5 4Z"
+        fill="#7F1D1D"
+      />
+      <path
+        d="M84 80c3 10-2 20-12 24-3-2-4-8-2-14 2-7 5-12 9-14 3-1 5 1 5 4Z"
+        fill="#7F1D1D"
+      />
+    </g>
+  );
+}
+
+function SoftScarf() {
+  return (
+    <g>
+      <path
+        d="M18 76c-2 9 2 18 10 22 4 1 6-3 5-8-1-7-3-13-7-16-3-2-7-1-8 2Z"
+        fill="#B91C1C"
+      />
+      <path
+        d="M82 76c2 9-2 18-10 22-4 1-6-3-5-8 1-7 3-13 7-16 3-2 7-1 8 2Z"
+        fill="#B91C1C"
+      />
+      <path
+        d="M24 86c8 1 17 2 26 1 9 1 18 0 26-1 3 3 2 9-2 12-15 5-35 5-50 0-4-3-4-9 0-12Z"
+        fill="#DC2626"
+      />
+      <path
+        d="M30 88c10-3 20-1 30 1 6 1 12-1 16-3"
+        fill="none"
+        stroke="#F87171"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
+      <path
+        d="M32 94c12 2 26 2 38-1"
+        fill="none"
+        stroke="#9F1239"
+        strokeWidth="1.15"
+        strokeLinecap="round"
+        opacity="0.45"
+      />
+      <path
+        d="M54 90c6-3 12 0 12 6 0 5-5 8-10 6-4-2-5-6-2-12Z"
+        fill="#B91C1C"
+      />
+      <ellipse cx="61" cy="95.2" rx="4.4" ry="3.3" fill="#EF4444" />
+      <ellipse cx="59.6" cy="93.8" rx="1.5" ry="1.1" fill="#FECACA" opacity="0.75" />
+      <path
+        d="M55 98c-4 7-3 15 1 20 3 3 7 1 6-3-1-6 0-12-3-16-1-2-3-2-4-1Z"
+        fill="#B91C1C"
+      />
+      <path
+        d="M63 98c6 6 9 14 8 23 0 6-3 10 1 13 5-2 6-9 5-14 2-9-3-18-9-23-2-1-5 0-5 1Z"
+        fill="#DC2626"
+      />
+      <path
+        d="M66 105c3 7 4 14 3 20"
+        fill="none"
+        stroke="#9F1239"
+        strokeWidth="1"
+        strokeLinecap="round"
+        opacity="0.4"
+      />
+      <g stroke="#7F1D1D" strokeWidth="1.15" strokeLinecap="round">
+        <path d="M55.5 117v4" />
+        <path d="M58.8 118v3.4" />
+        <path d="M64.8 132v5.2" />
+        <path d="M68.2 133v4.8" />
+        <path d="M71.6 131.6 72.8 136.4" />
+      </g>
+    </g>
+  );
+}
+
 function Gear({ id }: { id: SparkGearId }) {
   if (id === "bow") {
     return (
@@ -186,14 +266,7 @@ function Gear({ id }: { id: SparkGearId }) {
       </g>
     );
   }
-  if (id === "scarf") {
-    return (
-      <g fill="#DC2626">
-        <path d="M32 78c6 8 30 8 36 0-4 10-10 14-18 14-7 0-13-4-18-14Z" />
-        <path d="M58 90c2 8 7 13 4 18-6-2-10-10-9-16Z" fill="#B91C1C" />
-      </g>
-    );
-  }
+  if (id === "scarf") return <SoftScarf />;
   if (id === "cap") {
     return (
       <g>
@@ -505,6 +578,7 @@ export function Spark({
         <ellipse cx="50" cy="72" rx="28" ry="24" fill={`url(#${glowId})`} />
 
         <g className="spark-body">
+          <GearBack id={gearId} />
           <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
           <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
           <Gear id={gearId} />
