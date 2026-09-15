@@ -244,6 +244,35 @@ function Gear({ id }: { id: SparkGearId }) {
       </g>
     );
   }
+  if (id === "headband") {
+    return (
+      <g fill="none" stroke="#5EEAD4" strokeWidth="3.2" strokeLinecap="round">
+        <path d="M28 28c8-10 36-10 44 0" />
+      </g>
+    );
+  }
+  if (id === "phones") {
+    return (
+      <g>
+        <path
+          d="M24 52c0-18 10-28 26-28s26 10 26 28"
+          fill="none"
+          stroke="#18181B"
+          strokeWidth="3.2"
+        />
+        <rect x="18" y="50" width="10" height="16" rx="4" fill="#18181B" />
+        <rect x="72" y="50" width="10" height="16" rx="4" fill="#18181B" />
+      </g>
+    );
+  }
+  if (id === "star") {
+    return (
+      <path
+        d="M32 18l2.2 6.4H41l-5.4 4 2.1 6.4L32 30.8 26.3 34.8l2.1-6.4-5.4-4h6.8Z"
+        fill="#E8C547"
+      />
+    );
+  }
   return null;
 }
 
@@ -347,13 +376,20 @@ export function Spark({
     if (act === "sleep" || mood === "sleepy") setOrbit(false);
   }, [act, mood]);
 
+  const SAYS = ["hey.", "boop.", "nice.", "ok."];
+  const [say, setSay] = useState<string | null>(null);
+
   function pet() {
     const now = Date.now();
-    if (now - lastPet.current < 280) return;
+    if (now - lastPet.current < 220) return;
     lastPet.current = now;
     setPetted(true);
+    setSay(SAYS[Math.floor(Math.random() * SAYS.length)] ?? "hey.");
     window.clearTimeout(petTimer.current);
-    petTimer.current = window.setTimeout(() => setPetted(false), 1800);
+    petTimer.current = window.setTimeout(() => {
+      setPetted(false);
+      setSay(null);
+    }, 1400);
   }
 
   useEffect(() => {
@@ -431,6 +467,11 @@ export function Spark({
     <>
       <span className="spark-halo absolute inset-[-28%] rounded-full" />
       <Trail id={trailId} />
+      {say && canPet ? (
+        <span className="spark-say" aria-live="polite">
+          {say}
+        </span>
+      ) : null}
       <svg
         viewBox="-22 -18 144 150"
         width={drawn}
