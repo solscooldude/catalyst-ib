@@ -21,9 +21,12 @@ import {
 } from "@/lib/care";
 import {
   COMPLETION_BONUS,
-  DEMO_TOKEN_MS,
+  DEMO_TIME_COMPRESS_MS,
+  DEMO_TOKEN_BLOCK_MS,
+  DEMO_TOKENS_PER_BLOCK,
   DEMO_UNLOCK_MS,
   MOCK_TASKS,
+  REAL_TIME_COMPRESS_MS,
   REAL_TOKEN_MS,
   REAL_UNLOCK_MS,
   SUBJECTS,
@@ -90,7 +93,7 @@ export function plannedLockMs(session: Session) {
   if (!session.plannedMinutes) return null;
   const realMs = session.plannedMinutes * 60 * 1000;
   return session.demoMode
-    ? Math.round(realMs * (DEMO_TOKEN_MS / REAL_TOKEN_MS))
+    ? Math.round(realMs * (DEMO_TIME_COMPRESS_MS / REAL_TIME_COMPRESS_MS))
     : realMs;
 }
 
@@ -224,8 +227,11 @@ export function markTaskDone(done: boolean) {
 }
 
 export function tokensFromElapsed(elapsedMs: number, demoMode: boolean) {
-  const interval = demoMode ? DEMO_TOKEN_MS : REAL_TOKEN_MS;
-  return Math.floor(Math.max(0, elapsedMs) / interval);
+  const ms = Math.max(0, elapsedMs);
+  if (demoMode) {
+    return Math.floor(ms / DEMO_TOKEN_BLOCK_MS) * DEMO_TOKENS_PER_BLOCK;
+  }
+  return Math.floor(ms / REAL_TOKEN_MS);
 }
 
 export function completeSession(tokensEarned?: number) {
