@@ -40,6 +40,48 @@
   animation: focus-stage-shoot 11s linear infinite;
 }
 
+.focus-stage-waves {
+  background:
+    radial-gradient(ellipse at 50% 110%, #141820 0%, transparent 50%),
+    linear-gradient(180deg, #0b0d12 0%, #12161c 100%);
+}
+
+.focus-stage-band {
+  position: absolute;
+  left: -22%;
+  width: 144%;
+  height: 28%;
+  border-radius: 50%;
+  filter: blur(22px);
+  animation: focus-stage-band 18s ease-in-out infinite;
+}
+
+.focus-stage-band-a {
+  top: 22%;
+  background: rgb(94 234 212 / 0.16);
+}
+
+.focus-stage-band-b {
+  top: 42%;
+  background: rgb(196 181 253 / 0.14);
+  animation-duration: 24s;
+  animation-delay: -8s;
+}
+
+.focus-stage-band-c {
+  top: 58%;
+  background: rgb(94 234 212 / 0.1);
+  animation-duration: 20s;
+  animation-delay: -4s;
+}
+
+.focus-stage-band-d {
+  top: 74%;
+  background: rgb(167 139 250 / 0.1);
+  animation-duration: 26s;
+  animation-delay: -12s;
+}
+
 .focus-stage-sea {
   background:
     radial-gradient(ellipse at 18% 18%, #123a62 0%, transparent 42%),
@@ -223,6 +265,16 @@
   }
 }
 
+@keyframes focus-stage-band {
+  0%,
+  100% {
+    transform: translate3d(-6%, 4%, 0);
+  }
+  50% {
+    transform: translate3d(8%, -6%, 0);
+  }
+}
+
 @keyframes focus-stage-drift {
   0% {
     transform: translate3d(0, 12px, 0);
@@ -241,6 +293,7 @@
 @media (prefers-reduced-motion: reduce) {
   .focus-stage-star,
   .focus-stage-shoot,
+  .focus-stage-band,
   .focus-stage-wave,
   .focus-stage-swell,
   .focus-stage-caustic,

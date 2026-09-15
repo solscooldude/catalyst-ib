@@ -17,7 +17,7 @@ const STARS = Array.from({ length: 42 }, (_, index) => {
   };
 });
 
-const SYMBOLS = ["x²", "Σ", "π", "√", "∫", "Δ", "θ", "∞", "f(x)", "n!"];
+const SYMBOLS = ["x²", "Σ", "π", "√", "∫", "Δ", "θ", "∞", "f(x)", "n!", "∑", "λ"];
 
 export function FocusStage({
   theme,
@@ -36,6 +36,7 @@ export function FocusStage({
       aria-hidden
     >
       {id === "nightsky" ? <NightSky /> : null}
+      {id === "waves" ? <GentleWaves /> : null}
       {id === "sea" ? <Sea /> : null}
       {id === "math" ? <MathDrift /> : null}
     </div>
@@ -59,6 +60,18 @@ function NightSky() {
         />
       ))}
       <span className="focus-stage-shoot" style={{ top: "22%", left: "10%" }} />
+      <span className="focus-stage-shoot" style={{ top: "58%", left: "42%", animationDelay: "5.5s" }} />
+    </>
+  );
+}
+
+function GentleWaves() {
+  return (
+    <>
+      <div className="focus-stage-band focus-stage-band-a" />
+      <div className="focus-stage-band focus-stage-band-b" />
+      <div className="focus-stage-band focus-stage-band-c" />
+      <div className="focus-stage-band focus-stage-band-d" />
     </>
   );
 }

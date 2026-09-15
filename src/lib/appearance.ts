@@ -258,6 +258,13 @@ export const FOCUS_THEMES = [
     blurb: "Free default. Soft indigo, twinkle, a rare shooting star.",
   },
   {
+    id: "waves",
+    name: "Gentle waves",
+    cost: 0,
+    collection: "focus" as const,
+    blurb: "Slow mint and lilac bands drifting behind the spark.",
+  },
+  {
     id: "sea",
     name: "Deep blue sea",
     cost: 18,
@@ -336,7 +343,7 @@ export const defaultAppearance: AppearanceState = {
   ownedSparkTints: ["mint"],
   ownedGear: ["none"],
   ownedTrails: ["none"],
-  ownedFocusThemes: ["none", "nightsky", "cat"],
+  ownedFocusThemes: ["none", "nightsky", "waves", "cat"],
   accent: "mint",
   background: "void",
   sparkTint: "mint",
@@ -360,7 +367,13 @@ export function normalizeAppearance(
   const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
   const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
   const ownedFocusThemes = unique(
-    [...(raw?.ownedFocusThemes ?? ["none", "nightsky", "cat"]), "nightsky", "cat"],
+    [
+      ...(raw?.ownedFocusThemes ?? ["none", "nightsky", "waves", "cat"]),
+      "none",
+      "nightsky",
+      "waves",
+      "cat",
+    ],
     "none",
   );
   return {
