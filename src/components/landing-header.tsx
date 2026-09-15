@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DemoBadge } from "@/components/demo-badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -14,6 +15,7 @@ export function LandingHeader() {
     <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6">
       <Wordmark />
       <div className="flex items-center gap-2 sm:gap-3">
+        <ThemeToggle />
         <DemoBadge className="hidden sm:inline-flex">Interactive demo</DemoBadge>
         {auth.user ? (
           <Button asChild className="h-9 rounded-full px-4">

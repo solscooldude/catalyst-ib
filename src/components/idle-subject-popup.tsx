@@ -69,7 +69,7 @@ export function IdleSubjectPopup() {
       role="status"
       aria-live="polite"
     >
-      <div className="idle-subject-pop flex items-center gap-3 rounded-2xl border border-white/10 bg-[#121218]/92 px-3 py-2.5 shadow-[0_18px_40px_-24px_rgb(0_0_0_/_0.9)] backdrop-blur-md">
+      <div className="idle-subject-pop flex items-center gap-3 rounded-2xl border border-border bg-card/92 px-3 py-2.5 shadow-[0_18px_40px_-24px_rgb(0_0_0_/_0.28)] backdrop-blur-md">
         <Spark
           mood="idle"
           flavor={moment.flavor}
@@ -82,7 +82,7 @@ export function IdleSubjectPopup() {
           <p className="text-[10px] tracking-[0.16em] text-primary uppercase">
             Still on your diploma
           </p>
-          <p className="mt-0.5 text-sm text-zinc-100">{moment.label}</p>
+          <p className="mt-0.5 text-sm text-foreground">{moment.label}</p>
         </div>
       </div>
     </div>

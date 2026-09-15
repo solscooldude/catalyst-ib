@@ -1,0 +1,143 @@
+/* Soft Flux chrome + ring particles. Spark body styles stay in globals.css. */
+
+:root,
+.light {
+  --background: #f4f1ea;
+  --foreground: #1c1917;
+  --card: #fffcf7;
+  --card-foreground: #1c1917;
+  --popover: #fffcf7;
+  --popover-foreground: #1c1917;
+  --primary: #5eead4;
+  --primary-foreground: #0b0b0f;
+  --secondary: #ede8df;
+  --secondary-foreground: #1c1917;
+  --muted: #ede8df;
+  --muted-foreground: #78716c;
+  --accent: #e8e4db;
+  --accent-foreground: #1c1917;
+  --destructive: #e11d48;
+  --border: rgb(28 25 23 / 8%);
+  --input: rgb(28 25 23 / 12%);
+  --ring: #5eead4;
+  --chart-1: #5eead4;
+  --chart-2: #a8a29e;
+  --chart-3: #78716c;
+  --chart-4: #d6d3d1;
+  --chart-5: #e7e5e4;
+  --sidebar: #fffcf7;
+  --sidebar-foreground: #1c1917;
+  --sidebar-primary: #5eead4;
+  --sidebar-primary-foreground: #0b0b0f;
+  --sidebar-accent: #ede8df;
+  --sidebar-accent-foreground: #1c1917;
+  --sidebar-border: rgb(28 25 23 / 8%);
+  --sidebar-ring: #5eead4;
+  --spark-hi: #b8fff3;
+  --spark-mid: #7af0dc;
+  --spark-lo: #5eead4;
+}
+
+.dark {
+  --background: #0b0b0f;
+  --foreground: #f4f4f5;
+  --card: #121218;
+  --card-foreground: #f4f4f5;
+  --popover: #121218;
+  --popover-foreground: #f4f4f5;
+  --primary: #5eead4;
+  --primary-foreground: #0b0b0f;
+  --secondary: #1a1a22;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1a1a22;
+  --muted-foreground: #a1a1aa;
+  --accent: #1a1a22;
+  --accent-foreground: #f4f4f5;
+  --destructive: #fb7185;
+  --border: rgb(244 244 245 / 8%);
+  --input: rgb(244 244 245 / 10%);
+  --ring: #5eead4;
+  --chart-1: #5eead4;
+  --chart-2: #a1a1aa;
+  --chart-3: #71717a;
+  --chart-4: #3f3f46;
+  --chart-5: #27272a;
+  --sidebar: #121218;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #5eead4;
+  --sidebar-primary-foreground: #0b0b0f;
+  --sidebar-accent: #1a1a22;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: rgb(244 244 245 / 8%);
+  --sidebar-ring: #5eead4;
+  --spark-hi: #b8fff3;
+  --spark-mid: #7af0dc;
+  --spark-lo: #5eead4;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--primary) 16%, transparent), transparent);
+}
+
+html.dark body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--primary) 10%, transparent), transparent);
+}
+
+@keyframes spark-orbit-dot {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translate(0, 0) scale(0.86);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(var(--odx, 0px), var(--ody, -4px)) scale(1.08);
+  }
+}
+
+.spark-orbit-dot {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-orbit-dot 2.8s ease-in-out infinite;
+}
+
+.spark-orbit-n0 { --odx: 3px; --ody: -5px; }
+.spark-orbit-n1 { --odx: 5px; --ody: 2px; animation-delay: 0.16s; }
+.spark-orbit-n2 { --odx: 2px; --ody: 5px; animation-delay: 0.32s; }
+.spark-orbit-n3 { --odx: -4px; --ody: 3px; animation-delay: 0.48s; }
+.spark-orbit-n4 { --odx: -5px; --ody: -2px; animation-delay: 0.64s; }
+.spark-orbit-n5 { --odx: -2px; --ody: -5px; animation-delay: 0.8s; }
+.spark-orbit-n6 { --odx: 4px; --ody: -3px; animation-delay: 0.96s; }
+.spark-orbit-n7 { --odx: 1px; --ody: 4px; animation-delay: 1.12s; }
+
+.spark-idle-pop .spark-orbit-dot {
+  animation-delay: -10.9s;
+}
+
+.soft-panel {
+  border-radius: 2rem;
+  background: var(--card);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 28px 50px -32px rgb(28 25 23 / 0.22);
+}
+
+.dark .soft-panel {
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-orbit-dot {
+    animation: none;
+  }
+}
