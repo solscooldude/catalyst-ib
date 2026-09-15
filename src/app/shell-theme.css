@@ -96,29 +96,26 @@ html.dark body {
 @keyframes spark-orbit-dot {
   0%,
   100% {
-    opacity: 0.28;
-    transform: translate(0, 0) scale(0.86);
+    opacity: 0.32;
   }
   50% {
-    opacity: 0.95;
-    transform: translate(var(--odx, 0px), var(--ody, -4px)) scale(1.08);
+    opacity: 1;
   }
 }
 
 .spark-orbit-dot {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
   animation: spark-orbit-dot 2.8s ease-in-out infinite;
 }
 
-.spark-orbit-n0 { --odx: 3px; --ody: -5px; }
-.spark-orbit-n1 { --odx: 5px; --ody: 2px; animation-delay: 0.16s; }
-.spark-orbit-n2 { --odx: 2px; --ody: 5px; animation-delay: 0.32s; }
-.spark-orbit-n3 { --odx: -4px; --ody: 3px; animation-delay: 0.48s; }
-.spark-orbit-n4 { --odx: -5px; --ody: -2px; animation-delay: 0.64s; }
-.spark-orbit-n5 { --odx: -2px; --ody: -5px; animation-delay: 0.8s; }
-.spark-orbit-n6 { --odx: 4px; --ody: -3px; animation-delay: 0.96s; }
-.spark-orbit-n7 { --odx: 1px; --ody: 4px; animation-delay: 1.12s; }
+.spark-orbit-n1 { animation-delay: 0.18s; }
+.spark-orbit-n2 { animation-delay: 0.36s; }
+.spark-orbit-n3 { animation-delay: 0.54s; }
+.spark-orbit-n4 { animation-delay: 0.72s; }
+.spark-orbit-n5 { animation-delay: 0.9s; }
+.spark-orbit-n6 { animation-delay: 1.08s; }
+.spark-orbit-n7 { animation-delay: 1.26s; }
+.spark-orbit-n8 { animation-delay: 1.44s; }
+.spark-orbit-n9 { animation-delay: 1.62s; }
 
 .spark-idle-pop .spark-orbit-dot {
   animation-delay: -10.9s;
