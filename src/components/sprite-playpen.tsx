@@ -17,6 +17,7 @@ import {
   type SparkAct,
 } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
+import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { cn } from "@/lib/utils";
 
 const TAP_SLOP = 9;
@@ -31,6 +32,7 @@ type SpritePlaypenProps = {
   petPulse: number;
   canFeed: boolean;
   celebrate?: boolean;
+  asleep?: boolean;
   onPet: () => void;
   onFeed: () => boolean;
   onSleep?: () => void;
@@ -48,6 +50,7 @@ export function SpritePlaypen({
   petPulse,
   canFeed,
   celebrate = false,
+  asleep = false,
   onPet,
   onFeed,
   onSleep,
@@ -80,13 +83,21 @@ export function SpritePlaypen({
     | null
   >(null);
   const holdTimer = useRef(0);
+  const scrunch = useRef(createSparkScrunch());
   const [held, setHeld] = useState<"spark" | "snack" | "hand" | null>(null);
   const [eaten, setEaten] = useState(false);
   const eatenRef = useRef(false);
   const snackScale = useRef(1);
   const [snackId, setSnackId] = useState<SnackId>("cookie");
-  const [act, setAct] = useState<SparkAct>(null);
+  const [act, setAct] = useState<SparkAct>(asleep ? "sleep" : null);
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
+  const asleepRef = useRef(asleep);
+  asleepRef.current = asleep;
+
+  useEffect(() => {
+    const controller = scrunch.current;
+    return () => controller.dispose();
+  }, []);
 
   useEffect(() => {
     let frame = 0;
@@ -119,6 +130,13 @@ export function SpritePlaypen({
   useEffect(() => {
     if (celebrate) setAct("celebrate");
   }, [celebrate]);
+
+  useEffect(() => {
+    setAct((current) => {
+      if (asleep) return "sleep";
+      return current === "sleep" ? null : current;
+    });
+  }, [asleep]);
 
   useEffect(() => {
     const first = window.setTimeout(spawnStar, 7000);
@@ -154,8 +172,10 @@ export function SpritePlaypen({
     if (kind === "snack" && (!canFeed || eaten || mood === "eating")) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     const zone = kind === "spark" ? zoneFromEvent(event) : "body";
-    if (kind === "spark" && zone === "peak") {
-      sparkRef.current?.classList.add("is-scrunching");
+    scrunch.current.attach(sparkRef.current);
+    if (kind === "spark" && zone === "peak" && !asleepRef.current && mood !== "sleepy") {
+      const box = sparkRef.current?.getBoundingClientRect();
+      scrunch.current.press(event.clientY, box?.height ?? 200);
     }
     hold.current = {
       kind,
@@ -177,8 +197,7 @@ export function SpritePlaypen({
     if (kind === "spark" && mood !== "eating") {
       holdTimer.current = window.setTimeout(() => {
         if (!hold.current || hold.current.dragged) return;
-        if (act === "sleep" || mood === "sleepy") {
-          setAct(null);
+        if (asleepRef.current || mood === "sleepy") {
           onWake?.();
           return;
         }
@@ -197,8 +216,12 @@ export function SpritePlaypen({
       active.dragged = true;
       window.clearTimeout(holdTimer.current);
       if (active.kind === "spark" && active.zone === "peak") {
-        sparkRef.current?.classList.add("is-scrunching");
+        scrunch.current.move(event.clientY);
       }
+    }
+    if (active.kind === "spark" && active.zone === "peak") {
+      scrunch.current.move(event.clientY);
+      return;
     }
     if (!active.dragged) return;
     const now = performance.now();
@@ -230,14 +253,17 @@ export function SpritePlaypen({
       /* already released */
     }
     if (!active.dragged) {
-      sparkRef.current?.classList.remove("is-scrunching");
+      if (active.kind === "spark" && active.zone === "peak") {
+        scrunch.current.release();
+      }
       if (active.kind === "hand") {
+        if (asleepRef.current || mood === "sleepy") return;
         play("highfive", 800);
         onHighFive?.();
         return;
       }
       if (active.kind === "spark") {
-        if (act === "sleep" || mood === "sleepy") {
+        if (asleepRef.current || mood === "sleepy") {
           return;
         }
         if (celebrate) {
@@ -250,12 +276,7 @@ export function SpritePlaypen({
       return;
     }
     if (active.kind === "spark" && active.zone === "peak") {
-      sparkRef.current?.classList.remove("is-scrunching");
-      sparkRef.current?.classList.add("spark-scrunch-release");
-      window.setTimeout(
-        () => sparkRef.current?.classList.remove("spark-scrunch-release"),
-        480,
-      );
+      scrunch.current.release();
     }
     if (active.kind === "snack") {
       if (over(sparkRef, snackRef) && canFeed && onFeed()) {
@@ -276,7 +297,7 @@ export function SpritePlaypen({
         return;
       }
     }
-    if (active.kind === "hand" && over(sparkRef, handRef)) {
+    if (active.kind === "hand" && !asleepRef.current && mood !== "sleepy" && over(sparkRef, handRef)) {
       play("highfive", 800);
       onHighFive?.();
     }
@@ -321,9 +342,8 @@ export function SpritePlaypen({
       <div
         ref={sparkRef}
         className={cn(
-          "sprite-spark-stage",
+          "sprite-spark-stage spark-scrunch-host",
           held === "spark" && "is-held",
-          act === null && "spark-scrunch-host",
         )}
         onPointerDown={(event) => begin("spark", event)}
         onPointerMove={move}
@@ -389,7 +409,7 @@ export function SpritePlaypen({
           <button
             ref={snackRef}
             type="button"
-            aria-label={`Drag ${snackId} onto the spark`}
+            aria-label={snackId}
             disabled={eaten || mood === "eating"}
             className={cn(
               "sprite-snack border-0 bg-transparent p-0",
@@ -445,6 +465,7 @@ function apply(
 ) {
   if (!node) return;
   const scrunching = node.classList.contains("is-scrunching");
+  if (scrunching) return;
   const speed = Math.hypot(body.vx, body.vy);
   const stretch = 1 + Math.min(speed * 0.03, 0.18);
   const squash = 1 - Math.min(speed * 0.018, 0.12);
