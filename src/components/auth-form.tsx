@@ -48,12 +48,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       <h1 className="mt-8 text-4xl text-foreground">
         {isSignup ? "Create a demo account" : "Log in"}
       </h1>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        {isSignup
-          ? "After signup you set class year and DP subjects, then the dashboard."
-          : "Welcome back. This opens your saved tokens, stats, and unlocks."}
-      </p>
-      <DemoBadge className="mt-4">Demo accounts · this browser only</DemoBadge>
+      <DemoBadge className="mt-4">This browser only</DemoBadge>
 
       <form className="mt-8 space-y-4" onSubmit={onSubmit}>
         <div className="space-y-2">
