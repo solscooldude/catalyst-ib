@@ -13,6 +13,7 @@ import {
   writeCloset,
 } from "@/lib/closet";
 import { writeDeviceFocusStage } from "@/lib/focus-stage-persist";
+import { setUiTheme } from "@/lib/ui-theme";
 import {
   pickPersistedSpriteName,
   readDeviceSpriteName,
@@ -477,6 +478,7 @@ export function resetDemo() {
     clearCloset(userId);
   }
   state = { ...createDefaultState(), hydrated: true };
+  setUiTheme("dark");
   emit();
 }
 
@@ -514,4 +516,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-

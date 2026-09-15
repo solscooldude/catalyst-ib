@@ -157,8 +157,6 @@ export default function SpritePage() {
         {notice ? <p className="mt-3 text-sm text-primary">{notice}</p> : null}
       </section>
 
-      <TokenCatch onNotice={setNotice} />
-
       <section className="grid gap-3 sm:grid-cols-3">
         <StatusCard
           label="Care stage"
@@ -174,6 +172,8 @@ export default function SpritePage() {
           value={`${state.streakDays}`}
         />
       </section>
+
+      <TokenCatch onNotice={setNotice} />
 
       <EquipRow
         title="Sprite colour"

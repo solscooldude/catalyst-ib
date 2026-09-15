@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { ACCOUNTS_KEY, AUTH_SESSION_KEY } from "@/lib/constants";
 import { claimDailyLogin, hydrateStore } from "@/lib/store";
+import { setUiTheme } from "@/lib/ui-theme";
 
 export type AuthUser = {
   id: string;
@@ -127,6 +128,7 @@ export async function signUp(email: string, password: string) {
   };
   hydrateStore(account.id);
   claimDailyLogin();
+  setUiTheme("dark");
   emit();
   return { ok: true as const };
 }
