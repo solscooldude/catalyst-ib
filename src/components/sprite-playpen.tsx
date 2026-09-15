@@ -11,10 +11,19 @@ import type {
   SparkTrailId,
 } from "@/lib/appearance";
 import {
+  DOUBLE_TAP_MS,
   SNACKS,
+  SPARK_GIFT_MIME,
+  WAVE_FLIP_MS,
+  WAVE_NEAR,
+  decodeSparkGift,
+  encodeSparkGift,
   hitZone,
+  isTickleSwipe,
   type SnackId,
   type SparkAct,
+  type SparkGiftKind,
+  type SparkZone,
 } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
 import { createSparkScrunch } from "@/lib/spark-scrunch";
@@ -26,6 +35,16 @@ const STIFFNESS = 0.16;
 const DAMPING = 0.84;
 const SNAP = 0.14;
 const HOLD_SLEEP_MS = 620;
+
+export type SparkGiftChip = {
+  kind: SparkGiftKind;
+  id: string;
+  name: string;
+  tint?: SparkTintId;
+  gear?: SparkGearId;
+  aura?: SparkAuraId;
+  trail?: SparkTrailId;
+};
 
 type SpritePlaypenProps = {
   mood: SparkMood;
@@ -39,6 +58,8 @@ type SpritePlaypenProps = {
   onWake?: () => void;
   onCelebrate?: () => void;
   onCatch?: (ok: boolean, reason?: string) => void;
+  onGift?: (kind: SparkGiftKind, id: string) => void;
+  gifts?: SparkGiftChip[];
   tint?: SparkTintId;
   gear?: SparkGearId;
   aura?: SparkAuraId;
@@ -57,6 +78,8 @@ export function SpritePlaypen({
   onWake,
   onCelebrate,
   onCatch,
+  onGift,
+  gifts = [],
   tint,
   gear,
   aura,
@@ -76,11 +99,15 @@ export function SpritePlaypen({
         lastY: number;
         lastT: number;
         dragged: boolean;
-        zone: "peak" | "face" | "body";
+        zone: SparkZone;
+        tickle: boolean;
       }
     | null
   >(null);
   const holdTimer = useRef(0);
+  const lastTap = useRef(0);
+  const wave = useRef<{ x: number; t: number }[]>([]);
+  const waveCool = useRef(0);
   const scrunch = useRef(createSparkScrunch());
   const [held, setHeld] = useState<"spark" | "snack" | null>(null);
   const [eaten, setEaten] = useState(false);
@@ -89,6 +116,7 @@ export function SpritePlaypen({
   const [snackId, setSnackId] = useState<SnackId>("cookie");
   const [act, setAct] = useState<SparkAct>(asleep ? "sleep" : null);
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
+  const [giftOver, setGiftOver] = useState(false);
   const asleepRef = useRef(asleep);
   asleepRef.current = asleep;
 
@@ -156,10 +184,45 @@ export function SpritePlaypen({
     }, ms);
   }
 
-  function zoneFromEvent(event: React.PointerEvent<HTMLElement>): "peak" | "face" | "body" {
+  function zoneFromEvent(event: React.PointerEvent<HTMLElement>): SparkZone {
     const box = sparkRef.current?.getBoundingClientRect();
     if (!box) return "body";
     return hitZone(event.clientX - box.left, event.clientY - box.top, box.width, box.height);
+  }
+
+  function maybeWave(clientX: number, clientY: number) {
+    if (hold.current || asleepRef.current || mood === "sleepy" || mood === "eating") {
+      return;
+    }
+    const box = sparkRef.current?.getBoundingClientRect();
+    if (!box) return;
+    const near =
+      clientX > box.left - WAVE_NEAR &&
+      clientX < box.right + WAVE_NEAR &&
+      clientY > box.top - WAVE_NEAR &&
+      clientY < box.bottom + WAVE_NEAR;
+    if (!near) {
+      wave.current = [];
+      return;
+    }
+    const now = performance.now();
+    if (now - waveCool.current < 2200) return;
+    wave.current.push({ x: clientX, t: now });
+    wave.current = wave.current.filter((point) => now - point.t < WAVE_FLIP_MS);
+    let flips = 0;
+    let prev = 0;
+    for (let index = 1; index < wave.current.length; index += 1) {
+      const delta = wave.current[index].x - wave.current[index - 1].x;
+      if (Math.abs(delta) < 10) continue;
+      const sign = Math.sign(delta);
+      if (prev && sign !== prev) flips += 1;
+      prev = sign;
+    }
+    if (flips >= 2) {
+      waveCool.current = now;
+      wave.current = [];
+      play("wave", 720);
+    }
   }
 
   function begin(
@@ -184,6 +247,7 @@ export function SpritePlaypen({
       lastT: performance.now(),
       dragged: false,
       zone,
+      tickle: false,
     };
     const body = kind === "spark" ? spark.current : snack.current;
     body.tx = body.x;
@@ -204,6 +268,7 @@ export function SpritePlaypen({
   }
 
   function move(event: React.PointerEvent<HTMLElement>) {
+    if (!hold.current) maybeWave(event.clientX, event.clientY);
     const active = hold.current;
     if (!active || active.pointerId !== event.pointerId) return;
     const dx = event.clientX - active.originX;
@@ -217,6 +282,14 @@ export function SpritePlaypen({
     }
     if (active.kind === "spark" && active.zone === "peak") {
       scrunch.current.move(event.clientY);
+      return;
+    }
+    if (
+      active.kind === "spark" &&
+      active.zone === "belly" &&
+      isTickleSwipe(dx, dy)
+    ) {
+      active.tickle = true;
       return;
     }
     if (!active.dragged) return;
@@ -243,6 +316,13 @@ export function SpritePlaypen({
     } catch {
       /* already released */
     }
+    if (active.kind === "spark" && active.tickle && !asleepRef.current && mood !== "sleepy") {
+      play("tickle", 720);
+      onPet();
+      spark.current.tx = 0;
+      spark.current.ty = 0;
+      return;
+    }
     if (!active.dragged) {
       if (active.kind === "spark" && active.zone === "peak") {
         scrunch.current.release();
@@ -251,12 +331,20 @@ export function SpritePlaypen({
         if (asleepRef.current || mood === "sleepy") {
           return;
         }
+        const now = performance.now();
+        if (now - lastTap.current < DOUBLE_TAP_MS) {
+          lastTap.current = 0;
+          play("spin", 820);
+          onPet();
+          return;
+        }
+        lastTap.current = now;
         if (celebrate) {
           play("celebrate", 900);
           onCelebrate?.();
         }
         if (active.zone === "face") play("boop", 700);
-        else if (active.zone === "body") play("poke", 720);
+        else if (active.zone === "body" || active.zone === "belly") play("poke", 720);
         onPet();
       }
       return;
@@ -314,18 +402,70 @@ export function SpritePlaypen({
     onCatch?.(result.ok, result.ok ? undefined : result.reason);
   }
 
+  function takeGift(event: React.DragEvent<HTMLElement>) {
+    event.preventDefault();
+    setGiftOver(false);
+    const raw =
+      event.dataTransfer.getData(SPARK_GIFT_MIME) ||
+      event.dataTransfer.getData("text/plain");
+    const gift = decodeSparkGift(raw);
+    if (gift) onGift?.(gift.kind, gift.id);
+  }
+
   return (
-    <div className="sprite-playpen">
+    <div
+      className="sprite-playpen"
+      onPointerMove={(event) => {
+        if (!hold.current) maybeWave(event.clientX, event.clientY);
+      }}
+    >
+      {gifts.length > 0 ? (
+        <div className="sprite-gift-tray" aria-label="Gift tray">
+          {gifts.map((item) => (
+            <button
+              key={`${item.kind}-${item.id}`}
+              type="button"
+              draggable
+              aria-label={`Gift ${item.name}`}
+              title={item.name}
+              className="sprite-gift-chip"
+              onDragStart={(event) => {
+                const payload = encodeSparkGift(item.kind, item.id);
+                event.dataTransfer.setData(SPARK_GIFT_MIME, payload);
+                event.dataTransfer.setData("text/plain", payload);
+                event.dataTransfer.effectAllowed = "copy";
+              }}
+            >
+              <Spark
+                mood="idle"
+                size={40}
+                evolve={false}
+                tint={item.tint ?? tint}
+                gear={item.gear ?? "none"}
+                aura={item.aura ?? "none"}
+                trail={item.trail ?? "none"}
+              />
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div
         ref={sparkRef}
         className={cn(
           "sprite-spark-stage spark-scrunch-host",
           held === "spark" && "is-held",
+          giftOver && "is-gift-over",
         )}
         onPointerDown={(event) => begin("spark", event)}
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={end}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setGiftOver(true);
+        }}
+        onDragLeave={() => setGiftOver(false)}
+        onDrop={takeGift}
       >
         <Spark
           mood={act === "sleep" ? "sleepy" : mood}
