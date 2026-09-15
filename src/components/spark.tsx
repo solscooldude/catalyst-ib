@@ -9,6 +9,7 @@ import {
   type SparkTrailId,
 } from "@/lib/appearance";
 import { SparkParticleRing, SubjectFlourish } from "@/components/spark-flourishes";
+import { SPARK_BODY_PATH } from "@/lib/spark-silhouette";
 import {
   SPARK_FLAVOR_INK,
   sparkFlavorFromContext,
@@ -355,10 +356,7 @@ export function Spark({
         <ellipse cx="50" cy="72" rx="28" ry="24" fill={`url(#${glowId})`} />
 
         <g className="spark-body">
-          <path
-            d="M50 10C50 10 22 46 22 70c0 16.6 12.1 26 28 26s28-9.4 28-26C78 46 50 10 50 10Z"
-            fill={`url(#${bodyId})`}
-          />
+          <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
           <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
           <Gear id={gearId} />
           <g className={canGlance ? "spark-glance" : undefined}>
