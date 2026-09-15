@@ -12,6 +12,7 @@ import {
   sessionAccountId,
   writeCloset,
 } from "@/lib/closet";
+import { writeDeviceFocusStage } from "@/lib/focus-stage-persist";
 import {
   MOCK_TASKS,
   NEMESIS_APPS,
@@ -55,6 +56,8 @@ export type Session = {
   lockedAt: number;
   focusStartedAt: number | null;
   completedAt: number | null;
+  pausedAt: number | null;
+  pauseAccumMs: number;
   taskMarkedDone: boolean;
   tokensEarned: number;
   timeTokens: number;
@@ -171,6 +174,7 @@ function persist(next: CatalystState) {
   void hydrated;
   window.localStorage.setItem(accountStorageKey(userId), JSON.stringify(rest));
   writeCloset(userId, next.appearance);
+  writeDeviceFocusStage(next.appearance.focusTheme);
 }
 
 export function setState(updater: (current: CatalystState) => CatalystState) {
@@ -214,7 +218,13 @@ function normalizeNemeses(
 
 function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) {
   if (!raw) return null;
-  if (raw.kind && raw.subjectId && raw.title) return raw;
+  if (raw.kind && raw.subjectId && raw.title) {
+    return {
+      ...raw,
+      pausedAt: raw.pausedAt ?? null,
+      pauseAccumMs: raw.pauseAccumMs ?? 0,
+    };
+  }
   const legacy = raw as Session & { taskId?: TaskId };
   const taskId = legacy.taskId;
   if (!taskId) return null;
@@ -226,6 +236,8 @@ function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) 
     subjectId: TASK_SUBJECT[taskId],
     title: task?.title ?? "Focus session",
     plannedMinutes: legacy.plannedMinutes ?? null,
+    pausedAt: legacy.pausedAt ?? null,
+    pauseAccumMs: legacy.pauseAccumMs ?? 0,
   };
 }
 
