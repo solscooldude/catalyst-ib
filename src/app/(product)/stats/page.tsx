@@ -201,7 +201,7 @@ function RoundupStat({ label, value }: { label: string; value: ReactNode }) {
       <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {label}
       </p>
-      <div className="mt-1 truncate text-sm text-foreground">{value}</div>
+      <div className="font-heading mt-1 truncate text-xl text-foreground">{value}</div>
     </div>
   );
 }

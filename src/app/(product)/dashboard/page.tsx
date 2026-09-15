@@ -98,7 +98,7 @@ export default function DashboardPage() {
             <Flame className="size-3.5 text-primary" />
             Focus streak
           </p>
-          <p className="mt-3 text-4xl font-semibold tracking-tight text-foreground">
+          <p className="font-heading mt-3 text-4xl tracking-tight text-foreground">
             {state.streakDays} day{state.streakDays === 1 ? "" : "s"}
           </p>
           <div className="mt-4 flex items-center justify-between gap-3">
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             <Clock3 className="size-3.5 text-primary" />
             Today’s study time
           </p>
-          <p className="mt-3 text-4xl font-semibold tracking-tight text-foreground">
+          <p className="font-heading mt-3 text-4xl tracking-tight text-foreground">
             {formatClock(todayMs)}
           </p>
           <div className="mt-4 flex items-center justify-between gap-4">
