@@ -88,12 +88,14 @@ function NightSky() {
 function Sea() {
   return (
     <>
+      <div className="focus-stage-horizon" />
       <div className="focus-stage-swell" />
       <div className="focus-stage-caustic" />
       <div className="focus-stage-wave" style={{ bottom: "18%" }} />
       <div className="focus-stage-wave focus-stage-wave-b" style={{ bottom: "4%" }} />
       <div className="focus-stage-wave focus-stage-wave-c" style={{ bottom: "-10%" }} />
       <div className="focus-stage-wave focus-stage-wave-d" style={{ bottom: "28%" }} />
+      <div className="focus-stage-wave focus-stage-wave-e" style={{ bottom: "36%" }} />
       <SeaWave className="focus-stage-wave-svg" bottom="12%" fill="rgb(12 74 128 / 0.55)" />
       <SeaWave
         className="focus-stage-wave-svg focus-stage-wave-svg-b"
@@ -105,7 +107,13 @@ function Sea() {
         bottom="22%"
         fill="rgb(186 230 253 / 0.28)"
       />
+      <SeaWave
+        className="focus-stage-wave-svg"
+        bottom="32%"
+        fill="rgb(125 211 252 / 0.16)"
+      />
       <div className="focus-stage-foam" style={{ bottom: "26%" }} />
+      <div className="focus-stage-foam" style={{ bottom: "14%", animationDelay: "-1.8s" }} />
     </>
   );
 }

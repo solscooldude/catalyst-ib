@@ -195,8 +195,8 @@ html[data-bg="aurora"] .scene-aurora-c {
   border-radius: 1.75rem;
   background: var(--card);
   box-shadow:
-    0 1px 2px rgb(24 24 27 / 0.04),
-    0 18px 40px -28px rgb(24 24 27 / 0.18);
+    0 1px 2px rgb(24 24 27 / 0.035),
+    0 22px 48px -30px rgb(24 24 27 / 0.16);
 }
 
 .dark .flux-card,
