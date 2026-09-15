@@ -4,6 +4,7 @@ import {
   ACCENTS,
   BACKGROUNDS,
   FOCUS_THEMES,
+  SPARK_AURAS,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
@@ -528,6 +529,7 @@ export type AppearanceKind =
   | "background"
   | "sparkTint"
   | "gear"
+  | "aura"
   | "trail"
   | "focusTheme";
 
@@ -536,6 +538,7 @@ function catalogFor(kind: AppearanceKind) {
   if (kind === "background") return BACKGROUNDS;
   if (kind === "sparkTint") return SPARK_TINTS;
   if (kind === "gear") return SPARK_GEAR;
+  if (kind === "aura") return SPARK_AURAS;
   if (kind === "trail") return SPARK_TRAILS;
   return FOCUS_THEMES;
 }
@@ -545,6 +548,7 @@ function ownedKey(kind: AppearanceKind): keyof AppearanceState {
   if (kind === "background") return "ownedBackgrounds";
   if (kind === "sparkTint") return "ownedSparkTints";
   if (kind === "gear") return "ownedGear";
+  if (kind === "aura") return "ownedAuras";
   if (kind === "trail") return "ownedTrails";
   return "ownedFocusThemes";
 }
@@ -554,6 +558,7 @@ function equippedKey(kind: AppearanceKind): keyof AppearanceState {
   if (kind === "background") return "background";
   if (kind === "sparkTint") return "sparkTint";
   if (kind === "gear") return "gear";
+  if (kind === "aura") return "aura";
   if (kind === "trail") return "trail";
   return "focusTheme";
 }
