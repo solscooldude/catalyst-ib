@@ -62,7 +62,7 @@ export const ACCENT_SHADE_OPTIONS: {
 
 function shade(pastel: string, normal: string, deep: string, ink: string, paper: string) {
   return {
-    pastel: { hex: pastel, fg: ink },
+    pastel: { hex: pastel, fg: paper },
     normal: { hex: normal, fg: ink },
     deep: { hex: deep, fg: paper },
   };
