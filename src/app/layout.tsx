@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description:
     "For IB DP students. Apps pull you off ManageBac. Catalyst locks them until a session finishes. Tokens come from that work, then you buy a short unlock.",
   icons: {
-    icon: [{ url: "/icon.svg", type: "application/svg+xml" }],
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-icon" }],
   },
 };
