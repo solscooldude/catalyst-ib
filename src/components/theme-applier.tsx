@@ -2,16 +2,15 @@
 
 import { useEffect } from "react";
 import { getSparkTint } from "@/lib/appearance";
-import { applyUiTheme, useUiTheme } from "@/lib/ui-theme";
+import { applyUiTheme, readStoredUiTheme } from "@/lib/ui-theme";
 import { useCatalyst } from "@/lib/store";
 
 export function ThemeApplier() {
   const { appearance, hydrated } = useCatalyst();
-  const uiTheme = useUiTheme();
 
   useEffect(() => {
-    applyUiTheme(uiTheme);
-  }, [uiTheme]);
+    applyUiTheme(readStoredUiTheme(), false);
+  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -26,7 +25,7 @@ export function ThemeApplier() {
     root.style.setProperty("--spark-hi", tint.hi);
     root.style.setProperty("--spark-mid", tint.mid);
     root.style.setProperty("--spark-lo", tint.lo);
-  }, [hydrated, appearance, uiTheme]);
+  }, [hydrated, appearance]);
 
   return null;
 }
