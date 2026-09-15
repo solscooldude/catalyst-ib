@@ -13,16 +13,12 @@ import type {
 import {
   DOUBLE_TAP_MS,
   SNACKS,
-  SPARK_GIFT_MIME,
   WAVE_FLIP_MS,
   WAVE_NEAR,
-  decodeSparkGift,
-  encodeSparkGift,
   hitZone,
   isTickleSwipe,
   type SnackId,
   type SparkAct,
-  type SparkGiftKind,
   type SparkZone,
 } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
@@ -36,16 +32,6 @@ const DAMPING = 0.84;
 const SNAP = 0.14;
 const HOLD_SLEEP_MS = 620;
 
-export type SparkGiftChip = {
-  kind: SparkGiftKind;
-  id: string;
-  name: string;
-  tint?: SparkTintId;
-  gear?: SparkGearId;
-  aura?: SparkAuraId;
-  trail?: SparkTrailId;
-};
-
 type SpritePlaypenProps = {
   mood: SparkMood;
   petPulse: number;
@@ -58,8 +44,6 @@ type SpritePlaypenProps = {
   onWake?: () => void;
   onCelebrate?: () => void;
   onCatch?: (ok: boolean, reason?: string) => void;
-  onGift?: (kind: SparkGiftKind, id: string) => void;
-  gifts?: SparkGiftChip[];
   tint?: SparkTintId;
   gear?: SparkGearId;
   aura?: SparkAuraId;
@@ -78,8 +62,6 @@ export function SpritePlaypen({
   onWake,
   onCelebrate,
   onCatch,
-  onGift,
-  gifts = [],
   tint,
   gear,
   aura,
@@ -116,7 +98,6 @@ export function SpritePlaypen({
   const [snackId, setSnackId] = useState<SnackId>("cookie");
   const [act, setAct] = useState<SparkAct>(asleep ? "sleep" : null);
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
-  const [giftOver, setGiftOver] = useState(false);
   const asleepRef = useRef(asleep);
   asleepRef.current = asleep;
 
@@ -402,16 +383,6 @@ export function SpritePlaypen({
     onCatch?.(result.ok, result.ok ? undefined : result.reason);
   }
 
-  function takeGift(event: React.DragEvent<HTMLElement>) {
-    event.preventDefault();
-    setGiftOver(false);
-    const raw =
-      event.dataTransfer.getData(SPARK_GIFT_MIME) ||
-      event.dataTransfer.getData("text/plain");
-    const gift = decodeSparkGift(raw);
-    if (gift) onGift?.(gift.kind, gift.id);
-  }
-
   return (
     <div
       className="sprite-playpen"
@@ -419,53 +390,16 @@ export function SpritePlaypen({
         if (!hold.current) maybeWave(event.clientX, event.clientY);
       }}
     >
-      {gifts.length > 0 ? (
-        <div className="sprite-gift-tray" aria-label="Gift tray">
-          {gifts.map((item) => (
-            <button
-              key={`${item.kind}-${item.id}`}
-              type="button"
-              draggable
-              aria-label={`Gift ${item.name}`}
-              title={item.name}
-              className="sprite-gift-chip"
-              onDragStart={(event) => {
-                const payload = encodeSparkGift(item.kind, item.id);
-                event.dataTransfer.setData(SPARK_GIFT_MIME, payload);
-                event.dataTransfer.setData("text/plain", payload);
-                event.dataTransfer.effectAllowed = "copy";
-              }}
-            >
-              <Spark
-                mood="idle"
-                size={40}
-                evolve={false}
-                tint={item.tint ?? tint}
-                gear={item.gear ?? "none"}
-                aura={item.aura ?? "none"}
-                trail={item.trail ?? "none"}
-              />
-            </button>
-          ))}
-        </div>
-      ) : null}
       <div
         ref={sparkRef}
         className={cn(
           "sprite-spark-stage spark-scrunch-host",
           held === "spark" && "is-held",
-          giftOver && "is-gift-over",
         )}
         onPointerDown={(event) => begin("spark", event)}
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={end}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setGiftOver(true);
-        }}
-        onDragLeave={() => setGiftOver(false)}
-        onDrop={takeGift}
       >
         <Spark
           mood={act === "sleep" ? "sleepy" : mood}
