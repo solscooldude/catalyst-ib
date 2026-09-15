@@ -5,7 +5,10 @@ import Link from "next/link";
 import { TokenAmount } from "@/components/mint-chip";
 import { ROUTES } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
-import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
+import {
+  unlocksByTier,
+  type UnlockCatalogId,
+} from "@/lib/constants";
 import { spendUnlock, useCatalyst } from "@/lib/store";
 import { formatUnlockLeft } from "@/lib/unlock-time";
 import { cn } from "@/lib/utils";
@@ -29,7 +32,6 @@ export function UnlockPanel({
     return () => window.clearInterval(id);
   }, []);
 
-  const nemesisLabel = formatNemesisList(state.nemeses);
   const active = useMemo(
     () =>
       state.unlocks
@@ -38,7 +40,7 @@ export function UnlockPanel({
     [state.unlocks, now],
   );
 
-  function buy(id: (typeof UNLOCK_CATALOG)[number]["id"]) {
+  function buy(id: UnlockCatalogId) {
     const result = spendUnlock(id);
     if (!result.ok) {
       setNotice(result.reason);
@@ -96,6 +98,11 @@ export function UnlockPanel({
               </div>
             </div>
           )}
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            School tools stay allowed during lock — Chrome, Drive,
+            Docs/Classroom, Gmail, ManageBac, Calculator, Phone/SOS/Clock,
+            Spotify, ChatGPT/Gemini, Maps. They are not in this shop.
+          </p>
         </div>
       ) : (
         <div>
@@ -104,6 +111,9 @@ export function UnlockPanel({
             Unlocks
           </p>
           )}
+          <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+            School / essentials stay allowed — not in this shop.
+          </p>
           {active.length > 0 ? (
             <p className="mt-1 font-mono text-xs text-primary">
               {active
@@ -119,43 +129,14 @@ export function UnlockPanel({
 
       {collapsible && !open ? null : (
         <>
-      <div className={cn("space-y-2", compact && "space-y-1.5")}>
-        {UNLOCK_CATALOG.map((item) => {
-          const label = item.id === "nemesis" ? nemesisLabel : item.name;
-          const affordable = state.tokens >= item.cost;
-          const current = active.find((unlock) => unlock.catalogId === item.id);
-          const left = current ? Math.max(0, current.expiresAt - now) : 0;
-          return (
-            <div
-              key={item.id}
-              className={cn(
-                "flex items-center justify-between gap-3 rounded-2xl bg-card ring-1",
-                left > 0 ? "ring-primary/50" : "ring-border",
-                compact ? "px-3 py-2" : "px-4 py-3",
-              )}
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm text-foreground">{label}</p>
-                {left > 0 ? (
-                  <p className="font-heading font-mono text-sm tabular-nums text-primary">
-                    {formatUnlockLeft(left)} left
-                  </p>
-                ) : null}
-              </div>
-              <Button
-                className={cn("rounded-full", compact ? "h-9 px-3" : "h-10")}
-                disabled={!affordable}
-                onClick={() => buy(item.id)}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  {left > 0 ? "Add time" : "Unlock"}
-                  <TokenAmount value={item.cost} mark="ink" />
-                </span>
-              </Button>
-            </div>
-          );
-        })}
-      </div>
+      <UnlockShopList
+        tokens={state.tokens}
+        nemeses={state.nemeses}
+        active={active}
+        now={now}
+        compact={compact}
+        onBuy={buy}
+      />
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
         <Link
           href={ROUTES.unlocks}
@@ -165,6 +146,88 @@ export function UnlockPanel({
         </Link>
         </>
       )}
+    </div>
+  );
+}
+
+export function UnlockShopList({
+  tokens,
+  nemeses,
+  active,
+  now,
+  compact = false,
+  detailed = false,
+  onBuy,
+}: {
+  tokens: number;
+  nemeses: readonly string[];
+  active: { id: string; catalogId: string; expiresAt: number }[];
+  now: number;
+  compact?: boolean;
+  detailed?: boolean;
+  onBuy: (id: UnlockCatalogId) => void;
+}) {
+  return (
+    <div className={cn("space-y-4", compact && "space-y-3")}>
+      {([2, 3] as const).map((tier) => {
+        const items = unlocksByTier(tier);
+        return (
+          <div key={tier}>
+            <p className="mb-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+              {tier === 2 ? "Tier 2 · medium" : "Tier 3 · nemesis set"}
+            </p>
+            <div className={cn("space-y-2", compact && "space-y-1.5")}>
+              {items.map((item) => {
+                const affordable = tokens >= item.cost;
+                const current = active.find((unlock) => unlock.catalogId === item.id);
+                const left = current ? Math.max(0, current.expiresAt - now) : 0;
+                const yours = nemeses.includes(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "flex items-center justify-between gap-3 rounded-2xl bg-card ring-1",
+                      left > 0 ? "ring-primary/50" : "ring-border",
+                      compact ? "px-3 py-2" : "px-4 py-3",
+                    )}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-foreground">
+                        {item.name}
+                        {yours ? (
+                          <span className="ml-2 text-[10px] tracking-wide text-primary uppercase">
+                            Yours
+                          </span>
+                        ) : null}
+                      </p>
+                      {detailed ? (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {item.blurb}
+                        </p>
+                      ) : null}
+                      {left > 0 ? (
+                        <p className="font-heading font-mono text-sm tabular-nums text-primary">
+                          {formatUnlockLeft(left)} left
+                        </p>
+                      ) : null}
+                    </div>
+                    <Button
+                      className={cn("rounded-full", compact ? "h-9 px-3" : "h-10")}
+                      disabled={!affordable}
+                      onClick={() => onBuy(item.id)}
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        {left > 0 ? "Add time" : "Unlock"}
+                        <TokenAmount value={item.cost} mark="ink" />
+                      </span>
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

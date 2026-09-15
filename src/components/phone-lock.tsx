@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Clock3,
-  MessageCircle,
-  Phone,
-  ShieldAlert,
-  StickyNote,
-} from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import { DemoBadge } from "@/components/demo-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatNemesisList, type NemesisId } from "@/lib/constants";
+import {
+  ESSENTIAL_APPS,
+  NEMESIS_APPS,
+  TIER2_APPS,
+  TIER2_COST,
+  formatNemesisList,
+  type NemesisId,
+} from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { isUnlockActive, type Unlock } from "@/lib/store";
+import { isAppUnlocked, type Unlock } from "@/lib/store";
 
 type PhoneLockProps = {
   nemeses?: NemesisId[];
@@ -29,13 +30,6 @@ type PhoneLockProps = {
   onBeginFocus?: () => void;
 };
 
-const ESSENTIALS = [
-  { id: "phone", name: "Phone", icon: Phone },
-  { id: "messages", name: "Messages", icon: MessageCircle },
-  { id: "notes", name: "Notes", icon: StickyNote },
-  { id: "clock", name: "Clock", icon: Clock3 },
-];
-
 function SocialGlyph({ label }: { label: string }) {
   return (
     <span className="font-mono text-[10px] font-semibold tracking-wide">
@@ -43,15 +37,6 @@ function SocialGlyph({ label }: { label: string }) {
     </span>
   );
 }
-
-const SOCIALS = [
-  { id: "instagram", name: "Instagram", glyph: "IG" },
-  { id: "tiktok", name: "TikTok", glyph: "TT" },
-  { id: "snapchat", name: "Snapchat", glyph: "SC" },
-  { id: "youtube", name: "YouTube", glyph: "YT" },
-  { id: "x", name: "X", glyph: "X" },
-  { id: "reddit", name: "Reddit", glyph: "RD" },
-] as const;
 
 export function PhoneLock({
   nemeses = ["tiktok"],
@@ -80,20 +65,17 @@ export function PhoneLock({
   });
 
   const named = formatNemesisList(nemeses);
-  const notesOpen = isUnlockActive(unlocks, "notes");
-  const youtubeOpen = isUnlockActive(unlocks, "youtube");
-  const nemesisOpen = isUnlockActive(unlocks, "nemesis");
-
-  const socials = SOCIALS.map((app) => {
-    const isNemesis = nemeses.includes(app.id as NemesisId);
-    const unlocked =
-      app.id === "youtube"
-        ? youtubeOpen
-        : isNemesis && nemesisOpen;
+  const tier2 = TIER2_APPS.map((app) => ({
+    ...app,
+    isNemesis: false,
+    open: !locked || isAppUnlocked(unlocks, app.id),
+  }));
+  const tier3 = NEMESIS_APPS.map((app) => {
+    const isNemesis = nemeses.includes(app.id);
     return {
       ...app,
-      locked: locked && !unlocked,
       isNemesis,
+      open: !locked || isAppUnlocked(unlocks, app.id),
     };
   });
 
@@ -115,7 +97,7 @@ export function PhoneLock({
             <span>Catalyst</span>
             <span>LTE</span>
           </div>
-          <div className={cn("px-6", compact ? "pt-6 pb-4" : "pt-8 pb-6")}>
+          <div className={cn("px-6", compact ? "pt-6 pb-3" : "pt-8 pb-5")}>
             <p className="text-center text-[11px] text-zinc-500">{date}</p>
             <p
               className={cn(
@@ -133,82 +115,73 @@ export function PhoneLock({
             </div>
           </div>
 
-          <div className="px-5">
-            <div className="grid grid-cols-4 gap-3">
-              {ESSENTIALS.map((app) => {
-                const Icon = app.icon;
-                const notesLocked = app.id === "notes" && locked && !notesOpen;
-                return (
-                  <button
-                    key={app.id}
-                    type="button"
-                    onClick={() => {
-                      if (notesLocked) tapLocked("Notes");
-                    }}
-                    className="flex flex-col items-center gap-1.5"
-                  >
-                    <span
-                      className={cn(
-                        "flex size-11 items-center justify-center rounded-2xl",
-                        notesLocked
-                          ? "bg-zinc-800/80 text-zinc-600"
-                          : "bg-zinc-800 text-zinc-200",
-                      )}
-                    >
-                      <Icon className="size-4" />
-                    </span>
-                    <span className="text-[9px] text-zinc-500">{app.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <p className="mt-5 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
-              Greyed until you earn it
+          <div className={cn("px-4", compact ? "px-3.5" : "px-5")}>
+            <p className="mb-2 text-[10px] tracking-[0.16em] text-emerald-500/80 uppercase">
+              School / essentials — allowed
             </p>
-            <div className="grid grid-cols-3 gap-3">
-              {socials.map((app) => (
+            <div className="flex flex-wrap gap-1.5">
+              {ESSENTIAL_APPS.map((app) => (
                 <button
                   key={app.id}
                   type="button"
+                  onClick={() =>
+                    setNotice(`${app.name} stays allowed during lock.`)
+                  }
+                  className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] text-emerald-300 ring-1 ring-emerald-500/25"
+                >
+                  {app.name}
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-4 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
+              Tier 2 — {TIER2_COST} tokens / 10 min
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {tier2.map((app) => (
+                <LockTile
+                  key={app.id}
+                  name={app.name}
+                  glyph={app.glyph}
+                  locked={!app.open}
+                  highlight={false}
                   onClick={() => {
-                    if (app.locked) tapLocked(app.name);
+                    if (!app.open) tapLocked(app.name);
                     else setNotice(`${app.name} is unlocked for this window.`);
                   }}
-                  className="flex flex-col items-center gap-1.5"
-                >
-                  <span
-                    className={cn(
-                      "flex size-11 items-center justify-center rounded-2xl",
-                      app.locked
-                        ? "bg-zinc-900 text-zinc-600 ring-1 ring-white/4"
-                        : "bg-primary/15 text-primary ring-1 ring-primary/30",
-                    )}
-                  >
-                    <SocialGlyph label={app.glyph} />
-                  </span>
-                  <span
-                    className={cn(
-                      "text-[9px]",
-                      app.isNemesis ? "text-primary/70" : "text-zinc-600",
-                    )}
-                  >
-                    {app.name}
-                  </span>
-                </button>
+                />
+              ))}
+            </div>
+
+            <p className="mt-4 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
+              Tier 3 — nemesis set
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {tier3.map((app) => (
+                <LockTile
+                  key={app.id}
+                  name={app.name}
+                  glyph={app.glyph}
+                  locked={!app.open}
+                  highlight={app.isNemesis}
+                  onClick={() => {
+                    if (!app.open) tapLocked(app.name);
+                    else setNotice(`${app.name} is unlocked for this window.`);
+                  }}
+                />
               ))}
             </div>
           </div>
 
-          <div className="mt-6 space-y-3 px-5 pb-5">
+          <div className="mt-5 space-y-3 px-5 pb-5">
             {notice ? (
               <p className="rounded-xl bg-black/40 px-3 py-2 text-center text-[11px] text-zinc-400">
                 {notice}
               </p>
             ) : (
               <p className="text-center text-[11px] text-zinc-600">
-                {named} {nemeses.length === 1 ? "is" : "are"} locked. Emergency
-                stays live.
+                {named} {nemeses.length === 1 ? "is" : "are"} your nemesis
+                {nemeses.length === 1 ? "" : "es"}. Emergency stays live.
               </p>
             )}
             <div className="flex gap-2">
@@ -251,5 +224,46 @@ export function PhoneLock({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function LockTile({
+  name,
+  glyph,
+  locked,
+  highlight,
+  onClick,
+}: {
+  name: string;
+  glyph: string;
+  locked: boolean;
+  highlight: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col items-center gap-1"
+    >
+      <span
+        className={cn(
+          "flex size-10 items-center justify-center rounded-2xl",
+          locked
+            ? "bg-zinc-900 text-zinc-600 ring-1 ring-white/4"
+            : "bg-primary/15 text-primary ring-1 ring-primary/30",
+        )}
+      >
+        <SocialGlyph label={glyph} />
+      </span>
+      <span
+        className={cn(
+          "text-center text-[8px] leading-tight",
+          highlight ? "text-primary/80" : "text-zinc-600",
+        )}
+      >
+        {name}
+      </span>
+    </button>
   );
 }
