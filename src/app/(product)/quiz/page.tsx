@@ -68,7 +68,7 @@ export default function QuizPage() {
         <button
           type="button"
           className="border-0 bg-transparent p-0"
-          aria-label="Replay Spark celebration"
+          aria-label="Replay sprite celebration"
           onClick={() => {
             if (done) setAct("celebrate");
           }}

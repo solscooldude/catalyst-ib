@@ -47,8 +47,8 @@ const GROUPS = [
     label: "Shop",
     href: ROUTES.appearance,
     items: [
-      { href: ROUTES.appearance, label: "Appearance" },
-      { href: `${ROUTES.appearance}#scenes`, label: "Focus scenes" },
+      { href: `${ROUTES.appearance}#sprite`, label: "Sprite appearance" },
+      { href: `${ROUTES.appearance}#app`, label: "App appearance" },
     ],
   },
 ] as const;
@@ -57,12 +57,27 @@ function itemPath(href: string) {
   return href.split("#")[0] ?? href;
 }
 
+const SPRITE_HASHES = new Set([
+  "",
+  "#",
+  "#sprite",
+  "#cosmetics",
+  "#colours",
+  "#gradients",
+  "#auras",
+  "#trails",
+]);
+const APP_HASHES = new Set(["#app", "#scenes", "#room", "#accents"]);
+
 function itemActive(pathname: string, hash: string, href: string) {
   const [path, anchor] = href.split("#");
-  if (anchor) return pathname === path && hash === `#${anchor}`;
-  if (path === ROUTES.appearance) {
-    return pathname === path && (hash === "" || hash === "#");
+  if (path === ROUTES.appearance && anchor === "sprite") {
+    return pathname === path && SPRITE_HASHES.has(hash || "");
   }
+  if (path === ROUTES.appearance && anchor === "app") {
+    return pathname === path && APP_HASHES.has(hash);
+  }
+  if (anchor) return pathname === path && hash === `#${anchor}`;
   return pathname === path;
 }
 
