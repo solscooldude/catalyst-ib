@@ -1,4 +1,4 @@
-import { MintChip } from "@/components/mint-chip";
+import { SparkleMark } from "@/components/brand-marks";
 import { cn } from "@/lib/utils";
 
 export function FocusHud({
@@ -26,7 +26,7 @@ export function FocusHud({
         className="focus-hud-tokens"
         aria-label={`${tokens} tokens`}
       >
-        <MintChip size={16} tone="soft" />
+        <SparkleMark size={16} />
         <span>{tokens}</span>
       </div>
     </div>

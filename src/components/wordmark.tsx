@@ -12,7 +12,7 @@ export function Wordmark({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-baseline gap-1 tracking-tight text-foreground",
+        "font-heading inline-flex items-baseline gap-1 tracking-tight text-foreground",
         className,
       )}
     >
