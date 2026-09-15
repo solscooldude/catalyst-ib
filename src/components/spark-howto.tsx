@@ -18,7 +18,7 @@ export function SparkHowTo() {
     <>
       <button
         type="button"
-        aria-label="How to play with Spark"
+        aria-label="How to play with the sprite"
         className="inline-flex size-8 items-center justify-center rounded-full text-zinc-400 ring-1 ring-border hover:text-foreground"
         onClick={() => setOpen(true)}
       >
@@ -30,7 +30,7 @@ export function SparkHowTo() {
           className="z-50 mx-auto max-h-[70dvh] max-w-md gap-0 overflow-y-auto rounded-t-[1.5rem]"
         >
           <SheetHeader>
-            <SheetTitle>Play with Spark</SheetTitle>
+            <SheetTitle>Play with the sprite</SheetTitle>
             <SheetDescription>Short taps. No extra copy on the page.</SheetDescription>
           </SheetHeader>
           <ul className="space-y-2.5 px-4 pb-8">

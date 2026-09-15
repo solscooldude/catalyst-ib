@@ -277,7 +277,7 @@ export function drawWeekStory(
   ctx.font = bodyFont(500, 24);
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "center";
-  const peekName = story.spriteName.trim() || "Spark";
+  const peekName = story.spriteName.trim() || "Sprite";
   ctx.fillText(
     story.empty
       ? `${peekName} is waiting.`
