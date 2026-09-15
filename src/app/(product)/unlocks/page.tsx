@@ -13,12 +13,12 @@ import { ROUTES } from "@/lib/routes";
 import { SessionRecapCard } from "@/components/session-recap";
 import { readSessionRecap } from "@/lib/session-recap";
 import { PageFrame } from "@/components/page-frame";
-import { UnlockShopList } from "@/components/unlock-panel";
+import { UnlockTierShop } from "@/components/unlock-panel";
 import {
-  spendUnlock,
+  spendUnlockTier,
   useCatalyst,
 } from "@/lib/store";
-import type { UnlockCatalogId } from "@/lib/constants";
+import type { UnlockTier } from "@/lib/constants";
 
 function UnlockInner() {
   const router = useRouter();
@@ -91,8 +91,8 @@ function UnlockInner() {
 
   if (!state.setupComplete) return null;
 
-  function buy(id: UnlockCatalogId) {
-    const result = spendUnlock(id);
+  function buy(tier: UnlockTier) {
+    const result = spendUnlockTier(tier);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -128,9 +128,8 @@ function UnlockInner() {
         </p>
 
         <div className="mt-6">
-          <UnlockShopList
+          <UnlockTierShop
             tokens={state.tokens}
-            nemeses={state.nemeses}
             active={active}
             now={now}
             detailed
