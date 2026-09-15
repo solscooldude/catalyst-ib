@@ -111,15 +111,51 @@ html[data-bg="aurora"],
 html.light[data-bg="aurora"] {
   --background: #f3eef7;
   --card: #fbf8fd;
+  --popover: #fbf8fd;
   --accent: #efe8f6;
   --secondary: #efe8f6;
+  --muted: #efe8f6;
+  --sidebar: #fbf8fd;
 }
 
 html.dark[data-bg="aurora"] {
-  --background: #14111a;
+  --background: #16121c;
   --card: #1f1a27;
+  --popover: #1f1a27;
   --accent: #2a2233;
   --secondary: #2a2233;
+  --muted: #2a2233;
+  --sidebar: #1f1a27;
+}
+
+html[data-bg="aurora"] body {
+  background-image:
+    radial-gradient(ellipse 70% 48% at 18% -8%, rgb(196 181 253 / 0.2), transparent 58%),
+    radial-gradient(ellipse 55% 40% at 92% 8%, rgb(237 228 245 / 0.28), transparent 52%);
+}
+
+html.dark[data-bg="aurora"] body {
+  background-image:
+    radial-gradient(ellipse 70% 48% at 18% -8%, rgb(167 139 250 / 0.1), transparent 58%),
+    radial-gradient(ellipse 55% 40% at 92% 8%, rgb(88 28 135 / 0.14), transparent 52%);
+}
+
+html[data-bg="aurora"] .scene-aurora-band {
+  opacity: 0.2;
+  filter: blur(64px);
+  animation-duration: 40s;
+}
+
+html[data-bg="aurora"] .scene-aurora-a {
+  background: radial-gradient(ellipse at 30% 40%, rgb(196 181 253 / 0.2), transparent 66%);
+}
+
+html[data-bg="aurora"] .scene-aurora-b {
+  background: radial-gradient(ellipse at 78% 22%, rgb(216 180 254 / 0.14), transparent 62%);
+}
+
+html[data-bg="aurora"] .scene-aurora-c {
+  background: radial-gradient(ellipse at 50% 78%, rgb(237 233 254 / 0.1), transparent 64%);
 }
 
 @keyframes spark-orbit-dot {

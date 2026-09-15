@@ -28,7 +28,12 @@ export function FocusStage({
 }) {
   const equipped = useCatalyst().appearance.focusTheme;
   const raw = theme ?? equipped;
-  const id = (raw as string) === "waves" ? "sea" : raw;
+  const id =
+    (raw as string) === "waves"
+      ? "sea"
+      : (raw as string) === "aurora"
+        ? "nightsky"
+        : raw;
 
   if (id === "none" || !isStageFocusTheme(id)) {
     return (
@@ -50,7 +55,6 @@ export function FocusStage({
     >
       {id === "nightsky" ? <NightSky /> : null}
       {id === "sea" ? <Sea /> : null}
-      {id === "aurora" ? <Aurora /> : null}
       {id === "math" ? <MathDrift /> : null}
     </div>
   );
@@ -77,18 +81,6 @@ function NightSky() {
         className="focus-stage-shoot"
         style={{ top: "58%", left: "42%", animationDelay: "5.5s" }}
       />
-    </>
-  );
-}
-
-function Aurora() {
-  return (
-    <>
-      <div className="focus-stage-ribbon focus-stage-ribbon-a" />
-      <div className="focus-stage-ribbon focus-stage-ribbon-b" />
-      <div className="focus-stage-ribbon focus-stage-ribbon-c" />
-      <div className="focus-stage-ribbon focus-stage-ribbon-d" />
-      <div className="focus-stage-ribbon focus-stage-ribbon-e" />
     </>
   );
 }

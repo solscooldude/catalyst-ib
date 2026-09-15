@@ -41,4 +41,4 @@ npm run build
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
 11. `/account/subscription` and `/account/settings` — plan and account basics.
 
-Focus stages sit behind Spark and never cover the HUD: Night sky (free default), Deep blue sea, Aurora (violet/magenta ribbons), and Math drift. Light/dark theme only restyles chrome — the session canvas keeps the selected scene in both themes. Pick a stage on Focus setup or in the Shop. Last stage is remembered on this device.
+Focus stages sit behind Spark and never cover the HUD: Night sky (free default), Deep blue sea, and Math drift. Aurora is an optional quiet lavender room skin for the whole app — not a session backdrop. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a stage on Focus setup or in the Shop. Last stage is remembered on this device.

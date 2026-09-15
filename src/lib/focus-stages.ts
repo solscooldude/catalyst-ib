@@ -14,12 +14,6 @@ export const STAGE_THEMES = [
     blurb: "Navy and cobalt water rolling behind the spark.",
   },
   {
-    id: "aurora" as const,
-    name: "Aurora",
-    cost: 22,
-    blurb: "Violet and magenta ribbons with teal. Moving, behind Spark.",
-  },
-  {
     id: "math" as const,
     name: "Math drift",
     cost: 18,
@@ -31,7 +25,5 @@ export const STAGE_THEMES = [
 export type StageThemeId = (typeof STAGE_THEMES)[number]["id"];
 
 export function isStageFocusTheme(id: FocusThemeId | string): id is StageThemeId {
-  return (
-    id === "nightsky" || id === "sea" || id === "aurora" || id === "math"
-  );
+  return id === "nightsky" || id === "sea" || id === "math";
 }

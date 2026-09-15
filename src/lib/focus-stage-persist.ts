@@ -8,6 +8,7 @@ export function readDeviceFocusStage(): FocusThemeId | null {
   try {
     const raw = window.localStorage.getItem(FOCUS_STAGE_KEY);
     if (raw === "waves") return "sea";
+    if (raw === "aurora") return "nightsky";
     if (raw && isStageFocusTheme(raw)) return raw;
   } catch {
     /* private mode */

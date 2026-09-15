@@ -281,7 +281,7 @@ function BgSwatch({ id }: { id: string }) {
         id === "stars" &&
           "bg-[#07080d] shadow-[inset_1px_1px_0_#fff8,inset_-8px_-10px_0_-6px_#fff5]",
         id === "aurora" &&
-          "bg-[linear-gradient(135deg,#0a1a16_0%,#14241c_40%,#1a1430_100%)]",
+          "bg-[linear-gradient(135deg,#efe8f6_0%,#e9d5ff_45%,#c4b5fd_100%)]",
       )}
     />
   );

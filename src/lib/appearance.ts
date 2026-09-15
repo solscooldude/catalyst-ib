@@ -16,7 +16,7 @@ export const COLLECTIONS: {
     id: "aurora",
     name: "Night sky",
     range: "80–150",
-    copy: "Stars, aurora wash, and a mint-violet trail.",
+    copy: "A quiet lavender room skin. Not a Focus backdrop.",
   },
   {
     id: "gold",
@@ -116,7 +116,7 @@ export const BACKGROUNDS = [
     name: "Aurora",
     cost: 100,
     collection: "aurora" as const,
-    blurb: "Quiet lavender chrome for the whole app. Not a focus backdrop.",
+    blurb: "Soft muted lavender chrome for the whole app. Not a Focus backdrop.",
   },
 ] as const;
 
@@ -265,13 +265,6 @@ export const FOCUS_THEMES = [
     blurb: "Navy and cobalt water rolling behind the spark.",
   },
   {
-    id: "aurora",
-    name: "Aurora",
-    cost: 22,
-    collection: "focus" as const,
-    blurb: "Violet and magenta ribbons with teal. Moving, behind Spark.",
-  },
-  {
     id: "math",
     name: "Math drift",
     cost: 18,
@@ -367,7 +360,11 @@ export function normalizeAppearance(
   const ownedGear = unique(raw?.ownedGear ?? ["none"], "none");
   const ownedTrails = unique(raw?.ownedTrails ?? ["none"], "none");
   const rawOwned = (raw?.ownedFocusThemes ?? ["none", "nightsky", "cat"]).map(
-    (id) => ((id as string) === "waves" ? "sea" : id),
+    (id) => {
+      if ((id as string) === "waves") return "sea";
+      if ((id as string) === "aurora") return "nightsky";
+      return id;
+    },
   );
   const ownedFocusThemes = unique(
     [...rawOwned, "none", "nightsky", "cat"],
@@ -376,7 +373,9 @@ export function normalizeAppearance(
   const rawTheme =
     (raw?.focusTheme as string) === "waves"
       ? "sea"
-      : (raw?.focusTheme ?? "nightsky");
+      : (raw?.focusTheme as string) === "aurora"
+        ? "nightsky"
+        : (raw?.focusTheme ?? "nightsky");
   return {
     ownedAccents,
     ownedBackgrounds,
