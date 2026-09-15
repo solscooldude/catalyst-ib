@@ -4,9 +4,11 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Spark, type SparkMood } from "@/components/spark";
 import { SpritePlaypen } from "@/components/sprite-playpen";
 import {
+  SPARK_AURAS,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  type SparkAuraId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
@@ -38,6 +40,7 @@ export default function SpritePage() {
   const [tryOn, setTryOn] = useState<{
     tint?: SparkTintId;
     gear?: SparkGearId;
+    aura?: SparkAuraId;
     trail?: SparkTrailId;
   }>({});
   const look = state.appearance;
@@ -69,13 +72,14 @@ export default function SpritePage() {
   }, [tucked, state.streakDays, todayMs]);
 
   function wear(
-    kind: "sparkTint" | "gear" | "trail",
+    kind: "sparkTint" | "gear" | "aura" | "trail",
     id: string,
     owned: boolean,
   ) {
     if (!owned) {
       if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: id as SparkTintId }));
       if (kind === "gear") setTryOn((current) => ({ ...current, gear: id as SparkGearId }));
+      if (kind === "aura") setTryOn((current) => ({ ...current, aura: id as SparkAuraId }));
       if (kind === "trail") setTryOn((current) => ({ ...current, trail: id as SparkTrailId }));
       setNotice("Preview.");
       return;
@@ -84,6 +88,7 @@ export default function SpritePage() {
     if (result.ok) {
       if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: undefined }));
       if (kind === "gear") setTryOn((current) => ({ ...current, gear: undefined }));
+      if (kind === "aura") setTryOn((current) => ({ ...current, aura: undefined }));
       if (kind === "trail") setTryOn((current) => ({ ...current, trail: undefined }));
     }
     setNotice(result.ok ? "Equipped." : result.reason);
@@ -140,6 +145,7 @@ export default function SpritePage() {
           petPulse={petPulse}
           tint={tryOn.tint}
           gear={tryOn.gear}
+          aura={tryOn.aura}
           trail={tryOn.trail}
           canFeed={snacksOnStage}
           celebrate={canCelebrate && !tucked}
@@ -232,6 +238,27 @@ export default function SpritePage() {
           ),
         }))}
         onWear={(id, owned) => wear("gear", id, owned)}
+      />
+      <EquipRow
+        title="Aura"
+        items={SPARK_AURAS.map((item) => ({
+          id: item.id,
+          name: item.name,
+          owned: look.ownedAuras.includes(item.id),
+          on: look.aura === item.id || tryOn.aura === item.id,
+          preview: (
+            <Spark
+              mood="idle"
+              tint={look.sparkTint}
+              gear="none"
+              aura={item.id}
+              trail="none"
+              evolve={false}
+              size={52}
+            />
+          ),
+        }))}
+        onWear={(id, owned) => wear("aura", id, owned)}
       />
       <EquipRow
         title="Trail"
