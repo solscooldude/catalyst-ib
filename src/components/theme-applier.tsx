@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   getAccentShade,
   getBackgroundShade,
   getSparkTint,
 } from "@/lib/appearance";
-import { applyUiTheme, readStoredUiTheme, useUiTheme } from "@/lib/ui-theme";
+import { ROUTES } from "@/lib/routes";
+import { applyUiTheme, restoreStoredUiTheme, useUiTheme } from "@/lib/ui-theme";
 import { useCatalyst } from "@/lib/store";
 
 const ROOM_VARS = [
@@ -23,12 +25,18 @@ function clearRoomVars(root: HTMLElement) {
 }
 
 export function ThemeApplier() {
+  const pathname = usePathname();
   const { appearance, hydrated } = useCatalyst();
   const uiTheme = useUiTheme();
+  const introLock = pathname === ROUTES.intro;
 
   useEffect(() => {
-    applyUiTheme(readStoredUiTheme(), false);
-  }, []);
+    if (introLock) {
+      applyUiTheme("dark", false);
+      return;
+    }
+    restoreStoredUiTheme();
+  }, [introLock]);
 
   useEffect(() => {
     if (!hydrated) return;

@@ -47,6 +47,11 @@ export function setUiTheme(theme: UiTheme) {
   applyUiTheme(theme, true);
 }
 
+export function restoreStoredUiTheme() {
+  cached = null;
+  applyUiTheme(readStoredUiTheme(), false);
+}
+
 export function subscribeUiTheme(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
