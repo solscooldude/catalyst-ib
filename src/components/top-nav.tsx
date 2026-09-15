@@ -87,7 +87,7 @@ function MenuLinks({
   hash: string;
   onPick?: () => void;
 }) {
-  const [open, setOpen] = useState(
+  const [open, setOpen] = useState<string>(
     () => GROUPS.find((group) => groupActive(pathname, group))?.id ?? "home",
   );
 
