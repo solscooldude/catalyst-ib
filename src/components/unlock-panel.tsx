@@ -12,14 +12,17 @@ import { cn } from "@/lib/utils";
 
 export function UnlockPanel({
   compact = false,
+  collapsible = false,
   className,
 }: {
   compact?: boolean;
+  collapsible?: boolean;
   className?: string;
 }) {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
+  const [open, setOpen] = useState(!collapsible);
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
@@ -50,7 +53,20 @@ export function UnlockPanel({
 
   return (
     <div className={cn(compact ? "space-y-2" : "space-y-3", className)}>
-      {!compact ? (
+      {collapsible ? (
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-2xl bg-card px-3 py-2 text-left ring-1 ring-border"
+          aria-expanded={open}
+          onClick={() => setOpen((current) => !current)}
+        >
+          <span className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+            Unlocks
+          </span>
+          <span className="text-xs text-foreground">{open ? "Hide" : "Show"}</span>
+        </button>
+      ) : null}
+      {!open && collapsible ? null : !compact ? (
         <div>
           <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
             App unlocks
@@ -83,9 +99,11 @@ export function UnlockPanel({
         </div>
       ) : (
         <div>
+          {collapsible ? null : (
           <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
             Unlocks
           </p>
+          )}
           {active.length > 0 ? (
             <p className="mt-1 font-mono text-xs text-primary">
               {active
@@ -99,6 +117,8 @@ export function UnlockPanel({
         </div>
       )}
 
+      {collapsible && !open ? null : (
+        <>
       <div className={cn("space-y-2", compact && "space-y-1.5")}>
         {UNLOCK_CATALOG.map((item) => {
           const label = item.id === "nemesis" ? nemesisLabel : item.name;
@@ -137,12 +157,14 @@ export function UnlockPanel({
         })}
       </div>
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
-      <Link
-        href={ROUTES.unlocks}
-        className="inline-block text-xs text-zinc-400 hover:text-foreground"
-      >
-        Unlocks page
-      </Link>
+        <Link
+          href={ROUTES.unlocks}
+          className="inline-block text-xs text-zinc-400 hover:text-foreground"
+        >
+          Unlocks page
+        </Link>
+        </>
+      )}
     </div>
   );
 }
