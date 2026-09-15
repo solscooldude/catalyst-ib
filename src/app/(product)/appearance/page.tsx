@@ -13,6 +13,7 @@ import {
   SPARK_TRAILS,
   SPARK_TINTS,
 } from "@/lib/appearance";
+import { FocusStagePicker } from "@/components/focus-stage";
 import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -59,6 +60,23 @@ export default function AppearancePage() {
       </div>
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
+
+      <section id="stages" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+          Focus stages
+        </p>
+        <h2 className="text-2xl text-foreground">Behind Spark on a session</h2>
+        <p className="text-sm leading-6 text-muted-foreground">
+          Night sky is free. Deep blue sea and math drift stay behind the
+          spark and the timer in both light and dark chrome. Aurora is a
+          quiet app skin in Rooms, not a session backdrop.
+        </p>
+        <FocusStagePicker
+          value={look.focusTheme}
+          owned={(id) => look.ownedFocusThemes.includes(id as typeof look.focusTheme)}
+          onPick={(id, owned) => act("focusTheme", id, owned)}
+        />
+      </section>
 
       <section id="snacks" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
