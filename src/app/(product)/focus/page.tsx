@@ -13,6 +13,7 @@ import { StudyStartForm } from "@/components/study-start-form";
 import { SelectedTaskChip, TaskOption } from "@/components/task-option";
 import { MOCK_TASKS, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
+import { PageFrame } from "@/components/page-frame";
 import {
   buyAppearance,
   equipAppearance,
@@ -58,7 +59,7 @@ export default function AppHomePage() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+    <PageFrame className="grid gap-6 space-y-0 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Focus
@@ -196,6 +197,6 @@ export default function AppHomePage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }

@@ -22,6 +22,7 @@ import {
   weekDayMarks,
 } from "@/lib/stats";
 import { displaySpriteName } from "@/lib/sprite-name";
+import { PageFrame } from "@/components/page-frame";
 import { sessionHint, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -67,13 +68,13 @@ export default function DashboardPage() {
         : "Finish setup";
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-4">
-      <p className="font-heading px-1 text-2xl text-foreground sm:text-3xl">
+    <PageFrame>
+      <p className="font-heading px-1 pt-1 text-2xl text-foreground sm:text-3xl">
         {greeting(now)}.
       </p>
 
-      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
-        <section className="flux-card px-6 py-7 sm:px-8">
+      <div className="grid gap-5 lg:grid-cols-[1.2fr_0.9fr_0.9fr]">
+        <section className="flux-card px-6 py-8 sm:px-8">
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Current sprite
           </p>
@@ -122,7 +123,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="flux-card px-6 py-7">
+        <section className="flux-card px-6 py-8">
           <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
             <Flame className="size-3.5 text-primary" />
             Streak
@@ -148,7 +149,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="flux-card px-6 py-7">
+        <section className="flux-card px-6 py-8">
           <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
             <Clock3 className="size-3.5 text-primary" />
             Study time
@@ -167,10 +168,10 @@ export default function DashboardPage() {
 
       <QuietHoursChip />
 
-      <section className="flux-card px-6 py-6">
+      <section className="flux-card px-6 py-8">
         <UnlockPanel />
       </section>
-    </div>
+    </PageFrame>
   );
 }
 
