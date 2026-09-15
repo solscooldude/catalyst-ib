@@ -48,6 +48,7 @@ import {
   validateWindow,
   type LockWindow,
 } from "@/lib/schedule";
+import { writeSessionRecap } from "@/lib/session-recap";
 import {
   coalesceUnlocks,
   setState,
@@ -108,6 +109,8 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     lockedAt: Date.now(),
     focusStartedAt: null,
     completedAt: null,
+    pausedAt: null,
+    pauseAccumMs: 0,
     taskMarkedDone: false,
     tokensEarned: 0,
     timeTokens: 0,
@@ -119,15 +122,16 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
 export function startStudySession(input: {
   subjectId: SubjectId;
   title: string;
-  minutes: number;
+  minutes?: number | null;
 }) {
-  const minutes = Math.floor(input.minutes);
+  const minutes =
+    input.minutes == null ? null : Math.floor(input.minutes);
   const title = input.title.trim();
   if (title.length < 3) {
     return { ok: false as const, reason: "Say what you are studying." };
   }
-  if (!Number.isFinite(minutes) || minutes < 5) {
-    return { ok: false as const, reason: "Pick at least a 5-minute block." };
+  if (minutes != null && (!Number.isFinite(minutes) || minutes < 5)) {
+    return { ok: false as const, reason: "Soft goal must be at least 5 minutes." };
   }
   const subject = SUBJECTS.find((row) => row.id === input.subjectId);
   if (!subject) {
@@ -149,6 +153,8 @@ export function startStudySession(input: {
     lockedAt: Date.now(),
     focusStartedAt: null,
     completedAt: null,
+    pausedAt: null,
+    pauseAccumMs: 0,
     taskMarkedDone: false,
     tokensEarned: 0,
     timeTokens: 0,
@@ -167,6 +173,41 @@ export function enterFocus() {
         ...current.session,
         status: "focus",
         focusStartedAt: Date.now(),
+        pausedAt: null,
+        pauseAccumMs: 0,
+      },
+    };
+  });
+}
+
+export function sessionElapsedMs(session: Session, now = Date.now()) {
+  const startedAt = session.focusStartedAt ?? session.lockedAt;
+  const livePause = session.pausedAt ? Math.max(0, now - session.pausedAt) : 0;
+  return Math.max(0, now - startedAt - (session.pauseAccumMs ?? 0) - livePause);
+}
+
+export function pauseSession() {
+  setState((current) => {
+    if (!current.session || current.session.status !== "focus") return current;
+    if (current.session.pausedAt) return current;
+    return {
+      ...current,
+      session: { ...current.session, pausedAt: Date.now() },
+    };
+  });
+}
+
+export function resumeSession() {
+  setState((current) => {
+    if (!current.session || current.session.status !== "focus") return current;
+    if (!current.session.pausedAt) return current;
+    const extra = Math.max(0, Date.now() - current.session.pausedAt);
+    return {
+      ...current,
+      session: {
+        ...current.session,
+        pausedAt: null,
+        pauseAccumMs: (current.session.pauseAccumMs ?? 0) + extra,
       },
     };
   });
@@ -187,7 +228,7 @@ export function tokensFromElapsed(elapsedMs: number, demoMode: boolean) {
   return Math.floor(Math.max(0, elapsedMs) / interval);
 }
 
-export function completeSession(tokensEarned: number) {
+export function completeSession(tokensEarned?: number) {
   const session = state.session;
   if (!session) {
     return { ok: false as const, reason: "No session to complete." };
@@ -196,24 +237,11 @@ export function completeSession(tokensEarned: number) {
     return { ok: false as const, reason: "Mark the ManageBac task done first." };
   }
   const startedAt = session.focusStartedAt ?? session.lockedAt;
-  const elapsed = Date.now() - startedAt;
-  const needed = plannedLockMs(session);
-  if (needed && elapsed < needed) {
-    return {
-      ok: false as const,
-      reason: "Stay until this study block ends. No credit for leaving early.",
-    };
-  }
-  if (tokensEarned < 1) {
-    return {
-      ok: false as const,
-      reason: session.demoMode
-        ? "Stay focused for 30 seconds to earn your first token."
-        : "Stay focused for 5 minutes to earn your first token.",
-    };
-  }
-
-  const timeTokens = tokensEarned;
+  const elapsed = sessionElapsedMs(session);
+  const timeTokens = Math.max(
+    0,
+    tokensEarned ?? tokensFromElapsed(elapsed, session.demoMode),
+  );
   const completionTokens = session.kind === "verified" ? COMPLETION_BONUS : 0;
   const totalTokens = timeTokens + completionTokens;
   const endedAt = Date.now();
@@ -228,12 +256,22 @@ export function completeSession(tokensEarned: number) {
     subjectLabel,
     startedAt,
     endedAt,
-    durationMs: Math.max(0, endedAt - startedAt),
+    durationMs: elapsed,
     timeTokens,
     completionTokens,
     note: session.goal || undefined,
     taskId: session.taskId,
   };
+
+  writeSessionRecap({
+    title: session.title,
+    minutes: Math.max(0, Math.round(elapsed / 60000)),
+    tokens: totalTokens,
+    timeTokens,
+    completionTokens,
+    kind: session.kind,
+    endedAt,
+  });
 
   setState((current) => ({
     ...current,
