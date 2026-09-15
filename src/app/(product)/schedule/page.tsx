@@ -87,15 +87,9 @@ export default function SchedulePage() {
             Lock schedule
           </p>
           <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-            Hours the phone stays grey.
+            Quiet hours
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Recurring lock windows. This does not earn tokens. Start a study
-            block or an official ManageBac task when you want credit.
-          </p>
-          <DemoBadge className="mt-4">
-            Simulated schedule · not real Screen Time
-          </DemoBadge>
+          <DemoBadge className="mt-4">Simulated schedule</DemoBadge>
         </div>
 
         {current ? (
@@ -117,9 +111,6 @@ export default function SchedulePage() {
           {state.schedule.length === 0 ? (
             <div className="flux-card p-5">
               <p className="text-sm text-foreground">No lock hours yet.</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Add a window below, or start with weeknights 7–10pm.
-              </p>
               <Button
                 className="mt-4 h-10 rounded-full"
                 variant="outline"
@@ -184,9 +175,6 @@ export default function SchedulePage() {
 
         <section className="flux-card p-6">
           <h2 className="text-lg text-foreground">Add a window</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Overnight is fine — 22:00 to 07:00 counts as one window.
-          </p>
 
           <div className="mt-5 space-y-4">
             <div className="space-y-2">
@@ -262,11 +250,6 @@ export default function SchedulePage() {
           compact
           onBeginFocus={() => router.push(`${ROUTES.focus}#study`)}
         />
-        <p className="mt-4 max-w-xs text-center text-xs text-muted-foreground">
-          {current
-            ? "This window greys the mock home screen. Buy an unlock if you need ten minutes."
-            : "Outside a window the mock phone is idle. Add hours to lock it on a schedule."}
-        </p>
       </div>
     </PageFrame>
   );
