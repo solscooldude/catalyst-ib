@@ -14,7 +14,13 @@ import {
 } from "@/lib/sprite-name";
 import { useCatalyst } from "@/lib/store";
 
-export function SpriteRename({ compact = false }: { compact?: boolean }) {
+export function SpriteRename({
+  compact = false,
+  onDraft,
+}: {
+  compact?: boolean;
+  onDraft?: (name: string) => void;
+}) {
   const state = useCatalyst();
   const fieldId = useId();
   const current = displaySpriteName(state.spriteName);
@@ -49,7 +55,16 @@ export function SpriteRename({ compact = false }: { compact?: boolean }) {
           value={value}
           maxLength={SPRITE_NAME_MAX}
           placeholder={DEFAULT_SPRITE_NAME}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => {
+            const next = event.target.value;
+            setValue(next);
+            onDraft?.(next);
+          }}
+          onBlur={() => {
+            if (value.trim() && displaySpriteName(value) !== current) {
+              save();
+            }
+          }}
           className="h-11"
         />
         <Button type="button" className="h-11 rounded-full px-5" onClick={save}>

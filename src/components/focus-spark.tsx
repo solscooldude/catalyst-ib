@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { SparkleMark } from "@/components/brand-marks";
 import { Spark, type SparkMood } from "@/components/spark";
-import { hitZone, type SparkAct } from "@/lib/spark-play";
+import {
+  DOUBLE_TAP_MS,
+  hitZone,
+  isTickleSwipe,
+  type SparkAct,
+  type SparkZone,
+} from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
 import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { grantFocusGift } from "@/lib/store";
@@ -17,11 +23,13 @@ export function FocusSpark({
   taskId,
   subject,
   hint,
+  sit = false,
 }: {
   mood: SparkMood;
   taskId?: TaskId;
   subject?: SubjectId;
   hint?: string;
+  sit?: boolean;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [act, setAct] = useState<SparkAct>(null);
@@ -29,7 +37,9 @@ export function FocusSpark({
   const gifted = useRef(false);
   const holdTimer = useRef(0);
   const moved = useRef(false);
-  const zone = useRef<"peak" | "face" | "body">("body");
+  const origin = useRef({ x: 0, y: 0 });
+  const lastTap = useRef(0);
+  const zone = useRef<SparkZone>("body");
   const scrunch = useRef(createSparkScrunch());
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
 
@@ -43,6 +53,11 @@ export function FocusSpark({
   }, [mood]);
 
   useEffect(() => {
+    if (sit) {
+      setIdle("rest");
+      setStar(null);
+      return;
+    }
     let hold = 0;
     function playIdle(next: IdleAct) {
       setIdle(next);
@@ -75,9 +90,10 @@ export function FocusSpark({
       window.clearTimeout(starFirst);
       window.clearInterval(starBeat);
     };
-  }, []);
+  }, [sit]);
 
   function spawnStar() {
+    if (sit) return;
     setStar({ id: Date.now(), left: 30 + Math.random() * 40 });
     window.setTimeout(() => setStar(null), 3400);
   }
@@ -93,6 +109,7 @@ export function FocusSpark({
     event.currentTarget.setPointerCapture(event.pointerId);
     const box = stageRef.current?.getBoundingClientRect();
     moved.current = false;
+    origin.current = { x: event.clientX, y: event.clientY };
     scrunch.current.attach(stageRef.current);
     zone.current = box
       ? hitZone(event.clientX - box.left, event.clientY - box.top, box.width, box.height)
@@ -110,10 +127,8 @@ export function FocusSpark({
 
   function move(event: React.PointerEvent<HTMLDivElement>) {
     if (event.buttons === 0) return;
-    const origin = stageRef.current?.getBoundingClientRect();
-    if (!origin) return;
-    const dx = event.clientX - (origin.left + origin.width / 2);
-    const dy = event.clientY - (origin.top + origin.height / 2);
+    const dx = event.clientX - origin.current.x;
+    const dy = event.clientY - origin.current.y;
     if (Math.hypot(dx, dy) > 8) {
       moved.current = true;
       window.clearTimeout(holdTimer.current);
@@ -132,25 +147,38 @@ export function FocusSpark({
       }
     }
     window.clearTimeout(holdTimer.current);
+    const dx = event ? event.clientX - origin.current.x : 0;
+    const dy = event ? event.clientY - origin.current.y : 0;
+    if (zone.current === "belly" && isTickleSwipe(dx, dy) && act !== "sleep") {
+      play("tickle", 720);
+      return;
+    }
     if (zone.current === "peak") {
       scrunch.current.release();
       if (moved.current) return;
     }
     if (!moved.current) {
       if (act === "sleep") return;
+      const now = performance.now();
+      if (now - lastTap.current < DOUBLE_TAP_MS) {
+        lastTap.current = 0;
+        play("spin", 820);
+        return;
+      }
+      lastTap.current = now;
       if (mood === "done") play("celebrate", 900);
       else if (zone.current === "face") play("boop", 700);
-      else if (zone.current === "body") play("poke", 720);
+      else if (zone.current === "body" || zone.current === "belly") play("poke", 720);
     }
   }
 
   return (
-    <div className="focus-quiet-stage">
+    <div className={cn("focus-quiet-stage", sit && "is-buddy-sit")}>
       <div
         ref={stageRef}
         className={cn(
           "focus-spark-stage spark-scrunch-host",
-          `focus-spark-${idle}`,
+          sit ? "is-buddy-sit" : `focus-spark-${idle}`,
         )}
         onPointerDown={down}
         onPointerMove={move}
@@ -162,18 +190,19 @@ export function FocusSpark({
           taskId={taskId}
           subject={subject}
           hint={hint}
-          size={248}
+          size={sit ? 112 : 248}
           pettable
           act={act}
-          flourish="now"
+          flourish={sit ? "loop" : "now"}
+          className={sit ? "spark-sit" : undefined}
         />
-        {idle === "gift" ? (
+        {idle === "gift" && !sit ? (
           <span className="focus-token-drop" aria-live="polite">
             <SparkleMark size={16} />
             +1
           </span>
         ) : null}
-        {star ? (
+        {star && !sit ? (
           <button
             type="button"
             aria-label="Catch a token"
