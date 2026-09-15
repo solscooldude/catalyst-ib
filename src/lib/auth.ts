@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { ACCOUNTS_KEY, AUTH_SESSION_KEY } from "@/lib/constants";
-import { hydrateStore } from "@/lib/store";
+import { claimDailyLogin, hydrateStore } from "@/lib/store";
 
 export type AuthUser = {
   id: string;
@@ -126,6 +126,7 @@ export async function signUp(email: string, password: string) {
     user: { id: account.id, email: account.email },
   };
   hydrateStore(account.id);
+  claimDailyLogin();
   emit();
   return { ok: true as const };
 }
@@ -147,6 +148,7 @@ export async function logIn(email: string, password: string) {
     user: { id: account.id, email: account.email },
   };
   hydrateStore(account.id);
+  claimDailyLogin();
   emit();
   return { ok: true as const };
 }
