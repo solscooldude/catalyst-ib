@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import Link from "next/link";
 import { Spark, type SparkMood } from "@/components/spark";
 import { SpritePlaypen } from "@/components/sprite-playpen";
-import { TokenAmount } from "@/components/mint-chip";
-import { Button } from "@/components/ui/button";
 import {
   SPARK_GEAR,
   SPARK_TRAILS,
@@ -14,7 +11,7 @@ import {
   type SparkTintId,
   type SparkTrailId,
 } from "@/lib/appearance";
-import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
+import { FEED_COST, FEED_DAILY_LIMIT, dayKey } from "@/lib/care";
 import {
   formatHours,
   sparkEvolution,
@@ -22,7 +19,6 @@ import {
   todayStudyMs,
   verifiedStudyMs,
 } from "@/lib/stats";
-import { ROUTES } from "@/lib/routes";
 import { careMood } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
@@ -41,7 +37,6 @@ export default function SpritePage() {
     trail?: SparkTrailId;
   }>({});
   const idleTimer = useRef(0);
-  const pokeAt = useRef(0);
   const tucked = useRef(false);
   const look = state.appearance;
   const evo = sparkEvolution(state.logs);
@@ -52,9 +47,11 @@ export default function SpritePage() {
     lastDone && Date.now() - lastDone.endedAt < 30 * 60 * 1000,
   );
   const feedsLeft =
-    state.feedDay === todayLocal()
+    state.feedDay === dayKey()
       ? Math.max(0, FEED_DAILY_LIMIT - state.feedCount)
       : FEED_DAILY_LIMIT;
+  const snacksOnStage =
+    feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating";
 
   function restMood() {
     return careMood(state.streakDays, todayMs);
@@ -81,7 +78,7 @@ export default function SpritePage() {
       if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: id as SparkTintId }));
       if (kind === "gear") setTryOn((current) => ({ ...current, gear: id as SparkGearId }));
       if (kind === "trail") setTryOn((current) => ({ ...current, trail: id as SparkTrailId }));
-      setNotice("Preview only. Buy it in Appearance to keep.");
+      setNotice("Preview.");
       return;
     }
     const result = equipAppearance(kind, id);
@@ -113,36 +110,17 @@ export default function SpritePage() {
       return false;
     }
     setMood("eating");
-    setNotice("Nom.");
+    setNotice(null);
     bumpIdle();
     window.setTimeout(() => {
       setMood("done");
       setPetPulse((value) => value + 1);
-      setNotice("Snack time.");
       bumpIdle();
       window.setTimeout(() => {
         setMood((current) => (current === "done" ? restMood() : current));
       }, 1800);
     }, 1200);
     return true;
-  }
-
-  function onPoke() {
-    if (mood === "eating") return;
-    const now = Date.now();
-    if (now - pokeAt.current < 2400) {
-      setNotice("Give it a second.");
-      return;
-    }
-    pokeAt.current = now;
-    react("annoyed", 900);
-    setNotice("Hey.");
-  }
-
-  function onHighFive() {
-    if (mood === "eating") return;
-    react("done", 2000);
-    setNotice("Nice work.");
   }
 
   return (
@@ -154,11 +132,6 @@ export default function SpritePage() {
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           {displaySpriteName(state.spriteName)}
         </h1>
-        <p className="mt-3 text-sm">
-          <Link href={ROUTES.quiz} className="text-zinc-400 hover:text-foreground">
-            Quiz
-          </Link>
-        </p>
       </section>
 
       <section className="flux-card px-6 py-6">
@@ -172,9 +145,7 @@ export default function SpritePage() {
           tint={tryOn.tint}
           gear={tryOn.gear}
           trail={tryOn.trail}
-          canFeed={
-            feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating"
-          }
+          canFeed={snacksOnStage}
           celebrate={canCelebrate}
           onPet={onPet}
           onFeed={onFeedDrop}
@@ -182,48 +153,21 @@ export default function SpritePage() {
             tucked.current = true;
             window.clearTimeout(idleTimer.current);
             setMood("sleepy");
-            setNotice("Tucked in.");
           }}
           onWake={() => {
             tucked.current = false;
             setMood(restMood());
             bumpIdle();
-            setNotice("Up.");
           }}
-          onCelebrate={() => {
-            react("done", 900);
-            setNotice("Again!");
-          }}
-          onHighFive={() => {
-            react("done", 2000);
-            setNotice("Nice work.");
-          }}
+          onCelebrate={() => react("done", 900)}
+          onHighFive={() => react("done", 2000)}
           onCatch={(ok, reason) => {
-            setNotice(ok ? "Caught a token." : (reason ?? "Missed it."));
+            if (!ok && reason) setNotice(reason);
           }}
         />
         {feedsLeft === 0 ? (
-          <p className="mt-2 text-center text-xs text-zinc-400">Snacks tomorrow.</p>
-        ) : (
-          <p className="mt-2 text-center text-xs text-zinc-400">
-            <TokenAmount value={FEED_COST} />
-          </p>
-        )}
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <Button variant="outline" className="h-10 rounded-full" onClick={onPoke}>
-            Poke
-          </Button>
-          <Button
-            variant="outline"
-            className="h-10 rounded-full"
-            onClick={onHighFive}
-          >
-            High-five
-          </Button>
-          <Button asChild variant="ghost" className="h-10 rounded-full">
-            <Link href={ROUTES.quiz}>Quiz</Link>
-          </Button>
-        </div>
+          <p className="mt-3 text-center text-xs text-zinc-400">Snacks tomorrow.</p>
+        ) : null}
         {notice ? <p className="mt-3 text-sm text-primary">{notice}</p> : null}
       </section>
 
@@ -231,17 +175,14 @@ export default function SpritePage() {
         <StatusCard
           label="Care stage"
           value={sparkEvolutionLabel(evo.stage)}
-          detail={`${Math.round(evo.glow * 100)}% glow`}
         />
         <StatusCard
           label="Official hours"
           value={formatHours(official)}
-          detail="Verified ManageBac only"
         />
         <StatusCard
           label="Login streak"
           value={`${state.streakDays}`}
-          detail="7 days unlocks Seven-day flare"
         />
       </section>
 
@@ -301,13 +242,6 @@ export default function SpritePage() {
         onWear={(id, owned) => wear("trail", id, owned)}
       />
 
-      <p className="text-sm text-muted-foreground">
-        Buy new closet pieces in{" "}
-        <Link href={ROUTES.appearance} className="text-foreground underline">
-          Appearance
-        </Link>
-        .
-      </p>
     </PageFrame>
   );
 }
@@ -315,11 +249,9 @@ export default function SpritePage() {
 function StatusCard({
   label,
   value,
-  detail,
 }: {
   label: string;
   value: string;
-  detail: string;
 }) {
   return (
     <div className="flux-card px-4 py-4">
@@ -327,7 +259,6 @@ function StatusCard({
         {label}
       </p>
       <p className="mt-2 text-lg text-foreground">{value}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
     </div>
   );
 }
@@ -367,18 +298,13 @@ function EquipRow({
             </span>
             <span>
               <span className="block text-sm text-foreground">{item.name}</span>
-              <span className="block text-xs text-muted-foreground">
-                {item.on ? "On" : item.owned ? "Tap to wear" : "Tap to preview"}
-              </span>
+              {item.on ? (
+                <span className="block text-xs text-muted-foreground">On</span>
+              ) : null}
             </span>
           </button>
         ))}
       </div>
     </section>
   );
-}
-
-function todayLocal() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
