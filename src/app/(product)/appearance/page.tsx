@@ -43,26 +43,32 @@ type Preview = {
   trail?: SparkTrailId;
 };
 
-const SHOP_TABS = [
+const SPRITE_TABS = [
   { id: "cosmetics", label: "Cosmetics" },
   { id: "colours", label: "Colours" },
   { id: "gradients", label: "Gradients" },
   { id: "auras", label: "Auras" },
   { id: "trails", label: "Trails" },
-  { id: "scenes", label: "Focus scenes" },
-  { id: "room", label: "Room" },
 ] as const;
 
-type ShopTab = (typeof SHOP_TABS)[number]["id"];
+const APP_TABS = [
+  { id: "scenes", label: "Focus scenes" },
+  { id: "room", label: "Rooms" },
+] as const;
+
+type ShopRealm = "sprite" | "app";
+type ShopTab =
+  | (typeof SPRITE_TABS)[number]["id"]
+  | (typeof APP_TABS)[number]["id"];
 
 function tabFromHash(hash: string): ShopTab {
   const key = hash.replace(/^#/, "");
-  if (key === "colours" || key === "accents") return "colours";
+  if (key === "colours") return "colours";
   if (key === "gradients" || key === "spark-gradient") return "gradients";
   if (key === "auras") return "auras";
   if (key === "trails") return "trails";
-  if (key === "scenes") return "scenes";
-  if (key === "room") return "room";
+  if (key === "scenes" || key === "app") return "scenes";
+  if (key === "room" || key === "accents") return "room";
   return "cosmetics";
 }
 
@@ -96,6 +102,13 @@ export default function AppearancePage() {
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
+
+  const shownRealm: ShopRealm =
+    tab === "scenes" || tab === "room" ? "app" : "sprite";
+
+  function openRealm(next: ShopRealm) {
+    openTab(next === "app" ? "scenes" : "cosmetics");
+  }
 
   function openTab(next: ShopTab) {
     setTab(next);
@@ -159,12 +172,55 @@ export default function AppearancePage() {
 
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
 
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => openRealm("sprite")}
+          className={cn(
+            "rounded-3xl px-5 py-6 text-left transition-colors",
+            shownRealm === "sprite"
+              ? "bg-primary/18 ring-2 ring-primary"
+              : "bg-card ring-1 ring-border hover:ring-primary/40",
+          )}
+        >
+          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+            Closet
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">
+            Sprite appearance
+          </p>
+          <p className="mt-2 text-sm text-zinc-500">
+            Cosmetics, colours, gradients, auras, trails.
+          </p>
+        </button>
+        <button
+          type="button"
+          onClick={() => openRealm("app")}
+          className={cn(
+            "rounded-3xl px-5 py-6 text-left transition-colors",
+            shownRealm === "app"
+              ? "bg-primary/18 ring-2 ring-primary"
+              : "bg-card ring-1 ring-border hover:ring-primary/40",
+          )}
+        >
+          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
+            Chrome
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">
+            App appearance
+          </p>
+          <p className="mt-2 text-sm text-zinc-500">
+            Focus scenes and rooms.
+          </p>
+        </button>
+      </div>
+
       <div
         role="tablist"
-        aria-label="Shop categories"
+        aria-label={shownRealm === "sprite" ? "Sprite appearance" : "App appearance"}
         className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {SHOP_TABS.map((item) => {
+        {(shownRealm === "sprite" ? SPRITE_TABS : APP_TABS).map((item) => {
           const on = tab === item.id;
           return (
             <button
@@ -192,7 +248,7 @@ export default function AppearancePage() {
             <div>
               <h2 className="text-2xl text-foreground">Cosmetics</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Clothes and solid Spark body colours. Try before you buy.
+                Clothes for the sprite. Try before you buy.
               </p>
             </div>
             <Group
@@ -215,18 +271,6 @@ export default function AppearancePage() {
                 />
               )}
             />
-            <Group
-              title="Solid body colours"
-              items={SPARK_TINTS.filter((item) => item.kind === "solid")}
-              owned={(id) => look.ownedSparkTints.includes(id)}
-              equipped={(id) => look.sparkTint === id}
-              previewing={(id) => preview.sparkTint === id}
-              onAct={(id, owned) => act("sparkTint", id, owned)}
-              onTry={(id) => tryOn("sparkTint", id)}
-              swatch={(item) => (
-                <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
-              )}
-            />
             <p className="text-sm text-zinc-400">
               Snacks are on{" "}
               <Link href={`${ROUTES.sprite}#snacks`} className="text-foreground underline">
@@ -241,22 +285,22 @@ export default function AppearancePage() {
         {tab === "colours" ? (
           <>
             <div>
-              <h2 className="text-2xl text-foreground">Colours</h2>
+              <h2 className="text-2xl text-foreground">Sprite colour</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Accent hues for buttons and chrome. Buy the colour once, then
-                Pastel / Normal / Deep.
+                Solid body colours. One equipped at a time.
               </p>
             </div>
-            <AccentGroup
-              items={ACCENTS}
-              owned={(id) => look.ownedAccents.includes(id)}
-              equipped={(id) => look.accent === id}
-              shade={look.accentShade}
-              onAct={(id, owned) => act("accent", id, owned)}
-              onShade={(id, shade) => {
-                const result = setAccentShade(shade, id);
-                setNotice(result.ok ? "Shade saved." : result.reason);
-              }}
+            <Group
+              title="Solid body"
+              items={SPARK_TINTS.filter((item) => item.kind === "solid")}
+              owned={(id) => look.ownedSparkTints.includes(id)}
+              equipped={(id) => look.sparkTint === id}
+              previewing={(id) => preview.sparkTint === id}
+              onAct={(id, owned) => act("sparkTint", id, owned)}
+              onTry={(id) => tryOn("sparkTint", id)}
+              swatch={(item) => (
+                <Spark mood="idle" tint={item.id} gear="none" trail="none" evolve={false} size={52} />
+              )}
             />
           </>
         ) : null}
@@ -264,13 +308,13 @@ export default function AppearancePage() {
         {tab === "gradients" ? (
           <>
             <div>
-              <h2 className="text-2xl text-foreground">Gradients</h2>
+              <h2 className="text-2xl text-foreground">Sprite gradient</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Premium two-tone Spark washes. 40–44, Aurora 90. No shade dropdown.
+                Premium two-tone sprite washes. 40–44, Aurora 90. No shade dropdown.
               </p>
             </div>
             <Group
-              title="Spark body"
+              title="Gradient body"
               items={SPARK_TINTS.filter((item) => item.kind === "gradient")}
               owned={(id) => look.ownedSparkTints.includes(id)}
               equipped={(id) => look.sparkTint === id}
@@ -287,10 +331,11 @@ export default function AppearancePage() {
         {tab === "auras" ? (
           <>
             <div>
-              <h2 className="text-2xl text-foreground">Auras</h2>
+              <h2 className="text-2xl text-foreground">Aura · Body glow</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Body glow. Pick the colour of the light around the silhouette.
-                One at a time.
+                Change the colour of the soft glow around the sprite. Mint,
+                pink, gold, lavender, and aurora. Not a prop or trail. One at a
+                time.
               </p>
             </div>
             <Group
@@ -321,8 +366,8 @@ export default function AppearancePage() {
             <div>
               <h2 className="text-2xl text-foreground">Trails</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Spark trail only. No Pastel / Normal / Deep — that dropdown is
-                for colours and rooms.
+                Motion behind the sprite. No Pastel / Normal / Deep — that
+                dropdown is for rooms.
               </p>
             </div>
             <Group
@@ -347,7 +392,7 @@ export default function AppearancePage() {
             <div>
               <h2 className="text-2xl text-foreground">Focus scenes</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Behind Spark in a session. Night sky is free.
+                Behind the sprite in a session. Night sky is free.
               </p>
             </div>
             <Group
@@ -368,9 +413,20 @@ export default function AppearancePage() {
               <h2 className="text-2xl text-foreground">Room</h2>
               <p className="mt-1 text-sm text-zinc-500">
                 App chrome hue. Buy once, then Pastel / Normal / Deep. Void and
-                star dots stay as they are.
+                star dots stay as they are. Accent buttons live here too.
               </p>
             </div>
+            <AccentGroup
+              items={ACCENTS}
+              owned={(id) => look.ownedAccents.includes(id)}
+              equipped={(id) => look.accent === id}
+              shade={look.accentShade}
+              onAct={(id, owned) => act("accent", id, owned)}
+              onShade={(id, shade) => {
+                const result = setAccentShade(shade, id);
+                setNotice(result.ok ? "Shade saved." : result.reason);
+              }}
+            />
             <RoomGroup
               items={BACKGROUNDS}
               owned={(id) => look.ownedBackgrounds.includes(id)}
