@@ -432,3 +432,4 @@ export function isAppUnlocked(
   if (!isUnlockCatalogId(appId)) return false;
   return isUnlockActive(unlocks, appId, now);
 }
+
