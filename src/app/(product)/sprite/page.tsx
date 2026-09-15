@@ -172,7 +172,7 @@ export default function SpritePage() {
 
       <EquipRow
         title="Color"
-        items={ownedColors}
+        items={ownedColors
           .filter((item) => item.kind === "solid")
           .map((item) => ({
             id: item.id,
@@ -193,7 +193,7 @@ export default function SpritePage() {
       />
       <EquipRow
         title="Gradient · premium"
-        items={ownedColors}
+        items={ownedColors
           .filter((item) => item.kind === "gradient")
           .map((item) => ({
             id: item.id,
