@@ -46,9 +46,6 @@ export default function SpritePage() {
   const official = verifiedStudyMs(state.logs);
   const lastDone = state.logs[state.logs.length - 1];
   const todayMs = todayStudyMs(state.logs);
-  const canHighFive = Boolean(
-    lastDone && Date.now() - lastDone.endedAt < 12 * 60 * 1000,
-  );
   const canCelebrate = Boolean(
     lastDone && Date.now() - lastDone.endedAt < 30 * 60 * 1000,
   );
@@ -141,10 +138,6 @@ export default function SpritePage() {
 
   function onHighFive() {
     if (mood === "eating") return;
-    if (!canHighFive) {
-      setNotice("Finish a session first, then come high-five.");
-      return;
-    }
     react("done", 2000);
     setNotice("Nice work.");
   }
@@ -179,7 +172,6 @@ export default function SpritePage() {
           canFeed={
             feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating"
           }
-          canHighFive={canHighFive}
           celebrate={canCelebrate}
           onPet={onPet}
           onFeed={onFeedDrop}
