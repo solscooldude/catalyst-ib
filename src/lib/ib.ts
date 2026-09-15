@@ -1,3 +1,4 @@
+import { alphaByLabel } from "@/lib/alpha";
 import type { SubjectId } from "@/lib/constants";
 
 export const IB_GROUPS = [1, 2, 3, 4, 5, 6] as const;
@@ -137,14 +138,10 @@ export const defaultMotivation: MotivationState = {
   unlockNote: "",
 };
 
+export { alphaByLabel } from "@/lib/alpha";
+
 export function getIbSubject(id: string) {
   return IB_SUBJECTS.find((row) => row.id === id);
-}
-
-export function alphaByLabel<T extends { label: string }>(items: readonly T[]): T[] {
-  return [...items].sort((a, b) =>
-    a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
-  );
 }
 
 export function subjectsInGroup(group: IbGroup) {
@@ -245,17 +242,21 @@ export function diplomaSubjectList(profile: ProfileState) {
     .map((id) => getIbSubject(id))
     .filter((row): row is IbSubject => Boolean(row));
   return {
-    core: CORE_DIPLOMA.map((row) => ({
-      id: row.statId,
-      label: row.label,
-      statId: row.statId,
-    })),
-    groups: groups.map((row) => ({
-      id: row.id,
-      label: row.label,
-      statId: row.statId,
-      level: row.level,
-    })),
+    core: alphaByLabel(
+      CORE_DIPLOMA.map((row) => ({
+        id: row.statId,
+        label: row.label,
+        statId: row.statId,
+      })),
+    ),
+    groups: alphaByLabel(
+      groups.map((row) => ({
+        id: row.id,
+        label: row.label,
+        statId: row.statId,
+        level: row.level,
+      })),
+    ),
   };
 }
 
