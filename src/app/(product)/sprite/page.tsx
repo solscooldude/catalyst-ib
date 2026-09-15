@@ -16,16 +16,18 @@ import {
   formatHours,
   sparkEvolution,
   sparkEvolutionLabel,
+  todayStudyMs,
   verifiedStudyMs,
 } from "@/lib/stats";
 import { ROUTES } from "@/lib/routes";
+import { careMood } from "@/lib/spark-play";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function SpritePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
-  const [mood, setMood] = useState<SparkMood>("idle");
+  const [mood, setMood] = useState<SparkMood>(() => "idle");
   const [petPulse, setPetPulse] = useState(0);
   const idleTimer = useRef(0);
   const pokeAt = useRef(0);
@@ -33,13 +35,21 @@ export default function SpritePage() {
   const evo = sparkEvolution(state.logs);
   const official = verifiedStudyMs(state.logs);
   const lastDone = state.logs[state.logs.length - 1];
+  const todayMs = todayStudyMs(state.logs);
   const canHighFive = Boolean(
     lastDone && Date.now() - lastDone.endedAt < 12 * 60 * 1000,
+  );
+  const canCelebrate = Boolean(
+    lastDone && Date.now() - lastDone.endedAt < 30 * 60 * 1000,
   );
   const feedsLeft =
     state.feedDay === todayLocal()
       ? Math.max(0, FEED_DAILY_LIMIT - state.feedCount)
       : FEED_DAILY_LIMIT;
+
+  function restMood() {
+    return careMood(state.streakDays, todayMs);
+  }
 
   function bumpIdle() {
     window.clearTimeout(idleTimer.current);
@@ -47,9 +57,10 @@ export default function SpritePage() {
   }
 
   useEffect(() => {
+    setMood(careMood(state.streakDays, todayMs));
     bumpIdle();
     return () => window.clearTimeout(idleTimer.current);
-  }, []);
+  }, [state.streakDays, todayMs]);
 
   function wear(
     kind: "sparkTint" | "gear" | "trail",
@@ -67,7 +78,7 @@ export default function SpritePage() {
   function react(next: SparkMood, ms = 1600) {
     setMood(next);
     bumpIdle();
-    window.setTimeout(() => setMood((current) => (current === next ? "idle" : current)), ms);
+    window.setTimeout(() => setMood((current) => (current === next ? restMood() : current)), ms);
   }
 
   function onPet() {
@@ -96,7 +107,7 @@ export default function SpritePage() {
       setNotice("Snack time.");
       bumpIdle();
       window.setTimeout(() => {
-        setMood((current) => (current === "done" ? "idle" : current));
+        setMood((current) => (current === "done" ? restMood() : current));
       }, 1800);
     }, 1200);
     return true;
@@ -155,11 +166,33 @@ export default function SpritePage() {
           canFeed={
             feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating"
           }
+          canHighFive={canHighFive}
+          celebrate={canCelebrate}
           onPet={onPet}
           onFeed={onFeedDrop}
+          onSleep={() => {
+            setMood("sleepy");
+            setNotice("Tucked in.");
+          }}
+          onWake={() => {
+            setMood(restMood());
+            setNotice("Up.");
+          }}
+          onCelebrate={() => {
+            react("done", 900);
+            setNotice("Again!");
+          }}
+          onHighFive={() => {
+            react("done", 2000);
+            setNotice("Nice work.");
+          }}
+          onCatch={(ok, reason) => {
+            setNotice(ok ? "Caught a token." : (reason ?? "Missed it."));
+          }}
         />
         <p className="mt-2 text-center text-xs text-muted-foreground">
-          Tap to pet · drag it for a bounce · drop the snack on the spark
+          Boop the face · scrunch the peaks · long-press to sleep · catch the
+          star · pick a snack and drag it on
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           Snack · <TokenAmount value={FEED_COST} /> · {feedsLeft} left today
