@@ -37,10 +37,10 @@ export default function AppHomePage() {
   }, [state.hydrated, state.setupComplete, router]);
 
   useEffect(() => {
-    if (state.hydrated && state.session?.status === "locked") {
-      router.replace(ROUTES.lock);
-    }
-    if (state.hydrated && state.session?.status === "focus") {
+    if (
+      state.hydrated &&
+      (state.session?.status === "locked" || state.session?.status === "focus")
+    ) {
       router.replace(ROUTES.session);
     }
   }, [state.hydrated, state.session, router]);
@@ -56,7 +56,7 @@ export default function AppHomePage() {
   function begin() {
     if (!taskId) return;
     startSession({ taskId, goal });
-    router.push(ROUTES.lock);
+    router.push(ROUTES.session);
   }
 
   return (
@@ -157,7 +157,7 @@ export default function AppHomePage() {
             disabled={!taskId}
             onClick={begin}
           >
-            Enter lock
+            Start focus
             <ArrowRight className="size-4" />
           </Button>
           <Button asChild variant="ghost" className="h-11 w-full rounded-full">

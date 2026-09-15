@@ -21,6 +21,7 @@ import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
   creditLiveSessionTokens,
+  enterFocus,
   markTaskDone,
   pauseSession,
   plannedLockMs,
@@ -55,7 +56,7 @@ export default function FocusPage() {
       return;
     }
     if (state.session.status === "locked") {
-      router.replace(ROUTES.lock);
+      enterFocus();
     }
     if (state.session.status === "completed") {
       router.replace(ROUTES.focus);
@@ -141,7 +142,7 @@ export default function FocusPage() {
           <span>
             <span className="text-sm text-white">Study buddy sit</span>
             <span className="mt-1 block text-xs text-zinc-100">
-              Spark sits beside the timer. Quiet idle.
+              The sprite sits beside the timer. Quiet idle.
             </span>
           </span>
         </label>
