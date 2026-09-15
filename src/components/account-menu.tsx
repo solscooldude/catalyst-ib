@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { logOut, useAuth } from "@/lib/auth";
 import { resetDemo } from "@/lib/store";
+import { setUiTheme, useUiTheme } from "@/lib/ui-theme";
 
 export function AccountMenu() {
   const router = useRouter();
   const auth = useAuth();
+  const theme = useUiTheme();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const label = auth.user?.email?.slice(0, 1).toUpperCase() ?? "A";
@@ -30,10 +32,9 @@ export function AccountMenu() {
   }, []);
 
   const items = [
-    { href: ROUTES.profile, label: "Profile" },
-    { href: ROUTES.motivation, label: "Account" },
-    { href: ROUTES.appearance, label: "Appearance" },
-    { href: ROUTES.unlocks, label: "Unlocks" },
+    { href: ROUTES.subscription, label: "Subscription" },
+    { href: ROUTES.profile, label: "IB profile" },
+    { href: ROUTES.settings, label: "Settings" },
   ];
 
   return (
@@ -51,7 +52,7 @@ export function AccountMenu() {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-48 rounded-2xl bg-white p-1.5 shadow-[0_16px_36px_-20px_rgb(24_24_27/0.35)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgb(244_244_245/0.08)]"
+          className="absolute right-0 top-full z-50 mt-2 w-52 rounded-2xl bg-white p-1.5 shadow-[0_16px_36px_-20px_rgb(24_24_27/0.35)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgb(244_244_245/0.08)]"
         >
           {items.map((item) => (
             <Link
@@ -64,6 +65,15 @@ export function AccountMenu() {
               {item.label}
             </Link>
           ))}
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center rounded-xl px-3.5 text-left text-sm text-zinc-600 dark:text-zinc-300"
+            onClick={() => {
+              setUiTheme(theme === "dark" ? "light" : "dark");
+            }}
+          >
+            {theme === "dark" ? "Light chrome" : "Dark chrome"}
+          </button>
           <button
             type="button"
             className="flex min-h-11 w-full items-center rounded-xl px-3.5 text-left text-sm text-zinc-600 dark:text-zinc-300"

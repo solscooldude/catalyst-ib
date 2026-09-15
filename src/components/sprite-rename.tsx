@@ -52,9 +52,13 @@ export function SpriteRename({ compact = false }: { compact?: boolean }) {
         </Button>
       </div>
       <p className="text-sm text-zinc-400">
-        Default is {DEFAULT_SPRITE_NAME}. Up to {SPRITE_NAME_MAX} characters.
-        First rename is free
-        {first ? "." : "."} Later ones cost <TokenAmount value={SPRITE_RENAME_COST} />.
+        {first ? (
+          "First rename is free."
+        ) : (
+          <>
+            Later renames cost <TokenAmount value={SPRITE_RENAME_COST} />
+          </>
+        )}
       </p>
       {notice ? <p className="text-sm text-foreground">{notice}</p> : null}
     </div>
