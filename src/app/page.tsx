@@ -6,7 +6,7 @@ import { PhoneLock } from "@/components/phone-lock";
 import { BrandC, SparkleMark } from "@/components/brand-marks";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
-import { PRICING, UNLOCK_CATALOG } from "@/lib/constants";
+import { UNLOCK_CATALOG } from "@/lib/constants";
 
 const STEPS = [
   {
@@ -60,7 +60,7 @@ export default function LandingPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
                 <Link href="/signup">
-                  Start free month
+                  Open the demo
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
@@ -73,8 +73,7 @@ export default function LandingPage() {
               </Button>
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              First month free, then {PRICING.then.toLowerCase()}. Phone lock
-              and ManageBac are simulated in this demo.
+              Free demo. Phone lock and ManageBac are simulated.
             </p>
           </div>
           <PhoneLock compact nemeses={["tiktok", "instagram"]} />
@@ -188,14 +187,14 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 lg:grid-cols-2">
             <div>
               <p className="text-xs tracking-[0.2em] text-primary uppercase">
-                Pricing
+                Free demo
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                First month free, then $2 a month
+                Use it here. No paywall.
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-                This build is a product demo. Sign up creates a demo account in
-                this browser — not a real checkout.
+                Sign up creates a demo account in this browser. There is no
+                checkout and no monthly plan.
               </p>
               <Button asChild className="mt-8 h-12 rounded-full px-6">
                 <Link href="/signup">
