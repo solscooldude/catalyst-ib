@@ -67,6 +67,7 @@ export default function ProfilePage() {
   const [course, setCourse] = useState(state.motivation.course);
   const [why, setWhy] = useState(state.motivation.why);
   const [error, setError] = useState<string | null>(null);
+  const [spriteDraft, setSpriteDraft] = useState(state.spriteName);
 
   const requiredIds = useMemo(
     () => Object.values(required).filter(Boolean),
@@ -82,7 +83,11 @@ export default function ProfilePage() {
   );
 
   function save() {
-    const result = saveProfile({ classYear, subjects });
+    const result = saveProfile({
+      classYear,
+      subjects,
+      spriteName: spriteDraft,
+    });
     if (!result.ok) {
       setError(result.reason);
       return;
@@ -108,7 +113,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="flux-card space-y-6 px-6 py-8">
-      <SpriteRename />
+      <SpriteRename onDraft={setSpriteDraft} />
       <div className="space-y-2">
         <Label htmlFor="class-year">Graduating class</Label>
         <AppSelect

@@ -30,12 +30,18 @@ import {
   useCatalyst,
 } from "@/lib/store";
 import { formatElapsed } from "@/lib/session-recap";
+import { readStudyBuddySit, writeStudyBuddySit } from "@/lib/study-buddy";
 
 export default function FocusPage() {
   const router = useRouter();
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
+  const [sit, setSit] = useState(false);
+
+  useEffect(() => {
+    setSit(readStudyBuddySit());
+  }, []);
 
   useEffect(() => {
     if (!state.hydrated) return;
@@ -96,6 +102,7 @@ export default function FocusPage() {
         taskId={session.taskId}
         subject={session.subjectId}
         hint={sessionHint(session)}
+        sit={sit}
       />
       <FocusHud
         time={formatElapsed(elapsed)}
@@ -108,24 +115,41 @@ export default function FocusPage() {
         <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
           {paused ? "Paused" : "Focus session"}
         </p>
-        <h1 className="mt-2 font-heading text-2xl text-foreground sm:text-3xl">
+        <h1 className="mt-2 font-heading text-2xl text-white sm:text-3xl">
           {title}
         </h1>
         {session.goal && session.kind === "verified" ? (
           <p className="mt-3 text-sm text-foreground/90">{session.goal}</p>
         ) : null}
 
+        <label className="focus-board-row mt-5 flex items-start gap-3">
+          <Checkbox
+            checked={sit}
+            onCheckedChange={(value) => {
+              const next = Boolean(value);
+              setSit(next);
+              writeStudyBuddySit(next);
+            }}
+          />
+          <span>
+            <span className="text-sm text-white">Study buddy sit</span>
+            <span className="mt-1 block text-xs text-zinc-100">
+              Spark sits beside the timer. Quiet idle.
+            </span>
+          </span>
+        </label>
+
         {session.kind === "verified" ? (
-          <label className="mt-5 flex items-start gap-3">
+          <label className="focus-board-row mt-4 flex items-start gap-3">
             <Checkbox
               checked={session.taskMarkedDone}
               onCheckedChange={(value) => markTaskDone(Boolean(value))}
             />
             <span>
-              <span className="text-sm text-foreground">
+              <span className="text-sm text-white">
                 Mark ManageBac task done
               </span>
-              <span className="mt-1 block text-xs text-muted-foreground">
+              <span className="mt-1 block text-xs text-zinc-100">
                 Adds <TokenAmount value={COMPLETION_BONUS} />
               </span>
             </span>
