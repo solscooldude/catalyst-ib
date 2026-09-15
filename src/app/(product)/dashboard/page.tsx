@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, Clock3, Flame, Heart, Unlock } from "lucide-react";
+import { Check, Clock3, Flame, Heart } from "lucide-react";
 import { QuietHoursChip } from "@/components/quiet-hours-chip";
 import { Spark } from "@/components/spark";
-import { TokenAmount } from "@/components/mint-chip";
+import { UnlockPanel } from "@/components/unlock-panel";
 import { Button } from "@/components/ui/button";
 import { SUBJECTS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
@@ -48,7 +48,6 @@ export default function DashboardPage() {
   const week = weekDayMarks(state.logs, now);
   const dailyGoalMs = 2 * 60 * 60 * 1000;
   const progress = Math.min(1, todayMs / dailyGoalMs);
-  const active = state.unlocks.filter((unlock) => unlock.expiresAt > now.getTime());
   const continueHref =
     session?.status === "locked"
       ? ROUTES.lock
@@ -80,10 +79,11 @@ export default function DashboardPage() {
               <h1 className="text-4xl tracking-tight text-foreground sm:text-5xl">
                 {displaySpriteName(state.spriteName)}
               </h1>
-              <p className="mt-2 max-w-[14rem] text-sm leading-6 text-zinc-400">
-                Soft glow
-                {evo.stage === "ember" ? "." : ` · ${evo.stage}.`}
-              </p>
+              {evo.stage === "ember" ? null : (
+                <p className="mt-2 max-w-[14rem] text-sm text-zinc-400">
+                  {evo.stage}
+                </p>
+              )}
               <Button
                 asChild
                 className="mt-5 h-11 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-none hover:bg-primary/85"
@@ -140,9 +140,6 @@ export default function DashboardPage() {
               </span>
             ))}
           </div>
-          <p className="mt-4 text-sm text-zinc-400">
-            {state.streakDays > 0 ? "Keep the chain." : "Log in after a session."}
-          </p>
         </section>
 
         <section className="flux-card px-6 py-7">
@@ -159,44 +156,13 @@ export default function DashboardPage() {
               style={{ width: `${Math.max(todayMs > 0 ? 8 : 0, progress * 100)}%` }}
             />
           </div>
-          <p className="mt-4 text-sm text-zinc-400">
-            {todayMs > 0 ? "Toward a two-hour day." : "No official minutes yet."}
-          </p>
         </section>
       </div>
 
       <QuietHoursChip />
 
-      <section className="flux-card flex flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-            <Unlock className="size-3.5 text-primary" />
-            App unlocks
-          </p>
-          <h2 className="mt-2 text-xl text-foreground">Spend tokens for ten minutes</h2>
-          <p className="mt-1 text-sm text-zinc-400">
-            {active.length === 0
-              ? "Nothing unlocked. Buy Notes, YouTube, or a nemesis app."
-              : active
-                  .map((unlock) => {
-                    const left = Math.max(0, unlock.expiresAt - now.getTime());
-                    const mins = Math.floor(left / 60000);
-                    const secs = Math.floor((left % 60000) / 1000);
-                    return `${unlock.label} ${mins}:${String(secs).padStart(2, "0")} left`;
-                  })
-                  .join(" · ")}
-          </p>
-        </div>
-        <Button asChild className="h-11 rounded-full">
-          <Link href={ROUTES.unlocks}>
-            Open unlocks
-            {state.tokens > 0 ? (
-              <span className="ml-1">
-                · <TokenAmount value={state.tokens} />
-              </span>
-            ) : null}
-          </Link>
-        </Button>
+      <section className="flux-card px-6 py-6">
+        <UnlockPanel />
       </section>
     </div>
   );

@@ -153,6 +153,49 @@ export async function logIn(email: string, password: string) {
   return { ok: true as const };
 }
 
+export async function updateEmail(nextEmail: string, password: string) {
+  const normalized = normalizeEmail(nextEmail);
+  if (!isEmail(normalized)) {
+    return { ok: false as const, reason: "Enter a valid email." };
+  }
+  const user = authState.user;
+  if (!user) return { ok: false as const, reason: "Not signed in." };
+  const accounts = readAccounts();
+  if (accounts.some((row) => row.email === normalized && row.id !== user.id)) {
+    return { ok: false as const, reason: "That email already has a demo account." };
+  }
+  const account = accounts.find((row) => row.id === user.id);
+  if (!account) return { ok: false as const, reason: "Account missing." };
+  const hash = await hashPassword(account.email, password);
+  if (hash !== account.passwordHash) {
+    return { ok: false as const, reason: "Password does not match." };
+  }
+  account.email = normalized;
+  account.passwordHash = await hashPassword(normalized, password);
+  writeAccounts(accounts);
+  authState = { hydrated: true, user: { id: user.id, email: normalized } };
+  emit();
+  return { ok: true as const };
+}
+
+export async function updatePassword(currentPassword: string, nextPassword: string) {
+  if (nextPassword.length < 6) {
+    return { ok: false as const, reason: "Use at least 6 characters." };
+  }
+  const user = authState.user;
+  if (!user) return { ok: false as const, reason: "Not signed in." };
+  const accounts = readAccounts();
+  const account = accounts.find((row) => row.id === user.id);
+  if (!account) return { ok: false as const, reason: "Account missing." };
+  const currentHash = await hashPassword(account.email, currentPassword);
+  if (currentHash !== account.passwordHash) {
+    return { ok: false as const, reason: "Current password does not match." };
+  }
+  account.passwordHash = await hashPassword(account.email, nextPassword);
+  writeAccounts(accounts);
+  return { ok: true as const };
+}
+
 export function logOut() {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(AUTH_SESSION_KEY);
