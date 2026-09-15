@@ -183,7 +183,7 @@ export default function AppearancePage() {
           />
 
           <Group
-            title="Spark color"
+            title="Spark color · 10–14"
             items={SPARK_TINTS.filter(
               (item) =>
                 item.collection === collection.id && item.kind === "solid",
@@ -199,7 +199,7 @@ export default function AppearancePage() {
           />
 
           <Group
-            title="Spark gradient"
+            title="Spark gradient · premium 40–44"
             items={SPARK_TINTS.filter(
               (item) =>
                 item.collection === collection.id && item.kind === "gradient",
