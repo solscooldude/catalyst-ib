@@ -87,7 +87,7 @@ function MenuLinks({
   hash: string;
   onPick?: () => void;
 }) {
-  const [open, setOpen] = useState<string>(
+  const [open, setOpen] = useState<string | null>(
     () => GROUPS.find((group) => groupActive(pathname, group))?.id ?? "home",
   );
 
@@ -105,7 +105,7 @@ function MenuLinks({
                 active ? "text-foreground" : "text-zinc-500",
               )}
               aria-expanded={expanded}
-              onClick={() => setOpen(expanded ? "" : group.id)}
+              onClick={() => setOpen(expanded ? null : group.id)}
             >
               {group.label}
               <ChevronDown
