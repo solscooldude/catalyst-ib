@@ -201,14 +201,14 @@ export const SPARK_GEAR = [
     name: "Mini cape",
     cost: 16,
     collection: "starter" as const,
-    blurb: "An indigo cloak draped from the neck, panels hanging behind.",
+    blurb: "A short indigo cloak from a neck clasp, hem hanging behind.",
   },
   {
     id: "horn",
     name: "Unicorn horn",
     cost: 18,
     collection: "starter" as const,
-    blurb: "A cream spiral on the twin peaks.",
+    blurb: "A cream spiral sitting on the left peak.",
   },
   {
     id: "bowtie",
