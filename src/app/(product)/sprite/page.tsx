@@ -25,6 +25,7 @@ import {
 import { ROUTES } from "@/lib/routes";
 import { careMood } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
+import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -145,7 +146,7 @@ export default function SpritePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
+    <PageFrame width="mid">
       <section className="flux-card px-6 py-8 sm:px-10">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           My Sprite
@@ -307,7 +308,7 @@ export default function SpritePage() {
         </Link>
         .
       </p>
-    </div>
+    </PageFrame>
   );
 }
 
