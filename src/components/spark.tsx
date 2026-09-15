@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
@@ -175,7 +175,7 @@ function SparkAuraMark({ id }: { id: SparkAuraId }) {
   if (id === "none") return null;
   const spec = getSparkAura(id);
   return (
-    <g aria-hidden>
+    <g aria-hidden className="spark-aura-wash">
       {spec.washes.map((wash, index) => (
         <ellipse
           key={`w${index}`}
@@ -187,19 +187,6 @@ function SparkAuraMark({ id }: { id: SparkAuraId }) {
           fillOpacity={wash.fillOpacity}
         />
       ))}
-      {spec.rings.map((ring, index) => (
-        <ellipse
-          key={`r${index}`}
-          cx={ring.cx}
-          cy={ring.cy}
-          rx={ring.rx}
-          ry={ring.ry}
-          fill="none"
-          stroke={ring.stroke}
-          strokeOpacity={ring.strokeOpacity}
-          strokeWidth={ring.strokeWidth}
-        />
-      ))}
     </g>
   );
 }
@@ -209,28 +196,44 @@ function GearBack({ id }: { id: SparkGearId }) {
     return (
       <g>
         <path
-          d="M12 70c-4 16 1 30 12 38 5 2 8-5 6-13-2-10-4-18-8-22-4-3-8-4-10-3Z"
+          d="M28 74c-10 4-18 16-20 32-1 10 3 20 10 24 4 2 7-2 6-8-2-12 0-22 4-28 2-3 3-8 0-20Z"
           fill="#1E1B4B"
         />
         <path
-          d="M88 70c4 16-1 30-12 38-5 2-8-5-6-13 2-10 4-18 8-22 4-3 8-4 10-3Z"
+          d="M72 74c10 4 18 16 20 32 1 10-3 20-10 24-4 2-7-2-6-8 2-12 0-22-4-28-2-3-3-8 0-20Z"
           fill="#1E1B4B"
         />
         <path
-          d="M16 76c8 18 8 28 4 36"
+          d="M26 86c-6 14-6 28-2 38"
           fill="none"
           stroke="#312E81"
           strokeWidth="2"
           strokeLinecap="round"
-          opacity="0.7"
+          opacity="0.55"
         />
         <path
-          d="M84 76c-8 18-8 28-4 36"
+          d="M74 86c6 14 6 28 2 38"
           fill="none"
           stroke="#312E81"
           strokeWidth="2"
           strokeLinecap="round"
-          opacity="0.7"
+          opacity="0.55"
+        />
+        <path
+          d="M22 112c8 8 16 10 22 6"
+          fill="none"
+          stroke="#4338CA"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          opacity="0.45"
+        />
+        <path
+          d="M78 112c-8 8-16 10-22 6"
+          fill="none"
+          stroke="#4338CA"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          opacity="0.45"
         />
       </g>
     );
@@ -411,10 +414,38 @@ function Gear({ id }: { id: SparkGearId }) {
     return (
       <g>
         <path
-          d="M34 76c5-3 27-3 32 0-2 4-8 6-16 6s-14-2-16-6Z"
+          d="M32 74c6-6 30-6 36 0-1 5-8 8-18 8s-17-3-18-8Z"
           fill="#312E81"
         />
-        <circle cx="50" cy="78.4" r="2.3" fill="#A78BFA" />
+        <path
+          d="M34 76c5-3 27-3 32 0"
+          fill="none"
+          stroke="#A78BFA"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        <circle cx="50" cy="78.6" r="2.1" fill="#C4B5FD" />
+      </g>
+    );
+  }
+  if (id === "horn") {
+    return (
+      <g>
+        <path
+          d="M48.2 22c.4-10 1.4-18 1.8-22 .3 4 1.4 12 1.8 22 .2 4-1.4 6-3.6 6-2.2 0-3.8-2-3.6-6Z"
+          fill="#FDE68A"
+          stroke="#D97706"
+          strokeWidth="0.7"
+        />
+        <path
+          d="M49.2 4c2 5-.4 8 1.4 12M48.6 8c-1.6 4 .8 7-1 12"
+          fill="none"
+          stroke="#F59E0B"
+          strokeWidth="0.85"
+          strokeLinecap="round"
+        />
+        <ellipse cx="50" cy="24.4" rx="4.2" ry="1.8" fill="#F59E0B" opacity="0.45" />
       </g>
     );
   }
@@ -468,23 +499,39 @@ function GearFront({ id }: { id: SparkGearId }) {
   return (
     <g>
       <path
-        d="M38.2 58c-1.6-2.4-5.2-2.6-6.8-.2-2.1 3.1-.1 6.6 6.8 11.8 6.9-5.2 8.9-8.7 6.8-11.8-1.6-2.4-5.2-2.2-6.8.2Z"
+        d="M37.4 54.2c-2.6-3.8-8.2-4.2-10.8-.4-3.4 4.8-.2 10.4 10.8 18.2 11-7.8 14.2-13.4 10.8-18.2-2.6-3.8-8.2-3.4-10.8.4Z"
         fill="#DB2777"
         stroke="#9D174D"
-        strokeWidth="0.7"
+        strokeWidth="0.85"
       />
       <path
-        d="M61.8 58c-1.6-2.4-5.2-2.6-6.8-.2-2.1 3.1-.1 6.6 6.8 11.8 6.9-5.2 8.9-8.7 6.8-11.8-1.6-2.4-5.2-2.2-6.8.2Z"
+        d="M62.6 54.2c-2.6-3.8-8.2-4.2-10.8-.4-3.4 4.8-.2 10.4 10.8 18.2 11-7.8 14.2-13.4 10.8-18.2-2.6-3.8-8.2-3.4-10.8.4Z"
         fill="#DB2777"
         stroke="#9D174D"
-        strokeWidth="0.7"
+        strokeWidth="0.85"
       />
       <path
-        d="M45.6 64.2h8.8"
+        d="M44.2 64.6h11.6"
         fill="none"
         stroke="#9D174D"
-        strokeWidth="1.5"
+        strokeWidth="1.8"
         strokeLinecap="round"
+      />
+      <path
+        d="M33.6 58.4c1.4-1.6 3.6-1.4 4.2.4"
+        fill="none"
+        stroke="#F9A8D4"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <path
+        d="M58.8 58.4c1.4-1.6 3.6-1.4 4.2.4"
+        fill="none"
+        stroke="#F9A8D4"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.7"
       />
     </g>
   );
@@ -618,7 +665,7 @@ export function Spark({
       ? "eating"
       : act === "sleep" || mood === "sleepy"
         ? "sleepy"
-        : act === "celebrate" || act === "highfive" || petted
+        : act === "celebrate" || act === "tickle" || act === "wave" || petted
           ? "done"
           : mood;
   const asleep = shownMood === "sleepy";
@@ -663,14 +710,17 @@ export function Spark({
     petted && mood !== "eating" && "spark-petted",
     (act === "boop" || petted) && mood !== "eating" && "spark-boop",
     act === "poke" && mood !== "eating" && "spark-poke",
+    act === "spin" && mood !== "eating" && "spark-spin",
+    act === "tickle" && mood !== "eating" && "spark-tickle",
+    act === "wave" && mood !== "eating" && "spark-wave",
     act === "scrunch" && "spark-scrunch",
     act === "celebrate" && "spark-celebrate",
-    act === "highfive" && "spark-highfive",
     (act === "sleep" || mood === "sleepy") && "spark-sleeping",
     mood === "eating" && "spark-eating",
     mood === "eating" && snack && `spark-eat-${snack}`,
     flourish === "now" && "spark-idle-pop",
     trackEyes && "spark-track-eyes",
+    auraId !== "none" && "spark-has-aura",
     className,
   );
   const frameStyle = {
@@ -678,6 +728,7 @@ export function Spark({
     height: drawn,
     color: palette.lo,
     ["--spark-evo-glow" as string]: String(evo.glow),
+    ["--spark-aura" as string]: getSparkAura(auraId).glow,
   };
 
   const body = (
