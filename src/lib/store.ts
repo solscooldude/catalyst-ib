@@ -37,7 +37,6 @@ import {
   SUBJECTS,
   TASK_SUBJECT,
   UNLOCK_CATALOG,
-  formatNemesisList,
   isNemesisId,
   type NemesisId,
   type SubjectId,
@@ -493,8 +492,7 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
 
   const duration = state.demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
   const now = Date.now();
-  const label =
-    catalogId === "nemesis" ? formatNemesisList(state.nemeses) : item.name;
+  const label = item.name;
   const existing = coalesceUnlocks(state.unlocks, now).find(
     (unlock) => unlock.catalogId === catalogId,
   );
