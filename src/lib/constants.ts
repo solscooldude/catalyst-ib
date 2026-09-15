@@ -130,12 +130,6 @@ export const REAL_TIME_COMPRESS_MS = 5 * 60 * 1000;
 export const REAL_UNLOCK_MS = 10 * 60 * 1000;
 export const DEMO_UNLOCK_MS = 60 * 1000;
 
-/** Future billing stub — landing and account hide subscribe for this demo. */
-export const PRICING = {
-  trial: "Free demo",
-  then: "Free",
-};
-
 export function isNemesisId(id: string): id is NemesisId {
   return NEMESIS_APPS.some((app) => app.id === id);
 }
