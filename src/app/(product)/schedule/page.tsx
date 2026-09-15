@@ -248,7 +248,6 @@ export default function SchedulePage() {
           unlocks={state.unlocks}
           locked={Boolean(current)}
           compact
-          onBeginFocus={() => router.push(`${ROUTES.focus}#study`)}
         />
       </div>
     </PageFrame>
