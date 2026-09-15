@@ -1,5 +1,5 @@
 import { SUBJECTS, type SubjectId } from "@/lib/constants";
-import type { SessionLog } from "@/lib/store";
+import type { SessionLog } from "@/lib/store-core";
 
 export function startOfWeek(now = new Date()) {
   const date = new Date(now);
@@ -37,24 +37,121 @@ export function verifiedStudyMs(logs: SessionLog[]) {
     .reduce((sum, log) => sum + log.durationMs, 0);
 }
 
-export function sparkEvolution(logs: SessionLog[]) {
+export const CARE_STAGES = [
+  "egg",
+  "hatchling",
+  "sparklet",
+  "steady",
+  "bright",
+  "luminary",
+] as const;
+
+export type CareStage = (typeof CARE_STAGES)[number];
+
+export const CARE_STAGE_GUIDE: {
+  stage: CareStage;
+  label: string;
+  how: string;
+}[] = [
+  {
+    stage: "egg",
+    label: "Egg",
+    how: "Closed shell. First real focus block or snack hatches it into Hatchling.",
+  },
+  {
+    stage: "hatchling",
+    label: "Hatchling",
+    how: "Tiny body, dim glow. A little study time or a care action.",
+  },
+  {
+    stage: "sparklet",
+    label: "Sparklet",
+    how: "Growing. Keep a short streak and log a few hours.",
+  },
+  {
+    stage: "steady",
+    label: "Steady",
+    how: "Baseline size. Regular study plus snacks or quiz.",
+  },
+  {
+    stage: "bright",
+    label: "Bright",
+    how: "Bigger body, stronger glow. Longer official hours and streak.",
+  },
+  {
+    stage: "luminary",
+    label: "Luminary",
+    how: "Largest glow. Deep study weeks, a long streak, and ongoing care.",
+  },
+];
+
+const STAGE_LOOK: Record<CareStage, { scale: number; glow: number }> = {
+  egg: { scale: 0.8, glow: 0.32 },
+  hatchling: { scale: 0.72, glow: 0.48 },
+  sparklet: { scale: 0.88, glow: 0.78 },
+  steady: { scale: 1, glow: 1.05 },
+  bright: { scale: 1.16, glow: 1.62 },
+  luminary: { scale: 1.28, glow: 2.15 },
+};
+
+export type EvolutionExtras = {
+  streakDays?: number;
+  careActions?: number;
+  hatched?: boolean;
+};
+
+export function careScore(input: {
+  hours: number;
+  streakDays: number;
+  careActions: number;
+}) {
+  return input.hours + input.streakDays * 0.45 + input.careActions * 0.3;
+}
+
+export function stageFromScore(score: number, hatched: boolean): CareStage {
+  if (!hatched) return "egg";
+  if (score < 2.2) return "hatchling";
+  if (score < 7) return "sparklet";
+  if (score < 16) return "steady";
+  if (score < 32) return "bright";
+  return "luminary";
+}
+
+export function sparkEvolution(logs: SessionLog[], extras: EvolutionExtras = {}) {
   const hours = verifiedStudyMs(logs) / 3_600_000;
-  const t = Math.min(1, hours / 24);
+  const streakDays = extras.streakDays ?? 0;
+  const careActions = extras.careActions ?? 0;
+  const hatched =
+    extras.hatched ?? (logs.length > 0 || careActions > 0);
+  const score = careScore({ hours, streakDays, careActions });
+  const stage = stageFromScore(score, hatched);
+  const look = STAGE_LOOK[stage];
+  const t = Math.min(1, score / 32);
   return {
     hours,
+    score,
     t,
-    scale: 1 + t * 0.2,
-    glow: 1 + t * 0.85,
-    stage:
-      hours < 2 ? "ember" : hours < 8 ? "kindled" : hours < 20 ? "steady" : "bright",
+    scale: look.scale,
+    glow: look.glow,
+    stage,
   };
 }
 
-export function sparkEvolutionLabel(stage: ReturnType<typeof sparkEvolution>["stage"]) {
-  if (stage === "ember") return "Ember";
-  if (stage === "kindled") return "Kindled";
-  if (stage === "steady") return "Steady";
-  return "Bright";
+export function sparkEvolutionFromState(state: {
+  logs: SessionLog[];
+  streakDays: number;
+  careActions: number;
+  spriteHatched: boolean;
+}) {
+  return sparkEvolution(state.logs, {
+    streakDays: state.streakDays,
+    careActions: state.careActions,
+    hatched: state.spriteHatched,
+  });
+}
+
+export function sparkEvolutionLabel(stage: CareStage) {
+  return CARE_STAGE_GUIDE.find((row) => row.stage === stage)?.label ?? "Egg";
 }
 
 export function formatHours(ms: number) {
