@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,10 +16,15 @@ import { useCatalyst } from "@/lib/store";
 
 export function SpriteRename({ compact = false }: { compact?: boolean }) {
   const state = useCatalyst();
+  const fieldId = useId();
   const current = displaySpriteName(state.spriteName);
   const [value, setValue] = useState(current);
   const [notice, setNotice] = useState<string | null>(null);
   const first = (state.spriteRenameCount ?? 0) === 0;
+
+  useEffect(() => {
+    setValue(current);
+  }, [current]);
 
   function save() {
     const result = renameSprite(value);
@@ -37,10 +42,10 @@ export function SpriteRename({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className={compact ? "space-y-2" : "space-y-3"}>
-      <Label htmlFor="sprite-name">Sprite name</Label>
+      <Label htmlFor={fieldId}>Sprite name</Label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
-          id="sprite-name"
+          id={fieldId}
           value={value}
           maxLength={SPRITE_NAME_MAX}
           placeholder={DEFAULT_SPRITE_NAME}
