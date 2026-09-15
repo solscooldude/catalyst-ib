@@ -32,8 +32,8 @@ export function CareStageInfo() {
           ))}
         </ul>
         <p className="mt-3 text-xs text-muted-foreground">
-          Study time, login streak, and care (snacks, quiz, token catch) all
-          move the sprite up. Egg hatches on the first real focus or snack.
+          Egg → Hatchling → Sparklet → Steady → Bright → Luminary. Study time,
+          streak, and care (snacks, quiz, catch) move it up.
         </p>
       </PopoverContent>
     </Popover>
