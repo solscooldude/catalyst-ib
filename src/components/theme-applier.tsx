@@ -34,6 +34,7 @@ export function ThemeApplier() {
     if (!hydrated) return;
     const root = document.documentElement;
     const shade = getAccentShade(appearance.accent, appearance.accentShade);
+    const deep = getAccentShade(appearance.accent, "deep");
     root.dataset.accent = appearance.accent;
     root.dataset.accentShade = appearance.accentShade;
     root.style.setProperty("--primary", shade.hex);
@@ -43,6 +44,7 @@ export function ThemeApplier() {
     root.style.setProperty("--sidebar-ring", shade.hex);
     root.style.setProperty("--primary-foreground", shade.fg);
     root.style.setProperty("--sidebar-primary-foreground", shade.fg);
+    root.style.setProperty("--accent-deep", deep.hex);
     if (appearance.background === "void") {
       delete root.dataset.bg;
       delete root.dataset.bgShade;
