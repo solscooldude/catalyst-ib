@@ -199,6 +199,7 @@ export function FocusSpark({
           size={248}
           pettable
           act={act}
+          flourish="now"
         />
         {idle === "gift" ? (
           <span className="focus-token-drop" aria-live="polite">
