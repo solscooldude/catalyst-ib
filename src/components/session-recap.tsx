@@ -2,7 +2,7 @@
 
 import { Spark } from "@/components/spark";
 import { TokenAmount } from "@/components/mint-chip";
-import type { SessionRecap } from "@/lib/session-recap";
+import { formatElapsed, recapElapsedMs, type SessionRecap } from "@/lib/session-recap";
 
 export function SessionRecapCard({ recap }: { recap: SessionRecap }) {
   return (
@@ -15,7 +15,7 @@ export function SessionRecapCard({ recap }: { recap: SessionRecap }) {
         <div>
           <p className="text-xs text-[#3f3f46]">Elapsed</p>
           <p className="font-heading mt-1 text-3xl text-[#134e4a]">
-            {recap.minutes} min
+            {formatElapsed(recapElapsedMs(recap))}
           </p>
         </div>
         <div>

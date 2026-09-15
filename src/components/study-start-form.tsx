@@ -85,8 +85,7 @@ export function StudyStartForm() {
           ))}
         </div>
         <p className="text-xs text-muted-foreground">
-          The timer counts up. End when you are done. A goal is a reminder, not
-          an auto-stop. Tokens come from elapsed time. No +5.
+          Counts up until you End. A goal never auto-stops the block.
         </p>
       </div>
       {error ? <p className="text-sm text-rose-300">{error}</p> : null}
