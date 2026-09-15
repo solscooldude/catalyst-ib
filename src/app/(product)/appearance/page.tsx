@@ -127,8 +127,28 @@ export default function AppearancePage() {
         </p>
       </section>
 
-      <section id="trails" className="scroll-mt-24 space-y-4">
-      {COLLECTIONS.map((collection) => (
+      <section id="trails" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+          Trails
+        </p>
+        <h2 className="text-2xl text-foreground">Trails</h2>
+        <Group
+          title="Spark trail"
+          items={SPARK_TRAILS.filter(
+            (item) => item.id !== "week" || look.ownedTrails.includes("week"),
+          )}
+          owned={(id) => look.ownedTrails.includes(id)}
+          equipped={(id) => look.trail === id}
+          onAct={(id, owned) => act("trail", id, owned)}
+          onTry={(id) => tryOn("trail", id)}
+          swatch={(item) => (
+            <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
+          )}
+        />
+      </section>
+
+      <section className="scroll-mt-24 space-y-4">
+      {COLLECTIONS.filter((collection) => collection.id !== "focus").map((collection) => (
         <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
           <div>
             <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.16em] text-primary uppercase">
@@ -187,22 +207,6 @@ export default function AppearancePage() {
                 evolve={false}
                 size={52}
               />
-            )}
-          />
-
-          <Group
-            title="Trail"
-            items={SPARK_TRAILS.filter(
-              (item) =>
-                item.collection === collection.id &&
-                (item.id !== "week" || look.ownedTrails.includes("week")),
-            )}
-            owned={(id) => look.ownedTrails.includes(id)}
-            equipped={(id) => look.trail === id}
-            onAct={(id, owned) => act("trail", id, owned)}
-            onTry={(id) => tryOn("trail", id)}
-            swatch={(item) => (
-              <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
             )}
           />
 
