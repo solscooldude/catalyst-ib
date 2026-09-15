@@ -25,6 +25,7 @@ import {
   type AppearanceKind,
   useCatalyst,
 } from "@/lib/store";
+import { PageFrame } from "@/components/page-frame";
 import { cn } from "@/lib/utils";
 
 type Preview = {
@@ -68,7 +69,7 @@ export default function AppearancePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
+    <PageFrame>
       <div className="flux-card flex items-start justify-between gap-4 px-6 py-8 sm:px-10">
         <div>
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
@@ -147,7 +148,7 @@ export default function AppearancePage() {
         />
       </section>
 
-      <section className="scroll-mt-24 space-y-4">
+      <section className="scroll-mt-24 space-y-6">
       {COLLECTIONS.filter((collection) => collection.id !== "focus").map((collection) => (
         <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
           <div>
@@ -213,7 +214,7 @@ export default function AppearancePage() {
         </section>
       ))}
       </section>
-    </div>
+    </PageFrame>
   );
 }
 
