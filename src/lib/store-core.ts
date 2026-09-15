@@ -1,1 +1,516 @@
 "use client";
+
+import { useSyncExternalStore } from "react";
+import {
+  defaultAppearance,
+  normalizeAppearance,
+  type AppearanceState,
+} from "@/lib/appearance";
+import {
+  clearCloset,
+  mergeAppearance,
+  sessionAccountId,
+  writeCloset,
+} from "@/lib/closet";
+import { writeDeviceFocusStage } from "@/lib/focus-stage-persist";
+import {
+  pickPersistedSpriteName,
+  readDeviceSpriteName,
+  writeDeviceSpriteName,
+} from "@/lib/sprite-name-persist";
+import {
+  MOCK_TASKS,
+  NEMESIS_APPS,
+  STORAGE_KEY,
+  TASK_SUBJECT,
+  getUnlockItem,
+  isEssentialAppId,
+  isNemesisId,
+  isUnlockCatalogId,
+  isUnlockSpendId,
+  isUnlockTierSpendId,
+  type NemesisId,
+  type SubjectId,
+  type TaskId,
+  type UnlockSpendId,
+} from "@/lib/constants";
+import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
+import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
+import {
+  defaultMotivation,
+  defaultProfile,
+  normalizeMotivation,
+  normalizeProfile,
+  type MotivationState,
+  type ProfileState,
+} from "@/lib/ib";
+import {
+  normalizePlannerEvents,
+  normalizePlannerTodos,
+  type PlannerEvent,
+  type PlannerTodo,
+} from "@/lib/planner";
+import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
+import { sparkEvolutionFromState } from "@/lib/stats";
+
+export type TaskState = {
+  id: TaskId;
+  done: boolean;
+};
+
+export type SessionStatus = "locked" | "focus" | "completed";
+
+export type SessionKind = "verified" | "study";
+
+export type Session = {
+  id: string;
+  kind: SessionKind;
+  taskId?: TaskId;
+  subjectId: SubjectId;
+  title: string;
+  goal: string;
+  plannedMinutes: number | null;
+  demoMode: boolean;
+  status: SessionStatus;
+  lockedAt: number;
+  focusStartedAt: number | null;
+  completedAt: number | null;
+  pausedAt: number | null;
+  pauseAccumMs: number;
+  taskMarkedDone: boolean;
+  tokensEarned: number;
+  timeTokens: number;
+  completionTokens: number;
+};
+
+export type SessionLog = {
+  id: string;
+  kind: "verified" | "manual";
+  subjectId: SubjectId;
+  subjectLabel: string;
+  startedAt: number;
+  endedAt: number;
+  durationMs: number;
+  timeTokens: number;
+  completionTokens: number;
+  note?: string;
+  taskId?: TaskId;
+};
+
+export type Unlock = {
+  id: string;
+  catalogId: UnlockSpendId;
+  label: string;
+  cost: number;
+  startedAt: number;
+  expiresAt: number;
+};
+
+export type CatalystState = {
+  hydrated: boolean;
+  setupComplete: boolean;
+  nemeses: NemesisId[];
+  manageBacConnected: boolean;
+  demoMode: boolean;
+  tokens: number;
+  tasks: TaskState[];
+  session: Session | null;
+  unlocks: Unlock[];
+  logs: SessionLog[];
+  appearance: AppearanceState;
+  profile: ProfileState;
+  motivation: MotivationState;
+  schedule: LockWindow[];
+  lastLoginDay: string | null;
+  streakDays: number;
+  feedDay: string | null;
+  feedCount: number;
+  quizDay: string | null;
+  quizCorrect: number;
+  spriteName: string;
+  spriteRenameCount: number;
+  spriteAsleep: boolean;
+  dailyGoalMinutes: number;
+  spriteHatched: boolean;
+  careStage:
+    | "egg"
+    | "hatchling"
+    | "sparklet"
+    | "steady"
+    | "bright"
+    | "luminary";
+  careActions: number;
+  hatchBurstAt: number | null;
+  introSeen: boolean;
+  username: string;
+  avatarDataUrl: string | null;
+  soundMuted: boolean;
+  friendCode: string;
+  plannerTodos: PlannerTodo[];
+  plannerEvents: PlannerEvent[];
+};
+
+const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
+  id: task.id,
+  done: false,
+}));
+
+export function createDefaultState(): CatalystState {
+  return {
+    hydrated: false,
+    setupComplete: false,
+    nemeses: [],
+    manageBacConnected: false,
+    demoMode: true,
+    tokens: 0,
+    tasks: defaultTasks.map((task) => ({ ...task })),
+    session: null,
+    unlocks: [],
+    logs: [],
+    appearance: normalizeAppearance(defaultAppearance),
+    profile: {
+      ...defaultProfile,
+      subjects: [...defaultProfile.subjects],
+      core: [...defaultProfile.core],
+    },
+    motivation: { ...defaultMotivation },
+    schedule: [],
+    lastLoginDay: null,
+    streakDays: 0,
+    feedDay: null,
+    feedCount: 0,
+    quizDay: null,
+    quizCorrect: 0,
+    spriteName: "Sprite",
+    spriteRenameCount: 0,
+    spriteAsleep: false,
+    dailyGoalMinutes: DEFAULT_DAILY_GOAL_MINUTES,
+    spriteHatched: false,
+    careStage: "egg",
+    careActions: 0,
+    hatchBurstAt: null,
+    introSeen: false,
+    username: "",
+    avatarDataUrl: null,
+    soundMuted: false,
+    friendCode: makeFriendCode(),
+    plannerTodos: [],
+    plannerEvents: [],
+  };
+}
+
+export const defaultState: CatalystState = createDefaultState();
+
+type Listener = () => void;
+
+export let state: CatalystState = defaultState;
+const listeners = new Set<Listener>();
+
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+let storageAccountId: string | null = null;
+
+export function accountStorageKey(userId: string) {
+  return `${STORAGE_KEY}:user:${userId}`;
+}
+
+function persist(next: CatalystState) {
+  if (typeof window === "undefined") return;
+  writeDeviceSpriteName(next.spriteName);
+  const userId = storageAccountId ?? sessionAccountId();
+  if (!userId) return;
+  storageAccountId = userId;
+  const { hydrated, ...rest } = next;
+  void hydrated;
+  window.localStorage.setItem(accountStorageKey(userId), JSON.stringify(rest));
+  writeCloset(userId, next.appearance);
+  writeDeviceFocusStage(next.appearance.focusTheme);
+}
+
+function withGrowth(next: CatalystState): CatalystState {
+  const careStage = sparkEvolutionFromState(next).stage;
+  return next.careStage === careStage ? next : { ...next, careStage };
+}
+
+export function setState(updater: (current: CatalystState) => CatalystState) {
+  state = withGrowth(updater(state));
+  persist(state);
+  emit();
+}
+
+export function setSpriteAsleep(asleep: boolean) {
+  setState((current) =>
+    current.spriteAsleep === asleep ? current : { ...current, spriteAsleep: asleep },
+  );
+}
+
+function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
+  return unlocks.filter((unlock) => unlock.expiresAt > now);
+}
+
+export function coalesceUnlocks(unlocks: Unlock[], now = Date.now()) {
+  const byCatalog = new Map<UnlockSpendId, Unlock>();
+  for (const unlock of pruneUnlocks(unlocks, now)) {
+    if (!isUnlockSpendId(unlock.catalogId)) continue;
+    const existing = byCatalog.get(unlock.catalogId);
+    if (!existing) {
+      byCatalog.set(unlock.catalogId, unlock);
+      continue;
+    }
+    const remaining =
+      Math.max(0, existing.expiresAt - now) +
+      Math.max(0, unlock.expiresAt - now);
+    byCatalog.set(unlock.catalogId, {
+      ...existing,
+      cost: existing.cost + unlock.cost,
+      expiresAt: now + remaining,
+    });
+  }
+  return [...byCatalog.values()];
+}
+
+type RawUnlock = {
+  id?: string;
+  catalogId?: string;
+  label?: string;
+  cost?: number;
+  startedAt?: number;
+  expiresAt?: number;
+};
+
+export function normalizeUnlocks(
+  unlocks: RawUnlock[] | Unlock[] | undefined,
+  nemeses: readonly NemesisId[] = [],
+  now = Date.now(),
+): Unlock[] {
+  const migrated: Unlock[] = [];
+  for (const unlock of unlocks ?? []) {
+    const catalogId = unlock.catalogId;
+    if (!catalogId || catalogId === "notes") continue;
+    if (catalogId === "nemesis") {
+      for (const nemesisId of nemeses) {
+        const item = getUnlockItem(nemesisId);
+        migrated.push({
+          id: `${unlock.id ?? "legacy"}-${nemesisId}`,
+          catalogId: nemesisId,
+          label: item?.name ?? nemesisId,
+          cost: unlock.cost ?? item?.cost ?? 0,
+          startedAt: unlock.startedAt ?? now,
+          expiresAt: unlock.expiresAt ?? now,
+        });
+      }
+      continue;
+    }
+    if (isUnlockTierSpendId(catalogId)) {
+      migrated.push({
+        id: unlock.id ?? catalogId,
+        catalogId,
+        label: unlock.label ?? (catalogId === "tier2" ? "Tier 2" : "Tier 3"),
+        cost: unlock.cost ?? 0,
+        startedAt: unlock.startedAt ?? now,
+        expiresAt: unlock.expiresAt ?? now,
+      });
+      continue;
+    }
+    if (!isUnlockCatalogId(catalogId)) continue;
+    const item = getUnlockItem(catalogId);
+    migrated.push({
+      id: unlock.id ?? catalogId,
+      catalogId,
+      label: unlock.label ?? item?.name ?? catalogId,
+      cost: unlock.cost ?? item?.cost ?? 0,
+      startedAt: unlock.startedAt ?? now,
+      expiresAt: unlock.expiresAt ?? now,
+    });
+  }
+  return coalesceUnlocks(migrated, now);
+}
+
+function normalizeNemeses(
+  raw: Partial<CatalystState> & { nemesis?: NemesisId | null },
+): NemesisId[] {
+  const fromList = (raw.nemeses ?? []).filter(isNemesisId);
+  if (fromList.length > 0) return [...new Set(fromList)];
+  if (raw.nemesis && isNemesisId(raw.nemesis)) return [raw.nemesis];
+  return [];
+}
+
+function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) {
+  if (!raw) return null;
+  if (raw.kind && raw.subjectId && raw.title) {
+    return {
+      ...raw,
+      pausedAt: raw.pausedAt ?? null,
+      pauseAccumMs: raw.pauseAccumMs ?? 0,
+    };
+  }
+  const legacy = raw as Session & { taskId?: TaskId };
+  const taskId = legacy.taskId;
+  if (!taskId) return null;
+  const task = MOCK_TASKS.find((row) => row.id === taskId);
+  return {
+    ...legacy,
+    kind: "verified" as const,
+    taskId,
+    subjectId: TASK_SUBJECT[taskId],
+    title: task?.title ?? "Focus session",
+    plannedMinutes: legacy.plannedMinutes ?? null,
+    pausedAt: legacy.pausedAt ?? null,
+    pauseAccumMs: legacy.pauseAccumMs ?? 0,
+  };
+}
+
+export function hydrateStore(userId: string | null = null) {
+  if (typeof window === "undefined") return;
+  const id = userId ?? sessionAccountId();
+  storageAccountId = id;
+  if (!id) {
+    state = {
+      ...createDefaultState(),
+      spriteName: pickPersistedSpriteName(undefined, readDeviceSpriteName()),
+      hydrated: true,
+    };
+    emit();
+    return;
+  }
+  try {
+    const raw = window.localStorage.getItem(accountStorageKey(id));
+    if (!raw) {
+      state = {
+        ...createDefaultState(),
+        appearance: mergeAppearance(undefined, id),
+        spriteName: pickPersistedSpriteName(undefined, readDeviceSpriteName()),
+        hydrated: true,
+      };
+      persist(state);
+      emit();
+      return;
+    }
+    const parsed = JSON.parse(raw) as Partial<CatalystState> & {
+      nemesis?: NemesisId | null;
+    };
+    state = {
+      ...createDefaultState(),
+      ...parsed,
+      nemeses: normalizeNemeses(parsed),
+      tasks:
+        parsed.tasks && parsed.tasks.length === defaultTasks.length
+          ? parsed.tasks
+          : defaultTasks.map((task) => ({ ...task })),
+      unlocks: normalizeUnlocks(parsed.unlocks ?? [], normalizeNemeses(parsed)),
+      logs: parsed.logs ?? [],
+      appearance: mergeAppearance(parsed.appearance, id),
+      profile: normalizeProfile(parsed.profile),
+      motivation: normalizeMotivation(parsed.motivation),
+      schedule: normalizeSchedule(parsed.schedule),
+      session: normalizeSession(parsed.session ?? null),
+      lastLoginDay: parsed.lastLoginDay ?? null,
+      streakDays: parsed.streakDays ?? 0,
+      feedDay: parsed.feedDay ?? null,
+      feedCount: parsed.feedCount ?? 0,
+      quizDay: parsed.quizDay ?? null,
+      quizCorrect: parsed.quizCorrect ?? 0,
+      spriteName: pickPersistedSpriteName(
+        parsed.spriteName,
+        readDeviceSpriteName(),
+      ),
+      spriteRenameCount: parsed.spriteRenameCount ?? 0,
+      spriteAsleep: Boolean(parsed.spriteAsleep),
+      dailyGoalMinutes: clampDailyGoalMinutes(parsed.dailyGoalMinutes),
+      spriteHatched: Boolean(
+        parsed.spriteHatched ||
+          (parsed.logs?.length ?? 0) > 0 ||
+          (parsed.careActions ?? 0) > 0,
+      ),
+      careActions:
+        typeof parsed.careActions === "number"
+          ? Math.max(0, parsed.careActions)
+          : 0,
+      hatchBurstAt: null,
+      introSeen: Boolean(parsed.introSeen),
+      username: normalizeUsername(parsed.username),
+      avatarDataUrl: normalizeAvatar(parsed.avatarDataUrl),
+      soundMuted: Boolean(parsed.soundMuted),
+      friendCode:
+        typeof parsed.friendCode === "string" && parsed.friendCode.startsWith("CAT-")
+          ? parsed.friendCode
+          : makeFriendCode(),
+      plannerTodos: normalizePlannerTodos(parsed.plannerTodos),
+      plannerEvents: normalizePlannerEvents(parsed.plannerEvents),
+      hydrated: true,
+    };
+    state = withGrowth(state);
+  } catch {
+    state = {
+      ...createDefaultState(),
+      appearance: mergeAppearance(undefined, id),
+      hydrated: true,
+    };
+  }
+  persist(state);
+  emit();
+}
+
+export function subscribe(listener: Listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+export function getSnapshot() {
+  return state;
+}
+
+export function getServerSnapshot() {
+  return defaultState;
+}
+
+export function useCatalyst() {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+export function resetDemo() {
+  const userId = storageAccountId ?? sessionAccountId();
+  if (typeof window !== "undefined" && userId) {
+    window.localStorage.removeItem(accountStorageKey(userId));
+    clearCloset(userId);
+  }
+  state = { ...createDefaultState(), hydrated: true };
+  emit();
+}
+
+export function getTask(id: TaskId) {
+  return MOCK_TASKS.find((task) => task.id === id);
+}
+
+export function getNemesis(id: NemesisId | null) {
+  return NEMESIS_APPS.find((app) => app.id === id);
+}
+
+export function getNemeses(ids: readonly NemesisId[]) {
+  return NEMESIS_APPS.filter((app) => ids.includes(app.id));
+}
+
+export function isUnlockActive(
+  unlocks: Unlock[],
+  catalogId: UnlockSpendId,
+  now = Date.now(),
+) {
+  return coalesceUnlocks(unlocks, now).some(
+    (unlock) => unlock.catalogId === catalogId,
+  );
+}
+
+export function isAppUnlocked(
+  unlocks: Unlock[],
+  appId: string,
+  now = Date.now(),
+) {
+  if (isEssentialAppId(appId)) return true;
+  if (!isUnlockCatalogId(appId)) return false;
+  const item = getUnlockItem(appId);
+  if (!item) return false;
+  const tierId = item.tier === 2 ? "tier2" : "tier3";
+  return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
+}
