@@ -9,7 +9,6 @@ import type {
   SparkTintId,
   SparkTrailId,
 } from "@/lib/appearance";
-import { HighFiveHand } from "@/components/high-five-hand";
 import {
   SNACKS,
   hitZone,
@@ -21,10 +20,10 @@ import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { cn } from "@/lib/utils";
 
 const TAP_SLOP = 9;
-const FOLLOW = 0.82;
-const STIFFNESS = 0.22;
-const DAMPING = 0.76;
-const SNAP = 0.18;
+const FOLLOW = 0.72;
+const STIFFNESS = 0.16;
+const DAMPING = 0.84;
+const SNAP = 0.14;
 const HOLD_SLEEP_MS = 620;
 
 type SpritePlaypenProps = {
@@ -38,7 +37,6 @@ type SpritePlaypenProps = {
   onSleep?: () => void;
   onWake?: () => void;
   onCelebrate?: () => void;
-  onHighFive?: () => void;
   onCatch?: (ok: boolean, reason?: string) => void;
   tint?: SparkTintId;
   gear?: SparkGearId;
@@ -56,7 +54,6 @@ export function SpritePlaypen({
   onSleep,
   onWake,
   onCelebrate,
-  onHighFive,
   onCatch,
   tint,
   gear,
@@ -64,13 +61,11 @@ export function SpritePlaypen({
 }: SpritePlaypenProps) {
   const sparkRef = useRef<HTMLDivElement>(null);
   const snackRef = useRef<HTMLButtonElement>(null);
-  const handRef = useRef<HTMLButtonElement>(null);
   const spark = useRef({ x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0 });
   const snack = useRef({ x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0 });
-  const hand = useRef({ x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0 });
   const hold = useRef<
     | {
-        kind: "spark" | "snack" | "hand";
+        kind: "spark" | "snack";
         pointerId: number;
         originX: number;
         originY: number;
@@ -84,7 +79,7 @@ export function SpritePlaypen({
   >(null);
   const holdTimer = useRef(0);
   const scrunch = useRef(createSparkScrunch());
-  const [held, setHeld] = useState<"spark" | "snack" | "hand" | null>(null);
+  const [held, setHeld] = useState<"spark" | "snack" | null>(null);
   const [eaten, setEaten] = useState(false);
   const eatenRef = useRef(false);
   const snackScale = useRef(1);
@@ -111,7 +106,6 @@ export function SpritePlaypen({
         snackRef.current,
         snackScale.current,
       );
-      step(hand.current, hold.current?.kind === "hand", handRef.current, 1);
       frame = window.requestAnimationFrame(tick);
     }
     frame = window.requestAnimationFrame(tick);
@@ -166,7 +160,7 @@ export function SpritePlaypen({
   }
 
   function begin(
-    kind: "spark" | "snack" | "hand",
+    kind: "spark" | "snack",
     event: React.PointerEvent<HTMLElement>,
   ) {
     if (kind === "snack" && (!canFeed || eaten || mood === "eating")) return;
@@ -188,8 +182,7 @@ export function SpritePlaypen({
       dragged: false,
       zone,
     };
-    const body =
-      kind === "spark" ? spark.current : kind === "snack" ? snack.current : hand.current;
+    const body = kind === "spark" ? spark.current : snack.current;
     body.tx = body.x;
     body.ty = body.y;
     setHeld(kind);
@@ -226,12 +219,7 @@ export function SpritePlaypen({
     if (!active.dragged) return;
     const now = performance.now();
     const dt = Math.max(8, now - active.lastT);
-    const body =
-      active.kind === "spark"
-        ? spark.current
-        : active.kind === "snack"
-          ? snack.current
-          : hand.current;
+    const body = active.kind === "spark" ? spark.current : snack.current;
     body.tx = dx;
     body.ty = dy;
     body.vx = ((event.clientX - active.lastX) / dt) * 16;
@@ -255,12 +243,6 @@ export function SpritePlaypen({
     if (!active.dragged) {
       if (active.kind === "spark" && active.zone === "peak") {
         scrunch.current.release();
-      }
-      if (active.kind === "hand") {
-        if (asleepRef.current || mood === "sleepy") return;
-        play("highfive", 800);
-        onHighFive?.();
-        return;
       }
       if (active.kind === "spark") {
         if (asleepRef.current || mood === "sleepy") {
@@ -297,16 +279,7 @@ export function SpritePlaypen({
         return;
       }
     }
-    if (active.kind === "hand" && !asleepRef.current && mood !== "sleepy" && over(sparkRef, handRef)) {
-      play("highfive", 800);
-      onHighFive?.();
-    }
-    const body =
-      active.kind === "spark"
-        ? spark.current
-        : active.kind === "snack"
-          ? snack.current
-          : hand.current;
+    const body = active.kind === "spark" ? spark.current : snack.current;
     body.tx = 0;
     body.ty = 0;
     body.vx *= 0.45;
@@ -319,7 +292,7 @@ export function SpritePlaypen({
   ) {
     const sparkBox = a.current?.getBoundingClientRect();
     const other = b.current?.getBoundingClientRect();
-    if (!sparkBox || !other) return false;
+    if (!sparkBox || other == null) return false;
     const x = other.left + other.width / 2;
     const y = other.top + other.height / 2;
     const pad = 28;
@@ -363,20 +336,6 @@ export function SpritePlaypen({
           className="pointer-events-none"
         />
       </div>
-      <button
-        ref={handRef}
-        type="button"
-        aria-label="High-five Spark"
-        title="Drag onto Spark"
-        className={cn("sprite-highfive-hand", held === "hand" && "is-held")}
-        onPointerDown={(event) => begin("hand", event)}
-        onPointerMove={move}
-        onPointerUp={end}
-        onPointerCancel={end}
-      >
-        <HighFiveHand />
-        <span className="sprite-highfive-label">High-five</span>
-      </button>
       {star ? (
         <button
           type="button"
