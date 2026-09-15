@@ -148,7 +148,6 @@ export default function SpritePage() {
           onSleep={() => setSpriteAsleep(true)}
           onWake={() => setSpriteAsleep(false)}
           onCelebrate={() => react("done", 900)}
-          onHighFive={() => react("done", 2000)}
           onCatch={(ok, reason) => {
             if (!ok && reason) setNotice(reason);
           }}
