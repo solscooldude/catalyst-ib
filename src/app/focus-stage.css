@@ -1,4 +1,4 @@
-/* Session canvas is isolated from theme tokens. Light chrome must not wash it out. */
+/* Session canvas keeps the chosen scene. Light chrome inverts stars so they read on pale sky. */
 
 html:has([data-focus-canvas]),
 html:has([data-focus-canvas]) body {
@@ -46,12 +46,17 @@ html.light .focus-stage-spotlight {
     #0b0b0f !important;
 }
 
-.focus-stage-night,
-.light .focus-stage-night,
-html.light .focus-stage-night {
+.focus-stage-night {
   background:
     radial-gradient(ellipse at 50% 120%, #1a2744 0%, transparent 55%),
     linear-gradient(180deg, #070b16 0%, #101935 48%, #1b2440 100%) !important;
+}
+
+html.light .focus-stage-night,
+.light .focus-stage-night {
+  background:
+    radial-gradient(ellipse at 50% 120%, #c5d0e6 0%, transparent 55%),
+    linear-gradient(180deg, #e8eef8 0%, #d5deee 48%, #c4d0e4 100%) !important;
 }
 
 .focus-stage-star {
@@ -62,6 +67,12 @@ html.light .focus-stage-night {
   animation: focus-stage-twinkle 4.6s ease-in-out infinite;
 }
 
+html.light .focus-stage-star,
+.light .focus-stage-star {
+  background: #18181b;
+  box-shadow: 0 0 6px rgb(24 24 27 / 35%);
+}
+
 .focus-stage-shoot {
   position: absolute;
   width: 72px;
@@ -69,6 +80,11 @@ html.light .focus-stage-night {
   background: linear-gradient(90deg, transparent, #fff, transparent);
   opacity: 0;
   animation: focus-stage-shoot 11s linear infinite;
+}
+
+html.light .focus-stage-shoot,
+.light .focus-stage-shoot {
+  background: linear-gradient(90deg, transparent, #18181b, transparent);
 }
 
 .focus-stage-sea,
