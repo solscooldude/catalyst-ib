@@ -31,12 +31,12 @@ npm run build
 
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only.
-3. `/dashboard` — mint Home: greeting, three soft cards (Current Sprite / Streak / Study time), quiet hours, and inline app unlocks. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
-4. Avatar menu — Subscription ($2/mo), IB profile, Settings (email + password). Not Unlocks, Appearance, Focus, or Sprite.
+3. `/dashboard` — mint Home: greeting, three soft cards (Current Sprite / Streak / Study time), a dedicated App unlocks card (spend + live countdown), then quiet hours. Token pill jumps to that card and shows remaining time when something is on. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
+4. Avatar menu — IB profile, Account settings, Subscription ($2/mo), light/dark chrome. Not Unlocks, Appearance, Focus, or Sprite. Aurora lives in Shop → Room.
 5. `/setup` — nemesis apps + mock ManageBac.
 6. `/focus` — pick a ManageBac task or start a study block. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
 7. `/session` — timer counts up in the center of the HUD (no sprite name). Pause or End anytime. Tokens are not awarded mid-session. Compact unlocks panel stays on the board.
-8. `/unlocks` — the dedicated spend route (also linked from the token pill). Recap lands here after End.
+8. `/unlocks` — dedicated spend route (also in Shop). Recap lands here after End. Day-to-day spend is the Home App unlocks card; the token pill jumps there.
 9. `/sprite` — My Sprite. `/appearance` is the closet. `/quiz` is a daily IB-style check.
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
 11. `/account/subscription` and `/account/settings` — plan and account basics.
