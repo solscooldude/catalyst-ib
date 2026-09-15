@@ -46,9 +46,9 @@ export default function SetupPage() {
         Your Tier 3 nemeses
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Pick the apps that pull you off the IA. These are the highest-cost
-        unlocks — Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord.
-        School tools stay allowed. YouTube stays in Tier 2.
+        Pick which apps sit in Tier 3 for the simulated lock. Spending still
+        unlocks the whole tier for the time block — not one app. School tools
+        stay free. YouTube stays in Tier 2.
       </p>
 
       <section className="mt-10">

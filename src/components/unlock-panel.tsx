@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { TokenAmount } from "@/components/mint-chip";
 import { ROUTES } from "@/lib/routes";
-import { Button } from "@/components/ui/button";
 import {
   TIER2_COST,
   TIER3_COST,
@@ -175,43 +174,69 @@ export function UnlockTierShop({
         const current = active.find((unlock) => unlock.catalogId === spendId);
         const left = current ? Math.max(0, current.expiresAt - now) : 0;
         const affordable = tokens >= cost;
+        const label = tier === 2 ? "Unlock Tier 2" : "Unlock Tier 3";
         return (
-          <div
+          <button
             key={tier}
+            type="button"
+            disabled={!affordable}
+            onClick={() => onBuy(tier)}
             className={cn(
-              "flex flex-col gap-3 rounded-2xl bg-card ring-1",
-              left > 0 ? "ring-primary/50" : "ring-border",
-              compact ? "px-3 py-3" : "px-4 py-4",
+              "text-left transition-colors disabled:opacity-45",
+              compact
+                ? "flex min-h-14 items-center justify-between rounded-2xl px-4 py-3"
+                : "min-h-[8.5rem] rounded-[1.75rem] px-6 py-6",
+              left > 0 || affordable
+                ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+                : "bg-card text-foreground ring-2 ring-border",
             )}
           >
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {tier === 2 ? "Unlock Tier 2" : "Unlock Tier 3"}
-              </p>
-              {detailed && row ? (
-                <p className="mt-1 text-xs text-muted-foreground">{row.blurb}</p>
-              ) : (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {cost} tokens / 10 min · whole tier
-                </p>
+            <p
+              className={cn(
+                "font-semibold tracking-tight",
+                compact ? "text-lg" : "text-2xl",
               )}
-              {left > 0 ? (
-                <p className="font-heading mt-1 font-mono text-sm tabular-nums text-primary">
-                  {formatUnlockLeft(left)} left
-                </p>
-              ) : null}
-            </div>
-            <Button
-              className={cn("rounded-full", compact ? "h-10" : "h-11")}
-              disabled={!affordable}
-              onClick={() => onBuy(tier)}
+            >
+              {left > 0 ? `Add time · ${label}` : label}
+            </p>
+            <p
+              className={cn(
+                compact ? "text-sm" : "mt-2 text-sm",
+                left > 0 || affordable
+                  ? "text-primary-foreground/80"
+                  : "text-zinc-500",
+              )}
             >
               <span className="inline-flex items-center gap-1.5">
-                {left > 0 ? "Add time" : tier === 2 ? "Unlock Tier 2" : "Unlock Tier 3"}
-                <TokenAmount value={cost} mark="ink" />
+                <TokenAmount
+                  value={cost}
+                  mark={left > 0 || affordable ? "cream" : "ink"}
+                />
+                / 10 min · whole tier
               </span>
-            </Button>
-          </div>
+            </p>
+            {left > 0 ? (
+              <p
+                className={cn(
+                  "font-heading font-mono tabular-nums",
+                  compact ? "mt-1 text-xs" : "mt-3 text-sm",
+                )}
+              >
+                {formatUnlockLeft(left)} left
+              </p>
+            ) : detailed && row ? (
+              <p
+                className={cn(
+                  "mt-3 text-xs",
+                  left > 0 || affordable
+                    ? "text-primary-foreground/75"
+                    : "text-zinc-500",
+                )}
+              >
+                {row.blurb}
+              </p>
+            ) : null}
+          </button>
         );
       })}
     </div>

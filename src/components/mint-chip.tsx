@@ -20,22 +20,28 @@ export function TokenAmount({
 }: {
   value: number | string;
   className?: string;
-  mark?: "mint" | "ink";
+  mark?: "mint" | "ink" | "cream";
 }) {
+  const tone =
+    mark === "cream"
+      ? "text-[#F8F4EA]"
+      : "text-zinc-800 dark:text-zinc-100";
   return (
     <span
       className={cn(
         "token-amount inline-flex items-center gap-1 text-[13px] font-semibold",
-        mark === "ink"
-          ? "text-zinc-800 dark:text-zinc-100"
-          : "text-zinc-800 dark:text-zinc-100",
+        tone,
         className,
       )}
     >
       <SparkleMark
         size={13}
         className={
-          mark === "ink" ? "text-zinc-800 dark:text-zinc-100" : "text-[#5EEAD4]"
+          mark === "ink"
+            ? "text-zinc-800 dark:text-zinc-100"
+            : mark === "cream"
+              ? "text-[#F8F4EA]"
+              : "text-[#5EEAD4]"
         }
       />
       <span className="tabular-nums">{value}</span>

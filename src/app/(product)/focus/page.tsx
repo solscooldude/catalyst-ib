@@ -165,7 +165,7 @@ export default function AppHomePage() {
           </Button>
         </div>
         <div className="mt-6">
-          <UnlockPanel compact />
+          <UnlockPanel compact collapsible />
         </div>
       </div>
 
