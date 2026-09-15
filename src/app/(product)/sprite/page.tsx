@@ -16,11 +16,13 @@ import {
 import { FEED_COST, FEED_DAILY_LIMIT, dayKey } from "@/lib/care";
 import {
   formatHours,
-  sparkEvolution,
+  sparkEvolutionFromState,
   sparkEvolutionLabel,
   todayStudyMs,
   verifiedStudyMs,
 } from "@/lib/stats";
+import { CareStageInfo } from "@/components/care-stage-info";
+import { TokenCatch } from "@/components/token-catch";
 import { careMood, type SparkGiftKind } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { SparkHowTo } from "@/components/spark-howto";
@@ -41,7 +43,7 @@ export default function SpritePage() {
   );
   const [petPulse, setPetPulse] = useState(0);
   const look = state.appearance;
-  const evo = sparkEvolution(state.logs);
+  const evo = sparkEvolutionFromState(state);
   const official = verifiedStudyMs(state.logs);
   const lastDone = state.logs[state.logs.length - 1];
   const todayMs = todayStudyMs(state.logs);
@@ -155,10 +157,13 @@ export default function SpritePage() {
         {notice ? <p className="mt-3 text-sm text-primary">{notice}</p> : null}
       </section>
 
+      <TokenCatch onNotice={setNotice} />
+
       <section className="grid gap-3 sm:grid-cols-3">
         <StatusCard
           label="Care stage"
-          value={sparkEvolutionLabel(evo.stage)}
+          value={sparkEvolutionLabel(state.careStage)}
+          hint={<CareStageInfo />}
         />
         <StatusCard
           label="Official hours"
@@ -271,14 +276,17 @@ export default function SpritePage() {
 function StatusCard({
   label,
   value,
+  hint,
 }: {
   label: string;
   value: string;
+  hint?: ReactNode;
 }) {
   return (
     <div className="flux-card px-4 py-4">
-      <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
+      <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {label}
+        {hint}
       </p>
       <p className="mt-2 text-lg text-foreground">{value}</p>
     </div>
