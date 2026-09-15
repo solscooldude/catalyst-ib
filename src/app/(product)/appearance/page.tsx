@@ -361,7 +361,7 @@ export default function AppearancePage() {
         {tab === "auras" ? (
           <>
             <div>
-              <h2 className="text-2xl text-foreground">Aura \u00b7 Body glow</h2>
+              <h2 className="text-2xl text-foreground">Aura · Body glow</h2>
               <p className="mt-1 text-sm text-zinc-500">
                 Change the colour of the soft glow around the sprite. Mint,
                 pink, gold, lavender, and aurora. Not a prop or trail. One at a
