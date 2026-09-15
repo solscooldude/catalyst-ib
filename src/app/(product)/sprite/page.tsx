@@ -175,7 +175,27 @@ export default function SpritePage() {
 
       <EquipRow
         title="Color"
-        items={SPARK_TINTS.map((item) => ({
+        items={SPARK_TINTS.filter((item) => item.kind === "solid").map((item) => ({
+          id: item.id,
+          name: item.name,
+          owned: look.ownedSparkTints.includes(item.id),
+          on: look.sparkTint === item.id || tryOn.tint === item.id,
+          preview: (
+            <Spark
+              mood="idle"
+              tint={item.id}
+              gear="none"
+              trail="none"
+              evolve={false}
+              size={52}
+            />
+          ),
+        }))}
+        onWear={(id, owned) => wear("sparkTint", id, owned)}
+      />
+      <EquipRow
+        title="Gradient"
+        items={SPARK_TINTS.filter((item) => item.kind === "gradient").map((item) => ({
           id: item.id,
           name: item.name,
           owned: look.ownedSparkTints.includes(item.id),
