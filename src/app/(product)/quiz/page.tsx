@@ -5,25 +5,28 @@ import Link from "next/link";
 import { Spark } from "@/components/spark";
 import { TokenAmount } from "@/components/mint-chip";
 import { Button } from "@/components/ui/button";
-import { pickQuiz } from "@/lib/care";
+import { pickQuiz, quizItemCaption, QUIZ_LENGTH } from "@/lib/care";
 import { ROUTES } from "@/lib/routes";
 import { scoreQuiz, useCatalyst } from "@/lib/store";
 
 export default function QuizPage() {
   const state = useCatalyst();
   const items = useMemo(
-    () => pickQuiz(state.profile.subjects, 3),
+    () => pickQuiz(state.profile.subjects, QUIZ_LENGTH),
     [state.profile.subjects],
   );
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
-  const [done, setDone] = useState(state.quizDay !== null && state.quizDay === todayLocal());
+  const [done, setDone] = useState(
+    state.quizDay !== null && state.quizDay === todayLocal(),
+  );
   const [gained, setGained] = useState(0);
   const [mood, setMood] = useState<"idle" | "done" | "tempted">("idle");
 
   const item = items[index];
   const already = state.quizDay === todayLocal();
+  const caption = item ? quizItemCaption(item, state.profile.subjects) : null;
 
   function choose(choice: number) {
     if (picked !== null || already) return;
@@ -50,10 +53,12 @@ export default function QuizPage() {
       <div>
         <p className="text-xs tracking-[0.2em] text-primary uppercase">Quiz</p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-          Three quick checks.
+          Ten checks from your diploma.
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Drawn from your IB subjects. Right answers pay{" "}
+          Catalyst-original practice mapped to your IB subjects
+          {state.profile.subjects.length ? "" : " and the core"}. Not past
+          papers, not a revision-site dump. Right answers pay{" "}
           <TokenAmount value={1} /> each. Once a day.
         </p>
       </div>
@@ -65,7 +70,7 @@ export default function QuizPage() {
       {already && !done ? (
         <p className="text-sm text-muted-foreground">
           Already done today. Come back tomorrow. Last run: {state.quizCorrect}{" "}
-          right.
+          of {QUIZ_LENGTH} right.
         </p>
       ) : done ? (
         <div className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
@@ -89,6 +94,13 @@ export default function QuizPage() {
         <div className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
           <p className="text-xs text-muted-foreground">
             {index + 1} / {items.length}
+            {caption ? (
+              <>
+                {" "}
+                · {caption.name}
+                {caption.level ? ` · ${caption.level}` : ""} · {caption.topic}
+              </>
+            ) : null}
           </p>
           <p className="mt-2 text-lg text-foreground">{item.prompt}</p>
           <div className="mt-5 grid gap-2">
@@ -100,7 +112,7 @@ export default function QuizPage() {
                   key={choice}
                   type="button"
                   variant={show && right ? "default" : "outline"}
-                  className="h-11 justify-start rounded-full"
+                  className="h-auto min-h-11 justify-start whitespace-normal rounded-full py-2.5 text-left"
                   disabled={picked !== null}
                   onClick={() => choose(choiceIndex)}
                 >
