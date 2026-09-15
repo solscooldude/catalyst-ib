@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
+import { FocusScene } from "@/components/focus-scene";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
+import { isStageFocusTheme } from "@/lib/focus-stages";
 import { TokenAmount } from "@/components/mint-chip";
 import { UnlockPanel } from "@/components/unlock-panel";
 import { type SparkMood } from "@/components/spark";
@@ -90,7 +92,16 @@ export default function FocusPage() {
 
   return (
     <div className="focus-session focus-session-stage" data-focus-canvas="">
-      <FocusStage />
+      {isStageFocusTheme(state.appearance.focusTheme) ||
+      state.appearance.focusTheme === "none" ? (
+        <FocusStage />
+      ) : (
+        <FocusScene
+          elapsedMs={elapsed}
+          demoMode={demoMode}
+          plannedMs={goalMs}
+        />
+      )}
       <FocusSpark
         mood={mood}
         taskId={session.taskId}
