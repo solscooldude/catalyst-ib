@@ -163,7 +163,7 @@ export const ACCENTS = [
 ] as const;
 
 export const SPARK_GEAR = [
-  { id: "none", name: "Bare", cost: 0, collection: "starter" as const, blurb: "Just the spark." },
+  { id: "none", name: "Bare", cost: 0, collection: "starter" as const, blurb: "Just the sprite." },
   { id: "bow", name: "Tiny bow", cost: 10, collection: "starter" as const, blurb: "A pink knot on the crown." },
   { id: "glasses", name: "Round glasses", cost: 12, collection: "starter" as const, blurb: "Black study frames." },
   { id: "scarf", name: "Soft scarf", cost: 12, collection: "starter" as const, blurb: "A red knit looped at the base, ends hanging down." },
@@ -222,7 +222,7 @@ export const SPARK_GEAR = [
     name: "Heart sunglasses",
     cost: 14,
     collection: "starter" as const,
-    blurb: "Big pink heart lenses over the eyes.",
+    blurb: "Oversized pink heart lenses over the eyes.",
   },
   {
     id: "beanie",
@@ -246,14 +246,14 @@ export const SPARK_TRAILS = [
     name: "No trail",
     cost: 0,
     collection: "starter" as const,
-    blurb: "The spark floats clean.",
+    blurb: "The sprite floats clean.",
   },
   {
     id: "sparkle",
     name: "Basic sparkle",
     cost: 24,
     collection: "starter" as const,
-    blurb: "Tiny motes while the spark is on screen.",
+    blurb: "Tiny motes while the sprite is on screen.",
   },
   {
     id: "paper",
@@ -281,7 +281,7 @@ export const SPARK_TRAILS = [
     name: "Lamp ember",
     cost: 72,
     collection: "starter" as const,
-    blurb: "Warm desk-lamp specks rising off the spark.",
+    blurb: "Warm desk-lamp specks rising off the sprite.",
   },
   {
     id: "gold",
@@ -312,7 +312,7 @@ export const FOCUS_THEMES = [
     name: "Deep blue sea",
     cost: 18,
     collection: "focus" as const,
-    blurb: "Rolling navy swells and foam behind Spark.",
+    blurb: "Rolling navy swells and foam behind the sprite.",
   },
   {
     id: "math",
