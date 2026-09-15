@@ -99,12 +99,12 @@ export function SparkleMark({
       viewBox="0 0 16 16"
       width={size}
       height={size}
-      className={cn("shrink-0", className)}
+      className={cn("shrink-0 text-[#5EEAD4]", className)}
       aria-hidden
     >
       <path
         d="M8 1.1 9.15 6.2 14.9 8 9.15 9.8 8 14.9 6.85 9.8 1.1 8l5.75-1.8Z"
-        fill={BRAND_MINT}
+        fill="currentColor"
       />
     </svg>
   );
