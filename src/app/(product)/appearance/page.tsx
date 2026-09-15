@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { MintChip, TokenAmount } from "@/components/mint-chip";
+import { BuyLabel, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,7 +100,6 @@ export default function AppearancePage() {
         <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
           <div>
             <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.16em] text-primary uppercase">
-              <MintChip size={11} />
               {collection.range}
             </p>
             <h2 className="mt-1 text-2xl text-foreground">{collection.name}</h2>
@@ -291,9 +290,7 @@ function ShopCard({
         ) : cost === 0 ? (
           "Take"
         ) : (
-          <span className="inline-flex items-center gap-1">
-            Buy · <TokenAmount value={cost} />
-          </span>
+          <BuyLabel cost={cost} />
         )}
       </Button>
     </div>
