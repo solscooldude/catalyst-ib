@@ -41,8 +41,8 @@ export default function LockPage() {
   }
 
   return (
-    <div className="relative mx-auto grid w-full max-w-4xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <div className="flux-card px-6 py-8">
+    <div className="relative mx-auto grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="flux-card px-6 py-8 sm:px-8">
         <DemoBadge>Simulated phone lock</DemoBadge>
         <h1 className="mt-4 text-4xl text-foreground sm:text-5xl">
           Phone is locked. Laptop is the only door.

@@ -8,6 +8,7 @@ import { TokenAmount } from "@/components/mint-chip";
 import { Button } from "@/components/ui/button";
 import { pickQuiz, quizItemCaption, QUIZ_LENGTH } from "@/lib/care";
 import { ROUTES } from "@/lib/routes";
+import { PageFrame } from "@/components/page-frame";
 import { scoreQuiz, useCatalyst } from "@/lib/store";
 
 export default function QuizPage() {
@@ -52,8 +53,8 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      <div className="flux-card px-6 py-8">
+    <PageFrame width="form">
+      <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Quiz</p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
           Daily quiz
@@ -132,7 +133,7 @@ export default function QuizPage() {
           </div>
         </div>
       ) : null}
-    </div>
+    </PageFrame>
   );
 }
 
