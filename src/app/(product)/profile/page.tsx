@@ -17,6 +17,7 @@ import {
 import { SpriteRename } from "@/components/sprite-rename";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
+import { PageFrame } from "@/components/page-frame";
 import { saveMotivation, saveProfile, useCatalyst } from "@/lib/store";
 
 export default function ProfilePage() {
@@ -96,8 +97,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      <div className="flux-card px-6 py-8">
+    <PageFrame width="form">
+      <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Profile
         </p>
@@ -212,6 +213,6 @@ export default function ProfilePage() {
         Save profile
       </Button>
       </div>
-    </div>
+    </PageFrame>
   );
 }

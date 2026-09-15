@@ -20,6 +20,7 @@ import {
   subjectStacks,
   weekLabel,
 } from "@/lib/stats";
+import { PageFrame } from "@/components/page-frame";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -48,8 +49,8 @@ export default function StatsPage() {
   if (!state.setupComplete) return null;
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
-      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8">
+    <PageFrame>
+      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8 sm:px-8">
         <div>
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Stats
@@ -191,7 +192,7 @@ export default function StatsPage() {
           </ul>
         )}
       </section>
-    </div>
+    </PageFrame>
   );
 }
 
