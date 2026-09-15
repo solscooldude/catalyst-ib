@@ -41,6 +41,7 @@ export default function SpritePage() {
   }>({});
   const idleTimer = useRef(0);
   const pokeAt = useRef(0);
+  const tucked = useRef(false);
   const look = state.appearance;
   const evo = sparkEvolution(state.logs);
   const official = verifiedStudyMs(state.logs);
@@ -64,6 +65,7 @@ export default function SpritePage() {
   }
 
   useEffect(() => {
+    if (tucked.current) return;
     setMood(careMood(state.streakDays, todayMs));
     bumpIdle();
     return () => window.clearTimeout(idleTimer.current);
@@ -176,11 +178,13 @@ export default function SpritePage() {
           onPet={onPet}
           onFeed={onFeedDrop}
           onSleep={() => {
+            tucked.current = true;
             window.clearTimeout(idleTimer.current);
             setMood("sleepy");
             setNotice("Tucked in.");
           }}
           onWake={() => {
+            tucked.current = false;
             setMood(restMood());
             bumpIdle();
             setNotice("Up.");
