@@ -14,9 +14,9 @@ export const COLLECTIONS: {
   },
   {
     id: "aurora",
-    name: "Night sky",
+    name: "Aurora",
     range: "80–150",
-    copy: "A quiet lavender room skin. Not a Focus backdrop.",
+    copy: "Lavender room chrome for the whole app. Not a Focus scene.",
   },
   {
     id: "gold",
@@ -106,10 +106,10 @@ export const BACKGROUNDS = [
   },
   {
     id: "stars",
-    name: "Stars",
+    name: "Star dots",
     cost: 100,
     collection: "aurora" as const,
-    blurb: "Soft glowing dots. A quiet night sky.",
+    blurb: "Soft dots on the app chrome. Not the Focus night-sky scene.",
   },
   {
     id: "aurora",
@@ -262,7 +262,7 @@ export const FOCUS_THEMES = [
     name: "Deep blue sea",
     cost: 18,
     collection: "focus" as const,
-    blurb: "Navy and cobalt water rolling behind the spark.",
+    blurb: "Rolling navy swells and foam behind Spark.",
   },
   {
     id: "math",
@@ -307,6 +307,9 @@ export const FOCUS_THEMES = [
     blurb: "Older option. Liftoff into the open universe — kept, not the main scene.",
   },
 ] as const;
+
+/** Session backdrops sold under Focus scenes. Quiet spotlight stays off the shelf. */
+export const SHOP_FOCUS_SCENES = FOCUS_THEMES.filter((item) => item.id !== "none");
 
 export type AccentId = (typeof ACCENTS)[number]["id"];
 export type BackgroundId = (typeof BACKGROUNDS)[number]["id"];
