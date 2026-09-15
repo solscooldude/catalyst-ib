@@ -1,3 +1,27 @@
+/* Pastel CTAs use cream labels. Mix in the deep hue so pale fills still read. */
+html[data-accent-shade="pastel"] [data-slot="button"][data-variant="default"],
+html[data-accent-shade="pastel"] .bg-primary.text-primary-foreground {
+  background-color: color-mix(in srgb, var(--primary) 64%, var(--accent-deep, #0f766e) 36%);
+  color: var(--primary-foreground);
+}
+
+html[data-accent-shade="pastel"] [data-slot="button"][data-variant="default"]:hover,
+html[data-accent-shade="pastel"] .bg-primary.text-primary-foreground:hover {
+  background-color: color-mix(in srgb, var(--primary) 52%, var(--accent-deep, #0f766e) 48%);
+}
+
+/* Pastel CTAs use cream labels. Mix in the deep hue so pale fills still read. */
+html[data-accent-shade="pastel"] [data-slot="button"][data-variant="default"],
+html[data-accent-shade="pastel"] .bg-primary.text-primary-foreground {
+  background-color: color-mix(in srgb, var(--primary) 64%, var(--accent-deep, #0f766e) 36%);
+  color: var(--primary-foreground);
+}
+
+html[data-accent-shade="pastel"] [data-slot="button"][data-variant="default"]:hover,
+html[data-accent-shade="pastel"] .bg-primary.text-primary-foreground:hover {
+  background-color: color-mix(in srgb, var(--primary) 52%, var(--accent-deep, #0f766e) 48%);
+}
+
 /* Star-dot room is a texture, not a hue. Wash hues are applied by ThemeApplier. */
 
 html[data-bg="stars"],
