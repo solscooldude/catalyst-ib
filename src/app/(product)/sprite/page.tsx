@@ -280,7 +280,7 @@ export default function SpritePage() {
               gear={item.id}
               trail="none"
               evolve={false}
-              size={52}
+              size={64}
             />
           ),
         }))}
