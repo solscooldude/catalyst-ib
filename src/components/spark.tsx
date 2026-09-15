@@ -186,17 +186,17 @@ function SparkAuraMark({
         <path
           d={SPARK_BODY_PATH}
           fill={spec.glowB}
-          fillOpacity="0.62"
+          fillOpacity="0.55"
           filter={`url(#${blurId})`}
-          transform="translate(54 60) scale(1.38) translate(-50 -62)"
+          transform="translate(50 62) scale(1.22) translate(-50 -62)"
         />
       ) : null}
       <path
         d={SPARK_BODY_PATH}
         fill={spec.glow}
-        fillOpacity="0.78"
+        fillOpacity="0.7"
         filter={`url(#${blurId})`}
-        transform="translate(50 62) scale(1.34) translate(-50 -62)"
+        transform="translate(50 62) scale(1.18) translate(-50 -62)"
       />
     </g>
   );
@@ -799,8 +799,8 @@ export function Spark({
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
           </radialGradient>
-          <filter id={auraBlurId} x="-45%" y="-45%" width="190%" height="190%">
-            <feGaussianBlur stdDeviation="4.2" />
+          <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
+            <feGaussianBlur stdDeviation="5.4" />
           </filter>
         </defs>
 
