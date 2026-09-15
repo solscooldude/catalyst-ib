@@ -6,7 +6,9 @@ This repo is a **web demo**. Phone lock and ManageBac are simulated — there is
 
 The currency mark is the mint four-point sparkle everywhere (nav pill, price rows, Buy / Unlock buttons). One sparkle on spend buttons — never a circled C or hex C as the token icon.
 
-Spark play on Focus and My Sprite: boop the face, scrunch the twin peaks, long-press to sleep, catch a floating mint star, high-five the labeled hand, and pick a cookie / berry / mint puff to feed. Mini-games are ideas only — not in this build. Planner is deferred.
+Spark play on Focus, My Sprite, and Home: boop the face, scrunch the twin peaks (they stay one silhouette), long-press to sleep (long-press again to wake), catch a floating mint star, high-five the labeled hand, and pick a cookie / berry / mint puff to feed. Mood follows streak and study time. Eyes glance toward the cursor only on My Sprite, and not while asleep.
+
+Mini-game ideas only — not in this build: memory/flip cards, streak balloon. Soft focus washes (spotlight / gradient / subject tint) are next after these interactions. Planner is deferred.
 
 ## Palette
 
@@ -32,8 +34,8 @@ npm run build
 3. `/dashboard` — greeting, Current Sprite / Streak / Study time, quiet hours, and inline app unlocks (spend without leaving Home).
 4. Avatar menu — Subscription ($2/mo), IB profile, Settings (email + password). Not Unlocks, Appearance, Focus, or Sprite.
 5. `/setup` — nemesis apps + mock ManageBac.
-6. `/focus` — pick a ManageBac task or start a study block. Demo speed: **30 seconds = 1 token**.
-7. `/session` — timer counts up. Pause or End anytime. Compact unlocks panel stays on the board.
+6. `/focus` — pick a ManageBac task or start a study block. Demo: **10 tokens per 20 seconds**, paid once when you End. Production target: **1 token per 2 minutes**.
+7. `/session` — timer counts up in the center of the HUD (no sprite name). Pause or End anytime. Tokens are not awarded mid-session. Compact unlocks panel stays on the board.
 8. `/unlocks` — the dedicated spend route (also linked from the token pill). Recap lands here after End.
 9. `/sprite` — My Sprite. `/appearance` is the closet. `/quiz` is a daily IB-style check.
 10. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
