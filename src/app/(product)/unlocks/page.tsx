@@ -7,18 +7,18 @@ import { Suspense } from "react";
 import { DemoBadge } from "@/components/demo-badge";
 import { PhoneLock } from "@/components/phone-lock";
 import { Spark } from "@/components/spark";
-import { TokenAmount } from "@/components/mint-chip";
 import { TokenChip } from "@/components/token-chip";
 import { Button } from "@/components/ui/button";
-import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { SessionRecapCard } from "@/components/session-recap";
 import { readSessionRecap } from "@/lib/session-recap";
 import { PageFrame } from "@/components/page-frame";
+import { UnlockShopList } from "@/components/unlock-panel";
 import {
   spendUnlock,
   useCatalyst,
 } from "@/lib/store";
+import type { UnlockCatalogId } from "@/lib/constants";
 
 function UnlockInner() {
   const router = useRouter();
@@ -84,7 +84,6 @@ function UnlockInner() {
   const mood =
     recap && now - arrivedAt < 5200 ? "done" : "tempted";
 
-  const nemesisLabel = formatNemesisList(state.nemeses);
   const active = useMemo(
     () => state.unlocks.filter((unlock) => unlock.expiresAt > now),
     [state.unlocks, now],
@@ -92,7 +91,7 @@ function UnlockInner() {
 
   if (!state.setupComplete) return null;
 
-  function buy(id: (typeof UNLOCK_CATALOG)[number]["id"]) {
+  function buy(id: UnlockCatalogId) {
     const result = spendUnlock(id);
     if (!result.ok) {
       setNotice(result.reason);
@@ -122,42 +121,21 @@ function UnlockInner() {
           <TokenChip tokens={state.tokens} />
         </div>
 
-        <div className="mt-8 space-y-3">
-          {UNLOCK_CATALOG.map((item) => {
-            const label = item.id === "nemesis" ? nemesisLabel : item.name;
-            const affordable = state.tokens >= item.cost;
-            const activeForApp = active.find((unlock) => unlock.catalogId === item.id);
-            const left = activeForApp
-              ? Math.max(0, activeForApp.expiresAt - now)
-              : 0;
-            return (
-              <div
-                key={item.id}
-                className="flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-border sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="text-sm text-foreground">{label}</p>
-                  {left > 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      {Math.floor(left / 60000)}:
-                      {String(Math.floor((left % 60000) / 1000)).padStart(2, "0")}{" "}
-                      left
-                    </p>
-                  ) : null}
-                </div>
-                <Button
-                  className="h-10 rounded-full"
-                  disabled={!affordable}
-                  onClick={() => buy(item.id)}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    {left > 0 ? "Add time" : "Unlock"}
-                    <TokenAmount value={item.cost} mark="ink" />
-                  </span>
-                </Button>
-              </div>
-            );
-          })}
+        <p className="mt-6 text-sm leading-6 text-muted-foreground">
+          School / essentials stay allowed during lock and are not sold here:
+          Chrome, Drive, Docs/Classroom, Gmail, ManageBac, Calculator,
+          Phone/SOS/Clock, Spotify, ChatGPT/Gemini, Maps.
+        </p>
+
+        <div className="mt-6">
+          <UnlockShopList
+            tokens={state.tokens}
+            nemeses={state.nemeses}
+            active={active}
+            now={now}
+            detailed
+            onBuy={buy}
+          />
         </div>
 
         {notice ? (
