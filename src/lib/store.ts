@@ -62,6 +62,12 @@ import {
 import { writeSessionRecap } from "@/lib/session-recap";
 import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
+import { normalizeAvatar, normalizeUsername } from "@/lib/identity";
+import {
+  normalizePlannerEvents,
+  type PlannerEventKind,
+} from "@/lib/planner";
+import { playSfx } from "@/lib/sfx";
 import {
   coalesceUnlocks,
   setState,
@@ -330,8 +336,11 @@ export function completeSession(tokensEarned?: number) {
     endedAt,
   });
 
+  const justHatched = !state.spriteHatched;
   setState((current) => ({
     ...current,
+    spriteHatched: true,
+    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
     tokens: current.tokens + leftover + completionTokens,
     tasks:
       session.kind === "verified" && session.taskId
@@ -351,6 +360,7 @@ export function completeSession(tokensEarned?: number) {
         }
       : null,
   }));
+  if (justHatched) playSfx("hatch");
   return { ok: true as const, timeTokens, completionTokens, totalTokens };
 }
 
@@ -488,12 +498,17 @@ export function feedSpark() {
   if (state.tokens < FEED_COST) {
     return { ok: false as const, reason: "Need 1 token to feed." };
   }
+  const justHatched = !state.spriteHatched;
   setState((current) => ({
     ...current,
     tokens: current.tokens - FEED_COST,
     feedDay: today,
     feedCount: used + 1,
+    careActions: current.careActions + 1,
+    spriteHatched: true,
+    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
+  if (justHatched) playSfx("hatch");
   return { ok: true as const, remaining: FEED_DAILY_LIMIT - used - 1 };
 }
 
@@ -508,6 +523,9 @@ export function scoreQuiz(correct: number) {
     quizDay: today,
     quizCorrect: correct,
     tokens: current.tokens + gained,
+    careActions: current.careActions + 1,
+    spriteHatched: true,
+    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
   return { ok: true as const, gained };
 }
@@ -595,6 +613,7 @@ export function spendUnlockTier(tier: UnlockTier) {
     ],
   }));
 
+  playSfx("unlock");
   return { ok: true as const, unlock, stacked };
 }
 
@@ -719,4 +738,113 @@ export function setBackgroundShade(shade: AccentShadeId, hue?: BackgroundId) {
     }),
   }));
   return { ok: true as const };
+}
+
+export function completeIntro() {
+  setState((current) => ({ ...current, introSeen: true }));
+}
+
+export function setSoundMuted(soundMuted: boolean) {
+  setState((current) => ({ ...current, soundMuted }));
+}
+
+export function saveIdentity(input: {
+  username?: string;
+  avatarDataUrl?: string | null;
+}) {
+  const username = normalizeUsername(input.username);
+  const avatarDataUrl =
+    input.avatarDataUrl === undefined
+      ? undefined
+      : normalizeAvatar(input.avatarDataUrl);
+  setState((current) => ({
+    ...current,
+    username: input.username === undefined ? current.username : username,
+    avatarDataUrl:
+      avatarDataUrl === undefined ? current.avatarDataUrl : avatarDataUrl,
+  }));
+  return { ok: true as const };
+}
+
+export function addCareAction() {
+  const justHatched = !state.spriteHatched;
+  setState((current) => ({
+    ...current,
+    careActions: current.careActions + 1,
+    spriteHatched: true,
+    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
+  }));
+  if (justHatched) playSfx("hatch");
+}
+
+export function addPlannerTodo(title: string) {
+  const next = title.trim();
+  if (!next) return { ok: false as const, reason: "Add a title." };
+  if (state.plannerTodos.length >= 40) {
+    return { ok: false as const, reason: "Forty to-dos is enough." };
+  }
+  setState((current) => ({
+    ...current,
+    plannerTodos: [
+      {
+        id: crypto.randomUUID(),
+        title: next.slice(0, 80),
+        done: false,
+        createdAt: Date.now(),
+      },
+      ...current.plannerTodos,
+    ],
+  }));
+  return { ok: true as const };
+}
+
+export function togglePlannerTodo(id: string) {
+  setState((current) => ({
+    ...current,
+    plannerTodos: current.plannerTodos.map((row) =>
+      row.id === id ? { ...row, done: !row.done } : row,
+    ),
+  }));
+}
+
+export function removePlannerTodo(id: string) {
+  setState((current) => ({
+    ...current,
+    plannerTodos: current.plannerTodos.filter((row) => row.id !== id),
+  }));
+}
+
+export function addPlannerEvent(input: {
+  title: string;
+  day: number;
+  time: string;
+  kind: PlannerEventKind;
+  date?: string | null;
+}) {
+  if (state.plannerEvents.length >= 60) {
+    return { ok: false as const, reason: "Sixty events is enough." };
+  }
+  const [event] = normalizePlannerEvents([
+    {
+      id: crypto.randomUUID(),
+      title: input.title,
+      day: input.day,
+      time: input.time,
+      kind: input.kind,
+      date: input.date ?? null,
+    },
+  ]);
+  if (!event) return { ok: false as const, reason: "Need a title, day, and time." };
+  setState((current) => ({
+    ...current,
+    plannerEvents: [...current.plannerEvents, event],
+  }));
+  return { ok: true as const, event };
+}
+
+export function removePlannerEvent(id: string) {
+  setState((current) => ({
+    ...current,
+    plannerEvents: current.plannerEvents.filter((row) => row.id !== id),
+  }));
 }
