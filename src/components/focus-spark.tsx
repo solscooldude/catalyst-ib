@@ -6,6 +6,7 @@ import { HighFiveHand } from "@/components/high-five-hand";
 import { Spark, type SparkMood } from "@/components/spark";
 import { hitZone, type SparkAct } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
+import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { grantFocusGift } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { SubjectId, TaskId } from "@/lib/constants";
@@ -31,9 +32,15 @@ export function FocusSpark({
   const holdTimer = useRef(0);
   const moved = useRef(false);
   const zone = useRef<"peak" | "face" | "body">("body");
+  const scrunch = useRef(createSparkScrunch());
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
   const [handHeld, setHandHeld] = useState(false);
   const hand = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const controller = scrunch.current;
+    return () => controller.dispose();
+  }, []);
 
   useEffect(() => {
     if (mood === "done") setAct("celebrate");
@@ -86,23 +93,16 @@ export function FocusSpark({
     }, ms);
   }
 
-  function releaseScrunch() {
-    const node = stageRef.current;
-    if (!node) return;
-    node.classList.remove("is-scrunching");
-    node.classList.add("spark-scrunch-release");
-    window.setTimeout(() => node.classList.remove("spark-scrunch-release"), 480);
-  }
-
   function down(event: React.PointerEvent<HTMLDivElement>) {
     event.currentTarget.setPointerCapture(event.pointerId);
     const box = stageRef.current?.getBoundingClientRect();
     moved.current = false;
+    scrunch.current.attach(stageRef.current);
     zone.current = box
       ? hitZone(event.clientX - box.left, event.clientY - box.top, box.width, box.height)
       : "body";
-    if (zone.current === "peak") {
-      stageRef.current?.classList.add("is-scrunching");
+    if (zone.current === "peak" && act !== "sleep") {
+      scrunch.current.press(event.clientY, box?.height ?? 200);
     }
     window.clearTimeout(holdTimer.current);
     holdTimer.current = window.setTimeout(() => {
@@ -123,17 +123,23 @@ export function FocusSpark({
       window.clearTimeout(holdTimer.current);
     }
     if (zone.current === "peak") {
-      stageRef.current?.classList.add("is-scrunching");
+      scrunch.current.move(event.clientY);
     }
   }
 
-  function up() {
-    window.clearTimeout(holdTimer.current);
-    if (zone.current === "peak" && moved.current) {
-      releaseScrunch();
-      return;
+  function up(event?: React.PointerEvent<HTMLDivElement>) {
+    if (event) {
+      try {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      } catch {
+        /* already released */
+      }
     }
-    stageRef.current?.classList.remove("is-scrunching");
+    window.clearTimeout(holdTimer.current);
+    if (zone.current === "peak") {
+      scrunch.current.release();
+      if (moved.current) return;
+    }
     if (!moved.current) {
       if (act === "sleep") return;
       if (mood === "done") play("celebrate", 900);
