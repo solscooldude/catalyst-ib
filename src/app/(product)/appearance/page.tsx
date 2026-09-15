@@ -11,12 +11,14 @@ import {
   BACKGROUNDS,
   COLLECTIONS,
   SHOP_FOCUS_SCENES,
+  SPARK_AURAS,
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
   type AccentId,
   type AccentShadeId,
   type BackgroundId,
+  type SparkAuraId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
@@ -38,6 +40,7 @@ import { cn } from "@/lib/utils";
 type Preview = {
   sparkTint?: SparkTintId;
   gear?: SparkGearId;
+  aura?: SparkAuraId;
   trail?: SparkTrailId;
 };
 
@@ -48,9 +51,13 @@ export default function AppearancePage() {
   const look = state.appearance;
   const shownTint = preview.sparkTint ?? look.sparkTint;
   const shownGear = preview.gear ?? look.gear;
+  const shownAura = preview.aura ?? look.aura;
   const shownTrail = preview.trail ?? look.trail;
   const trying =
-    preview.sparkTint != null || preview.gear != null || preview.trail != null;
+    preview.sparkTint != null ||
+    preview.gear != null ||
+    preview.aura != null ||
+    preview.trail != null;
 
   function act(kind: AppearanceKind, id: string, owned: boolean) {
     const result = owned ? equipAppearance(kind, id) : buyAppearance(kind, id);
@@ -66,6 +73,11 @@ export default function AppearancePage() {
     }
     if (kind === "gear") {
       setPreview((current) => ({ ...current, gear: id as SparkGearId }));
+      setNotice("Preview.");
+      return;
+    }
+    if (kind === "aura") {
+      setPreview((current) => ({ ...current, aura: id as SparkAuraId }));
       setNotice("Preview.");
       return;
     }
@@ -96,6 +108,7 @@ export default function AppearancePage() {
             mood="idle"
             tint={shownTint}
             gear={shownGear}
+            aura={shownAura}
             trail={shownTrail}
             size={132}
             pettable
@@ -131,6 +144,33 @@ export default function AppearancePage() {
             Open the snack bowl
           </Link>
         </p>
+      </section>
+
+      <section id="auras" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
+        <h2 className="text-2xl text-foreground">Auras</h2>
+        <p className="text-sm text-zinc-500">
+          Soft halo. One at a time. Quiet on Focus.
+        </p>
+        <Group
+          title="Glow"
+          items={SPARK_AURAS}
+          owned={(id) => look.ownedAuras.includes(id)}
+          equipped={(id) => look.aura === id}
+          previewing={(id) => preview.aura === id}
+          onAct={(id, owned) => act("aura", id, owned)}
+          onTry={(id) => tryOn("aura", id)}
+          swatch={(item) => (
+            <Spark
+              mood="idle"
+              tint={look.sparkTint}
+              gear="none"
+              aura={item.id}
+              trail="none"
+              evolve={false}
+              size={52}
+            />
+          )}
+        />
       </section>
 
       <section id="trails" className="flux-card scroll-mt-24 space-y-3 px-6 py-8">
@@ -236,6 +276,7 @@ export default function AppearancePage() {
                 mood="idle"
                 tint={look.sparkTint}
                 gear={item.id}
+                aura="none"
                 trail="none"
                 evolve={false}
                 size={52}
