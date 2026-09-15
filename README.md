@@ -6,7 +6,7 @@ This repo is a **web demo**. Phone lock and ManageBac are simulated — there is
 
 The currency mark is the mint four-point sparkle everywhere (nav pill, price rows, Buy / Unlock buttons). One sparkle on spend buttons — never a circled C or hex C as the token icon.
 
-Sprite play on Focus and My Sprite: poke a side, boop the face, scrunch the twin peaks, double-tap to spin, drag across the belly to tickle, wave the cursor nearby for a mirrored pose, long-press to sleep, feed a snack, catch a mint star. Equip by tapping an owned look on My Sprite — the full catalog stays in Appearance. My Sprite ℹ lists the short cheat sheet. Focus can sit the sprite beside the timer (study buddy sit). No random high-fives. Heart sunglasses are oversized on the face. Auras are a body-glow colour (mint, pink, gold, lavender, aurora) — one at a time.
+Sprite play on Focus and My Sprite: poke a side, boop the face, scrunch the twin peaks, double-tap to spin, drag across the belly to tickle, wave the cursor nearby for a mirrored pose, long-press to sleep, feed a snack, catch a mint star. Equip by tapping an owned look on My Sprite — the full catalog stays in Appearance. My Sprite ⓘ lists the short cheat sheet. Focus can sit the sprite beside the timer (study buddy sit). No random high-fives. Heart sunglasses are oversized on the face. Auras are a body-glow colour (mint, pink, gold, lavender, aurora) — one at a time.
 
 Mini-game ideas only — not in this build: memory/flip cards, streak balloon. Soft focus washes (spotlight / gradient / subject tint) are next after these interactions. Planner is deferred.
 
