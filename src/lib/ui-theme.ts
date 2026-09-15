@@ -5,6 +5,7 @@ export type UiTheme = "light" | "dark";
 export const UI_THEME_KEY = "catalyst-v1:ui-theme";
 
 const listeners = new Set<() => void>();
+let cached: UiTheme | null = null;
 
 function emit() {
   listeners.forEach((listener) => listener());
@@ -16,29 +17,34 @@ export function normalizeUiTheme(raw?: string | null): UiTheme {
 
 export function readStoredUiTheme(): UiTheme {
   if (typeof window === "undefined") return "light";
+  if (cached !== null) return cached;
   try {
-    return normalizeUiTheme(window.localStorage.getItem(UI_THEME_KEY));
+    cached = normalizeUiTheme(window.localStorage.getItem(UI_THEME_KEY));
   } catch {
-    return "light";
+    cached = "light";
   }
+  return cached;
 }
 
-export function applyUiTheme(theme: UiTheme) {
+export function applyUiTheme(theme: UiTheme, persist = true) {
   if (typeof document === "undefined") return;
+  cached = theme;
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.classList.toggle("light", theme === "light");
   root.style.colorScheme = theme;
-  try {
-    window.localStorage.setItem(UI_THEME_KEY, theme);
-  } catch {
-    /* ignore quota */
+  if (persist) {
+    try {
+      window.localStorage.setItem(UI_THEME_KEY, theme);
+    } catch {
+      /* ignore quota */
+    }
   }
   emit();
 }
 
 export function setUiTheme(theme: UiTheme) {
-  applyUiTheme(theme);
+  applyUiTheme(theme, true);
 }
 
 export function subscribeUiTheme(listener: () => void) {
