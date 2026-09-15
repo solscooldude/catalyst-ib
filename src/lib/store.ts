@@ -41,7 +41,11 @@ import {
   type NemesisId,
   type SubjectId,
   type TaskId,
+  TIER2_COST,
+  TIER3_COST,
   type UnlockCatalogId,
+  type UnlockTier,
+  unlockTierSpendId,
 } from "@/lib/constants";
 import {
   normalizeMotivation,
@@ -56,7 +60,8 @@ import {
   type LockWindow,
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
-import { DEFAULT_SPRITE_NAME, displaySpriteName } from "@/lib/sprite-name";
+import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
+import { clampDailyGoalMinutes } from "@/lib/daily-goal";
 import {
   coalesceUnlocks,
   setState,
@@ -113,9 +118,9 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     goal: input.goal.trim(),
     plannedMinutes: null,
     demoMode: state.demoMode,
-    status: "locked",
+    status: "focus",
     lockedAt: Date.now(),
-    focusStartedAt: null,
+    focusStartedAt: Date.now(),
     completedAt: null,
     pausedAt: null,
     pauseAccumMs: 0,
@@ -157,9 +162,9 @@ export function startStudySession(input: {
     goal: title,
     plannedMinutes: minutes,
     demoMode: state.demoMode,
-    status: "locked",
+    status: "focus",
     lockedAt: Date.now(),
-    focusStartedAt: null,
+    focusStartedAt: Date.now(),
     completedAt: null,
     pausedAt: null,
     pauseAccumMs: 0,
@@ -174,18 +179,29 @@ export function startStudySession(input: {
 
 export function enterFocus() {
   setState((current) => {
-    if (!current.session || current.session.status !== "locked") return current;
+    if (!current.session) return current;
+    if (current.session.status === "focus") return current;
+    if (current.session.status !== "locked") return current;
     return {
       ...current,
       session: {
         ...current.session,
         status: "focus",
-        focusStartedAt: Date.now(),
+        focusStartedAt: current.session.focusStartedAt ?? Date.now(),
         pausedAt: null,
         pauseAccumMs: 0,
       },
     };
   });
+}
+
+export function setDailyGoalMinutes(minutes: number) {
+  const next = clampDailyGoalMinutes(minutes);
+  setState((current) =>
+    current.dailyGoalMinutes === next
+      ? current
+      : { ...current, dailyGoalMinutes: next },
+  );
 }
 
 export function sessionElapsedMs(session: Session, now = Date.now()) {
@@ -358,9 +374,7 @@ export function saveProfile(input: {
       ? displaySpriteName(input.spriteName)
       : null;
     const spriteName =
-      incoming && incoming !== DEFAULT_SPRITE_NAME
-        ? incoming
-        : currentName;
+      incoming && !isDefaultSpriteName(incoming) ? incoming : currentName;
     return {
       ...current,
       profile,
@@ -534,6 +548,45 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
   setState((current) => ({
     ...current,
     tokens: current.tokens - item.cost,
+    unlocks: [
+      ...coalesceUnlocks(current.unlocks, now).filter(
+        (row) => row.catalogId !== catalogId,
+      ),
+      unlock,
+    ],
+  }));
+
+  return { ok: true as const, unlock, stacked };
+}
+
+export function spendUnlockTier(tier: UnlockTier) {
+  const catalogId = unlockTierSpendId(tier);
+  const cost = tier === 2 ? TIER2_COST : TIER3_COST;
+  const label = tier === 2 ? "Tier 2" : "Tier 3";
+  if (state.tokens < cost) {
+    return { ok: false as const, reason: "Not enough tokens yet." };
+  }
+
+  const duration = state.demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  const now = Date.now();
+  const existing = coalesceUnlocks(state.unlocks, now).find(
+    (unlock) => unlock.catalogId === catalogId,
+  );
+  const remaining = existing ? Math.max(0, existing.expiresAt - now) : 0;
+  const stacked = remaining > 0;
+
+  const unlock: Unlock = {
+    id: existing?.id ?? crypto.randomUUID(),
+    catalogId,
+    label,
+    cost: (existing?.cost ?? 0) + cost,
+    startedAt: existing?.startedAt ?? now,
+    expiresAt: now + remaining + duration,
+  };
+
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens - cost,
     unlocks: [
       ...coalesceUnlocks(current.unlocks, now).filter(
         (row) => row.catalogId !== catalogId,
