@@ -2,15 +2,48 @@ export const STORAGE_KEY = "catalyst-v1";
 export const ACCOUNTS_KEY = "catalyst-v1-accounts";
 export const AUTH_SESSION_KEY = "catalyst-v1-session";
 
+export const ESSENTIAL_APPS = [
+  { id: "chrome", name: "Chrome", glyph: "CH", blurb: "Browser for ManageBac and research." },
+  { id: "drive", name: "Google Drive", glyph: "GD", blurb: "IA folders and shared docs." },
+  { id: "docs", name: "Docs / Classroom", glyph: "DC", blurb: "Google Docs and Classroom." },
+  { id: "gmail", name: "Gmail", glyph: "GM", blurb: "Teachers, CAS, university mail." },
+  { id: "managebac", name: "ManageBac", glyph: "MB", blurb: "The work this lock is for." },
+  { id: "calculator", name: "Calculator", glyph: "CA", blurb: "Math AA and science papers." },
+  { id: "phone", name: "Phone / SOS / Clock", glyph: "SOS", blurb: "Calls, emergency, and time." },
+  { id: "spotify", name: "Spotify", glyph: "SP", blurb: "Study music stays available." },
+  { id: "ai", name: "ChatGPT / Gemini", glyph: "AI", blurb: "Assistants for the laptop block." },
+  { id: "maps", name: "Maps", glyph: "MAP", blurb: "Getting home after late study." },
+] as const;
+
+export type EssentialAppId = (typeof ESSENTIAL_APPS)[number]["id"];
+
+export const TIER2_COST = 5;
+export const TIER3_COST = 9;
+
+export const TIER2_APPS = [
+  { id: "whatsapp", name: "WhatsApp", glyph: "WA", blurb: "Group chats that wait ten minutes." },
+  { id: "photos", name: "Photos", glyph: "PH", blurb: "Camera roll, not a spiral." },
+  { id: "food", name: "Food delivery", glyph: "FD", blurb: "Uber Eats, Deliveroo, and the rest." },
+  { id: "flightradar", name: "Flightradar24", glyph: "FR", blurb: "Planes as a study break." },
+  { id: "youtube", name: "YouTube", glyph: "YT", blurb: "Videos. Medium token cost." },
+  { id: "messages", name: "Messages", glyph: "SMS", blurb: "iMessage and texts." },
+  { id: "camera", name: "Camera", glyph: "CAM", blurb: "A photo, then back to the IA." },
+  { id: "discord", name: "Discord", glyph: "DC", blurb: "Servers stay Tier 2 by default." },
+] as const;
+
+export type Tier2Id = (typeof TIER2_APPS)[number]["id"];
+
 export const NEMESIS_APPS = [
-  { id: "tiktok", name: "TikTok", blurb: "The For You page that ate TOK." },
-  { id: "instagram", name: "Instagram", blurb: "Stories, then Reels, then your IA." },
-  { id: "snapchat", name: "Snapchat", blurb: "Streaks vs. the EE deadline." },
-  { id: "x", name: "X", blurb: "One quote-tweet becomes an hour." },
-  { id: "reddit", name: "Reddit", blurb: "A ‘quick check’ with no bottom." },
+  { id: "instagram", name: "Instagram", glyph: "IG", blurb: "Stories, then Reels, then your IA." },
+  { id: "tiktok", name: "TikTok", glyph: "TT", blurb: "The For You page that ate TOK." },
+  { id: "snapchat", name: "Snapchat", glyph: "SC", blurb: "Streaks vs. the EE deadline." },
+  { id: "reddit", name: "Reddit", glyph: "RD", blurb: "A ‘quick check’ with no bottom." },
+  { id: "x", name: "X", glyph: "X", blurb: "One quote-tweet becomes an hour." },
+  { id: "bereal", name: "BeReal", glyph: "BR", blurb: "The two-minute ping that isn’t." },
 ] as const;
 
 export type NemesisId = (typeof NEMESIS_APPS)[number]["id"];
+export type Tier3Id = NemesisId;
 
 export const MOCK_TASKS = [
   {
@@ -86,33 +119,48 @@ export const TASK_SUBJECT: Record<TaskId, SubjectId> = {
 export const COMPLETION_BONUS = 5;
 
 export const UNLOCK_CATALOG = [
-  {
-    id: "notes",
-    name: "Notes",
-    intensity: "Low distraction",
-    cost: 2,
+  ...TIER2_APPS.map((app) => ({
+    ...app,
+    tier: 2 as const,
+    intensity: "Tier 2 · medium",
+    cost: TIER2_COST,
     minutes: 10,
-    blurb: "Notes or a document. Lowest token cost.",
-  },
-  {
-    id: "youtube",
-    name: "YouTube",
-    intensity: "Medium",
-    cost: 4,
+  })),
+  ...NEMESIS_APPS.map((app) => ({
+    ...app,
+    tier: 3 as const,
+    intensity: "Tier 3 · nemesis",
+    cost: TIER3_COST,
     minutes: 10,
-    blurb: "Videos. Medium token cost.",
-  },
-  {
-    id: "nemesis",
-    name: "Nemesis apps",
-    intensity: "High",
-    cost: 8,
-    minutes: 10,
-    blurb: "The apps you named in setup. Highest token cost.",
-  },
+  })),
 ] as const;
 
 export type UnlockCatalogId = (typeof UNLOCK_CATALOG)[number]["id"];
+export type UnlockTier = 2 | 3;
+
+export const UNLOCK_TIER_ROWS = [
+  {
+    id: "essentials",
+    name: "School / essentials",
+    intensity: "Always allowed",
+    cost: 0,
+    blurb: "Chrome, Drive, Docs/Classroom, Gmail, ManageBac, Calculator, Phone/SOS/Clock, Spotify, ChatGPT/Gemini, Maps. Cost 0 — not sold in the shop.",
+  },
+  {
+    id: "tier2",
+    name: "Tier 2",
+    intensity: "Medium",
+    cost: TIER2_COST,
+    blurb: "WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera, Discord.",
+  },
+  {
+    id: "tier3",
+    name: "Tier 3 — nemesis set",
+    intensity: "High",
+    cost: TIER3_COST,
+    blurb: "Instagram, TikTok, Snapchat, Reddit, X, BeReal. Setup picks which of these are yours.",
+  },
+] as const;
 
 /**
  * Token award rates. `demoMode` stays ON for the Vercel web demo.
@@ -130,8 +178,24 @@ export const REAL_TIME_COMPRESS_MS = 5 * 60 * 1000;
 export const REAL_UNLOCK_MS = 10 * 60 * 1000;
 export const DEMO_UNLOCK_MS = 60 * 1000;
 
+export function isEssentialAppId(id: string): id is EssentialAppId {
+  return ESSENTIAL_APPS.some((app) => app.id === id);
+}
+
+export function isUnlockCatalogId(id: string): id is UnlockCatalogId {
+  return UNLOCK_CATALOG.some((item) => item.id === id);
+}
+
 export function isNemesisId(id: string): id is NemesisId {
   return NEMESIS_APPS.some((app) => app.id === id);
+}
+
+export function getUnlockItem(id: string) {
+  return UNLOCK_CATALOG.find((item) => item.id === id);
+}
+
+export function unlocksByTier(tier: UnlockTier) {
+  return UNLOCK_CATALOG.filter((item) => item.tier === tier);
 }
 
 export function formatNemesisList(ids: readonly NemesisId[]): string {

@@ -31,12 +31,12 @@ npm run build
 
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only.
-3. `/dashboard` — mint Home: greeting, Share this week (9:16 Stories card), three soft cards (Current Sprite / Streak / Study time), a dedicated App unlocks card (spend + live countdown), then quiet hours. Token pill jumps to that card and shows remaining time when something is on. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
+3. `/dashboard` — mint Home: greeting, Share this week (9:16 Stories card), three soft cards (Current Sprite / Streak / Study time), a dedicated App unlocks card (Tier 2 / Tier 3 spend + live countdown), then quiet hours. School tools are always allowed and are not sold. Token pill jumps to that card and shows remaining time when something is on. Same card rhythm on Focus, Stats, Shop, Sprite, and account pages. Default chrome stays mint; Aurora is an optional room skin.
 4. Avatar menu — IB profile, Account settings, light/dark chrome. Not Unlocks, Appearance, Focus, Sprite, or subscribe. Aurora lives in Shop → Room.
 5. `/setup` — nemesis apps + mock ManageBac. Quiet hours live on `/schedule`; Home shows today’s lock window as one chip.
 6. `/focus` — pick a ManageBac task or start a study block. Last Focus stage (night sky / deep blue sea / math drift) is remembered on this device. Demo: **10 tokens per 20 seconds**, credited live as the timer runs. Production target: **1 token per 2 minutes**.
 7. `/session` — timer counts up in the center of the HUD (no sprite name) until you End — it does not reset. Tokens tick into the wallet on the same cadence as the live counter. Unlock UI on Focus is collapsed until you open it. End returns to the Focus board.
-8. `/unlocks` — the one dedicated Unlocks route (linked from Home and Focus only). Day-to-day spend is the Home App unlocks card; Focus has a compact, hideable panel. The token pill jumps to Home.
+8. `/unlocks` — the one dedicated Unlocks route (linked from Home and Focus only). Notes is not an unlock. Day-to-day spend is the Home App unlocks card (Tier 2 at 5 tokens / 10 min, Tier 3 nemesis set at 9). Focus has a compact, hideable panel. The token pill jumps to Home.
 9. `/sprite` — My Sprite. `/appearance` is the closet. Try cosmetics on Spark before you buy. `/quiz` is a daily IB-style check.
 10. `/stats` — time by subject, monthly roundup, and a shareable weekly Instagram Stories card (9:16 PNG: top subject, streak, study time, tokens, Spark peek, mint Catalyst mark). Home has the same Share this week action.
 11. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
