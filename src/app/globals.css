@@ -788,3 +788,128 @@ html[data-bg="aurora"] {
 .spark-dot-d {
   animation-delay: 0.7s;
 }
+
+@keyframes spark-heart-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.45);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.75);
+  }
+}
+
+@keyframes spark-pet-bounce {
+  0% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: scale(1.08, 0.92);
+  }
+  60% {
+    transform: scale(0.96, 1.06);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.spark-heart {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spark-heart-rise 1.7s ease-out both;
+}
+
+.spark-heart-b {
+  animation-delay: 0.12s;
+}
+
+.spark-heart-c {
+  animation-delay: 0.24s;
+}
+
+.spark-petted .spark-body {
+  animation: spark-pet-bounce 0.7s ease-out;
+}
+
+@keyframes idle-subject-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  12%,
+  82% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.idle-subject-pop {
+  animation: idle-subject-in 3.4s ease-out both;
+}
+
+.spark-idle-pop .spark-flourish,
+.spark-idle-pop .spark-symbol,
+.spark-idle-pop .spark-leaf,
+.spark-idle-pop .spark-cell,
+.spark-idle-pop .spark-book,
+.spark-idle-pop .spark-crumb,
+.spark-idle-pop .spark-bubble,
+.spark-idle-pop .spark-molecule,
+.spark-idle-pop .spark-orbit,
+.spark-idle-pop .spark-hourglass,
+.spark-idle-pop .spark-globe,
+.spark-idle-pop .spark-bar,
+.spark-idle-pop .spark-thought,
+.spark-idle-pop .spark-bits,
+.spark-idle-pop .spark-cursor,
+.spark-idle-pop .spark-brush,
+.spark-idle-pop .spark-dab,
+.spark-idle-pop .spark-note,
+.spark-idle-pop .spark-lens,
+.spark-idle-pop .spark-pulse,
+.spark-idle-pop .spark-subject-ink,
+.spark-idle-pop .spark-subject-bits {
+  animation-delay: -10.9s;
+}
+
+.spark-subject-ink {
+  color: inherit;
+}
+
+.spark-subject-bits {
+  animation: spark-flourish 16s ease-in-out infinite;
+}
+
+.scene-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.scene-star {
+  position: absolute;
+  border-radius: 999px;
+  background: #f8fafc;
+  box-shadow: 0 0 7px 1px rgb(248 250 252 / 42%);
+  animation-name: scene-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+html.light .scene-star,
+html.light .focus-star {
+  background: #18181b;
+  box-shadow: 0 0 7px 1px rgb(24 24 27 / 38%);
+}
