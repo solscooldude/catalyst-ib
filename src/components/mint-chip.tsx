@@ -47,7 +47,10 @@ export function BuyLabel({ cost }: { cost: number }) {
   return (
     <span className="inline-flex items-center gap-1.5">
       Buy
-      <TokenAmount value={cost} mark="ink" />
+      <span className="inline-flex items-center gap-1 text-[13px] font-semibold">
+        <SparkleMark size={13} className="text-[#5EEAD4]" />
+        <span className="tabular-nums">{cost}</span>
+      </span>
     </span>
   );
 }
