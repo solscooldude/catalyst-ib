@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FocusStagePicker } from "@/components/focus-stage";
 import { StudyStartForm } from "@/components/study-start-form";
 import { MOCK_TASKS, formatNemesisList, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
+  buyAppearance,
+  equipAppearance,
   getNemeses,
   setDemoMode,
   startSession,
@@ -216,6 +219,26 @@ export default function AppHomePage() {
         </p>
         <div className="mt-5 max-w-xl">
           <StudyStartForm />
+        </div>
+        <div className="mt-8">
+          <h3 className="text-base text-foreground">Focus stage</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Stays behind Spark in light and dark. Night sky is free.
+          </p>
+          <div className="mt-4">
+            <FocusStagePicker
+              value={state.appearance.focusTheme}
+              owned={(id) =>
+                state.appearance.ownedFocusThemes.includes(
+                  id as (typeof state.appearance.ownedFocusThemes)[number],
+                )
+              }
+              onPick={(id, owned) => {
+                if (owned) equipAppearance("focusTheme", id);
+                else buyAppearance("focusTheme", id);
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
