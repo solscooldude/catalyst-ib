@@ -1,4 +1,4 @@
-/* Light Flux chrome from Sols' Home mock. Spark body styles stay in globals.css. */
+/* Light chrome from Sols' Home mock. Spark body styles stay in globals.css. */
 
 :root,
 .light {
@@ -123,6 +123,10 @@ html.dark[data-bg="aurora"] {
 
 .spark-orbit-dot {
   animation: spark-orbit-dot 2.8s ease-in-out infinite;
+}
+
+.spark-particles {
+  animation: spark-orbit-dot 3.4s ease-in-out 1;
 }
 
 .spark-orbit-n1 { animation-delay: 0.18s; }
