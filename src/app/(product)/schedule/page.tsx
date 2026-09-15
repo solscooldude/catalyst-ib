@@ -80,9 +80,9 @@ export default function SchedulePage() {
 
   return (
     <div className="mx-auto grid w-full max-w-4xl gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-8">
-        <div>
-          <p className="text-xs tracking-[0.2em] text-primary uppercase">
+      <div className="space-y-4">
+        <div className="flux-card px-6 py-8">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Lock schedule
           </p>
           <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
@@ -98,7 +98,7 @@ export default function SchedulePage() {
         </div>
 
         {current ? (
-          <div className="rounded-3xl bg-card p-5 ring-1 ring-primary/25">
+          <div className="flux-card p-5 ring-1 ring-primary/25">
             <p className="text-xs tracking-[0.16em] text-primary uppercase">
               Window on now
             </p>
@@ -114,7 +114,7 @@ export default function SchedulePage() {
         <section className="space-y-4">
           <h2 className="text-lg text-foreground">Your windows</h2>
           {state.schedule.length === 0 ? (
-            <div className="rounded-3xl bg-card p-5 ring-1 ring-white/6">
+            <div className="flux-card p-5">
               <p className="text-sm text-foreground">No lock hours yet.</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Add a window below, or start with weeknights 7–10pm.
@@ -136,7 +136,7 @@ export default function SchedulePage() {
                     key={window.id}
                     className={cn(
                       "flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1",
-                      on ? "ring-primary/30" : "ring-white/6",
+                      on ? "ring-primary/30" : "ring-border",
                       !window.enabled && "opacity-50",
                     )}
                   >
@@ -181,7 +181,7 @@ export default function SchedulePage() {
           )}
         </section>
 
-        <section className="rounded-3xl bg-card p-6 ring-1 ring-white/6">
+        <section className="flux-card p-6">
           <h2 className="text-lg text-foreground">Add a window</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Overnight is fine — 22:00 to 07:00 counts as one window.
