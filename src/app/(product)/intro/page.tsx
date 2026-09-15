@@ -25,8 +25,8 @@ const SLIDES = [
   },
   {
     kicker: "Sprite",
-    title: "An egg that hatches when you study.",
-    body: "Focus and snacks grow it — Hatchling to Luminary. You think about the next block because the sprite is waiting, not because of a slogan.",
+    title: "It starts as an egg.",
+    body: "First real focus or snack hatches it. Then Hatchling → Luminary as you study. You still think about the next block because the sprite is waiting — not because of a pep talk.",
   },
   {
     kicker: "Tokens",
@@ -78,7 +78,7 @@ export default function IntroPage() {
         </p>
         {index === 3 ? (
           <div className="mt-6 flex justify-center">
-            <Spark mood="idle" size={120} evolve={false} />
+            <Spark mood="idle" size={120} />
           </div>
         ) : null}
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
