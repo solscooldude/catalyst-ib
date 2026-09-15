@@ -27,7 +27,7 @@ npm run build
 
 1. Landing at `/` — public marketing page. Log in / Sign up in the header.
 2. `/signup` or `/login` — demo accounts live in this browser only (password is hashed locally). After auth you land on `/dashboard`.
-3. `/dashboard` — signed-in home: greeting, Current Sprite / Streak / Study time cards, and an App unlocks card with countdown. Top nav is Home · Focus · Sprite · Shop. Token sparkle pill and the account avatar open Unlocks and Profile / Account / Appearance. After signup (or any account without a diploma profile) you hit `/profile` first. Calendar and subject stack live on `/stats`.
+3. `/dashboard` — signed-in home: greeting, Current Sprite / Streak / Study time cards, and an App unlocks card with countdown. The sprite display name is Spark (never Flux); rename it on My Sprite or Profile. Top nav is Home · Focus · Sprite · Shop. Token sparkle pill and the account avatar open Unlocks and Profile / Account / Appearance. After signup (or any account without a diploma profile) you hit `/profile` first. Calendar and subject stack live on `/stats`.
 4. `/setup` — pick one or more nemesis apps (edit the set here later; you do not re-pick at each focus start), connect mock ManageBac (Bio IA, TOK essay, Math AA PS, Chem study, EE chapter).
 5. `/focus` — choose a task and optional goal. Demo speed is on by default: **30 seconds = 1 token** (real pace is 5 minutes).
 6. `/lock` — simulated lock screen. Emergency stays; social apps are grey.
