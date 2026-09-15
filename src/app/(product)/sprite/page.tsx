@@ -23,6 +23,7 @@ import {
 } from "@/lib/stats";
 import { careMood } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
+import { SparkHowTo } from "@/components/spark-howto";
 import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
 import { setSpriteAsleep } from "@/lib/store-core";
@@ -127,9 +128,12 @@ export default function SpritePage() {
   return (
     <PageFrame width="mid">
       <section className="flux-card px-6 py-8 sm:px-10">
-        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
-          My Sprite
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+            My Sprite
+          </p>
+          <SparkHowTo />
+        </div>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           {displaySpriteName(state.spriteName)}
         </h1>
