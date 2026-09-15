@@ -177,6 +177,7 @@ export function accountStorageKey(userId: string) {
 
 function persist(next: CatalystState) {
   if (typeof window === "undefined") return;
+  writeDeviceSpriteName(next.spriteName);
   const userId = storageAccountId ?? sessionAccountId();
   if (!userId) return;
   storageAccountId = userId;
@@ -185,7 +186,6 @@ function persist(next: CatalystState) {
   window.localStorage.setItem(accountStorageKey(userId), JSON.stringify(rest));
   writeCloset(userId, next.appearance);
   writeDeviceFocusStage(next.appearance.focusTheme);
-  writeDeviceSpriteName(next.spriteName);
 }
 
 export function setState(updater: (current: CatalystState) => CatalystState) {
@@ -432,4 +432,3 @@ export function isAppUnlocked(
   if (!isUnlockCatalogId(appId)) return false;
   return isUnlockActive(unlocks, appId, now);
 }
-

@@ -16,6 +16,21 @@ export function displaySpriteName(raw?: string | null) {
   return /^flux$/i.test(name) ? DEFAULT_SPRITE_NAME : name;
 }
 
+export function commitSpriteName(next: string) {
+  const name = displaySpriteName(next);
+  writeDeviceSpriteName(name);
+  setState((state) =>
+    displaySpriteName(state.spriteName) === name
+      ? state
+      : {
+          ...state,
+          spriteName: name,
+          spriteRenameCount: Math.max(state.spriteRenameCount ?? 0, 1),
+        },
+  );
+  return name;
+}
+
 export function renameSprite(next: string) {
   const name = normalizeSpriteName(next);
   if (/^flux$/i.test(name)) {
@@ -23,6 +38,7 @@ export function renameSprite(next: string) {
   }
   const current = getSnapshot();
   if (name === displaySpriteName(current.spriteName)) {
+    writeDeviceSpriteName(name);
     return { ok: true as const, cost: 0 };
   }
   const first = (current.spriteRenameCount ?? 0) === 0;

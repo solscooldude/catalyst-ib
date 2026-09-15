@@ -56,7 +56,7 @@ import {
   type LockWindow,
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
-import { displaySpriteName } from "@/lib/sprite-name";
+import { DEFAULT_SPRITE_NAME, displaySpriteName } from "@/lib/sprite-name";
 import {
   coalesceUnlocks,
   setState,
@@ -352,18 +352,25 @@ export function saveProfile(input: {
     subjects: input.subjects,
     complete: true,
   });
-  const spriteName = input.spriteName
-    ? displaySpriteName(input.spriteName)
-    : undefined;
-  setState((current) => ({
-    ...current,
-    profile,
-    spriteName: spriteName ?? current.spriteName,
-    spriteRenameCount:
-      spriteName && spriteName !== displaySpriteName(current.spriteName)
-        ? Math.max(current.spriteRenameCount ?? 0, 1)
-        : current.spriteRenameCount,
-  }));
+  setState((current) => {
+    const currentName = displaySpriteName(current.spriteName);
+    const incoming = input.spriteName
+      ? displaySpriteName(input.spriteName)
+      : null;
+    const spriteName =
+      incoming && incoming !== DEFAULT_SPRITE_NAME
+        ? incoming
+        : currentName;
+    return {
+      ...current,
+      profile,
+      spriteName,
+      spriteRenameCount:
+        spriteName !== currentName
+          ? Math.max(current.spriteRenameCount ?? 0, 1)
+          : current.spriteRenameCount,
+    };
+  });
   return { ok: true as const, profile };
 }
 
