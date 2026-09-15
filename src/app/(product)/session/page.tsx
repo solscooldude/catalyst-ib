@@ -51,7 +51,7 @@ export default function FocusPage() {
       router.replace(ROUTES.lock);
     }
     if (state.session.status === "completed") {
-      router.replace(ROUTES.unlocks);
+      router.replace(`${ROUTES.home}#unlocks`);
     }
   }, [state.hydrated, state.setupComplete, state.session, router]);
 
