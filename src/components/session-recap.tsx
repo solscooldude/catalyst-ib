@@ -34,12 +34,7 @@ export function SessionRecapCard({ recap }: { recap: SessionRecap }) {
       </div>
       <p className="selected-task-meta mt-3 text-xs">
         {recap.timeTokens} from time
-        {recap.completionTokens
-          ? ` + ${recap.completionTokens} official completion`
-          : recap.kind === "study"
-            ? " · study block, no +5"
-            : ""}
-        . Logged to Stats.
+        {recap.completionTokens ? ` + ${recap.completionTokens} completion` : ""}
       </p>
     </div>
   );
