@@ -1,181 +1,288 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
-import { SparkleMark } from "@/components/sparkle-mark";
-import { cn } from "@/lib/cn";
+import { ChevronDown } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ROUTES } from "@/lib/routes";
-import { useCatalyst } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: ROUTES.home, label: "Home" },
-  { href: ROUTES.unlocks, label: "Unlocks" },
+const GROUPS = [
   {
-    href: ROUTES.appearance,
-    label: "Shop",
-    children: [
-      { href: `${ROUTES.appearance}#rooms`, label: "Appearance" },
-      { href: `${ROUTES.appearance}#scenes`, label: "Focus scenes" },
-      { href: `${ROUTES.appearance}#trails`, label: "Trails" },
-      { href: ROUTES.snacks, label: "Snacks" },
+    id: "home",
+    label: "Home",
+    href: ROUTES.home,
+    items: [
+      { href: ROUTES.home, label: "Dashboard" },
+      { href: ROUTES.stats, label: "Stats" },
+      { href: ROUTES.schedule, label: "Schedule" },
     ],
   },
-  { href: ROUTES.focus, label: "Focus" },
-  { href: ROUTES.sprite, label: "Sprite" },
-];
+  {
+    id: "focus",
+    label: "Focus",
+    href: ROUTES.focus,
+    items: [
+      { href: ROUTES.focus, label: "Focus" },
+      { href: ROUTES.setup, label: "Setup" },
+    ],
+  },
+  {
+    id: "sprite",
+    label: "Sprite",
+    href: ROUTES.sprite,
+    items: [
+      { href: ROUTES.sprite, label: "My Sprite" },
+      { href: ROUTES.quiz, label: "Quiz" },
+    ],
+  },
+  {
+    id: "shop",
+    label: "Shop",
+    href: ROUTES.appearance,
+    items: [
+      { href: ROUTES.appearance, label: "Appearance" },
+      { href: `${ROUTES.appearance}#scenes`, label: "Focus scenes" },
+      { href: `${ROUTES.appearance}#trails`, label: "Trails" },
+      { href: `${ROUTES.appearance}#snacks`, label: "Snacks" },
+    ],
+  },
+] as const;
 
-function isActive(pathname: string, href: string) {
-  if (href === ROUTES.home) return pathname === ROUTES.home;
-  return pathname === href || pathname.startsWith(`${href}/`);
+function itemPath(href: string) {
+  return href.split("#")[0] ?? href;
 }
 
-function ShopMenu({
+function itemActive(pathname: string, hash: string, href: string) {
+  const [path, anchor] = href.split("#");
+  if (anchor) return pathname === path && hash === `#${anchor}`;
+  if (path === ROUTES.appearance) {
+    return pathname === path && (hash === "" || hash === "#");
+  }
+  return pathname === path;
+}
+
+function groupActive(pathname: string, group: (typeof GROUPS)[number]) {
+  return (
+    group.items.some((item) => pathname === itemPath(item.href)) ||
+    (group.id === "focus" &&
+      (pathname === ROUTES.lock || pathname === ROUTES.session))
+  );
+}
+
+function MenuLinks({
   pathname,
-  open,
-  onOpen,
-  onClose,
+  hash,
+  onPick,
 }: {
   pathname: string;
-  open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
+  hash: string;
+  onPick?: () => void;
 }) {
-  const menuId = useId();
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const shop = NAV[2];
-  const active = isActive(pathname, shop.href);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointer = (event: PointerEvent) => {
-      if (!wrapRef.current?.contains(event.target as Node)) onClose();
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("pointerdown", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, onClose]);
+  const [open, setOpen] = useState<string | null>(
+    () => GROUPS.find((group) => groupActive(pathname, group))?.id ?? "home",
+  );
 
   return (
-    <div ref={wrapRef} className="relative">
-      <button
-        type="button"
-        className={cn("nav-link", active && "is-active")}
-        aria-expanded={open}
-        aria-controls={menuId}
-        aria-haspopup="menu"
-        onClick={() => (open ? onClose() : onOpen())}
-      >
-        Shop
-      </button>
-      {open ? (
-        <div
-          id={menuId}
-          role="menu"
-          className="absolute left-0 top-full z-30 mt-2 min-w-44 rounded-[1.1rem] border border-zinc-200/80 bg-white p-1.5 shadow-[0_16px_40px_rgba(24,24,27,0.12)] dark:border-zinc-800 dark:bg-zinc-950"
-        >
-          {shop.children?.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              role="menuitem"
-              className="block rounded-xl px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-900"
-              onClick={onClose}
+    <div className="space-y-1">
+      {GROUPS.map((group) => {
+        const expanded = open === group.id;
+        const active = groupActive(pathname, group);
+        return (
+          <div key={group.id}>
+            <button
+              type="button"
+              className={cn(
+                "font-heading flex min-h-12 w-full items-center justify-between rounded-xl px-3.5 py-3 text-left text-sm font-semibold",
+                active ? "text-foreground" : "text-zinc-500",
+              )}
+              aria-expanded={expanded}
+              onClick={() => setOpen(expanded ? null : group.id)}
             >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      ) : null}
+              {group.label}
+              <ChevronDown
+                className={cn(
+                  "size-4 transition-transform",
+                  expanded && "rotate-180",
+                )}
+              />
+            </button>
+            {expanded ? (
+              <div className="mb-1 space-y-0.5 pb-1 pl-1">
+                {group.items.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onPick}
+                    className={cn(
+                      "flex min-h-12 items-center rounded-xl px-3.5 py-3 text-sm",
+                      itemActive(pathname, hash, item.href)
+                        ? "bg-primary/15 text-foreground"
+                        : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export function TopNav() {
   const pathname = usePathname();
-  const { state } = useCatalyst();
-  const [shopOpen, setShopOpen] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const [hash, setHash] = useState("");
+  const root = useRef<HTMLElement>(null);
+  const current = GROUPS.find((group) => groupActive(pathname, group));
+
+  useEffect(() => {
+    function syncHash() {
+      setHash(window.location.hash);
+    }
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [pathname]);
+
+  useEffect(() => {
+    setOpen(null);
+    setSheet(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function onPointer(event: PointerEvent) {
+      if (!root.current?.contains(event.target as Node)) setOpen(null);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(null);
+        setSheet(false);
+      }
+    }
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  function toggle(id: string) {
+    setOpen((currentOpen) => (currentOpen === id ? null : id));
+  }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-[#F4F4F5]/88 backdrop-blur-md dark:border-zinc-800/80 dark:bg-[#0B0B0F]/88">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href={ROUTES.home} className="flex items-center gap-2.5">
-          <span className="display-font text-[1.05rem] font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-50">
-            Catalyst
-          </span>
-        </Link>
-
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-          {NAV.map((item) =>
-            item.children ? (
-              <ShopMenu
-                key={item.href}
-                pathname={pathname}
-                open={shopOpen}
-                onOpen={() => setShopOpen(true)}
-                onClose={() => setShopOpen(false)}
-              />
-            ) : (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn("nav-link", isActive(pathname, item.href) && "is-active")}
-              >
-                {item.label}
-              </Link>
-            ),
-          )}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href={ROUTES.unlocks}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[0.78rem] font-semibold text-zinc-800 ring-1 ring-zinc-200/80 dark:bg-zinc-950 dark:text-zinc-100 dark:ring-zinc-800"
-          >
-            <SparkleMark className="h-3.5 w-3.5" />
-            <span className="tabular-nums">{state.tokens}</span>
-          </Link>
-          <Link href={ROUTES.account} className="nav-link">
-            Account
-          </Link>
-        </div>
-      </div>
-
+    <>
       <nav
-        className="flex gap-1 overflow-x-auto px-4 pb-2 md:hidden"
-        aria-label="Mobile"
+        ref={root}
+        aria-label="Main"
+        className="relative z-50 hidden items-center gap-1 overflow-visible md:flex"
       >
-        {NAV.flatMap((item) =>
-          item.children
-            ? item.children.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  className="nav-link shrink-0"
-                >
-                  {child.label}
-                </Link>
-              ))
-            : [
-                <Link
-                  key={item.href}
-                  href={item.href}
+        {GROUPS.map((group) => {
+          const active = groupActive(pathname, group);
+          const shown = open === group.id;
+          return (
+            <div key={group.id} className="relative overflow-visible">
+              <button
+                type="button"
+                className={cn(
+                  "font-heading relative inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors",
+                  active
+                    ? "font-medium text-foreground"
+                    : "text-zinc-400 hover:text-foreground",
+                )}
+                aria-expanded={shown}
+                aria-haspopup="menu"
+                aria-controls={`nav-${group.id}`}
+                onClick={() => toggle(group.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    setOpen(group.id);
+                  }
+                }}
+              >
+                {group.label}
+                <ChevronDown
                   className={cn(
-                    "nav-link shrink-0",
-                    isActive(pathname, item.href) && "is-active",
+                    "size-4 transition-transform",
+                    shown && "rotate-180",
                   )}
+                />
+                {active ? (
+                  <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary" />
+                ) : null}
+              </button>
+              {shown ? (
+                <div
+                  id={`nav-${group.id}`}
+                  role="menu"
+                  className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2"
                 >
-                  {item.label}
-                </Link>,
-              ],
-        )}
+                  <div className="rounded-2xl bg-white p-1.5 shadow-[0_1px_2px_rgb(24_24_27/0.06),0_16px_36px_-20px_rgb(24_24_27/0.35)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgb(244_244_245/0.08)]">
+                    {group.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        role="menuitem"
+                        onClick={() => setOpen(null)}
+                        className={cn(
+                          "flex min-h-11 items-center rounded-xl px-3.5 py-2.5 text-sm",
+                          itemActive(pathname, hash, item.href)
+                            ? "bg-primary/15 text-foreground"
+                            : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
       </nav>
-    </header>
+
+      <nav aria-label="Main" className="flex items-center md:hidden">
+        <button
+          type="button"n          className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 py-2.5 text-sm text-foreground ring-1 ring-border"
+          aria-expanded={sheet}
+          onClick={() => setSheet(true)}
+        >
+          {current?.label ?? "Menu"}
+          <ChevronDown className="size-4 text-zinc-400" />
+        </button>
+        <Sheet open={sheet} onOpenChange={setSheet}>
+          <SheetContent
+            side="bottom"
+            className="z-50 max-h-[85dvh] gap-0 overflow-y-auto rounded-t-[1.75rem] bg-white dark:bg-zinc-900"
+          >
+            <SheetHeader>
+              <SheetTitle>Pages</SheetTitle>
+            </SheetHeader>
+            <div className="px-3 pb-8">
+              <MenuLinks
+                pathname={pathname}
+                hash={hash}
+                onPick={() => setSheet(false)}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </nav>
+    </>
   );
 }
