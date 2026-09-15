@@ -56,6 +56,7 @@ import {
   type LockWindow,
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
+import { displaySpriteName } from "@/lib/sprite-name";
 import {
   coalesceUnlocks,
   setState,
@@ -337,7 +338,11 @@ export function completeSession(tokensEarned?: number) {
   return { ok: true as const, timeTokens, completionTokens, totalTokens };
 }
 
-export function saveProfile(input: { classYear: number; subjects: string[] }) {
+export function saveProfile(input: {
+  classYear: number;
+  subjects: string[];
+  spriteName?: string;
+}) {
   const check = validateDiploma(input.subjects, input.classYear);
   if (!check.ok) {
     return { ok: false as const, reason: check.reason };
@@ -347,7 +352,18 @@ export function saveProfile(input: { classYear: number; subjects: string[] }) {
     subjects: input.subjects,
     complete: true,
   });
-  setState((current) => ({ ...current, profile }));
+  const spriteName = input.spriteName
+    ? displaySpriteName(input.spriteName)
+    : undefined;
+  setState((current) => ({
+    ...current,
+    profile,
+    spriteName: spriteName ?? current.spriteName,
+    spriteRenameCount:
+      spriteName && spriteName !== displaySpriteName(current.spriteName)
+        ? Math.max(current.spriteRenameCount ?? 0, 1)
+        : current.spriteRenameCount,
+  }));
   return { ok: true as const, profile };
 }
 
