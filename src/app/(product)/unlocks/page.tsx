@@ -191,6 +191,8 @@ function UnlockInner() {
         <div className="mb-3 flex justify-center">
           <Spark
             mood={mood}
+            act={recap && mood === "done" ? "celebrate" : undefined}
+            flourish={recap ? "now" : "loop"}
             taskId={lastSession?.taskId}
             subject={lastSession?.subjectId}
             size={64}
