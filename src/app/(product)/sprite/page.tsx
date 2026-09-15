@@ -194,7 +194,7 @@ export default function SpritePage() {
         onWear={(id, owned) => wear("sparkTint", id, owned)}
       />
       <EquipRow
-        title="Gradient"
+        title="Gradient · premium"
         items={SPARK_TINTS.filter((item) => item.kind === "gradient").map((item) => ({
           id: item.id,
           name: item.name,
