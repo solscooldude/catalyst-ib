@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { TokenAmount } from "@/components/mint-chip";
+import { ROUTES } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { UNLOCK_CATALOG, formatNemesisList } from "@/lib/constants";
 import { spendUnlock, useCatalyst } from "@/lib/store";
@@ -137,6 +139,12 @@ export function UnlockPanel({
         })}
       </div>
       {notice ? <p className="text-sm text-primary">{notice}</p> : null}
+      <Link
+        href={ROUTES.unlocks}
+        className="inline-block text-xs text-zinc-400 hover:text-foreground"
+      >
+        Unlocks page
+      </Link>
     </div>
   );
 }
