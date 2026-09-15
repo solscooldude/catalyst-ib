@@ -17,7 +17,7 @@ export function ThemeApplier() {
     if (!hydrated) return;
     const root = document.documentElement;
     root.dataset.accent = appearance.accent;
-    if (uiTheme === "dark") {
+    if (uiTheme === "dark" || appearance.background === "aurora") {
       root.dataset.bg = appearance.background;
     } else {
       delete root.dataset.bg;
