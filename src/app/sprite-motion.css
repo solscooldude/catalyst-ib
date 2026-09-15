@@ -89,10 +89,11 @@
   transform: translate3d(0, 0, 0);
 }
 
-.sprite-spark-stage .spark-body {
+.sprite-spark-stage .spark-body,
+.focus-spark-stage .spark-body,
+.spark-scrunch-host .spark-body {
   transform-box: fill-box;
-  transform-origin: 50% 12%;
-  will-change: transform;
+  transform-origin: 50% 86%;
   backface-visibility: hidden;
 }
 
@@ -220,17 +221,14 @@
   animation: spark-boop-blink 0.42s ease-in-out;
 }
 
+.spark-scrunch-host.is-scrunching .spark-body,
+.spark-scrunch-host.is-scrunch-release .spark-body,
 .spark-scrunch .spark-body,
 .sprite-spark-stage.is-scrunching .spark-body,
 .focus-spark-stage.is-scrunching .spark-body {
-  transform: scale3d(1.18, 0.66, 1);
-}
-
-.focus-spark-stage .spark-body {
-  transform-box: fill-box;
-  transform-origin: 50% 12%;
+  animation: none;
   will-change: transform;
-  backface-visibility: hidden;
+  transform: scale3d(var(--scrunch-x, 1.18), var(--scrunch-y, 0.66), 1);
 }
 
 .spark-track-eyes:not(.spark-sleeping) .spark-pupil {
@@ -243,7 +241,8 @@
   top: 36%;
 }
 
-.spark-scrunch-release .spark-body {
+.spark-scrunch-release:not(.is-scrunching) .spark-body,
+.spark-scrunch-host.is-scrunch-release:not(.is-scrunching) .spark-body {
   animation: spark-scrunch-spring 0.42s cubic-bezier(0.22, 1.4, 0.36, 1) both;
 }
 
