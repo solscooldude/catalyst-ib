@@ -82,9 +82,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
-      <div>
-        <p className="text-xs tracking-[0.2em] text-primary uppercase">
+    <div className="mx-auto w-full max-w-2xl space-y-4">
+      <div className="flux-card px-6 py-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Profile
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
@@ -98,6 +98,7 @@ export default function ProfilePage() {
         </p>
       </div>
 
+      <div className="flux-card space-y-6 px-6 py-8">
       <div className="space-y-2">
         <Label htmlFor="class-year">Graduating class</Label>
         <AppSelect
@@ -170,6 +171,7 @@ export default function ProfilePage() {
       <Button className="h-11 rounded-full px-6" onClick={save} disabled={!preview.ok}>
         Save profile
       </Button>
+      </div>
     </div>
   );
 }

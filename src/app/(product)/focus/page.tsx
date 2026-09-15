@@ -55,12 +55,12 @@ export default function AppHomePage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
-        <p className="text-xs tracking-[0.2em] text-primary uppercase">
+    <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="flux-card px-6 py-8 sm:px-8">
+        <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Laptop first
         </p>
-        <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           Pick the task. Then lock the phone.
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -101,9 +101,9 @@ export default function AppHomePage() {
                 disabled={done}
                 onClick={() => setTaskId(task.id)}
                 className={cn(
-                  "w-full rounded-2xl bg-card p-4 text-left ring-1 transition-colors",
+                  "w-full rounded-2xl bg-white p-4 text-left shadow-[0_1px_2px_rgb(24_24_27/0.05)] transition-colors dark:bg-zinc-900",
                   done && "opacity-50",
-                  selected ? "ring-primary/50" : "ring-white/6",
+                  selected ? "ring-primary/50" : "ring-border",
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -132,8 +132,8 @@ export default function AppHomePage() {
         ) : null}
       </div>
 
-      <div className="h-fit rounded-3xl bg-card p-6 ring-1 ring-white/6">
-        <h2 className="text-lg text-foreground">Start a session</h2>
+      <div className="flux-card h-fit p-6 sm:p-8">
+        <h2 className="text-lg font-semibold text-foreground">Start a session</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Optional goal, then the simulated lock screen.
         </p>
@@ -182,7 +182,7 @@ export default function AppHomePage() {
 
       <div
         id="study"
-        className="h-fit rounded-3xl bg-card p-6 ring-1 ring-white/6 lg:col-span-2"
+        className="flux-card h-fit p-6 sm:p-8 lg:col-span-2"
       >
         <h2 className="text-lg text-foreground">Start your own study block</h2>
         <p className="mt-1 text-sm text-muted-foreground">
