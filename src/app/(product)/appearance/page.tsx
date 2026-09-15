@@ -280,6 +280,9 @@ function BgSwatch({ id }: { id: string }) {
           "bg-[#07080d] shadow-[inset_1px_1px_0_#fff8,inset_-8px_-10px_0_-6px_#fff5]",
         id === "aurora" &&
           "bg-[linear-gradient(135deg,#efe8f6_0%,#e9d5ff_45%,#c4b5fd_100%)]",
+        id === "lilac" && "bg-[#e9d5ff]",
+        id === "blush" && "bg-[#fecdd3]",
+        id === "babyblue" && "bg-[#bfdbfe]",
       )}
     />
   );
@@ -293,10 +296,6 @@ function SceneSwatch({ id }: { id: string }) {
         id === "nightsky" && "bg-[#0b1224]",
         id === "sea" && "bg-[#0a3a70]",
         id === "math" && "bg-[#1a1a22]",
-        id === "cat" && "bg-[#3f2a1e]",
-        id === "desk" && "bg-[#2a3340]",
-        id === "library" && "bg-[#2c241c]",
-        id === "rocket" && "bg-[#07080d]",
       )}
     />
   );
