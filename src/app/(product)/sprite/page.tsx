@@ -10,6 +10,9 @@ import {
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  type SparkGearId,
+  type SparkTintId,
+  type SparkTrailId,
 } from "@/lib/appearance";
 import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
 import {
@@ -31,6 +34,11 @@ export default function SpritePage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [mood, setMood] = useState<SparkMood>(() => "idle");
   const [petPulse, setPetPulse] = useState(0);
+  const [tryOn, setTryOn] = useState<{
+    tint?: SparkTintId;
+    gear?: SparkGearId;
+    trail?: SparkTrailId;
+  }>({});
   const idleTimer = useRef(0);
   const pokeAt = useRef(0);
   const look = state.appearance;
@@ -70,10 +78,18 @@ export default function SpritePage() {
     owned: boolean,
   ) {
     if (!owned) {
-      setNotice("Buy that in Appearance first.");
+      if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: id as SparkTintId }));
+      if (kind === "gear") setTryOn((current) => ({ ...current, gear: id as SparkGearId }));
+      if (kind === "trail") setTryOn((current) => ({ ...current, trail: id as SparkTrailId }));
+      setNotice("Preview only. Buy it in Appearance to keep.");
       return;
     }
     const result = equipAppearance(kind, id);
+    if (result.ok) {
+      if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: undefined }));
+      if (kind === "gear") setTryOn((current) => ({ ...current, gear: undefined }));
+      if (kind === "trail") setTryOn((current) => ({ ...current, trail: undefined }));
+    }
     setNotice(result.ok ? "Equipped." : result.reason);
   }
 
@@ -157,6 +173,9 @@ export default function SpritePage() {
         <SpritePlaypen
           mood={mood}
           petPulse={petPulse}
+          tint={tryOn.tint}
+          gear={tryOn.gear}
+          trail={tryOn.trail}
           canFeed={
             feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating"
           }
@@ -352,7 +371,7 @@ function EquipRow({
             <span>
               <span className="block text-sm text-foreground">{item.name}</span>
               <span className="block text-xs text-muted-foreground">
-                {item.on ? "On" : item.owned ? "Tap to wear" : "Buy in Appearance"}
+                {item.on ? "On" : item.owned ? "Tap to wear" : "Tap to preview"}
               </span>
             </span>
           </button>
