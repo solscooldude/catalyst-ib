@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { source: "/app/setup", destination: "/setup", permanent: false },
       { source: "/app/lock", destination: "/lock", permanent: false },
       { source: "/app/focus", destination: "/session", permanent: false },
+      { source: "/motivation", destination: "/profile", permanent: false },
     ];
   },
 };
