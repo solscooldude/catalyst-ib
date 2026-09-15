@@ -166,11 +166,11 @@ export default function DashboardPage() {
         </section>
       </div>
 
-      <QuietHoursChip />
-
-      <section className="flux-card px-6 py-8">
+      <section id="unlocks" className="flux-card scroll-mt-24 px-6 py-8 sm:px-8">
         <UnlockPanel />
       </section>
+
+      <QuietHoursChip />
     </PageFrame>
   );
 }
