@@ -140,7 +140,7 @@ export default function AppHomePage() {
               value={goal}
               onChange={(event) => setGoal(event.target.value)}
               placeholder="Finish methodology. No phone until the draft exists."
-              className="h-11 rounded-xl"
+              className="focus-field"
             />
           </div>
 
