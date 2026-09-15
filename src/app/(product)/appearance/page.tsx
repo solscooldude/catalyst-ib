@@ -289,7 +289,7 @@ export default function AppearancePage() {
             <div>
               <h2 className="text-2xl text-foreground">Auras</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Soft halo. One at a time. Quiet on Focus.
+                Soft colour glow around Spark. One at a time.
               </p>
             </div>
             <Group
