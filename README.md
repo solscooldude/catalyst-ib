@@ -42,6 +42,6 @@ npm run build
 11. `/profile` — diploma subjects, graduating year, and optional college / course / why (folded in; there is no Motivation page).
 12. `/account/settings` — account basics. `/account/subscription` redirects there. Billing is stubbed; this demo is free.
 
-Shop → Focus scenes sells session backdrops only (night sky, deep blue sea, math drift). Photo rooms are gone. Shop → Trails sells spark trail cosmetics only. Aurora and star dots are app chrome, not Focus scenes. Light/dark chrome defaults to light and persists. Accents and room backgrounds apply on the page.
+Shop → Focus scenes sells session backdrops only (night sky, deep blue sea, math drift). Photo rooms are gone. Shop → Trails sells spark trail cosmetics only. Aurora and star dots are app chrome, not Focus scenes. Light/dark chrome defaults to light and persists. Accent colours are sold as a hue (rainbow set); Pastel / Normal / Deep is a dropdown after purchase, not a second SKU. Spark body colours include extra solids and soft two-tone gradients; equipped colours persist. Token mark stays the mint sparkle. Rooms apply on the page.
 
 Focus stages sit behind Spark and never cover the HUD. Night sky is the free default. Light/dark theme only restyles chrome; the session canvas keeps the selected scene in both themes. Pick a backdrop on Focus setup or in the Shop. Last scene is remembered on this device.
