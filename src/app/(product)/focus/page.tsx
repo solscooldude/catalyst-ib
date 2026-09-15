@@ -47,6 +47,7 @@ export default function AppHomePage() {
   const openTasks = MOCK_TASKS.filter(
     (task) => !state.tasks.find((row) => row.id === task.id)?.done,
   );
+  const selectedTask = MOCK_TASKS.find((task) => task.id === taskId);
 
   function begin() {
     if (!taskId) return;
@@ -101,20 +102,26 @@ export default function AppHomePage() {
                 disabled={done}
                 onClick={() => setTaskId(task.id)}
                 className={cn(
-                  "w-full rounded-2xl bg-white p-4 text-left shadow-[0_1px_2px_rgb(24_24_27/0.05)] transition-colors dark:bg-zinc-900",
+                  "w-full rounded-2xl p-4 text-left ring-1 transition-colors",
                   done && "opacity-50",
-                  selected ? "ring-primary/50" : "ring-border",
+                  selected
+                    ? "bg-primary/15 text-zinc-900 ring-2 ring-primary dark:bg-primary/20 dark:text-zinc-50"
+                    : "bg-white text-zinc-900 shadow-[0_1px_2px_rgb(24_24_27/0.05)] ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700",
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm text-foreground">{task.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {task.title}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
                       {task.subject} · due {task.due} · {task.detail}
                     </p>
                   </div>
                   {done ? (
                     <CircleCheck className="size-4 text-primary" />
+                  ) : selected ? (
+                    <CircleCheck className="size-5 text-primary" />
                   ) : (
                     <DemoBadge>ManageBac</DemoBadge>
                   )}
@@ -137,6 +144,24 @@ export default function AppHomePage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Optional goal, then the simulated lock screen.
         </p>
+        {selectedTask ? (
+          <div className="mt-4 rounded-2xl bg-primary/15 px-3.5 py-3 ring-1 ring-primary">
+            <p className="text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">
+              Selected task
+            </p>
+            <p className="mt-1 text-sm font-medium text-zinc-900 dark:text-zinc-50">
+              {selectedTask.title}
+            </p>
+            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+              {selectedTask.subject} · due {selectedTask.due}
+            </p>
+          </div>
+        ) : (
+          <p className="mt-4 rounded-2xl bg-zinc-100 px-3.5 py-3 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+            Pick a ManageBac task on the left so you can see what you are
+            locking in.
+          </p>
+        )}
 
         <div className="mt-5 space-y-4">
           <div className="space-y-2">
