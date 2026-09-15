@@ -38,7 +38,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col">
+    <div
+      className={cn(
+        "relative flex min-h-dvh flex-col",
+        sessionView && "bg-transparent",
+      )}
+    >
       {sessionView || roomLock || uiTheme === "light" ? null : (
         <SceneBackground id={state.appearance.background} />
       )}
@@ -65,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className={cn(
           "relative z-10 flex w-full flex-1 flex-col",
           sessionView
-            ? "max-w-none px-0 py-0"
+            ? "max-w-none bg-transparent px-0 py-0"
             : "mx-auto w-full max-w-5xl px-4 pb-10 pt-2 sm:pt-4",
         )}
       >
