@@ -113,9 +113,11 @@ function UnlockInner() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
-              Shop
+              {recap ? "Session" : "App unlocks"}
             </p>
-            <h1 className="mt-3 text-4xl text-foreground">Unlocks</h1>
+            <h1 className="mt-3 text-4xl text-foreground">
+              {recap ? "Recap" : "Unlocks"}
+            </h1>
           </div>
           <TokenChip tokens={state.tokens} />
         </div>
@@ -190,9 +192,14 @@ function UnlockInner() {
           )}
         </div>
 
-        <Button asChild variant="outline" className="mt-8 h-11 rounded-full">
-          <Link href={ROUTES.focus}>Start another focus block</Link>
-        </Button>
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="h-11 rounded-full">
+            <Link href={`${ROUTES.home}#unlocks`}>Home</Link>
+          </Button>
+          <Button asChild className="h-11 rounded-full">
+            <Link href={ROUTES.focus}>Focus</Link>
+          </Button>
+        </div>
       </div>
 
       <div>
