@@ -5,11 +5,10 @@ import Link from "next/link";
 import { Moon } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 import {
-  formatRemaining,
-  formatWhen,
+  formatClock,
   formatWindow,
-  remainingMs,
-  upcomingWindow,
+  todaysLockWindow,
+  windowContains,
 } from "@/lib/schedule";
 import { useCatalyst } from "@/lib/store";
 
@@ -22,44 +21,27 @@ export function QuietHoursChip() {
     return () => window.clearInterval(id);
   }, []);
 
-  const next = upcomingWindow(state.schedule, now);
+  const today = todaysLockWindow(state.schedule, now);
+  const line =
+    state.schedule.length === 0
+      ? "No lock window yet."
+      : today
+        ? windowContains(today, now)
+          ? `On now · ${formatClock(today.start)}–${formatClock(today.end)}`
+          : `Today · ${formatClock(today.start)}–${formatClock(today.end)}`
+        : "Off today.";
 
   return (
-    <section className="flux-card flex flex-col gap-3 px-6 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-      <div>
-        <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-          <Moon className="size-3.5 text-primary" />
-          Quiet hours
-        </p>
-        {state.schedule.length === 0 ? (
-          <p className="mt-2 text-sm text-foreground">
-            No lock window yet. Set one in Setup.
-          </p>
-        ) : next?.active ? (
-          <>
-            <p className="mt-2 text-sm font-medium text-foreground">
-              On now · {formatWindow(next.window)}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              {formatRemaining(remainingMs(next.window, now))} left.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="mt-2 text-sm font-medium text-foreground">
-              {next
-                ? `${formatWhen(next.startsAt, now)} · ${formatWindow(next.window)}`
-                : "Every window is paused."}
-            </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Today&apos;s lock hours from Setup.
-            </p>
-          </>
-        )}
-      </div>
+    <section className="flux-card flex flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <p className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
+        <Moon className="size-3.5 text-primary" />
+        <span className="sr-only">Quiet hours</span>
+        {line}
+      </p>
       <Link
         href={ROUTES.schedule}
         className="text-sm font-medium text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-200"
+        title={today ? formatWindow(today) : "Set lock hours"}
       >
         {state.schedule.length === 0 ? "Add hours" : "Edit hours"}
       </Link>

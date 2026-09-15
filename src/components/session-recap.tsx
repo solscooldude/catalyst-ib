@@ -24,7 +24,13 @@ export function SessionRecapCard({ recap }: { recap: SessionRecap }) {
             +<TokenAmount value={recap.tokens} />
           </p>
         </div>
-        <Spark mood="done" size={72} className="shrink-0" />
+        <Spark
+          mood="done"
+          act="celebrate"
+          flourish="now"
+          size={72}
+          className="shrink-0"
+        />
       </div>
       <p className="selected-task-meta mt-3 text-xs">
         {recap.timeTokens} from time

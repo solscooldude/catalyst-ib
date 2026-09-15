@@ -18,6 +18,7 @@ export function readDeviceFocusStage(): FocusThemeId | null {
 
 export function writeDeviceFocusStage(id: FocusThemeId) {
   if (typeof window === "undefined") return;
+  if (!isStageFocusTheme(id)) return;
   try {
     window.localStorage.setItem(FOCUS_STAGE_KEY, id);
   } catch {
