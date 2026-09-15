@@ -3,7 +3,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { alphaByLabel } from "@/lib/alpha";
-import { nativeSelectClass } from "@/lib/select-class";
 import { cn } from "@/lib/utils";
 
 export type AppSelectOption = {
@@ -73,12 +72,12 @@ export function AppSelect({
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((current) => !current)}
-        className={cn(nativeSelectClass, "flex items-center justify-between gap-2 text-left")}
+        className="app-select-trigger"
       >
         <span
           className={cn(
-            "truncate font-medium text-zinc-900 dark:text-zinc-100",
-            !selected && "font-normal text-zinc-500 dark:text-zinc-400",
+            "truncate",
+            !selected && "font-normal opacity-70",
           )}
         >
           {selected?.label ?? placeholder}
