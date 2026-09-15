@@ -141,8 +141,14 @@ export function getIbSubject(id: string) {
   return IB_SUBJECTS.find((row) => row.id === id);
 }
 
+export function alphaByLabel<T extends { label: string }>(items: readonly T[]): T[] {
+  return [...items].sort((a, b) =>
+    a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
+  );
+}
+
 export function subjectsInGroup(group: IbGroup) {
-  return IB_SUBJECTS.filter((row) => row.group === group);
+  return alphaByLabel(IB_SUBJECTS.filter((row) => row.group === group));
 }
 
 export function takenCourses(subjectIds: string[]) {
@@ -261,12 +267,14 @@ export function studySubjectOptions(profile: ProfileState) {
     statId: row.statId,
   }));
   const seen = new Set<string>();
-  return [...core, ...groups, ...cas].filter((row) => {
-    const key = `${row.statId}:${row.label}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  return alphaByLabel(
+    [...core, ...groups, ...cas].filter((row) => {
+      const key = `${row.statId}:${row.label}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }),
+  );
 }
 
 export function motivationReady(motivation: MotivationState) {
