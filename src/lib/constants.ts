@@ -54,23 +54,23 @@ export type TaskId = (typeof MOCK_TASKS)[number]["id"];
 
 export const SUBJECTS = [
   { id: "biology", label: "Biology HL" },
+  { id: "cas", label: "CAS" },
   { id: "chemistry", label: "Chemistry SL" },
-  { id: "physics", label: "Physics HL" },
-  { id: "math-aa", label: "Mathematics AA HL" },
-  { id: "tok", label: "Theory of Knowledge" },
-  { id: "ee", label: "Extended Essay" },
-  { id: "english", label: "English A" },
-  { id: "language-b", label: "Language B" },
-  { id: "history", label: "History" },
-  { id: "geography", label: "Geography" },
-  { id: "economics", label: "Economics" },
-  { id: "psychology", label: "Psychology" },
   { id: "cs", label: "Computer Science" },
   { id: "digital-societies", label: "Digital Societies" },
-  { id: "visual-arts", label: "Visual Arts" },
+  { id: "economics", label: "Economics" },
+  { id: "english", label: "English A" },
+  { id: "ee", label: "Extended Essay" },
+  { id: "geography", label: "Geography" },
+  { id: "history", label: "History" },
+  { id: "language-b", label: "Language B" },
+  { id: "math-aa", label: "Mathematics AA HL" },
   { id: "music", label: "Music" },
-  { id: "cas", label: "CAS" },
   { id: "other", label: "Other" },
+  { id: "physics", label: "Physics HL" },
+  { id: "psychology", label: "Psychology" },
+  { id: "tok", label: "Theory of Knowledge" },
+  { id: "visual-arts", label: "Visual Arts" },
 ] as const;
 
 export type SubjectId = (typeof SUBJECTS)[number]["id"];
@@ -114,8 +114,19 @@ export const UNLOCK_CATALOG = [
 
 export type UnlockCatalogId = (typeof UNLOCK_CATALOG)[number]["id"];
 
-export const REAL_TOKEN_MS = 5 * 60 * 1000;
-export const DEMO_TOKEN_MS = 30 * 1000;
+/**
+ * Token award rates. `demoMode` stays ON for the Vercel web demo.
+ * Production target (flip demoMode off later): 1 token per 2 minutes.
+ * Demo (current): 10 tokens per 20 seconds, tallied once on End.
+ */
+export const DEMO_TOKEN_BLOCK_MS = 20 * 1000;
+export const DEMO_TOKENS_PER_BLOCK = 10;
+export const REAL_TOKEN_MS = 2 * 60 * 1000;
+/** Alias for the demo award block. Not a mid-session tick. */
+export const DEMO_TOKEN_MS = DEMO_TOKEN_BLOCK_MS;
+/** Lock / scene time compression only — not the award loop. */
+export const DEMO_TIME_COMPRESS_MS = 30 * 1000;
+export const REAL_TIME_COMPRESS_MS = 5 * 60 * 1000;
 export const REAL_UNLOCK_MS = 10 * 60 * 1000;
 export const DEMO_UNLOCK_MS = 60 * 1000;
 

@@ -71,8 +71,8 @@ export function AppSelect({
       >
         <span
           className={cn(
-            "truncate font-medium text-zinc-900",
-            !selected && "font-normal text-zinc-500",
+            "truncate font-medium text-zinc-900 dark:text-zinc-100",
+            !selected && "font-normal text-zinc-500 dark:text-zinc-400",
           )}
         >
           {selected?.label ?? placeholder}
