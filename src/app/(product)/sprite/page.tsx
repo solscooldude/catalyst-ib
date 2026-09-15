@@ -21,6 +21,8 @@ import {
 } from "@/lib/stats";
 import { ROUTES } from "@/lib/routes";
 import { careMood } from "@/lib/spark-play";
+import { displaySpriteName } from "@/lib/sprite-name";
+import { SpriteRename } from "@/components/sprite-rename";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -142,7 +144,7 @@ export default function SpritePage() {
           My Sprite
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          Sit with Spark.
+          Sit with {displaySpriteName(state.spriteName)}.
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
           Pet, drag a snack onto it, poke, or let it doze. Official hours
@@ -157,6 +159,10 @@ export default function SpritePage() {
             Ten-question diploma quiz
           </Link>
         </p>
+      </section>
+
+      <section className="flux-card px-6 py-6">
+        <SpriteRename />
       </section>
 
       <section id="snacks" className="flux-card scroll-mt-24 flex flex-col items-center px-5 py-8">
