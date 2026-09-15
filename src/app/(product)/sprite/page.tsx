@@ -287,7 +287,7 @@ export default function SpritePage() {
         onWear={(id) => wear("gear", id, true)}
       />
       <EquipRow
-        title="Aura"
+        title="Aura · Body glow"
         kind="aura"
         items={ownedAuras.map((item) => ({
           id: item.id,
@@ -393,7 +393,7 @@ function EquipRow({
                   <span className="block text-xs text-muted-foreground">On</span>
                 ) : (
                   <span className="block text-xs text-muted-foreground">
-                    Drag onto Spark
+                    Drag onto the sprite
                   </span>
                 )}
               </span>
