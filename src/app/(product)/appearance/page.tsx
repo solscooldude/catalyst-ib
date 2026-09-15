@@ -54,24 +54,24 @@ export default function AppearancePage() {
   function tryOn(kind: AppearanceKind, id: string) {
     if (kind === "sparkTint") {
       setPreview((current) => ({ ...current, sparkTint: id as SparkTintId }));
-      setNotice("Trying this color. Buy to keep it.");
+      setNotice("Preview.");
       return;
     }
     if (kind === "gear") {
       setPreview((current) => ({ ...current, gear: id as SparkGearId }));
-      setNotice("Trying this outfit. Buy to keep it.");
+      setNotice("Preview.");
       return;
     }
     if (kind === "trail") {
       setPreview((current) => ({ ...current, trail: id as SparkTrailId }));
-      setNotice("Trying this trail. Buy to keep it.");
+      setNotice("Preview.");
     }
   }
 
   return (
     <PageFrame>
-      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8 sm:px-10">
-        <div>
+      <div className="flux-card flex flex-col items-center gap-6 px-6 py-8 sm:flex-row sm:items-start sm:justify-between sm:px-10">
+        <div className="w-full">
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Shop
           </p>
@@ -84,7 +84,7 @@ export default function AppearancePage() {
             </Link>
           </p>
         </div>
-        <div className="hidden shrink-0 text-center sm:block">
+        <div className="shrink-0 text-center">
           <Spark
             mood="idle"
             tint={shownTint}
@@ -94,7 +94,7 @@ export default function AppearancePage() {
             pettable
           />
           {trying ? (
-            <p className="mt-2 text-xs text-zinc-500">Preview — not bought</p>
+            <p className="mt-2 text-xs text-zinc-500">Preview</p>
           ) : null}
         </div>
       </div>
@@ -140,6 +140,7 @@ export default function AppearancePage() {
           )}
           owned={(id) => look.ownedTrails.includes(id)}
           equipped={(id) => look.trail === id}
+          previewing={(id) => preview.trail === id}
           onAct={(id, owned) => act("trail", id, owned)}
           onTry={(id) => tryOn("trail", id)}
           swatch={(item) => (
@@ -184,6 +185,7 @@ export default function AppearancePage() {
             items={SPARK_TINTS.filter((item) => item.collection === collection.id)}
             owned={(id) => look.ownedSparkTints.includes(id)}
             equipped={(id) => look.sparkTint === id}
+            previewing={(id) => preview.sparkTint === id}
             onAct={(id, owned) => act("sparkTint", id, owned)}
             onTry={(id) => tryOn("sparkTint", id)}
             blurb="Same spark, different light."
@@ -197,6 +199,7 @@ export default function AppearancePage() {
             items={SPARK_GEAR.filter((item) => item.collection === collection.id)}
             owned={(id) => look.ownedGear.includes(id)}
             equipped={(id) => look.gear === id}
+            previewing={(id) => preview.gear === id}
             onAct={(id, owned) => act("gear", id, owned)}
             onTry={(id) => tryOn("gear", id)}
             swatch={(item) => (
@@ -225,6 +228,7 @@ function Group<
   items,
   owned,
   equipped,
+  previewing,
   onAct,
   onTry,
   swatch,
@@ -235,6 +239,7 @@ function Group<
   items: readonly T[];
   owned: (id: T["id"]) => boolean;
   equipped: (id: T["id"]) => boolean;
+  previewing?: (id: T["id"]) => boolean;
   onAct: (id: T["id"], owned: boolean) => void;
   onTry?: (id: T["id"]) => void;
   swatch: (item: T) => ReactNode;
@@ -257,6 +262,7 @@ function Group<
               cost={item.cost}
               owned={has}
               equipped={on}
+              previewing={previewing?.(item.id) ?? false}
               equipLabel={equipLabel}
               onClick={() => onAct(item.id, has)}
               onTry={onTry ? () => onTry(item.id) : undefined}
@@ -294,6 +300,7 @@ function ShopCard({
   cost,
   owned,
   equipped,
+  previewing = false,
   equipLabel = "Wear",
   onClick,
   onTry,
@@ -304,6 +311,7 @@ function ShopCard({
   cost: number;
   owned: boolean;
   equipped: boolean;
+  previewing?: boolean;
   equipLabel?: string;
   onClick: () => void;
   onTry?: () => void;
@@ -313,7 +321,11 @@ function ShopCard({
     <div
       className={cn(
         "flex items-center gap-4 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900",
-        equipped ? "ring-1 ring-primary/45" : "",
+        equipped
+          ? "ring-1 ring-primary/45"
+          : previewing
+            ? "ring-1 ring-primary/25"
+            : "",
       )}
     >
       <div className="flex size-14 items-center justify-center">{children}</div>
