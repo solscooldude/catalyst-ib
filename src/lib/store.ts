@@ -8,9 +8,11 @@ import {
   SPARK_TRAILS,
   SPARK_TINTS,
   normalizeAppearance,
+  roomHasShades,
   type AccentId,
   type AccentShadeId,
   type AppearanceState,
+  type BackgroundId,
 } from "@/lib/appearance";
 import {
   FEED_COST,
@@ -616,6 +618,25 @@ export function setAccentShade(shade: AccentShadeId, hue?: AccentId) {
       ...current.appearance,
       accent,
       accentShade: shade,
+    }),
+  }));
+  return { ok: true as const };
+}
+
+export function setBackgroundShade(shade: AccentShadeId, hue?: BackgroundId) {
+  const background = hue ?? state.appearance.background;
+  if (!state.appearance.ownedBackgrounds.includes(background)) {
+    return { ok: false as const, reason: "Buy the colour first." };
+  }
+  if (!roomHasShades(background)) {
+    return { ok: false as const, reason: "This room has no shade." };
+  }
+  setState((current) => ({
+    ...current,
+    appearance: normalizeAppearance({
+      ...current.appearance,
+      background,
+      backgroundShade: shade,
     }),
   }));
   return { ok: true as const };
