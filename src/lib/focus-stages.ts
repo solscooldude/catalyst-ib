@@ -27,6 +27,7 @@ export const STAGE_THEMES = [
   },
 ];
 
+/** Soft washes (spotlight / gradient / subject tint) — next after interactions. */
 export type StageThemeId = (typeof STAGE_THEMES)[number]["id"];
 
 export function isStageFocusTheme(id: FocusThemeId | string): id is StageThemeId {

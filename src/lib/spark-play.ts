@@ -26,6 +26,11 @@ export function careMood(
   return "idle";
 }
 
+/**
+ * Mini-game ideas only — do not ship UI yet:
+ * - Memory / flip: match two mint cards for a tiny token.
+ * - Streak balloon: tap rising balloons on a 7-day streak celebration.
+ */
 export function hitZone(
   x: number,
   y: number,

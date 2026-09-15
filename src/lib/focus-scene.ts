@@ -1,4 +1,4 @@
-import { DEMO_TOKEN_MS, REAL_TOKEN_MS } from "@/lib/constants";
+import { DEMO_TIME_COMPRESS_MS, REAL_TIME_COMPRESS_MS } from "@/lib/constants";
 import type { FocusThemeId } from "@/lib/appearance";
 
 export type RocketStage = "liftoff" | "climb" | "space";
@@ -33,7 +33,7 @@ export function isRoomFocusTheme(id: FocusThemeId | string): id is RoomThemeId {
 }
 
 export function studyEquivalentMs(elapsedMs: number, demoMode: boolean) {
-  const scale = demoMode ? REAL_TOKEN_MS / DEMO_TOKEN_MS : 1;
+  const scale = demoMode ? REAL_TIME_COMPRESS_MS / DEMO_TIME_COMPRESS_MS : 1;
   return Math.max(0, elapsedMs) * scale;
 }
 
