@@ -221,8 +221,26 @@
 }
 
 .spark-scrunch .spark-body,
-.sprite-spark-stage.is-scrunching .spark-body {
+.sprite-spark-stage.is-scrunching .spark-body,
+.focus-spark-stage.is-scrunching .spark-body {
   transform: scale3d(1.18, 0.66, 1);
+}
+
+.focus-spark-stage .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 12%;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.spark-track-eyes:not(.spark-sleeping) .spark-pupil {
+  transform: translate(var(--eye-x, 0px), var(--eye-y, 0px));
+  transition: transform 90ms linear;
+}
+
+.focus-highfive-hand {
+  right: -12%;
+  top: 36%;
 }
 
 .spark-scrunch-release .spark-body {
