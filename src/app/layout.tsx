@@ -37,13 +37,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${plusJakarta.variable} ${geistMono.variable} light h-full antialiased`}
+      className={`${geistSans.variable} ${plusJakarta.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var t=localStorage.getItem("catalyst-v1:ui-theme");var d=t==="dark";document.documentElement.classList.toggle("dark",d);document.documentElement.classList.toggle("light",!d);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}',
+              'try{var t=localStorage.getItem("catalyst-v1:ui-theme");var d=t!=="light";document.documentElement.classList.toggle("dark",d);document.documentElement.classList.toggle("light",!d);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}',
           }}
         />
         <CatalystProvider>{children}</CatalystProvider>

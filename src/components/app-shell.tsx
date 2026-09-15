@@ -11,14 +11,12 @@ import { useAuth } from "@/lib/auth";
 import { isRoomFocusTheme } from "@/lib/focus-scene";
 import { ROUTES } from "@/lib/routes";
 import { useCatalyst } from "@/lib/store";
-import { useUiTheme } from "@/lib/ui-theme";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const state = useCatalyst();
   const auth = useAuth();
-  const uiTheme = useUiTheme();
   const sessionView = pathname === ROUTES.session;
   const roomLock =
     pathname === ROUTES.lock && isRoomFocusTheme(state.appearance.focusTheme);
@@ -30,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         sessionView && "bg-transparent",
       )}
     >
-      {sessionView || roomLock || uiTheme === "light" ? null : (
+      {sessionView || roomLock ? null : (
         <SceneBackground id={state.appearance.background} />
       )}
       {sessionView ? null : (
