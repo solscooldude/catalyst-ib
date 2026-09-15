@@ -8,6 +8,8 @@ import {
   SPARK_TRAILS,
   SPARK_TINTS,
   normalizeAppearance,
+  type AccentId,
+  type AccentShadeId,
   type AppearanceState,
 } from "@/lib/appearance";
 import {
@@ -601,4 +603,20 @@ export function equipAppearance(kind: AppearanceKind, id: string) {
   }));
 
   return { ok: true as const, item };
+}
+
+export function setAccentShade(shade: AccentShadeId, hue?: AccentId) {
+  const accent = hue ?? state.appearance.accent;
+  if (!state.appearance.ownedAccents.includes(accent)) {
+    return { ok: false as const, reason: "Buy the colour first." };
+  }
+  setState((current) => ({
+    ...current,
+    appearance: normalizeAppearance({
+      ...current.appearance,
+      accent,
+      accentShade: shade,
+    }),
+  }));
+  return { ok: true as const };
 }
