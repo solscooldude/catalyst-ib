@@ -201,7 +201,7 @@ export function FocusStagePicker({
           <TaskOption
             key={item.id}
             title={item.name}
-            detail={`${item.blurb} · ${item.cost === 0 ? "Free" : `${item.cost} tokens`}${has ? " · owned" : ""}`}
+            detail={`${item.cost === 0 ? "Free" : `${item.cost} tokens`}${has ? " · owned" : ""}`}
             selected={on}
             onSelect={() => onPick(item.id, has)}
           />
