@@ -79,6 +79,10 @@
   justify-content: center;
 }
 
+.sprite-playpen:has(.sprite-gift-tray) {
+  padding-top: 2.8rem;
+}
+
 .sprite-spark-stage {
   position: relative;
   z-index: 2;
@@ -98,6 +102,40 @@
 }
 
 .sprite-spark-stage.is-held {
+  cursor: grabbing;
+}
+
+.sprite-spark-stage.is-gift-over {
+  filter: drop-shadow(0 0 18px rgb(94 234 212 / 0.55));
+}
+
+.sprite-gift-tray {
+  position: absolute;
+  top: 0.4rem;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  max-width: calc(100% - 1rem);
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  transform: translateX(-50%);
+}
+
+.sprite-gift-chip {
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: 0 0 0 1px rgb(24 24 27 / 0.06);
+  cursor: grab;
+}
+
+.sprite-gift-chip:active {
   cursor: grabbing;
 }
 
@@ -220,6 +258,94 @@
   transform-box: fill-box;
   transform-origin: 50% 80%;
   animation: spark-poke-punch 0.64s cubic-bezier(0.18, 0.7, 0.28, 1);
+}
+
+@keyframes spark-spin-twirl {
+  0% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  22% {
+    transform: rotate(90deg) scaleX(0.28);
+  }
+  48% {
+    transform: rotate(180deg) scaleX(1);
+  }
+  72% {
+    transform: rotate(270deg) scaleX(0.28);
+  }
+  100% {
+    transform: rotate(360deg) scaleX(1);
+  }
+}
+
+.spark-spin .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 62%;
+  animation: spark-spin-twirl 0.78s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes spark-tickle-giggle {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+  14% {
+    transform: translateX(-6px) rotate(-7deg) scale(1.06, 0.92);
+  }
+  28% {
+    transform: translateX(7px) rotate(6deg) scale(0.94, 1.08);
+  }
+  44% {
+    transform: translateX(-5px) rotate(-5deg) scale(1.05, 0.94);
+  }
+  62% {
+    transform: translateX(6px) rotate(4deg) scale(0.96, 1.05);
+  }
+  80% {
+    transform: translateX(-2px) rotate(-2deg);
+  }
+}
+
+.spark-tickle .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 78%;
+  animation: spark-tickle-giggle 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes spark-wave-pose {
+  0%,
+  100% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  24% {
+    transform: rotate(-9deg) translate(4px, -3px);
+  }
+  52% {
+    transform: rotate(8deg) translate(-3px, -5px);
+  }
+  76% {
+    transform: rotate(-4deg) translate(2px, -1px);
+  }
+}
+
+.spark-wave .spark-body {
+  transform-box: fill-box;
+  transform-origin: 50% 82%;
+  animation: spark-wave-pose 0.72s ease-in-out;
+}
+
+.spark-sit {
+  animation: spark-sit-breathe 7.2s ease-in-out infinite;
+}
+
+@keyframes spark-sit-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
 
 .spark-float {
@@ -428,8 +554,11 @@
   .spark-crumb-bit,
   .spark-boop .spark-blink,
   .spark-poke .spark-body,
+  .spark-spin .spark-body,
+  .spark-tickle .spark-body,
+  .spark-wave .spark-body,
+  .spark-sit,
   .spark-celebrate,
-  .spark-highfive .spark-body,
   .spark-z,
   .sprite-catch-star {
     animation: none;
