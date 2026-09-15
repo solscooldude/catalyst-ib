@@ -47,8 +47,8 @@ export default function SetupPage() {
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
         Pick the apps that pull you off the IA. These are the highest-cost
-        unlocks — Instagram, TikTok, Snapchat, Reddit, X, BeReal. School tools
-        stay allowed. Discord and YouTube sit in Tier 2.
+        unlocks — Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord.
+        School tools stay allowed. YouTube stays in Tier 2.
       </p>
 
       <section className="mt-10">

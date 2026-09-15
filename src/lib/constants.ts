@@ -28,7 +28,6 @@ export const TIER2_APPS = [
   { id: "youtube", name: "YouTube", glyph: "YT", blurb: "Videos. Medium token cost." },
   { id: "messages", name: "Messages", glyph: "SMS", blurb: "iMessage and texts." },
   { id: "camera", name: "Camera", glyph: "CAM", blurb: "A photo, then back to the IA." },
-  { id: "discord", name: "Discord", glyph: "DC", blurb: "Servers stay Tier 2 by default." },
 ] as const;
 
 export type Tier2Id = (typeof TIER2_APPS)[number]["id"];
@@ -40,6 +39,7 @@ export const NEMESIS_APPS = [
   { id: "reddit", name: "Reddit", glyph: "RD", blurb: "A ‘quick check’ with no bottom." },
   { id: "x", name: "X", glyph: "X", blurb: "One quote-tweet becomes an hour." },
   { id: "bereal", name: "BeReal", glyph: "BR", blurb: "The two-minute ping that isn’t." },
+  { id: "discord", name: "Discord", glyph: "DS", blurb: "Servers that eat the TOK hour." },
 ] as const;
 
 export type NemesisId = (typeof NEMESIS_APPS)[number]["id"];
@@ -151,14 +151,14 @@ export const UNLOCK_TIER_ROWS = [
     name: "Tier 2",
     intensity: "Medium",
     cost: TIER2_COST,
-    blurb: "WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera, Discord.",
+    blurb: "WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera.",
   },
   {
     id: "tier3",
     name: "Tier 3 — nemesis set",
     intensity: "High",
     cost: TIER3_COST,
-    blurb: "Instagram, TikTok, Snapchat, Reddit, X, BeReal. Setup picks which of these are yours.",
+    blurb: "Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord. Setup picks which of these are yours.",
   },
 ] as const;
 
