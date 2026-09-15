@@ -28,7 +28,6 @@ type PhoneLockProps = {
   unlocks?: Unlock[];
   locked?: boolean;
   compact?: boolean;
-  onBeginFocus?: () => void;
 };
 
 function SocialGlyph({ label }: { label: string }) {
@@ -44,7 +43,6 @@ export function PhoneLock({
   unlocks = [],
   locked = true,
   compact = false,
-  onBeginFocus,
 }: PhoneLockProps) {
   const [now, setNow] = useState(() => new Date());
   const [notice, setNotice] = useState<string | null>(null);
@@ -195,15 +193,6 @@ export function PhoneLock({
                 <ShieldAlert className="size-3.5" />
                 Emergency
               </Button>
-              {onBeginFocus ? (
-                <Button
-                  type="button"
-                  className="h-10 flex-1 rounded-full text-xs"
-                  onClick={onBeginFocus}
-                >
-                  Begin focus
-                </Button>
-              ) : null}
             </div>
             <div className="flex justify-center">
               <DemoBadge>Simulated phone lock</DemoBadge>
