@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Lock, NotebookPen, Smartphone } from "lucide-react";
 import { LandingHeader } from "@/components/landing-header";
-import { MintChip, TokenAmount } from "@/components/mint-chip";
+import { TokenAmount } from "@/components/mint-chip";
 import { PhoneLock } from "@/components/phone-lock";
+import { BrandC, SparkleMark } from "@/components/brand-marks";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
 import { PRICING, UNLOCK_CATALOG } from "@/lib/constants";
@@ -66,7 +67,7 @@ export default function LandingPage() {
               <Button
                 asChild
                 variant="outline"
-                className="h-12 rounded-full border-white/10 px-6 text-sm"
+                className="h-12 rounded-full border-border px-6 text-sm"
               >
                 <Link href="#how">See how it works</Link>
               </Button>
@@ -79,7 +80,7 @@ export default function LandingPage() {
           <PhoneLock compact nemeses={["tiktok", "instagram"]} />
         </section>
 
-        <section className="border-y border-white/6">
+        <section className="border-y border-border">
           <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-2">
             <div>
               <p className="text-xs tracking-[0.2em] text-primary uppercase">
@@ -116,12 +117,12 @@ export default function LandingPage() {
             {STEPS.map((step) => (
               <div
                 key={step.n}
-                className="rounded-3xl bg-card p-6 ring-1 ring-white/6"
+                className="rounded-3xl bg-card p-6 ring-1 ring-border"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs text-primary">{step.n}</span>
                   {step.icon === "chip" ? (
-                    <MintChip size={16} />
+                    <SparkleMark size={16} />
                   ) : (
                     <step.icon className="size-4 text-muted-foreground" />
                   )}
@@ -136,7 +137,7 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-5 pb-20">
-          <div className="rounded-[2rem] bg-card p-6 ring-1 ring-white/6 sm:p-10">
+          <div className="rounded-[2rem] bg-card p-6 ring-1 ring-border sm:p-10">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-xs tracking-[0.2em] text-primary uppercase">
@@ -151,9 +152,9 @@ export default function LandingPage() {
                 can equal 1 token so you can try it without waiting.
               </p>
             </div>
-            <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-white/6">
+            <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-border">
               <table className="w-full text-left text-sm">
-                <thead className="bg-white/3 text-xs tracking-[0.14em] text-muted-foreground uppercase">
+                <thead className="bg-muted/70 text-xs tracking-[0.14em] text-muted-foreground uppercase">
                   <tr>
                     <th className="px-5 py-3 font-medium">Unlock</th>
                     <th className="px-5 py-3 font-medium">Intensity</th>
@@ -162,7 +163,7 @@ export default function LandingPage() {
                 </thead>
                 <tbody>
                   {UNLOCK_CATALOG.map((row) => (
-                    <tr key={row.id} className="border-t border-white/6">
+                    <tr key={row.id} className="border-t border-border">
                       <td className="px-5 py-4">
                         <div className="font-medium text-foreground">{row.name}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
@@ -183,7 +184,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="border-t border-white/6">
+        <section className="border-t border-border">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 lg:grid-cols-2">
             <div>
               <p className="text-xs tracking-[0.2em] text-primary uppercase">
@@ -203,7 +204,7 @@ export default function LandingPage() {
                 </Link>
               </Button>
             </div>
-            <div className="rounded-[2rem] bg-card p-8 ring-1 ring-white/6">
+            <div className="rounded-[2rem] bg-card p-8 ring-1 ring-border">
               <p className="font-heading text-3xl text-foreground">
                 What the demo includes
               </p>
@@ -230,10 +231,13 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-white/6 px-5 py-8">
+      <footer className="border-t border-border px-5 py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <Wordmark />
-          <p>v1 demo for IB DP students. Phone lock and ManageBac are simulated.</p>
+          <p className="inline-flex items-center gap-2">
+            <BrandC size={18} />
+            v1 demo for IB DP students. Phone lock and ManageBac are simulated.
+          </p>
         </div>
       </footer>
     </div>
