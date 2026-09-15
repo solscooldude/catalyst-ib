@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import {
   CLASS_YEARS,
   GROUP_LABELS,
+  alphaByLabel,
   subjectsInGroup,
   takenCourses,
   validateDiploma,
@@ -73,9 +74,11 @@ export default function ProfilePage() {
   const subjects = [...requiredIds, sixth].filter(Boolean);
   const preview = validateDiploma(subjects, classYear);
 
-  const extraChoices = ([1, 2, 3, 4, 5] as const)
-    .flatMap((group) => subjectsInGroup(group))
-    .filter((row) => !takenCourses(requiredIds).has(row.course));
+  const extraChoices = alphaByLabel(
+    ([1, 2, 3, 4, 5] as const)
+      .flatMap((group) => subjectsInGroup(group))
+      .filter((row) => !takenCourses(requiredIds).has(row.course)),
+  );
 
   function save() {
     const result = saveProfile({ classYear, subjects });
