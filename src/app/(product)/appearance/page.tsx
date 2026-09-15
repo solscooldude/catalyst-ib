@@ -33,13 +33,13 @@ export default function AppearancePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-12">
-      <div className="flex items-start justify-between gap-4">
+    <div className="mx-auto w-full max-w-3xl space-y-4">
+      <div className="flux-card flex items-start justify-between gap-4 px-6 py-8 sm:px-10">
         <div>
-          <p className="text-xs tracking-[0.2em] text-primary uppercase">
-            Appearance shop
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+            Shop
           </p>
-          <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             A small closet. Four collections.
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -63,7 +63,7 @@ export default function AppearancePage() {
       </p>
 
       {COLLECTIONS.map((collection) => (
-        <section key={collection.id} className="space-y-6">
+        <section key={collection.id} className="flux-card space-y-6 px-6 py-8">
           <div>
             <p className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.16em] text-primary uppercase">
               <MintChip size={11} />
@@ -233,8 +233,8 @@ function ShopCard({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 rounded-2xl bg-card p-4 ring-1",
-        equipped ? "ring-primary/45" : "ring-white/6",
+        "flex items-center gap-4 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900",
+        equipped ? "ring-1 ring-primary/45" : "",
       )}
     >
       <div className="flex size-14 items-center justify-center">{children}</div>
