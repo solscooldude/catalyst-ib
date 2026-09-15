@@ -754,6 +754,16 @@ html[data-bg="aurora"] {
   animation: spark-halo 2.8s ease-in-out infinite;
 }
 
+.spark-has-aura .spark-halo {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--spark-aura, #5eead4) 62%, transparent),
+    color-mix(in srgb, var(--spark-aura, #5eead4) 22%, transparent) 46%,
+    transparent 72%
+  );
+  filter: blur(2px);
+}
+
 .spark-dot {
   animation: spark-dot 1.5s ease-in-out infinite;
 }
@@ -1312,6 +1322,17 @@ html[data-bg="aurora"] {
 
 .focus-spark-gift {
   animation: focus-spark-gift 1.1s ease-out;
+}
+
+.focus-quiet-stage.is-buddy-sit {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.2rem;
+}
+
+.focus-spark-stage.is-buddy-sit {
+  margin-right: min(32rem, 56vw);
+  margin-top: 0.1rem;
 }
 
 .focus-token-drop {
