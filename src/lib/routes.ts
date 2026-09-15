@@ -8,7 +8,6 @@ export const ROUTES = {
   appearance: "/appearance",
   setup: "/setup",
   profile: "/profile",
-  motivation: "/motivation",
   subscription: "/account/subscription",
   settings: "/account/settings",
   schedule: "/schedule",
