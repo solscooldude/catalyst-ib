@@ -17,6 +17,7 @@ import {
   type SparkFlavor,
 } from "@/lib/spark-flavor";
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
+import { type SnackId, type SparkAct } from "@/lib/spark-play";
 import { sparkEvolution } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,8 @@ type SparkProps = {
   petPulse?: number;
   flourish?: "loop" | "now";
   evolve?: boolean;
+  act?: SparkAct;
+  snack?: SnackId | null;
 };
 
 function OpenEyes({
@@ -266,6 +269,8 @@ export function Spark({
   petPulse = 0,
   flourish = "loop",
   evolve = true,
+  act = null,
+  snack = null,
 }: SparkProps) {
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
@@ -306,8 +311,18 @@ export function Spark({
   }, [petPulse]);
 
   const shownMood: SparkMood =
-    mood === "eating" ? "eating" : petted ? "done" : mood;
-  const canGlance = !petted && (mood === "idle" || mood === "locked");
+    mood === "eating"
+      ? "eating"
+      : act === "sleep" || mood === "sleepy"
+        ? "sleepy"
+        : act === "celebrate" || act === "highfive" || petted
+          ? "done"
+          : mood;
+  const canGlance =
+    !petted &&
+    act !== "sleep" &&
+    act !== "celebrate" &&
+    (mood === "idle" || mood === "locked");
   const evo = evolve ? sparkEvolution(store.logs) : { scale: 1, glow: 1 };
   const drawn = size * evo.scale;
   const frameClass = cn(
@@ -316,7 +331,13 @@ export function Spark({
       ? "cursor-pointer touch-manipulation border-0 bg-transparent p-0"
       : "pointer-events-none",
     petted && mood !== "eating" && "spark-petted",
+    (act === "boop" || petted) && mood !== "eating" && "spark-boop",
+    act === "scrunch" && "spark-scrunch",
+    act === "celebrate" && "spark-celebrate",
+    act === "highfive" && "spark-highfive",
+    (act === "sleep" || mood === "sleepy") && "spark-sleeping",
     mood === "eating" && "spark-eating",
+    mood === "eating" && snack && `spark-eat-${snack}`,
     flourish === "now" && "spark-idle-pop",
     className,
   );
@@ -364,10 +385,33 @@ export function Spark({
           </g>
         </g>
 
-        {petted && mood !== "eating" ? <PetHearts /> : null}
+        {(petted || act === "boop") && mood !== "eating" ? <PetHearts /> : null}
+
+        {act === "sleep" || mood === "sleepy" ? (
+          <g className="spark-zzz" fill="#A1A1AA" fontSize="11" fontWeight="700">
+            <text className="spark-z spark-z-a" x="74" y="22">
+              z
+            </text>
+            <text className="spark-z spark-z-b" x="84" y="12">
+              z
+            </text>
+            <text className="spark-z spark-z-c" x="92" y="4">
+              z
+            </text>
+          </g>
+        ) : null}
 
         {mood === "eating" ? (
-          <g className="spark-crumbs" fill="#F5D0A9">
+          <g
+            className="spark-crumbs"
+            fill={
+              snack === "berry"
+                ? "#C084FC"
+                : snack === "mint"
+                  ? "#5EEAD4"
+                  : "#F5D0A9"
+            }
+          >
             <circle className="spark-crumb-bit spark-crumb-a" cx="28" cy="84" r="2.1" />
             <circle className="spark-crumb-bit spark-crumb-b" cx="70" cy="88" r="1.6" />
             <circle className="spark-crumb-bit spark-crumb-c" cx="50" cy="94" r="1.3" />
