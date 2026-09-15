@@ -31,7 +31,7 @@ const GROUPS = [
     label: "Focus",
     href: ROUTES.focus,
     items: [
-      { href: ROUTES.focus, label: "Focus session" },
+      { href: ROUTES.focus, label: "Focus" },
       { href: ROUTES.setup, label: "Setup" },
     ],
   },
@@ -51,13 +51,28 @@ const GROUPS = [
     items: [
       { href: ROUTES.appearance, label: "Appearance" },
       { href: ROUTES.unlocks, label: "Unlocks" },
+      { href: `${ROUTES.appearance}#trails`, label: "Trails" },
+      { href: `${ROUTES.appearance}#snacks`, label: "Snacks" },
     ],
   },
 ] as const;
 
+function itemPath(href: string) {
+  return href.split("#")[0] ?? href;
+}
+
+function itemActive(pathname: string, hash: string, href: string) {
+  const [path, anchor] = href.split("#");
+  if (anchor) return pathname === path && hash === `#${anchor}`;
+  if (path === ROUTES.appearance) {
+    return pathname === path && (hash === "" || hash === "#");
+  }
+  return pathname === path;
+}
+
 function groupActive(pathname: string, group: (typeof GROUPS)[number]) {
   return (
-    group.items.some((item) => pathname === item.href) ||
+    group.items.some((item) => pathname === itemPath(item.href)) ||
     (group.id === "focus" &&
       (pathname === ROUTES.lock || pathname === ROUTES.session))
   );
@@ -65,9 +80,11 @@ function groupActive(pathname: string, group: (typeof GROUPS)[number]) {
 
 function MenuLinks({
   pathname,
+  hash,
   onPick,
 }: {
   pathname: string;
+  hash: string;
   onPick?: () => void;
 }) {
   const [open, setOpen] = useState(
@@ -107,7 +124,7 @@ function MenuLinks({
                     onClick={onPick}
                     className={cn(
                       "block rounded-xl px-3 py-2 text-[13px]",
-                      pathname === item.href
+                      itemActive(pathname, hash, item.href)
                         ? "bg-primary/15 text-foreground"
                         : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
                     )}
@@ -128,8 +145,18 @@ export function TopNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
+  const [hash, setHash] = useState("");
   const root = useRef<HTMLElement>(null);
   const current = GROUPS.find((group) => groupActive(pathname, group));
+
+  useEffect(() => {
+    function syncHash() {
+      setHash(window.location.hash);
+    }
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [pathname]);
 
   useEffect(() => {
     setOpen(null);
@@ -218,7 +245,7 @@ export function TopNav() {
                       href={item.href}
                       className={cn(
                         "block rounded-xl px-3 py-2 text-[13px]",
-                        pathname === item.href
+                        itemActive(pathname, hash, item.href)
                           ? "bg-primary/15 text-foreground"
                           : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
                       )}
@@ -252,7 +279,11 @@ export function TopNav() {
               <SheetTitle>Pages</SheetTitle>
             </SheetHeader>
             <div className="px-3 pb-6">
-              <MenuLinks pathname={pathname} onPick={() => setSheet(false)} />
+              <MenuLinks
+                pathname={pathname}
+                hash={hash}
+                onPick={() => setSheet(false)}
+              />
             </div>
           </SheetContent>
         </Sheet>
