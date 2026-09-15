@@ -18,8 +18,9 @@ import { SpriteRename } from "@/components/sprite-rename";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
 import { PageFrame } from "@/components/page-frame";
+import { readImageAsAvatar } from "@/lib/identity";
 import { commitSpriteName, displaySpriteName } from "@/lib/sprite-name";
-import { saveMotivation, saveProfile, useCatalyst } from "@/lib/store";
+import { saveIdentity, saveMotivation, saveProfile, useCatalyst } from "@/lib/store";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -72,6 +73,8 @@ export default function ProfilePage() {
     displaySpriteName(state.spriteName),
   );
   const [spriteDirty, setSpriteDirty] = useState(false);
+  const [username, setUsername] = useState(state.username);
+  const [avatarNotice, setAvatarNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (spriteDirty) return;
@@ -93,6 +96,7 @@ export default function ProfilePage() {
 
   function save() {
     commitSpriteName(spriteDraft);
+    saveIdentity({ username });
     const result = saveProfile({
       classYear,
       subjects,
@@ -123,6 +127,52 @@ export default function ProfilePage() {
       </div>
 
       <div className="flux-card space-y-6 px-6 py-8">
+      <div className="space-y-2">
+        <Label htmlFor="username">Username</Label>
+        <Input
+          id="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          placeholder="sols"
+          className="h-11 rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="avatar">Profile picture</Label>
+        <div className="flex items-center gap-3">
+          {state.avatarDataUrl ? (
+            <img
+              src={state.avatarDataUrl}
+              alt=""
+              className="size-12 rounded-full object-cover ring-1 ring-border"
+            />
+          ) : (
+            <span className="grid size-12 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+              {(username || "A").slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <Input
+            id="avatar"
+            type="file"
+            accept="image/*"
+            className="h-11 rounded-xl"
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              const data = await readImageAsAvatar(file);
+              if (!data) {
+                setAvatarNotice("Could not read that image.");
+                return;
+              }
+              saveIdentity({ avatarDataUrl: data });
+              setAvatarNotice(null);
+            }}
+          />
+        </div>
+        {avatarNotice ? (
+          <p className="text-sm text-rose-300">{avatarNotice}</p>
+        ) : null}
+      </div>
       <SpriteRename
         onDraft={(name) => {
           setSpriteDirty(true);

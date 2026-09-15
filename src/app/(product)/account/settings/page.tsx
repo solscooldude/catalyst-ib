@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
 import { updateEmail, updatePassword, useAuth } from "@/lib/auth";
+import { setSoundMuted, useCatalyst } from "@/lib/store";
 
 export default function SettingsPage() {
   const auth = useAuth();
+  const store = useCatalyst();
   const [emailDraft, setEmailDraft] = useState<string | null>(null);
   const email = emailDraft ?? auth.user?.email ?? "";
   const [emailPassword, setEmailPassword] = useState("");
@@ -46,6 +48,19 @@ export default function SettingsPage() {
 
       <div className="flux-card px-6 py-8">
         <SpriteRename />
+      </div>
+
+      <div className="flux-card px-6 py-8">
+        <h2 className="text-lg text-foreground">Sound</h2>
+        <label className="mt-4 flex items-center gap-3 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={store.soundMuted}
+            onChange={(event) => setSoundMuted(event.target.checked)}
+            className="size-4 accent-[var(--primary)]"
+          />
+          Mute soft sounds
+        </label>
       </div>
 
       <form className="flux-card space-y-4 px-6 py-8" onSubmit={saveEmail}>

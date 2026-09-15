@@ -15,7 +15,8 @@ import { careMood, type SparkAct } from "@/lib/spark-play";
 import {
   formatClock,
   monthlyRoundup,
-  sparkEvolution,
+  sparkEvolutionFromState,
+  sparkEvolutionLabel,
   startOfMonth,
   subjectStacks,
   todayStudyMs,
@@ -65,7 +66,7 @@ export default function DashboardPage() {
     state.logs.filter((log) => log.endedAt >= startOfMonth(now).getTime()),
   );
   const session = state.session;
-  const evo = sparkEvolution(state.logs);
+  const evo = sparkEvolutionFromState(state);
   const todayMs = todayStudyMs(state.logs, now);
   const week = weekDayMarks(state.logs, now);
   const dailyGoalMs = state.dailyGoalMinutes * 60 * 1000;
@@ -103,9 +104,9 @@ export default function DashboardPage() {
               <h1 className="text-4xl tracking-tight text-foreground sm:text-5xl">
                 {displaySpriteName(state.spriteName)}
               </h1>
-              {evo.stage === "ember" ? null : (
+              {evo.stage === "egg" ? null : (
                 <p className="mt-2 max-w-[14rem] text-sm text-zinc-400">
-                  {evo.stage}
+                  {sparkEvolutionLabel(evo.stage)}
                 </p>
               )}
               <Button
