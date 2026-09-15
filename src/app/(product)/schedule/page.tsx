@@ -22,6 +22,7 @@ import {
   updateLockWindow,
   useCatalyst,
 } from "@/lib/store";
+import { PageFrame } from "@/components/page-frame";
 import { cn } from "@/lib/utils";
 
 const timeClass =
@@ -79,9 +80,9 @@ export default function SchedulePage() {
   if (!state.setupComplete) return null;
 
   return (
-    <div className="mx-auto grid w-full max-w-4xl gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-4">
-        <div className="flux-card px-6 py-8">
+    <PageFrame className="grid gap-10 space-y-0 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="space-y-6">
+        <div className="flux-card px-6 py-8 sm:px-8">
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
             Lock schedule
           </p>
@@ -267,6 +268,6 @@ export default function SchedulePage() {
             : "Outside a window the mock phone is idle. Add hours to lock it on a schedule."}
         </p>
       </div>
-    </div>
+    </PageFrame>
   );
 }
