@@ -16,7 +16,9 @@ import { displaySpriteName } from "@/lib/sprite-name";
 import {
   completeSession,
   markTaskDone,
-  plannedLockMs,
+  pauseSession,
+  resumeSession,
+  sessionElapsedMs,
   sessionHint,
   sessionTitle,
   tokensFromElapsed,
@@ -27,7 +29,7 @@ function formatElapsed(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 export default function FocusPage() {
@@ -60,27 +62,26 @@ export default function FocusPage() {
   }, []);
 
   const session = state.session;
-  const startedAt = session?.focusStartedAt ?? now;
-  const elapsed = now - startedAt;
+  const paused = Boolean(session?.pausedAt);
+  const elapsed = session ? sessionElapsedMs(session, now) : 0;
   const demoMode = session?.demoMode ?? state.demoMode;
   const interval = demoMode ? DEMO_TOKEN_MS : REAL_TOKEN_MS;
   const earned = tokensFromElapsed(elapsed, demoMode);
   const tokenProgress = Math.min(1, (elapsed % interval) / interval);
   const title = session ? sessionTitle(session) : "";
-  const planned = session ? plannedLockMs(session) : null;
-  const remaining = planned ? Math.max(0, planned - elapsed) : 0;
-  const sessionProgress = planned
-    ? Math.min(1, elapsed / planned)
-    : tokenProgress;
+  const goalMs = session?.plannedMinutes
+    ? session.demoMode
+      ? Math.round(session.plannedMinutes * 60 * 1000 * (DEMO_TOKEN_MS / REAL_TOKEN_MS))
+      : session.plannedMinutes * 60 * 1000
+    : null;
   const taskMarkedDone = session?.taskMarkedDone ?? false;
   const justEarned = earned >= 1 && tokenProgress < 0.12;
-  const mood: SparkMood =
-    session?.kind === "study"
-      ? remaining === 0
-        ? "done"
-        : justEarned
-          ? "earning"
-          : "locked"
+  const mood: SparkMood = paused
+    ? "idle"
+    : session?.kind === "study"
+      ? justEarned
+        ? "earning"
+        : "locked"
       : taskMarkedDone
         ? "done"
         : justEarned
@@ -100,7 +101,10 @@ export default function FocusPage() {
       setError(result.reason);
       return;
     }
-    router.push(`${ROUTES.unlocks}?earned=1`);
+    const minutes = Math.max(0, Math.round(elapsed / 60000));
+    router.push(
+      `${ROUTES.unlocks}?earned=1&minutes=${minutes}&tokens=${result.totalTokens}`,
+    );
   }
 
   return (
@@ -114,21 +118,22 @@ export default function FocusPage() {
       />
       <FocusHud
         time={formatElapsed(elapsed)}
-        progress={sessionProgress}
+        progress={tokenProgress}
         tokens={liveTokens}
         name={displaySpriteName(state.spriteName)}
+        task={title}
       />
 
       <div className="focus-session-panel">
         <p className="text-[11px] tracking-[0.18em] text-primary uppercase">
-          Focus session
+          {paused ? "Paused" : "Focus session"}
         </p>
         <h1 className="mt-2 font-heading text-2xl text-foreground sm:text-3xl">
           {title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {session.kind === "study"
-            ? "Personal study block. Time tokens only."
+            ? "Personal study block. Time counts up. Time tokens only."
             : "Official ManageBac task."}
         </p>
         {session.goal && session.kind === "verified" ? (
@@ -153,15 +158,14 @@ export default function FocusPage() {
           </label>
         ) : (
           <p className="mt-5 text-sm text-muted-foreground">
-            Stay for the full block. Leaving early awards nothing.
+            End whenever you want. Tokens come from elapsed time.
           </p>
         )}
 
-        {planned ? (
+        {goalMs ? (
           <p className="mt-3 text-xs text-muted-foreground">
-            {remaining > 0
-              ? `${formatElapsed(remaining)} left in this block`
-              : "Block complete"}
+            Soft goal {session.plannedMinutes} min
+            {elapsed >= goalMs ? " · reached" : ` · ${formatElapsed(elapsed)} in`}
           </p>
         ) : null}
 
@@ -183,9 +187,18 @@ export default function FocusPage() {
           </p>
         )}
 
-        <Button className="mt-5 h-11 rounded-full px-6" onClick={finish}>
-          Complete session
-        </Button>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            className="h-11 rounded-full px-6"
+            onClick={() => (paused ? resumeSession() : pauseSession())}
+          >
+            {paused ? "Resume" : "Pause"}
+          </Button>
+          <Button className="h-11 rounded-full px-6" onClick={finish}>
+            End focus
+          </Button>
+        </div>
       </div>
     </div>
   );

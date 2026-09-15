@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CircleCheck } from "lucide-react";
-import { DemoBadge } from "@/components/demo-badge";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { StudyStartForm } from "@/components/study-start-form";
+import { SelectedTaskChip, TaskOption } from "@/components/task-option";
 import { MOCK_TASKS, formatNemesisList, type TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -21,7 +21,6 @@ import {
   startSession,
   useCatalyst,
 } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 export default function AppHomePage() {
   const router = useRouter();
@@ -94,42 +93,30 @@ export default function AppHomePage() {
           </div>
         ) : null}
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-6">
+          <SelectedTaskChip
+            title={selectedTask?.title}
+            detail={
+              selectedTask
+                ? `${selectedTask.subject} · due ${selectedTask.due}`
+                : undefined
+            }
+            empty="Pick a ManageBac task below. The name stays visible here after you choose."
+          />
+        </div>
+
+        <div className="mt-5 space-y-3">
           {MOCK_TASKS.map((task) => {
             const done = state.tasks.find((row) => row.id === task.id)?.done;
-            const selected = taskId === task.id;
             return (
-              <button
+              <TaskOption
                 key={task.id}
-                type="button"
+                title={task.title}
+                detail={`${task.subject} · due ${task.due} · ${task.detail}`}
+                selected={taskId === task.id}
                 disabled={done}
-                onClick={() => setTaskId(task.id)}
-                className={cn(
-                  "w-full rounded-2xl p-4 text-left ring-1 transition-colors",
-                  done && "opacity-50",
-                  selected
-                    ? "bg-primary/15 text-zinc-900 ring-2 ring-primary dark:bg-primary/20 dark:text-zinc-50"
-                    : "bg-white text-zinc-900 shadow-[0_1px_2px_rgb(24_24_27/0.05)] ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700",
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                      {task.title}
-                    </p>
-                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-                      {task.subject} · due {task.due} · {task.detail}
-                    </p>
-                  </div>
-                  {done ? (
-                    <CircleCheck className="size-4 text-primary" />
-                  ) : selected ? (
-                    <CircleCheck className="size-5 text-primary" />
-                  ) : (
-                    <DemoBadge>ManageBac</DemoBadge>
-                  )}
-                </div>
-              </button>
+                onSelect={() => setTaskId(task.id)}
+              />
             );
           })}
         </div>
@@ -147,24 +134,16 @@ export default function AppHomePage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Optional goal, then the simulated lock screen.
         </p>
-        {selectedTask ? (
-          <div className="mt-4 rounded-2xl bg-primary/15 px-3.5 py-3 ring-1 ring-primary">
-            <p className="text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">
-              Selected task
-            </p>
-            <p className="mt-1 text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              {selectedTask.title}
-            </p>
-            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-              {selectedTask.subject} · due {selectedTask.due}
-            </p>
-          </div>
-        ) : (
-          <p className="mt-4 rounded-2xl bg-zinc-100 px-3.5 py-3 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-            Pick a ManageBac task on the left so you can see what you are
-            locking in.
-          </p>
-        )}
+        <div className="mt-4">
+          <SelectedTaskChip
+            title={selectedTask?.title}
+            detail={
+              selectedTask
+                ? `${selectedTask.subject} · due ${selectedTask.due}`
+                : undefined
+            }
+          />
+        </div>
 
         <div className="mt-5 space-y-4">
           <div className="space-y-2">
