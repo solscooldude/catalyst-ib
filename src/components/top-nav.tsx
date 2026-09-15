@@ -101,7 +101,7 @@ function MenuLinks({
             <button
               type="button"
               className={cn(
-                "flex min-h-12 w-full items-center justify-between rounded-xl px-3.5 py-3 text-left text-sm",
+                "font-heading flex min-h-12 w-full items-center justify-between rounded-xl px-3.5 py-3 text-left text-sm font-semibold",
                 active ? "text-foreground" : "text-zinc-500",
               )}
               aria-expanded={expanded}
@@ -200,7 +200,7 @@ export function TopNav() {
               <button
                 type="button"
                 className={cn(
-                  "relative inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 py-2.5 text-sm transition-colors",
+                  "font-heading relative inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors",
                   active
                     ? "font-medium text-foreground"
                     : "text-zinc-400 hover:text-foreground",
