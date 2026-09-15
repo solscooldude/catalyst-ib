@@ -1,7 +1,19 @@
 import { SPARK_TINTS, type SparkTintId } from "./spark-tints";
+import {
+  BACKGROUNDS,
+  migrateBackground,
+  type BackgroundId,
+} from "./room-hues";
 
 export { SPARK_TINTS, getSparkTint } from "./spark-tints";
 export type { SparkTintId } from "./spark-tints";
+export {
+  BACKGROUNDS,
+  getBackground,
+  getBackgroundShade,
+  roomHasShades,
+} from "./room-hues";
+export type { BackgroundId } from "./room-hues";
 
 export type CollectionId = "starter" | "aurora" | "gold" | "focus";
 
@@ -147,72 +159,6 @@ export const ACCENTS = [
   },
 ] as const;
 
-export const BACKGROUNDS = [
-  {
-    id: "void",
-    name: "Void",
-    cost: 0,
-    collection: "starter" as const,
-    blurb: "Near-black, the original room.",
-  },
-  {
-    id: "dusk",
-    name: "Dusk",
-    cost: 12,
-    collection: "starter" as const,
-    blurb: "A violet evening wash.",
-  },
-  {
-    id: "mist",
-    name: "Mist",
-    cost: 12,
-    collection: "starter" as const,
-    blurb: "Cool slate, a little softer.",
-  },
-  {
-    id: "grove",
-    name: "Grove",
-    cost: 14,
-    collection: "starter" as const,
-    blurb: "Deep green, like a library lamp.",
-  },
-  {
-    id: "stars",
-    name: "Star dots",
-    cost: 100,
-    collection: "aurora" as const,
-    blurb: "Soft dots on the app chrome. Not the Focus night-sky scene.",
-  },
-  {
-    id: "aurora",
-    name: "Aurora",
-    cost: 100,
-    collection: "aurora" as const,
-    blurb: "Soft muted lavender chrome for the whole app. Not a Focus backdrop.",
-  },
-  {
-    id: "lilac",
-    name: "Lilac room",
-    cost: 14,
-    collection: "starter" as const,
-    blurb: "A light lilac wash. Works in light chrome.",
-  },
-  {
-    id: "blush",
-    name: "Light pink",
-    cost: 14,
-    collection: "starter" as const,
-    blurb: "Baby pink paper. Soft, not neon.",
-  },
-  {
-    id: "babyblue",
-    name: "Baby blue",
-    cost: 14,
-    collection: "starter" as const,
-    blurb: "Pale blue room, like morning sky.",
-  },
-] as const;
-
 export const SPARK_GEAR = [
   { id: "none", name: "Bare", cost: 0, collection: "starter" as const, blurb: "Just the spark." },
   { id: "bow", name: "Tiny bow", cost: 10, collection: "starter" as const, blurb: "A pink knot on the crown." },
@@ -352,7 +298,6 @@ const RETIRED_FOCUS = new Set(["cat", "desk", "library", "rocket", "waves"]);
 export const SHOP_FOCUS_SCENES = FOCUS_THEMES.filter((item) => item.id !== "none");
 
 export type AccentId = (typeof ACCENTS)[number]["id"];
-export type BackgroundId = (typeof BACKGROUNDS)[number]["id"];
 export type SparkGearId = (typeof SPARK_GEAR)[number]["id"];
 export type SparkTrailId = (typeof SPARK_TRAILS)[number]["id"];
 export type FocusThemeId = (typeof FOCUS_THEMES)[number]["id"];
@@ -376,6 +321,7 @@ export type AppearanceState = {
   accent: AccentId;
   accentShade: AccentShadeId;
   background: BackgroundId;
+  backgroundShade: AccentShadeId;
   sparkTint: SparkTintId;
   gear: SparkGearId;
   trail: SparkTrailId;
@@ -392,6 +338,7 @@ export const defaultAppearance: AppearanceState = {
   accent: "mint",
   accentShade: "normal",
   background: "void",
+  backgroundShade: "normal",
   sparkTint: "mint",
   gear: "none",
   trail: "none",
@@ -412,12 +359,6 @@ function migrateAccent(id: string | undefined): {
 
 function knownShade(id: string | undefined): AccentShadeId | null {
   return id === "pastel" || id === "normal" || id === "deep" ? id : null;
-}
-
-function knownBackground(id: string | undefined): BackgroundId {
-  return BACKGROUNDS.some((row) => row.id === id)
-    ? (id as BackgroundId)
-    : "void";
 }
 
 function mapFocusTheme(id: string | undefined): FocusThemeId {
@@ -441,9 +382,7 @@ export function normalizeAppearance(
     "mint",
   );
   const ownedBackgrounds = unique(
-    (raw?.ownedBackgrounds ?? ["void"]).filter((id) =>
-      BACKGROUNDS.some((row) => row.id === id),
-    ),
+    (raw?.ownedBackgrounds ?? ["void"]).map((id) => migrateBackground(id).hue),
     "void",
   );
   const ownedSparkTints = unique(
@@ -473,7 +412,12 @@ export function normalizeAppearance(
   const accent = ownedAccents.includes(migrated.hue) ? migrated.hue : "mint";
   const accentShade =
     knownShade(raw?.accentShade) ?? migrated.shade ?? "normal";
-  const background = knownBackground(raw?.background);
+  const migratedRoom = migrateBackground(raw?.background);
+  const background = ownedBackgrounds.includes(migratedRoom.hue)
+    ? migratedRoom.hue
+    : "void";
+  const backgroundShade =
+    knownShade(raw?.backgroundShade) ?? migratedRoom.shade ?? "normal";
   return {
     ownedAccents,
     ownedBackgrounds,
@@ -483,7 +427,8 @@ export function normalizeAppearance(
     ownedFocusThemes,
     accent,
     accentShade,
-    background: ownedBackgrounds.includes(background) ? background : "void",
+    background,
+    backgroundShade,
     sparkTint: ownedSparkTints.includes(raw?.sparkTint ?? "mint")
       ? (raw?.sparkTint ?? "mint")
       : "mint",
@@ -502,10 +447,6 @@ export function getAccent(id: AccentId) {
 export function getAccentShade(hue: AccentId, shade: AccentShadeId) {
   const accent = getAccent(hue);
   return accent.shades[shade] ?? accent.shades.normal;
-}
-
-export function getBackground(id: BackgroundId) {
-  return BACKGROUNDS.find((row) => row.id === id) ?? BACKGROUNDS[0];
 }
 
 export function getSparkGear(id: SparkGearId) {
