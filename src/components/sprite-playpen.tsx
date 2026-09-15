@@ -22,14 +22,16 @@ import {
   type SparkZone,
 } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
+import { playSfx } from "@/lib/sfx";
 import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { cn } from "@/lib/utils";
 
 const TAP_SLOP = 9;
-const FOLLOW = 0.72;
-const STIFFNESS = 0.16;
-const DAMPING = 0.84;
-const SNAP = 0.14;
+const FOLLOW = 0.46;
+const STIFFNESS = 0.026;
+const DAMPING = 0.868;
+const SNAP_POS = 0.32;
+const SNAP_VEL = 0.055;
 const HOLD_SLEEP_MS = 620;
 
 type SpritePlaypenProps = {
@@ -159,6 +161,7 @@ export function SpritePlaypen({
   }
 
   function play(next: SparkAct, ms = 700) {
+    if (next === "boop" || next === "poke" || next === "spin") playSfx("boop");
     setAct(next);
     window.setTimeout(() => {
       setAct((current) => (current === next ? null : current));
@@ -355,8 +358,12 @@ export function SpritePlaypen({
     const body = active.kind === "spark" ? spark.current : snack.current;
     body.tx = 0;
     body.ty = 0;
-    body.vx *= 0.45;
-    body.vy = body.vy * 0.35 - 10;
+    body.vx *= 0.12;
+    body.vy *= 0.1;
+    if (active.kind === "spark") {
+      body.vx += body.x * -0.018;
+      body.vy += body.y * -0.012 + 0.35;
+    }
   }
 
   function over(
@@ -365,7 +372,7 @@ export function SpritePlaypen({
   ) {
     const sparkBox = a.current?.getBoundingClientRect();
     const other = b.current?.getBoundingClientRect();
-    if (!sparkBox || !other) return false;
+    if (!sparkBox || other) return false;
     const x = other.left + other.width / 2;
     const y = other.top + other.height / 2;
     const pad = 28;
@@ -486,7 +493,10 @@ function step(
     body.vy *= DAMPING;
     body.x += body.vx;
     body.y += body.vy;
-    if (Math.hypot(body.x, body.y) < SNAP && Math.hypot(body.vx, body.vy) < SNAP) {
+    const atHome =
+      Math.hypot(body.x - body.tx, body.y - body.ty) < SNAP_POS &&
+      Math.hypot(body.vx, body.vy) < SNAP_VEL;
+    if (atHome) {
       body.x = body.tx;
       body.y = body.ty;
       body.vx = 0;
@@ -506,12 +516,12 @@ function apply(
   const scrunching = node.classList.contains("is-scrunching");
   if (scrunching) return;
   const speed = Math.hypot(body.vx, body.vy);
-  const stretch = 1 + Math.min(speed * 0.03, 0.18);
-  const squash = 1 - Math.min(speed * 0.018, 0.12);
+  const stretch = 1 + Math.min(speed * (held ? 0.022 : 0.01), held ? 0.12 : 0.06);
+  const squash = 1 - Math.min(speed * (held ? 0.012 : 0.006), held ? 0.08 : 0.04);
   const angle = Math.atan2(body.vy, body.vx);
   const lively =
     !scrunching &&
-    (held ? speed > 0.8 : Math.hypot(body.x, body.y) > 4 || speed > 1.2);
+    (held ? speed > 1.1 : Math.hypot(body.x, body.y) > 10 || speed > 2.4);
   const squashStretch = lively
     ? `rotate(${angle}rad) scale(${stretch}, ${squash}) rotate(${-angle}rad)`
     : "";
