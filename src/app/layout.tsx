@@ -3,6 +3,7 @@ import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { CatalystProvider } from "@/components/catalyst-provider";
 import "./globals.css";
 import "./shell-theme.css";
+import "./task-picker.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   description:
     "For IB DP students. Apps pull you off ManageBac. Catalyst locks them until a session finishes. Tokens come from that work, then you buy a short unlock.",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/icon.svg", type: "application/svg+xml" }],
     apple: [{ url: "/apple-icon" }],
   },
 };
