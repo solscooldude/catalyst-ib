@@ -190,11 +190,10 @@ export default function LandingPage() {
                 Free demo
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                Use it here. No paywall.
+                Use it here.
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-                Sign up creates a demo account in this browser. There is no
-                checkout and no monthly plan.
+                Sign up creates a demo account in this browser.
               </p>
               <Button asChild className="mt-8 h-12 rounded-full px-6">
                 <Link href="/signup">
