@@ -11,15 +11,15 @@ function emit() {
 }
 
 export function normalizeUiTheme(raw?: string | null): UiTheme {
-  return raw === "dark" ? "dark" : "light";
+  return raw === "light" ? "light" : "dark";
 }
 
 export function readStoredUiTheme(): UiTheme {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   try {
     return normalizeUiTheme(window.localStorage.getItem(UI_THEME_KEY));
   } catch {
-    return "light";
+    return "dark";
   }
 }
 
@@ -50,6 +50,6 @@ export function useUiTheme() {
   return useSyncExternalStore(
     subscribeUiTheme,
     readStoredUiTheme,
-    () => "light" as const,
+    () => "dark" as const,
   );
 }
