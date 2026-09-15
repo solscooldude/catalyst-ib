@@ -1,0 +1,40 @@
+export type SparkAct =
+  | "boop"
+  | "scrunch"
+  | "sleep"
+  | "celebrate"
+  | "highfive"
+  | null;
+
+export type SnackId = "cookie" | "berry" | "mint";
+
+export const SNACKS: { id: SnackId; label: string }[] = [
+  { id: "cookie", label: "Cookie" },
+  { id: "berry", label: "Berry" },
+  { id: "mint", label: "Mint puff" },
+];
+
+export const CATCH_DAILY_LIMIT = 3;
+
+/** Calm when a streak is on, proud after a long study day, sleepy if nothing logged. */
+export function careMood(
+  streakDays: number,
+  todayMs: number,
+): "idle" | "done" | "sleepy" {
+  if (todayMs >= 90 * 60 * 1000 || streakDays >= 5) return "done";
+  if (todayMs === 0 && streakDays === 0) return "sleepy";
+  return "idle";
+}
+
+export function hitZone(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): "peak" | "face" | "body" {
+  const px = x / width;
+  const py = y / height;
+  if (py < 0.3 && px > 0.22 && px < 0.78) return "peak";
+  if (py > 0.42 && py < 0.78 && px > 0.24 && px < 0.76) return "face";
+  return "body";
+}
