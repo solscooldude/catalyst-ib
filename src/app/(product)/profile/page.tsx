@@ -14,8 +14,9 @@ import {
   validateDiploma,
 } from "@/lib/ib";
 import { SpriteRename } from "@/components/sprite-rename";
+import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
-import { saveProfile, useCatalyst } from "@/lib/store";
+import { saveMotivation, saveProfile, useCatalyst } from "@/lib/store";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -60,6 +61,9 @@ export default function ProfilePage() {
     }
     return "";
   });
+  const [colleges, setColleges] = useState(state.motivation.colleges);
+  const [course, setCourse] = useState(state.motivation.course);
+  const [why, setWhy] = useState(state.motivation.why);
   const [error, setError] = useState<string | null>(null);
 
   const requiredIds = useMemo(
@@ -79,6 +83,12 @@ export default function ProfilePage() {
       setError(result.reason);
       return;
     }
+    saveMotivation({
+      ...state.motivation,
+      colleges,
+      course,
+      why,
+    });
     router.push(state.setupComplete ? ROUTES.home : ROUTES.setup);
   }
 
@@ -89,14 +99,8 @@ export default function ProfilePage() {
           Profile
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-          Your diploma, on paper.
+          IB profile
         </h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Groups 1–5 are required. Group 6 is optional — if you skip arts, take
-          a sixth subject from another group. Every subject is HL or SL. Ab
-          initio and self-taught Language A are SL only. TOK and EE sit on
-          every diploma automatically.
-        </p>
       </div>
 
       <div className="flux-card space-y-6 px-6 py-8">
@@ -162,6 +166,37 @@ export default function ProfilePage() {
       </div>
 
       <CoreSubjects />
+
+      <div className="space-y-2">
+        <Label htmlFor="colleges">Dream college</Label>
+        <Input
+          id="colleges"
+          value={colleges}
+          onChange={(event) => setColleges(event.target.value)}
+          placeholder="UCL, Toronto, NUS"
+          className="h-11 rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="course">Intended course</Label>
+        <Input
+          id="course"
+          value={course}
+          onChange={(event) => setCourse(event.target.value)}
+          placeholder="Biomedical engineering"
+          className="h-11 rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="why">Why it matters</Label>
+        <Input
+          id="why"
+          value={why}
+          onChange={(event) => setWhy(event.target.value)}
+          placeholder="The lab, not another hour of For You."
+          className="h-11 rounded-xl"
+        />
+      </div>
 
       <p className="text-sm text-muted-foreground">
         {preview.ok

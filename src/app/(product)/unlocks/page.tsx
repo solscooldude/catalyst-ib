@@ -106,19 +106,10 @@ function UnlockInner() {
             <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
               Shop
             </p>
-            <h1 className="mt-3 text-4xl text-foreground">Spend the proof.</h1>
-            <p className="mt-2 text-sm">
-              <Link href={ROUTES.appearance} className="text-muted-foreground hover:text-foreground">
-                Closet
-              </Link>
-            </p>
+            <h1 className="mt-3 text-4xl text-foreground">Unlocks</h1>
           </div>
           <TokenChip tokens={state.tokens} />
         </div>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Ten minutes on a real install. In demo speed, unlocks last 60 seconds
-          so you can watch the phone light back up.
-        </p>
 
         <div className="mt-8 space-y-3">
           {UNLOCK_CATALOG.map((item) => {
@@ -135,14 +126,13 @@ function UnlockInner() {
               >
                 <div>
                   <p className="text-sm text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.intensity} · {item.blurb}
-                    {left > 0
-                      ? ` · ${Math.floor(left / 60000)}:${String(
-                          Math.floor((left % 60000) / 1000),
-                        ).padStart(2, "0")} left`
-                      : ""}
-                  </p>
+                  {left > 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      {Math.floor(left / 60000)}:
+                      {String(Math.floor((left % 60000) / 1000)).padStart(2, "0")}{" "}
+                      left
+                    </p>
+                  ) : null}
                 </div>
                 <Button
                   className="h-10 rounded-full"
@@ -151,7 +141,7 @@ function UnlockInner() {
                 >
                   <span className="inline-flex items-center gap-1.5">
                     {left > 0 ? "Add time" : "Unlock"}
-                    <TokenAmount value={item.cost} />
+                    <TokenAmount value={item.cost} mark="ink" />
                   </span>
                 </Button>
               </div>
@@ -165,12 +155,10 @@ function UnlockInner() {
 
         <div className="mt-8">
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
-            Active windows
+            Active
           </p>
           {active.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Nothing unlocked. Earn a session, then buy ten minutes.
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground">Nothing unlocked.</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {active.map((unlock) => {
