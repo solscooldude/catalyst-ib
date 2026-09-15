@@ -1,3 +1,8 @@
+import { SPARK_TINTS, type SparkTintId } from "./spark-tints";
+
+export { SPARK_TINTS, getSparkTint } from "./spark-tints";
+export type { SparkTintId } from "./spark-tints";
+
 export type CollectionId = "starter" | "aurora" | "gold" | "focus";
 
 export const COLLECTIONS: {
@@ -32,142 +37,113 @@ export const COLLECTIONS: {
   },
 ];
 
+export type AccentShadeId = "pastel" | "normal" | "deep";
+
+export const ACCENT_SHADE_OPTIONS: {
+  id: AccentShadeId;
+  name: string;
+}[] = [
+  { id: "pastel", name: "Pastel" },
+  { id: "normal", name: "Normal" },
+  { id: "deep", name: "Deep" },
+];
+
+function shade(pastel: string, normal: string, deep: string, ink: string, paper: string) {
+  return {
+    pastel: { hex: pastel, fg: ink },
+    normal: { hex: normal, fg: ink },
+    deep: { hex: deep, fg: paper },
+  };
+}
+
 export const ACCENTS = [
   {
     id: "mint",
     name: "Mint",
-    hex: "#5EEAD4",
     cost: 0,
     collection: "starter" as const,
-    blurb: "The default. Soft cyan.",
-  },
-  {
-    id: "pink",
-    name: "Blush",
-    hex: "#F9A8D4",
-    cost: 20,
-    collection: "starter" as const,
-    blurb: "Warm pink buttons and highlights.",
-  },
-  {
-    id: "violet",
-    name: "Violet",
-    hex: "#C4B5FD",
-    cost: 18,
-    collection: "starter" as const,
-    blurb: "Lilac accents across the UI.",
-  },
-  {
-    id: "amber",
-    name: "Amber",
-    hex: "#FBBF24",
-    cost: 16,
-    collection: "starter" as const,
-    blurb: "A quieter gold for late sessions.",
-  },
-  {
-    id: "gold",
-    name: "Elite gold",
-    hex: "#E8C547",
-    cost: 220,
-    collection: "gold" as const,
-    blurb: "Rare metal on buttons and chips. Shine + sparkle.",
+    blurb: "The default. One colour — switch Pastel, Normal, or Deep.",
+    shades: shade("#A7F3E8", "#5EEAD4", "#0F766E", "#134e4a", "#f0fdfa"),
   },
   {
     id: "red",
     name: "Red",
-    hex: "#F87171",
     cost: 16,
     collection: "starter" as const,
-    blurb: "A clear red for buttons and chips.",
-  },
-  {
-    id: "red-deep",
-    name: "Deep red",
-    hex: "#B91C1C",
-    cost: 10,
-    collection: "starter" as const,
-    blurb: "Darker red. Buy after Red, or on its own.",
+    blurb: "Rainbow red. Shades are free after you buy the colour.",
+    shades: shade("#FECACA", "#F87171", "#B91C1C", "#7f1d1d", "#fff7f7"),
   },
   {
     id: "orange",
     name: "Orange",
-    hex: "#FB923C",
     cost: 16,
     collection: "starter" as const,
-    blurb: "Warm orange highlights.",
-  },
-  {
-    id: "orange-deep",
-    name: "Deep orange",
-    hex: "#C2410C",
-    cost: 10,
-    collection: "starter" as const,
-    blurb: "Burnt orange, a shade down.",
+    blurb: "Warm orange. Pastel / Normal / Deep in the dropdown.",
+    shades: shade("#FED7AA", "#FB923C", "#C2410C", "#7c2d12", "#fff7ed"),
   },
   {
     id: "yellow",
     name: "Yellow",
-    hex: "#FACC15",
     cost: 16,
     collection: "starter" as const,
-    blurb: "Bright yellow chrome.",
-  },
-  {
-    id: "yellow-deep",
-    name: "Deep yellow",
-    hex: "#CA8A04",
-    cost: 10,
-    collection: "starter" as const,
-    blurb: "Mustard yellow.",
+    blurb: "Bright yellow chrome, three shades included.",
+    shades: shade("#FEF08A", "#FACC15", "#CA8A04", "#713f12", "#fffbeb"),
   },
   {
     id: "green",
     name: "Green",
-    hex: "#4ADE80",
     cost: 16,
     collection: "starter" as const,
-    blurb: "Leaf green, not mint.",
-  },
-  {
-    id: "green-deep",
-    name: "Deep green",
-    hex: "#15803D",
-    cost: 10,
-    collection: "starter" as const,
-    blurb: "Forest green.",
+    blurb: "Leaf green, not mint. Shade is a dropdown, not another buy.",
+    shades: shade("#BBF7D0", "#4ADE80", "#15803D", "#14532d", "#f0fdf4"),
   },
   {
     id: "blue",
     name: "Blue",
-    hex: "#60A5FA",
     cost: 16,
     collection: "starter" as const,
-    blurb: "Clear sky blue.",
-  },
-  {
-    id: "blue-deep",
-    name: "Deep blue",
-    hex: "#1D4ED8",
-    cost: 10,
-    collection: "starter" as const,
-    blurb: "Ink blue.",
+    blurb: "Sky blue through ink blue.",
+    shades: shade("#BFDBFE", "#60A5FA", "#1D4ED8", "#1e3a8a", "#eff6ff"),
   },
   {
     id: "indigo",
     name: "Indigo",
-    hex: "#818CF8",
     cost: 16,
     collection: "starter" as const,
     blurb: "The last rainbow stop.",
+    shades: shade("#C7D2FE", "#818CF8", "#3730A3", "#312e81", "#eef2ff"),
   },
   {
-    id: "indigo-deep",
-    name: "Deep indigo",
-    hex: "#3730A3",
-    cost: 10,
+    id: "pink",
+    name: "Blush",
+    cost: 20,
     collection: "starter" as const,
-    blurb: "Night indigo.",
+    blurb: "Warm pink buttons. All three shades come with the colour.",
+    shades: shade("#FBCFE8", "#F9A8D4", "#DB2777", "#831843", "#fdf2f8"),
+  },
+  {
+    id: "violet",
+    name: "Violet",
+    cost: 18,
+    collection: "starter" as const,
+    blurb: "Lilac through deep violet.",
+    shades: shade("#DDD6FE", "#C4B5FD", "#6D28D9", "#4c1d95", "#f5f3ff"),
+  },
+  {
+    id: "amber",
+    name: "Amber",
+    cost: 16,
+    collection: "starter" as const,
+    blurb: "A quieter gold for late sessions.",
+    shades: shade("#FDE68A", "#FBBF24", "#B45309", "#78350f", "#fffbeb"),
+  },
+  {
+    id: "gold",
+    name: "Elite gold",
+    cost: 220,
+    collection: "gold" as const,
+    blurb: "Rare metal. Shine + sparkle. Shade still comes with the colour.",
+    shades: shade("#F5E6A8", "#E8C547", "#A16207", "#3f2f05", "#fffbeb"),
   },
 ] as const;
 
@@ -234,54 +210,6 @@ export const BACKGROUNDS = [
     cost: 14,
     collection: "starter" as const,
     blurb: "Pale blue room, like morning sky.",
-  },
-] as const;
-
-export const SPARK_TINTS = [
-  {
-    id: "mint",
-    name: "Mint spark",
-    cost: 0,
-    collection: "starter" as const,
-    hi: "#B8FFF3",
-    mid: "#7AF0DC",
-    lo: "#5EEAD4",
-  },
-  {
-    id: "rose",
-    name: "Rose spark",
-    cost: 14,
-    collection: "starter" as const,
-    hi: "#FFE4F1",
-    mid: "#F9A8D4",
-    lo: "#F472B6",
-  },
-  {
-    id: "gold",
-    name: "Gold spark",
-    cost: 16,
-    collection: "starter" as const,
-    hi: "#FFF4B8",
-    mid: "#F5D76A",
-    lo: "#D4A017",
-  },
-  {
-    id: "lilac",
-    name: "Lilac spark",
-    cost: 14,
-    collection: "starter" as const,
-    hi: "#EDE9FE",
-    mid: "#C4B5FD",
-    lo: "#A78BFA",
-  },
-  {
-    id: "aurora",
-    name: "Aurora spark",
-    cost: 90,
-    collection: "aurora" as const,
-    hi: "#E9D5FF",
-    mid: "#5EEAD4",
-    lo: "#A78BFA",
   },
 ] as const;
 
@@ -425,10 +353,18 @@ export const SHOP_FOCUS_SCENES = FOCUS_THEMES.filter((item) => item.id !== "none
 
 export type AccentId = (typeof ACCENTS)[number]["id"];
 export type BackgroundId = (typeof BACKGROUNDS)[number]["id"];
-export type SparkTintId = (typeof SPARK_TINTS)[number]["id"];
 export type SparkGearId = (typeof SPARK_GEAR)[number]["id"];
 export type SparkTrailId = (typeof SPARK_TRAILS)[number]["id"];
 export type FocusThemeId = (typeof FOCUS_THEMES)[number]["id"];
+
+const LEGACY_ACCENT: Record<string, { hue: AccentId; shade: AccentShadeId }> = {
+  "red-deep": { hue: "red", shade: "deep" },
+  "orange-deep": { hue: "orange", shade: "deep" },
+  "yellow-deep": { hue: "yellow", shade: "deep" },
+  "green-deep": { hue: "green", shade: "deep" },
+  "blue-deep": { hue: "blue", shade: "deep" },
+  "indigo-deep": { hue: "indigo", shade: "deep" },
+};
 
 export type AppearanceState = {
   ownedAccents: AccentId[];
@@ -438,6 +374,7 @@ export type AppearanceState = {
   ownedTrails: SparkTrailId[];
   ownedFocusThemes: FocusThemeId[];
   accent: AccentId;
+  accentShade: AccentShadeId;
   background: BackgroundId;
   sparkTint: SparkTintId;
   gear: SparkGearId;
@@ -453,6 +390,7 @@ export const defaultAppearance: AppearanceState = {
   ownedTrails: ["none"],
   ownedFocusThemes: ["none", "nightsky"],
   accent: "mint",
+  accentShade: "normal",
   background: "void",
   sparkTint: "mint",
   gear: "none",
@@ -460,8 +398,20 @@ export const defaultAppearance: AppearanceState = {
   focusTheme: "nightsky",
 };
 
-function knownAccent(id: string | undefined): AccentId {
-  return ACCENTS.some((row) => row.id === id) ? (id as AccentId) : "mint";
+function migrateAccent(id: string | undefined): {
+  hue: AccentId;
+  shade?: AccentShadeId;
+} {
+  if (!id) return { hue: "mint" };
+  const legacy = LEGACY_ACCENT[id];
+  if (legacy) return legacy;
+  return ACCENTS.some((row) => row.id === id)
+    ? { hue: id as AccentId }
+    : { hue: "mint" };
+}
+
+function knownShade(id: string | undefined): AccentShadeId | null {
+  return id === "pastel" || id === "normal" || id === "deep" ? id : null;
 }
 
 function knownBackground(id: string | undefined): BackgroundId {
@@ -487,9 +437,7 @@ export function normalizeAppearance(
   raw?: Partial<AppearanceState> | null,
 ): AppearanceState {
   const ownedAccents = unique(
-    (raw?.ownedAccents ?? ["mint"]).filter((id) =>
-      ACCENTS.some((row) => row.id === id),
-    ),
+    (raw?.ownedAccents ?? ["mint"]).map((id) => migrateAccent(id).hue),
     "mint",
   );
   const ownedBackgrounds = unique(
@@ -521,7 +469,10 @@ export function normalizeAppearance(
   );
   const ownedFocusThemes = unique([...rawOwned, "none", "nightsky"], "nightsky");
   const rawTheme = mapFocusTheme(raw?.focusTheme);
-  const accent = knownAccent(raw?.accent);
+  const migrated = migrateAccent(raw?.accent);
+  const accent = ownedAccents.includes(migrated.hue) ? migrated.hue : "mint";
+  const accentShade =
+    knownShade(raw?.accentShade) ?? migrated.shade ?? "normal";
   const background = knownBackground(raw?.background);
   return {
     ownedAccents,
@@ -530,7 +481,8 @@ export function normalizeAppearance(
     ownedGear,
     ownedTrails,
     ownedFocusThemes,
-    accent: ownedAccents.includes(accent) ? accent : "mint",
+    accent,
+    accentShade,
     background: ownedBackgrounds.includes(background) ? background : "void",
     sparkTint: ownedSparkTints.includes(raw?.sparkTint ?? "mint")
       ? (raw?.sparkTint ?? "mint")
@@ -547,12 +499,13 @@ export function getAccent(id: AccentId) {
   return ACCENTS.find((row) => row.id === id) ?? ACCENTS[0];
 }
 
-export function getBackground(id: BackgroundId) {
-  return BACKGROUNDS.find((row) => row.id === id) ?? BACKGROUNDS[0];
+export function getAccentShade(hue: AccentId, shade: AccentShadeId) {
+  const accent = getAccent(hue);
+  return accent.shades[shade] ?? accent.shades.normal;
 }
 
-export function getSparkTint(id: SparkTintId) {
-  return SPARK_TINTS.find((row) => row.id === id) ?? SPARK_TINTS[0];
+export function getBackground(id: BackgroundId) {
+  return BACKGROUNDS.find((row) => row.id === id) ?? BACKGROUNDS[0];
 }
 
 export function getSparkGear(id: SparkGearId) {
