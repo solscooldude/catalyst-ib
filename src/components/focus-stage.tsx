@@ -3,7 +3,7 @@
 import "@/app/focus-stage.css";
 import type { FocusThemeId } from "@/lib/appearance";
 import { STAGE_THEMES, isStageFocusTheme } from "@/lib/focus-stages";
-import { TokenAmount } from "@/components/mint-chip";
+import { TaskOption } from "@/components/task-option";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -109,28 +109,13 @@ export function FocusStagePicker({
         const has = owned(item.id);
         const on = value === item.id;
         return (
-          <button
+          <TaskOption
             key={item.id}
-            type="button"
-            onClick={() => onPick(item.id, has)}
-            className={cn(
-              "rounded-2xl px-3.5 py-3 text-left ring-1",
-              on
-                ? "bg-primary/15 text-zinc-900 ring-2 ring-primary dark:text-zinc-50"
-                : "bg-white text-zinc-900 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700",
-            )}
-          >
-            <p className="text-sm font-medium">{item.name}</p>
-            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">{item.blurb}</p>
-            <p className="mt-1 text-xs text-zinc-500">
-              {item.cost === 0 ? (
-                "Free"
-              ) : (
-                <TokenAmount value={item.cost} />
-              )}
-              {has ? " · owned" : ""}
-            </p>
-          </button>
+            title={item.name}
+            detail={`${item.blurb} · ${item.cost === 0 ? "Free" : `${item.cost} tokens`}${has ? " · owned" : ""}`}
+            selected={on}
+            onSelect={() => onPick(item.id, has)}
+          />
         );
       })}
     </div>
