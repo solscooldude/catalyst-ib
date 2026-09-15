@@ -45,7 +45,7 @@ export function AccountMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
-        className="font-heading grid size-11 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
+        className="font-heading grid size-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
       >
         {label}
       </button>

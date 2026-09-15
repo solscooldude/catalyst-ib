@@ -25,7 +25,7 @@ export function QuietHoursChip() {
   const next = upcomingWindow(state.schedule, now);
 
   return (
-    <section className="flux-card flex flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+    <section className="flux-card flex flex-col gap-3 px-6 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <div>
         <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
           <Moon className="size-3.5 text-primary" />

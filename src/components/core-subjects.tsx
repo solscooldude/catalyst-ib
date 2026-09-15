@@ -2,7 +2,7 @@ import { CORE_DIPLOMA } from "@/lib/ib";
 
 export function CoreSubjects({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flux-card px-4 py-3">
+    <div className="flux-card px-6 py-5">
       <p className="text-xs tracking-[0.16em] text-primary uppercase">
         Core · always on
       </p>
