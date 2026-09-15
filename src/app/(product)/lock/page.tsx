@@ -56,9 +56,13 @@ export default function LockPage() {
             Working on
           </p>
           <p className="mt-2 text-lg text-foreground">{title}</p>
-          {state.session.kind === "study" && state.session.plannedMinutes ? (
+          {state.session.kind === "study" ? (
             <p className="mt-1 text-sm text-muted-foreground">
-              Study block · {state.session.plannedMinutes} min · no +5 bonus
+              Study block · counts up
+              {state.session.plannedMinutes
+                ? ` · soft goal ${state.session.plannedMinutes} min`
+                : ""}{" "}
+              · no +5 bonus
             </p>
           ) : state.session.goal ? (
             <p className="mt-1 text-sm text-muted-foreground">

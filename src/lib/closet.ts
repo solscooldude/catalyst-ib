@@ -4,6 +4,7 @@ import {
   type AppearanceState,
 } from "@/lib/appearance";
 import { AUTH_SESSION_KEY, STORAGE_KEY } from "@/lib/constants";
+import { readDeviceFocusStage } from "@/lib/focus-stage-persist";
 
 export function closetKey(userId: string) {
   return `${STORAGE_KEY}:closet:${userId}`;
@@ -68,11 +69,13 @@ export function mergeAppearance(
   legacy?: AppearanceLegacy | null,
 ): AppearanceState {
   const closet = userId ? readCloset(userId) : null;
+  const deviceStage = readDeviceFocusStage();
   return normalizeAppearance({
     ...defaultAppearance,
     ...closet,
     ...legacy,
     ...parsed,
+    focusTheme: deviceStage ?? parsed?.focusTheme ?? closet?.focusTheme,
     ownedAccents: unionOwned(
       closet?.ownedAccents,
       legacy?.ownedAccents,

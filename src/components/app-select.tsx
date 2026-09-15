@@ -71,7 +71,7 @@ export function AppSelect({
       >
         <span
           className={cn(
-            "truncate font-medium text-zinc-900 dark:text-zinc-100",
+            "truncate font-medium text-zinc-900",
             !selected && "font-normal text-zinc-500",
           )}
         >
@@ -83,7 +83,7 @@ export function AppSelect({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-zinc-200 bg-white py-1 text-sm text-zinc-900 shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)] dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+          className="app-select-menu absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl py-1 text-sm shadow-[0_16px_40px_-20px_rgb(0_0_0_/_0.7)]"
         >
           {groups
             ? groups.map((group) => (
@@ -130,10 +130,8 @@ function OptionRow({
       role="option"
       aria-selected={selected}
       onClick={() => onPick(option.value)}
-      className={cn(
-        "flex min-h-11 w-full items-center justify-between px-3 py-2.5 text-left text-zinc-900 hover:bg-primary/15 dark:text-zinc-50 dark:hover:bg-primary/20",
-        selected && "bg-primary/20 font-medium text-zinc-900 dark:text-zinc-50",
-      )}
+      className="app-select-item flex min-h-11 w-full items-center justify-between px-3 py-2.5 text-left font-medium"
+      data-selected={selected || undefined}
     >
       <span>{option.label}</span>
       {selected ? <Check className="size-4 shrink-0 text-teal-700 dark:text-primary" /> : null}
