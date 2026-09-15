@@ -21,7 +21,7 @@ import {
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
 import { type SnackId, type SparkAct } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
-import { sparkEvolution } from "@/lib/stats";
+import { sparkEvolutionFromState } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -619,6 +619,7 @@ export function Spark({
   const canPet = pettable;
   const [petted, setPetted] = useState(false);
   const [orbit, setOrbit] = useState(false);
+  const [, setHatchTick] = useState(0);
   const petTimer = useRef<number>(0);
   const lastPet = useRef(0);
   const hideOrbit = useRef(0);
@@ -640,6 +641,14 @@ export function Spark({
   useEffect(() => {
     return () => window.clearTimeout(petTimer.current);
   }, []);
+
+  useEffect(() => {
+    if (!store.hatchBurstAt) return;
+    const left = 1600 - (Date.now() - store.hatchBurstAt);
+    if (left <= 0) return;
+    const id = window.setTimeout(() => setHatchTick((n) => n + 1), left);
+    return () => window.clearTimeout(id);
+  }, [store.hatchBurstAt]);
 
   useEffect(() => {
     if (!canSparkle) return;
@@ -731,7 +740,13 @@ export function Spark({
     window.addEventListener("pointermove", look, { passive: true });
     return () => window.removeEventListener("pointermove", look);
   }, [trackEyes, asleep]);
-  const evo = evolve ? sparkEvolution(store.logs) : { scale: 1, glow: 1 };
+  const evo = evolve
+    ? sparkEvolutionFromState(store)
+    : { scale: 1, glow: 1, stage: "steady" as const };
+  const hatching =
+    Boolean(store.hatchBurstAt) &&
+    Date.now() - (store.hatchBurstAt ?? 0) < 1600;
+  const showEgg = evolve && evo.stage === "egg";
   const drawn = size * evo.scale;
   const frameClass = cn(
     "spark-float relative isolate z-20 overflow-visible",
@@ -765,7 +780,7 @@ export function Spark({
   const body = (
     <>
       <span className="spark-halo absolute inset-[-28%] rounded-full" />
-      <Trail id={trailId} />
+      {showEgg ? null : <Trail id={trailId} />}
       {say && canPet ? (
         <span className="spark-say" aria-live="polite">
           {say}
@@ -806,17 +821,38 @@ export function Spark({
 
         <ellipse cx="50" cy="72" rx="28" ry="24" fill={`url(#${glowId})`} />
 
-        <g className="spark-body">
-          <SparkAuraMark id={auraId} blurId={auraBlurId} />
-          <GearBack id={gearId} />
-          <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
-          <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
-          <Gear id={gearId} />
-          <g className={canGlance ? "spark-glance" : undefined}>
-            <Eyes mood={shownMood} fill="#0B0B0F" />
+        {showEgg || hatching ? (
+          <g className={cn("spark-body", hatching && "spark-hatch")}>
+            <ellipse cx="52" cy="86" rx="16" ry="4.5" fill="#0B0B0F" opacity="0.18" />
+            <ellipse cx="50" cy="62" rx="22.5" ry="29.5" fill="#F3E2BF" />
+            <ellipse cx="50" cy="64" rx="20" ry="26" fill="#E8C98A" opacity="0.35" />
+            <ellipse cx="42" cy="50" rx="8" ry="6" fill="#FFF8E7" opacity="0.7" />
+            <circle cx="37" cy="68" r="1.5" fill="#C4A46A" opacity="0.55" />
+            <circle cx="58" cy="56" r="1.15" fill="#C4A46A" opacity="0.4" />
+            <circle cx="55" cy="76" r="1.3" fill="#C4A46A" opacity="0.35" />
+            {hatching ? (
+              <path
+                d="M50 34c2 7-5 11-2 17 4 8-4 11-1 18"
+                fill="none"
+                stroke="#3F3F46"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+              />
+            ) : null}
           </g>
-          <GearFront id={gearId} />
-        </g>
+        ) : (
+          <g className="spark-body">
+            <SparkAuraMark id={auraId} blurId={auraBlurId} />
+            <GearBack id={gearId} />
+            <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
+            <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
+            <Gear id={gearId} />
+            <g className={canGlance ? "spark-glance" : undefined}>
+              <Eyes mood={shownMood} fill="#0B0B0F" />
+            </g>
+            <GearFront id={gearId} />
+          </g>
+        )}
 
         {(petted || act === "boop") && mood !== "eating" ? <PetHearts /> : null}
 
