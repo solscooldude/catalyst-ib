@@ -104,9 +104,9 @@ export default function DashboardPage() {
               <h1 className="text-4xl tracking-tight text-foreground sm:text-5xl">
                 {displaySpriteName(state.spriteName)}
               </h1>
-              {evo.stage === "egg" ? null : (
+              {state.careStage === "egg" ? null : (
                 <p className="mt-2 max-w-[14rem] text-sm text-zinc-400">
-                  {sparkEvolutionLabel(evo.stage)}
+                  {sparkEvolutionLabel(state.careStage)}
                 </p>
               )}
               <Button
