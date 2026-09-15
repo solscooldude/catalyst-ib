@@ -131,8 +131,8 @@ function UnlockInner() {
                   disabled={!affordable}
                   onClick={() => buy(item.id)}
                 >
-                  <span className="inline-flex items-center gap-1">
-                    {left > 0 ? "Add time" : "Unlock"} ·{" "}
+                  <span className="inline-flex items-center gap-1.5">
+                    {left > 0 ? "Add time" : "Unlock"}
                     <TokenAmount value={item.cost} />
                   </span>
                 </Button>
