@@ -5,17 +5,24 @@ export function FocusHud({
   time,
   progress,
   tokens,
+  name,
   className,
 }: {
   time: string;
   progress: number;
   tokens: number;
+  name?: string;
   className?: string;
 }) {
   const width = Math.min(100, Math.max(0, progress * 100));
 
   return (
     <div className={cn("focus-hud", className)}>
+      {name ? (
+        <p className="font-heading mb-2 text-center text-sm text-foreground/90">
+          {name}
+        </p>
+      ) : null}
       <div className="focus-hud-timer" aria-label={`Session time ${time}`}>
         <p className="focus-hud-digits">{time}</p>
         <div className="focus-hud-track" aria-hidden>
