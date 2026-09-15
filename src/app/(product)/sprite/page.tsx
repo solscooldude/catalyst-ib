@@ -143,7 +143,6 @@ export default function SpritePage() {
           trail={tryOn.trail}
           canFeed={snacksOnStage}
           celebrate={canCelebrate && !tucked}
-          asleep={tucked}
           onPet={onPet}
           onFeed={onFeedDrop}
           onSleep={() => setSpriteAsleep(true)}
