@@ -16,6 +16,7 @@ import {
   SPARK_TINTS,
   type AccentId,
   type AccentShadeId,
+  type BackgroundId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
@@ -26,6 +27,7 @@ import {
   buyAppearance,
   equipAppearance,
   setAccentShade,
+  setBackgroundShade,
   type AppearanceKind,
   useCatalyst,
 } from "@/lib/store";
@@ -173,13 +175,16 @@ export default function AppearancePage() {
             }}
           />
 
-          <Group
-            title="Room"
+          <RoomGroup
             items={BACKGROUNDS.filter((item) => item.collection === collection.id)}
             owned={(id) => look.ownedBackgrounds.includes(id)}
             equipped={(id) => look.background === id}
+            shade={look.backgroundShade}
             onAct={(id, owned) => act("background", id, owned)}
-            swatch={(item) => <BgSwatch id={item.id} />}
+            onShade={(id, next) => {
+              const result = setBackgroundShade(next, id);
+              setNotice(result.ok ? "Shade saved." : result.reason);
+            }}
           />
 
           <Group
@@ -319,6 +324,89 @@ function AccentGroup({
   );
 }
 
+function RoomGroup({
+  items,
+  owned,
+  equipped,
+  shade,
+  onAct,
+  onShade,
+}: {
+  items: readonly (typeof BACKGROUNDS)[number][];
+  owned: (id: BackgroundId) => boolean;
+  equipped: (id: BackgroundId) => boolean;
+  shade: AccentShadeId;
+  onAct: (id: BackgroundId, owned: boolean) => void;
+  onShade: (id: BackgroundId, shade: AccentShadeId) => void;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm text-muted-foreground">Room colour</h3>
+      <p className="mt-1 text-xs text-zinc-500">
+        Buy the hue once. Then pick Pastel, Normal, or Deep. Void and star dots stay as they are.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const has = owned(item.id);
+          const on = equipped(item.id);
+          const wash = item.kind === "wash" ? item.shades : null;
+          return (
+            <ShopCard
+              key={item.id}
+              name={item.name}
+              blurb={item.blurb}
+              cost={item.cost}
+              owned={has}
+              equipped={on}
+              extra={
+                has && wash ? (
+                  <label className="block">
+                    <span className="sr-only">Shade for {item.name}</span>
+                    <select
+                      className={cn(nativeSelectClass, "h-8 min-w-[7.25rem] text-xs")}
+                      value={shade}
+                      onChange={(event) =>
+                        onShade(item.id, event.target.value as AccentShadeId)
+                      }
+                    >
+                      {ACCENT_SHADE_OPTIONS.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null
+              }
+              onClick={() => onAct(item.id, has)}
+            >
+              {wash ? (
+                <span className="flex size-8 overflow-hidden rounded-full ring-1 ring-zinc-200/80">
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.pastel.swatch }}
+                  />
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.normal.swatch }}
+                  />
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.deep.swatch }}
+                  />
+                </span>
+              ) : (
+                <BgSwatch id={item.id} />
+              )}
+            </ShopCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function Group<
   T extends { id: string; name: string; cost: number; blurb?: string },
 >({
@@ -378,16 +466,8 @@ function BgSwatch({ id }: { id: string }) {
       className={cn(
         "size-8 rounded-full ring-1 ring-white/15",
         id === "void" && "bg-[#0B0B0F]",
-        id === "dusk" && "bg-[#1b1524]",
-        id === "mist" && "bg-[#171c24]",
-        id === "grove" && "bg-[#141c18]",
         id === "stars" &&
           "bg-[#07080d] shadow-[inset_1px_1px_0_#fff8,inset_-8px_-10px_0_-6px_#fff5]",
-        id === "aurora" &&
-          "bg-[linear-gradient(135deg,#efe8f6_0%,#e9d5ff_45%,#c4b5fd_100%)]",
-        id === "lilac" && "bg-[#e9d5ff]",
-        id === "blush" && "bg-[#fecdd3]",
-        id === "babyblue" && "bg-[#bfdbfe]",
       )}
     />
   );
