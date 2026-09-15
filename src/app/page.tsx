@@ -6,7 +6,7 @@ import { PhoneLock } from "@/components/phone-lock";
 import { BrandC, SparkleMark } from "@/components/brand-marks";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
-import { UNLOCK_CATALOG } from "@/lib/constants";
+import { UNLOCK_TIER_ROWS } from "@/lib/constants";
 
 const STEPS = [
   {
@@ -30,7 +30,7 @@ const STEPS = [
   {
     n: "04",
     title: "Unlock",
-    copy: "Spend tokens for 10 minutes. Notes is 2, YouTube is 4, and your nemesis apps are 8.",
+    copy: "School tools stay free. Tier 2 apps are 5 tokens per 10 minutes. Instagram, TikTok, and the rest of Tier 3 are 9.",
     icon: Lock,
   },
 ];
@@ -161,7 +161,7 @@ export default function LandingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {UNLOCK_CATALOG.map((row) => (
+                  {UNLOCK_TIER_ROWS.map((row) => (
                     <tr key={row.id} className="border-t border-border">
                       <td className="px-5 py-4">
                         <div className="font-medium text-foreground">{row.name}</div>
@@ -173,7 +173,11 @@ export default function LandingPage() {
                         {row.intensity}
                       </td>
                       <td className="px-5 py-4 text-primary">
-                        <TokenAmount value={row.cost} />
+                        {row.cost === 0 ? (
+                          <span className="text-sm font-semibold">Free</span>
+                        ) : (
+                          <TokenAmount value={row.cost} />
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -208,7 +212,7 @@ export default function LandingPage() {
               </p>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Laptop focus plus a ManageBac task marked done. The apps you
-                named as nemesis cost the most tokens to unlock.
+                named as Tier 3 nemeses cost the most tokens to unlock.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-3">
