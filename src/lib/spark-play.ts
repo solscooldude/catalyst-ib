@@ -19,7 +19,7 @@ export const SPARK_HOW_TO = [
   { name: "Mirror pose", how: "Wave the cursor nearby — the sprite copies." },
   { name: "Sleep", how: "Long-press to tuck in. Long-press again to wake." },
   { name: "Feed", how: "Drag a snack onto the sprite." },
-  { name: "Gift", how: "Drag a cosmetic from the tray onto the sprite." },
+  { name: "Equip", how: "Tap an owned look below. Buy the rest in Appearance." },
   { name: "Catch a token", how: "Tap the floating mint star." },
   { name: "Study buddy sit", how: "On Focus, sit the sprite beside the timer." },
 ] as const;

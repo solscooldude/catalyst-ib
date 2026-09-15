@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { Spark, type SparkMood } from "@/components/spark";
-import { SpritePlaypen, type SparkGiftChip } from "@/components/sprite-playpen";
+import { SpritePlaypen } from "@/components/sprite-playpen";
 import {
   SPARK_AURAS,
   SPARK_GEAR,
@@ -21,7 +21,7 @@ import {
   todayStudyMs,
   verifiedStudyMs,
 } from "@/lib/stats";
-import { careMood, encodeSparkGift, SPARK_GIFT_MIME, type SparkGiftKind } from "@/lib/spark-play";
+import { careMood, type SparkGiftKind } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { SparkHowTo } from "@/components/spark-howto";
 import { PageFrame } from "@/components/page-frame";
@@ -29,6 +29,8 @@ import { SpriteRename } from "@/components/sprite-rename";
 import { setSpriteAsleep } from "@/lib/store-core";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/routes";
+import Link from "next/link";
 
 export default function SpritePage() {
   const state = useCatalyst();
@@ -38,12 +40,6 @@ export default function SpritePage() {
     tucked ? "sleepy" : "idle",
   );
   const [petPulse, setPetPulse] = useState(0);
-  const [tryOn, setTryOn] = useState<{
-    tint?: SparkTintId;
-    gear?: SparkGearId;
-    aura?: SparkAuraId;
-    trail?: SparkTrailId;
-  }>({});
   const look = state.appearance;
   const evo = sparkEvolution(state.logs);
   const official = verifiedStudyMs(state.logs);
@@ -58,43 +54,10 @@ export default function SpritePage() {
       : FEED_DAILY_LIMIT;
   const snacksOnStage =
     !tucked && feedsLeft > 0 && state.tokens >= FEED_COST && mood !== "eating";
-  const ownedColors = SPARK_TINTS.filter((item) =>
-    look.ownedSparkTints.includes(item.id),
-  );
-  const ownedClothes = SPARK_GEAR.filter((item) => look.ownedGear.includes(item.id));
-  const ownedAuras = SPARK_AURAS.filter((item) => look.ownedAuras.includes(item.id));
-  const ownedTrails = SPARK_TRAILS.filter((item) =>
-    look.ownedTrails.includes(item.id),
-  );
-  const gifts: SparkGiftChip[] = [
-    ...ownedClothes
-      .filter((item) => item.id !== "none")
-      .map((item) => ({
-        kind: "gear" as const,
-        id: item.id,
-        name: item.name,
-        gear: item.id,
-        tint: look.sparkTint,
-      })),
-    ...ownedAuras
-      .filter((item) => item.id !== "none")
-      .map((item) => ({
-        kind: "aura" as const,
-        id: item.id,
-        name: item.name,
-        aura: item.id,
-        tint: look.sparkTint,
-      })),
-    ...ownedColors
-      .filter((item) => item.id !== look.sparkTint)
-      .slice(0, 6)
-      .map((item) => ({
-        kind: "sparkTint" as const,
-        id: item.id,
-        name: item.name,
-        tint: item.id,
-      })),
-  ];
+  const ownedColors = purchased(SPARK_TINTS, look.ownedSparkTints);
+  const ownedClothes = purchased(SPARK_GEAR, look.ownedGear);
+  const ownedAuras = purchased(SPARK_AURAS, look.ownedAuras);
+  const ownedTrails = purchased(SPARK_TRAILS, look.ownedTrails);
 
   function restMood(): SparkMood {
     const next = careMood(state.streakDays, todayMs);
@@ -109,26 +72,17 @@ export default function SpritePage() {
     setMood((current) => (current === "eating" ? current : restMood()));
   }, [tucked, state.streakDays, todayMs]);
 
-  function wear(
-    kind: "sparkTint" | "gear" | "aura" | "trail",
-    id: string,
-    owned: boolean,
-  ) {
+  function wear(kind: SparkGiftKind, id: string) {
+    const owned =
+      (kind === "sparkTint" && look.ownedSparkTints.includes(id as SparkTintId)) ||
+      (kind === "gear" && look.ownedGear.includes(id as SparkGearId)) ||
+      (kind === "aura" && look.ownedAuras.includes(id as SparkAuraId)) ||
+      (kind === "trail" && look.ownedTrails.includes(id as SparkTrailId));
     if (!owned) {
-      if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: id as SparkTintId }));
-      if (kind === "gear") setTryOn((current) => ({ ...current, gear: id as SparkGearId }));
-      if (kind === "aura") setTryOn((current) => ({ ...current, aura: id as SparkAuraId }));
-      if (kind === "trail") setTryOn((current) => ({ ...current, trail: id as SparkTrailId }));
-      setNotice("Preview.");
+      setNotice("Buy that in Appearance.");
       return;
     }
     const result = equipAppearance(kind, id);
-    if (result.ok) {
-      if (kind === "sparkTint") setTryOn((current) => ({ ...current, tint: undefined }));
-      if (kind === "gear") setTryOn((current) => ({ ...current, gear: undefined }));
-      if (kind === "aura") setTryOn((current) => ({ ...current, aura: undefined }));
-      if (kind === "trail") setTryOn((current) => ({ ...current, trail: undefined }));
-    }
     setNotice(result.ok ? "Equipped." : result.reason);
   }
 
@@ -184,14 +138,8 @@ export default function SpritePage() {
         <SpritePlaypen
           mood={mood}
           petPulse={petPulse}
-          tint={tryOn.tint}
-          gear={tryOn.gear}
-          aura={tryOn.aura}
-          trail={tryOn.trail}
           canFeed={snacksOnStage}
           celebrate={canCelebrate && !tucked}
-          gifts={gifts}
-          onGift={(kind, id) => wear(kind, id, true)}
           onPet={onPet}
           onFeed={onFeedDrop}
           onSleep={() => setSpriteAsleep(true)}
@@ -224,13 +172,12 @@ export default function SpritePage() {
 
       <EquipRow
         title="Color"
-        kind="sparkTint"
-        items={ownedColors
+        items={ownedColors}
           .filter((item) => item.kind === "solid")
           .map((item) => ({
             id: item.id,
             name: item.name,
-            on: look.sparkTint === item.id || tryOn.tint === item.id,
+            on: look.sparkTint === item.id,
             preview: (
               <Spark
                 mood="idle"
@@ -242,17 +189,16 @@ export default function SpritePage() {
               />
             ),
           }))}
-        onWear={(id) => wear("sparkTint", id, true)}
+        onWear={(id) => wear("sparkTint", id)}
       />
       <EquipRow
         title="Gradient · premium"
-        kind="sparkTint"
-        items={ownedColors
+        items={ownedColors}
           .filter((item) => item.kind === "gradient")
           .map((item) => ({
             id: item.id,
             name: item.name,
-            on: look.sparkTint === item.id || tryOn.tint === item.id,
+            on: look.sparkTint === item.id,
             preview: (
               <Spark
                 mood="idle"
@@ -264,15 +210,14 @@ export default function SpritePage() {
               />
             ),
           }))}
-        onWear={(id) => wear("sparkTint", id, true)}
+        onWear={(id) => wear("sparkTint", id)}
       />
       <EquipRow
         title="Clothes"
-        kind="gear"
         items={ownedClothes.map((item) => ({
           id: item.id,
           name: item.name,
-          on: look.gear === item.id || tryOn.gear === item.id,
+          on: look.gear === item.id,
           preview: (
             <Spark
               mood="idle"
@@ -284,15 +229,14 @@ export default function SpritePage() {
             />
           ),
         }))}
-        onWear={(id) => wear("gear", id, true)}
+        onWear={(id) => wear("gear", id)}
       />
       <EquipRow
         title="Aura · Body glow"
-        kind="aura"
         items={ownedAuras.map((item) => ({
           id: item.id,
           name: item.name,
-          on: look.aura === item.id || tryOn.aura === item.id,
+          on: look.aura === item.id,
           preview: (
             <Spark
               mood="idle"
@@ -305,20 +249,19 @@ export default function SpritePage() {
             />
           ),
         }))}
-        onWear={(id) => wear("aura", id, true)}
+        onWear={(id) => wear("aura", id)}
       />
       <EquipRow
         title="Trail"
-        kind="trail"
         items={ownedTrails.map((item) => ({
           id: item.id,
           name: item.name,
-          on: look.trail === item.id || tryOn.trail === item.id,
+          on: look.trail === item.id,
           preview: (
             <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
           ),
         }))}
-        onWear={(id) => wear("trail", id, true)}
+        onWear={(id) => wear("trail", id)}
       />
 
     </PageFrame>
@@ -342,14 +285,19 @@ function StatusCard({
   );
 }
 
+function purchased<T extends { id: string }>(
+  catalog: readonly T[],
+  owned: readonly string[],
+) {
+  return catalog.filter((item) => item.id !== "none" && owned.includes(item.id));
+}
+
 function EquipRow({
   title,
-  kind,
   items,
   onWear,
 }: {
   title: string;
-  kind: SparkGiftKind;
   items: {
     id: string;
     name: string;
@@ -363,7 +311,11 @@ function EquipRow({
       <h2 className="text-lg text-foreground">{title}</h2>
       {items.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          Buy looks in Appearance.
+          Buy looks in{" "}
+          <Link href={ROUTES.appearance} className="text-foreground underline">
+            Appearance
+          </Link>
+          .
         </p>
       ) : (
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -371,17 +323,10 @@ function EquipRow({
             <button
               key={item.id}
               type="button"
-              draggable
               onClick={() => onWear(item.id)}
-              onDragStart={(event) => {
-                const payload = encodeSparkGift(kind, item.id);
-                event.dataTransfer.setData(SPARK_GIFT_MIME, payload);
-                event.dataTransfer.setData("text/plain", payload);
-                event.dataTransfer.effectAllowed = "copy";
-              }}
               className={cn(
                 "flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-left shadow-[0_1px_2px_rgb(24_24_27/0.05)] dark:bg-zinc-900",
-                item.on ? "ring-primary/45" : "ring-border",
+                item.on ? "ring-1 ring-primary/45" : "ring-1 ring-border",
               )}
             >
               <span className="flex size-14 items-center justify-center">
@@ -389,13 +334,9 @@ function EquipRow({
               </span>
               <span>
                 <span className="block text-sm text-foreground">{item.name}</span>
-                {item.on ? (
-                  <span className="block text-xs text-muted-foreground">On</span>
-                ) : (
-                  <span className="block text-xs text-muted-foreground">
-                    Drag onto the sprite
-                  </span>
-                )}
+                <span className="block text-xs text-muted-foreground">
+                  {item.on ? "On" : "Tap to wear"}
+                </span>
               </span>
             </button>
           ))}
