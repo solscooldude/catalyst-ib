@@ -18,6 +18,7 @@ import {
   weekDayMarks,
 } from "@/lib/stats";
 import { careMood } from "@/lib/spark-play";
+import { displaySpriteName } from "@/lib/sprite-name";
 import { sessionHint, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -76,7 +77,7 @@ export default function DashboardPage() {
           <div className="mt-3 flex items-center justify-between gap-4">
             <div>
               <h1 className="text-4xl tracking-tight text-foreground sm:text-5xl">
-                Spark
+                {displaySpriteName(state.spriteName)}
               </h1>
               <p className="mt-2 max-w-[14rem] text-sm leading-6 text-zinc-400">
                 Soft glow
