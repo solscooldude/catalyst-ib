@@ -367,6 +367,7 @@ export function SpritePlaypen({
         ref={handRef}
         type="button"
         aria-label="High-five Spark"
+        title="Drag onto Spark"
         className={cn("sprite-highfive-hand", held === "hand" && "is-held")}
         onPointerDown={(event) => begin("hand", event)}
         onPointerMove={move}
