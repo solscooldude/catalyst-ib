@@ -85,61 +85,79 @@ function NightSky() {
   );
 }
 
+/** Two identical periods so a -50% translate loops as a continuous roll. */
+const SEA_BODY =
+  "M0 128C120 36 180 220 300 128C420 36 480 220 600 128C720 36 780 220 900 128C1020 36 1080 220 1200 128C1320 36 1380 220 1500 128C1620 36 1680 220 1800 128C1920 36 1980 220 2100 128C2220 36 2280 220 2400 128V220H0Z";
+const SEA_CREST =
+  "M0 128C120 36 180 220 300 128C420 36 480 220 600 128C720 36 780 220 900 128C1020 36 1080 220 1200 128C1320 36 1380 220 1500 128C1620 36 1680 220 1800 128C1920 36 1980 220 2100 128C2220 36 2280 220 2400 128";
+
+const SEA_FLECKS = [
+  { left: "8%", bottom: "18%", delay: "0s", size: 11 },
+  { left: "22%", bottom: "12%", delay: "-1.4s", size: 7 },
+  { left: "36%", bottom: "22%", delay: "-2.6s", size: 13 },
+  { left: "51%", bottom: "9%", delay: "-0.8s", size: 8 },
+  { left: "64%", bottom: "16%", delay: "-3.2s", size: 10 },
+  { left: "78%", bottom: "11%", delay: "-1.9s", size: 6 },
+  { left: "88%", bottom: "20%", delay: "-4.1s", size: 12 },
+];
+
 function Sea() {
   return (
     <>
-      <div className="focus-stage-horizon" />
-      <div className="focus-stage-swell" />
-      <div className="focus-stage-caustic" />
-      <div className="focus-stage-wave" style={{ bottom: "18%" }} />
-      <div className="focus-stage-wave focus-stage-wave-b" style={{ bottom: "4%" }} />
-      <div className="focus-stage-wave focus-stage-wave-c" style={{ bottom: "-10%" }} />
-      <div className="focus-stage-wave focus-stage-wave-d" style={{ bottom: "28%" }} />
-      <div className="focus-stage-wave focus-stage-wave-e" style={{ bottom: "36%" }} />
-      <SeaWave className="focus-stage-wave-svg" bottom="12%" fill="rgb(12 74 128 / 0.55)" />
-      <SeaWave
-        className="focus-stage-wave-svg focus-stage-wave-svg-b"
-        bottom="-2%"
-        fill="rgb(8 47 92 / 0.7)"
-      />
-      <SeaWave
-        className="focus-stage-wave-svg focus-stage-wave-svg-foam"
-        bottom="22%"
-        fill="rgb(186 230 253 / 0.28)"
-      />
-      <SeaWave
-        className="focus-stage-wave-svg"
-        bottom="32%"
-        fill="rgb(125 211 252 / 0.16)"
-      />
-      <div className="focus-stage-foam" style={{ bottom: "26%" }} />
-      <div className="focus-stage-foam" style={{ bottom: "14%", animationDelay: "-1.8s" }} />
+      <div className="focus-sea-horizon" />
+      <div className="focus-sea-glint" />
+      <div className="focus-sea-caustic" />
+      <SeaBand className="focus-sea-far" fill="rgb(8 42 86 / 0.82)" />
+      <SeaBand className="focus-sea-mid" fill="rgb(10 64 112 / 0.78)" />
+      <SeaBand className="focus-sea-near" fill="rgb(14 92 148 / 0.8)" foam />
+      <SeaBand className="focus-sea-break" fill="rgb(7 48 86 / 0.92)" foam />
+      <SeaBand className="focus-sea-lip" fill="rgb(186 230 253 / 0.22)" foam />
+      {SEA_FLECKS.map((fleck, index) => (
+        <span
+          key={index}
+          className="focus-sea-fleck"
+          style={{
+            left: fleck.left,
+            bottom: fleck.bottom,
+            width: fleck.size,
+            height: Math.max(3, fleck.size * 0.38),
+            animationDelay: fleck.delay,
+          }}
+        />
+      ))}
     </>
   );
 }
 
-function SeaWave({
+function SeaBand({
   className,
-  bottom,
   fill,
+  foam = false,
 }: {
   className: string;
-  bottom: string;
   fill: string;
+  foam?: boolean;
 }) {
   return (
-    <svg
-      className={className}
-      style={{ bottom }}
-      viewBox="0 0 1200 160"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <path
-        d="M0 92c80-28 140 28 220 8 90-22 140-48 230-18 88 28 150 8 220-16 86-28 150 22 230 6 70-14 140-36 300 12v76H0Z"
-        fill={fill}
-      />
-    </svg>
+    <div className={cn("focus-sea-swell", className)}>
+      <svg
+        className="focus-sea-roll"
+        viewBox="0 0 2400 220"
+        preserveAspectRatio="none"
+        aria-hidden
+      >
+        <path d={SEA_BODY} fill={fill} />
+        {foam ? (
+          <path
+            d={SEA_CREST}
+            fill="none"
+            stroke="rgb(241 250 255 / 0.7)"
+            strokeWidth="9"
+            strokeLinecap="round"
+          />
+        ) : null}
+      </svg>
+    </div>
   );
 }
 
