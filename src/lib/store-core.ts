@@ -105,6 +105,8 @@ export type CatalystState = {
   feedCount: number;
   quizDay: string | null;
   quizCorrect: number;
+  spriteName: string;
+  spriteRenameCount: number;
 };
 
 const defaultTasks: TaskState[] = MOCK_TASKS.map((task) => ({
@@ -138,6 +140,8 @@ export function createDefaultState(): CatalystState {
     feedCount: 0,
     quizDay: null,
     quizCorrect: 0,
+    spriteName: "Spark",
+    spriteRenameCount: 0,
   };
 }
 
@@ -270,6 +274,11 @@ export function hydrateStore(userId: string | null = null) {
       feedCount: parsed.feedCount ?? 0,
       quizDay: parsed.quizDay ?? null,
       quizCorrect: parsed.quizCorrect ?? 0,
+      spriteName:
+        /^flux$/i.test(parsed.spriteName ?? "")
+          ? "Spark"
+          : (parsed.spriteName ?? "Spark"),
+      spriteRenameCount: parsed.spriteRenameCount ?? 0,
       hydrated: true,
     };
   } catch {
