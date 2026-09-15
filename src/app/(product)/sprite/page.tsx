@@ -180,7 +180,7 @@ export default function SpritePage() {
           id: item.id,
           name: item.name,
           owned: look.ownedSparkTints.includes(item.id),
-          on: look.sparkTint === item.id,
+          on: look.sparkTint === item.id || tryOn.tint === item.id,
           preview: (
             <Spark
               mood="idle"
@@ -200,7 +200,7 @@ export default function SpritePage() {
           id: item.id,
           name: item.name,
           owned: look.ownedGear.includes(item.id),
-          on: look.gear === item.id,
+          on: look.gear === item.id || tryOn.gear === item.id,
           preview: (
             <Spark
               mood="idle"
@@ -222,7 +222,7 @@ export default function SpritePage() {
           id: item.id,
           name: item.name,
           owned: look.ownedTrails.includes(item.id),
-          on: look.trail === item.id,
+          on: look.trail === item.id || tryOn.trail === item.id,
           preview: (
             <Spark mood="idle" gear="none" trail={item.id} evolve={false} size={52} />
           ),
@@ -287,7 +287,9 @@ function EquipRow({
             <span>
               <span className="block text-sm text-foreground">{item.name}</span>
               {item.on ? (
-                <span className="block text-xs text-muted-foreground">On</span>
+                <span className="block text-xs text-muted-foreground">
+                  {item.owned ? "On" : "Preview"}
+                </span>
               ) : null}
             </span>
           </button>
