@@ -28,7 +28,7 @@ export const COLLECTIONS: {
     id: "focus",
     name: "Focus scenes",
     range: "Free–120",
-    copy: "Session backdrops: night sky, deep blue sea, math drift. Room plates stay parked.",
+    copy: "Session backdrops only: night sky, deep blue sea, math drift. Trails live in Trails.",
   },
 ];
 
@@ -230,7 +230,7 @@ export const SPARK_TRAILS = [
     id: "ember",
     name: "Lamp ember",
     cost: 72,
-    collection: "focus" as const,
+    collection: "starter" as const,
     blurb: "Warm desk-lamp specks rising off the spark.",
   },
   {
