@@ -1,0 +1,114 @@
+/* Hardcoded so theme tokens cannot wash out ManageBac task labels. */
+
+.task-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-radius: 1rem;
+  padding: 1rem 1.05rem;
+  background: #ffffff;
+  color: #18181b;
+  border: 2px solid #d4d4d8;
+  box-shadow: 0 1px 2px rgb(24 24 27 / 0.06);
+}
+
+.task-option .task-option-title {
+  color: #18181b;
+  font-weight: 600;
+}
+
+.task-option .task-option-meta {
+  color: #3f3f46;
+}
+
+.task-option[data-selected="true"] {
+  background: #ccfbf1;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px #5eead4;
+}
+
+.task-option[data-selected="true"] .task-option-title,
+.task-option[data-selected="true"] .task-option-meta {
+  color: #134e4a;
+}
+
+.task-option:disabled {
+  opacity: 0.45;
+}
+
+.task-option-check {
+  display: flex;
+  height: 1.5rem;
+  width: 1.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid #a1a1aa;
+  color: transparent;
+  background: #ffffff;
+}
+
+.task-option[data-selected="true"] .task-option-check {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ecfdf8;
+}
+
+.selected-task-chip {
+  border-radius: 1rem;
+  background: #ccfbf1;
+  border: 2px solid #14b8a6;
+  color: #134e4a;
+  padding: 0.85rem 1rem;
+}
+
+.selected-task-chip .selected-task-label {
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.selected-task-chip .selected-task-name {
+  color: #134e4a;
+  font-weight: 700;
+}
+
+.selected-task-chip .selected-task-meta {
+  color: #3f3f46;
+}
+
+.app-select-menu {
+  background: #ffffff !important;
+  color: #18181b !important;
+  border: 1px solid #d4d4d8;
+}
+
+.app-select-item {
+  color: #18181b !important;
+  background: #ffffff;
+}
+
+.app-select-item[data-selected="true"],
+.app-select-item:hover {
+  background: #ccfbf1 !important;
+  color: #134e4a !important;
+}
+
+.study-chip {
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  background: #ffffff;
+  color: #18181b;
+  border: 2px solid #d4d4d8;
+}
+
+.study-chip[data-selected="true"] {
+  background: #ccfbf1;
+  color: #134e4a;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 2px #5eead4;
+}
