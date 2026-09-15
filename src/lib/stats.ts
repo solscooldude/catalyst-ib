@@ -64,6 +64,39 @@ export function formatHours(ms: number) {
   return `${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)} h`;
 }
 
+export function formatClock(ms: number) {
+  const minutes = Math.max(0, Math.round(ms / 60000));
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) return `${rest}m`;
+  return `${hours}h ${String(rest).padStart(2, "0")}m`;
+}
+
+export function todayStudyMs(logs: SessionLog[], now = new Date()) {
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const from = start.getTime();
+  return logs
+    .filter((log) => log.endedAt >= from)
+    .reduce((sum, log) => sum + log.durationMs, 0);
+}
+
+export function weekDayMarks(logs: SessionLog[], now = new Date()) {
+  const start = startOfWeek(now);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    const next = new Date(date);
+    next.setDate(date.getDate() + 1);
+    const from = date.getTime();
+    const to = next.getTime();
+    const studied = logs.some(
+      (log) => log.endedAt >= from && log.endedAt < to,
+    );
+    return { key: dayKey(date), studied, isToday: dayKey(date) === dayKey(now) };
+  });
+}
+
 export function subjectStacks(logs: SessionLog[]) {
   const totals = new Map<SubjectId, number>();
   for (const subject of SUBJECTS) totals.set(subject.id, 0);
