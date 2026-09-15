@@ -12,12 +12,12 @@ export function Wordmark({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center gap-2 text-[15px] font-medium tracking-tight text-foreground",
+        "inline-flex items-baseline gap-1 tracking-tight text-foreground",
         className,
       )}
     >
-      <span className="size-1.5 rounded-full bg-primary shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_80%,transparent)]" />
-      Catalyst
+      <span className="text-[17px] font-semibold">Catalyst</span>
+      <span className="text-[13px] font-medium text-muted-foreground">IB</span>
     </Link>
   );
 }
