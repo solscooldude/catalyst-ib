@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   title: "Catalyst — focus tool for IB DP",
   description:
     "For IB DP students. Apps pull you off ManageBac. Catalyst locks them until a session finishes. Tokens come from that work, then you buy a short unlock.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -31,13 +35,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`light ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var t=localStorage.getItem("catalyst-v1:ui-theme");var d=t!=="light";document.documentElement.classList.toggle("dark",d);document.documentElement.classList.toggle("light",!d);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}',
+              'try{var t=localStorage.getItem("catalyst-v1:ui-theme");var d=t==="dark";document.documentElement.classList.toggle("dark",d);document.documentElement.classList.toggle("light",!d);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}',
           }}
         />
         <CatalystProvider>{children}</CatalystProvider>
