@@ -1,3 +1,4 @@
+/** Future billing stub — no live subscribe UI. */
 const KEY = "catalyst-v1:subscription";
 
 export type SubscriptionState = {
