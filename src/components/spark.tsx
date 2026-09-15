@@ -186,17 +186,17 @@ function SparkAuraMark({
         <path
           d={SPARK_BODY_PATH}
           fill={spec.glowB}
-          fillOpacity="0.55"
+          fillOpacity="0.62"
           filter={`url(#${blurId})`}
-          transform="translate(54 60) scale(1.3) translate(-50 -62)"
+          transform="translate(54 60) scale(1.38) translate(-50 -62)"
         />
       ) : null}
       <path
         d={SPARK_BODY_PATH}
         fill={spec.glow}
-        fillOpacity="0.7"
+        fillOpacity="0.78"
         filter={`url(#${blurId})`}
-        transform="translate(50 62) scale(1.26) translate(-50 -62)"
+        transform="translate(50 62) scale(1.34) translate(-50 -62)"
       />
     </g>
   );
@@ -529,39 +529,39 @@ function GearFront({ id }: { id: SparkGearId }) {
   return (
     <g>
       <path
-        d="M37.4 54.2c-2.6-3.8-8.2-4.2-10.8-.4-3.4 4.8-.2 10.4 10.8 18.2 11-7.8 14.2-13.4 10.8-18.2-2.6-3.8-8.2-3.4-10.8.4Z"
+        d="M35.6 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z"
         fill="#DB2777"
         stroke="#9D174D"
-        strokeWidth="0.85"
+        strokeWidth="1.25"
       />
       <path
-        d="M62.6 54.2c-2.6-3.8-8.2-4.2-10.8-.4-3.4 4.8-.2 10.4 10.8 18.2 11-7.8 14.2-13.4 10.8-18.2-2.6-3.8-8.2-3.4-10.8.4Z"
+        d="M64.4 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z"
         fill="#DB2777"
         stroke="#9D174D"
-        strokeWidth="0.85"
+        strokeWidth="1.25"
       />
       <path
-        d="M44.2 64.6h11.6"
+        d="M43 65.2h14"
         fill="none"
         stroke="#9D174D"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M27.2 51.2c2.6-3 6.8-2.6 7.8.8"
+        fill="none"
+        stroke="#F9A8D4"
         strokeWidth="1.8"
         strokeLinecap="round"
+        opacity="0.85"
       />
       <path
-        d="M33.6 58.4c1.4-1.6 3.6-1.4 4.2.4"
+        d="M56 51.2c2.6-3 6.8-2.6 7.8.8"
         fill="none"
         stroke="#F9A8D4"
-        strokeWidth="1.1"
+        strokeWidth="1.8"
         strokeLinecap="round"
-        opacity="0.7"
-      />
-      <path
-        d="M58.8 58.4c1.4-1.6 3.6-1.4 4.2.4"
-        fill="none"
-        stroke="#F9A8D4"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        opacity="0.7"
+        opacity="0.85"
       />
     </g>
   );
