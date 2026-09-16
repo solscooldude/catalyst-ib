@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
@@ -10,10 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { StudyStartForm } from "@/components/study-start-form";
-import { SelectedTaskChip, TaskOption } from "@/components/task-option";
+import { SelectedTaskChip } from "@/components/task-option";
+import { SchoolTaskPick } from "@/components/school-task-pick";
 import type { TaskId } from "@/lib/constants";
+import { studySubjectOptions } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
-import { sourceLabel } from "@/lib/school-tasks";
+import { groupSchoolTasksBySubject } from "@/lib/school-tasks";
+import { providerLabel } from "@/lib/school-provider";
 import { PageFrame } from "@/components/page-frame";
 import { UnlockPanel } from "@/components/unlock-panel";
 import {
@@ -45,6 +48,15 @@ export default function AppHomePage() {
       router.replace(ROUTES.session);
     }
   }, [state.hydrated, state.session, router]);
+
+  const diploma = useMemo(
+    () => studySubjectOptions(state.profile),
+    [state.profile],
+  );
+  const sections = useMemo(
+    () => groupSchoolTasksBySubject(state.schoolTasks, diploma),
+    [state.schoolTasks, diploma],
+  );
 
   if (!state.setupComplete) return null;
 
@@ -95,21 +107,36 @@ export default function AppHomePage() {
           />
         </div>
 
-        <div className="mt-5 space-y-3">
-          {state.schoolTasks.map((task) => (
-            <TaskOption
-              key={task.id}
-              title={task.title}
-              detail={`${sourceLabel(task.source)} · ${task.subject} · due ${task.due}${task.detail ? ` · ${task.detail}` : ""}`}
-              selected={taskId === task.id}
-              disabled={task.done}
-              onSelect={() => setTaskId(task.id)}
-            />
+        <div className="mt-6 space-y-7">
+          {sections.map((section) => (
+            <section key={section.key}>
+              <h2 className="text-sm font-medium text-foreground">
+                {section.label}
+              </h2>
+              {section.tasks.length === 0 ? (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  No school tasks in this subject yet.
+                </p>
+              ) : (
+                <div className="mt-3 space-y-4">
+                  {section.tasks.map((task) => (
+                    <SchoolTaskPick
+                      key={task.id}
+                      task={task}
+                      selected={taskId === task.id}
+                      onSelect={() => setTaskId(task.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           ))}
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
           <Link href={ROUTES.integrations} className="text-primary hover:underline">
-            Connect Classroom or ManageBac
+            {state.schoolProvider
+              ? `Manage ${providerLabel(state.schoolProvider)}`
+              : "Choose ManageBac or Classroom"}
           </Link>
           {" · "}
           school sites stay allowed during a block.
