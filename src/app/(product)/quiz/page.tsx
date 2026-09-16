@@ -102,13 +102,18 @@ export default function QuizPage() {
         </div>
       ) : item ? (
         <div className="flux-card p-6">
-          <p className="text-xs text-muted-foreground">
+          {caption ? (
+            <p className="text-xs font-medium text-foreground">
+              {caption.source} · {caption.assignment}
+            </p>
+          ) : null}
+          <p className="mt-1 text-xs text-muted-foreground">
             {index + 1} / {items.length}
             {caption ? (
               <>
                 {" "}
                 · {caption.name}
-                {caption.level ? ` · ${caption.level}` : ""} · {caption.topic}
+                {caption.level ? ` ${caption.level}` : ""} · {caption.topic}
               </>
             ) : null}
           </p>

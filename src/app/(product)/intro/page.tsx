@@ -11,33 +11,33 @@ import { applyUiTheme, restoreStoredUiTheme } from "@/lib/ui-theme";
 const SLIDES = [
   {
     kicker: "The problem",
-    title: "Apps eat the IB block.",
-    body: "You sit down for ManageBac. Ten minutes later you are in a feed.",
+    title: "The problem",
+    body: "A lot of IB students struggle with procrastination, constant phone distractions, passive scrolling on other devices, or with staying motivated during intense workloads like IAs, TOK essays, or the full IB grind.",
   },
   {
     kicker: "The tool",
-    title: "Catalyst holds the phone.",
-    body: "You start a focus block. The apps you named wait until you end the session.",
+    title: "The tool",
+    body: "An AI-powered productivity app that rewards verified active work (not just absence from phone) with a gamified token economy.",
   },
   {
     kicker: "Focus",
-    title: "The timer counts up. You end it.",
-    body: "No fake countdown. Stay as long as the work needs. Tokens tick while you stay.",
+    title: "Focus",
+    body: "Your time to complete your work, log your time and earn tokens for studying.",
   },
   {
     kicker: "Sprite",
-    title: "It starts as an egg.",
-    body: "First real focus or snack hatches it. Then Hatchling → Luminary as you study. You still think about the next block because the sprite is waiting — not because of a pep talk.",
+    title: "Sprite",
+    body: "Your sprite will hatch now with a task completed or by feeding it, keep it growing by studying.",
   },
   {
     kicker: "Tokens",
-    title: "Earn time. Unlock a tier.",
-    body: "Focus pays tokens. Spend them on Unlock Tier 2 or Unlock Tier 3 — the whole tier, not one app at a time.",
+    title: "Tokens",
+    body: "Tokens allow you to unlock your app tiers. More studying = more tokens.",
   },
   {
-    kicker: "Ready",
-    title: "Go to Home.",
-    body: "Pick a task, start focus, hatch the egg.",
+    kicker: "Go to home",
+    title: "Go to home",
+    body: "Your central hub, the dashboard.",
   },
 ] as const;
 

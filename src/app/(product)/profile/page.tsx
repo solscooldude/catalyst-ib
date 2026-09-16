@@ -67,7 +67,6 @@ export default function ProfilePage() {
   });
   const [colleges, setColleges] = useState(state.motivation.colleges);
   const [course, setCourse] = useState(state.motivation.course);
-  const [why, setWhy] = useState(state.motivation.why);
   const [error, setError] = useState<string | null>(null);
   const [spriteDraft, setSpriteDraft] = useState(() =>
     displaySpriteName(state.spriteName),
@@ -110,7 +109,7 @@ export default function ProfilePage() {
       ...state.motivation,
       colleges,
       course,
-      why,
+      why: "",
     });
     router.push(state.setupComplete ? ROUTES.home : ROUTES.setup);
   }
@@ -258,16 +257,6 @@ export default function ProfilePage() {
           value={course}
           onChange={(event) => setCourse(event.target.value)}
           placeholder="Biomedical engineering"
-          className="h-11 rounded-xl"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="why">Why it matters</Label>
-        <Input
-          id="why"
-          value={why}
-          onChange={(event) => setWhy(event.target.value)}
-          placeholder="The lab, not another hour of For You."
           className="h-11 rounded-xl"
         />
       </div>

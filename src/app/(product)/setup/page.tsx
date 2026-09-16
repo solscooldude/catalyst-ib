@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Link2 } from "lucide-react";
 import { DemoBadge } from "@/components/demo-badge";
+import { LockHoursPicker } from "@/components/lock-hours-picker";
 import { Button } from "@/components/ui/button";
 import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
-import { completeSetup, useCatalyst } from "@/lib/store";
+import { WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
+import { addLockWindow, completeSetup, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export default function SetupPage() {
@@ -16,6 +18,10 @@ export default function SetupPage() {
   const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
   const [connected, setConnected] = useState(state.manageBacConnected);
   const [connecting, setConnecting] = useState(false);
+  const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [start, setStart] = useState("19:00");
+  const [end, setEnd] = useState("22:00");
+  const [lockError, setLockError] = useState<string | null>(null);
 
   function toggle(id: NemesisId) {
     setNemeses((current) =>
@@ -33,8 +39,18 @@ export default function SetupPage() {
     }, 700);
   }
 
+  function addWindow() {
+    const result = addLockWindow({ days, start, end, enabled: true });
+    setLockError(result.ok ? null : result.reason);
+  }
+
+  function addWeeknights() {
+    const result = addLockWindow(WEEKNIGHT_PRESET);
+    setLockError(result.ok ? null : result.reason);
+  }
+
   function finish() {
-    if (nemeses.length === 0 || !connected) return;
+    if (nemeses.length === 0 || !connected || state.schedule.length === 0) return;
     completeSetup(nemeses);
     router.push(ROUTES.focus);
   }
@@ -120,10 +136,53 @@ export default function SetupPage() {
         )}
       </section>
 
+      <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
+        <h2 className="text-base text-foreground">Lock hours</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Required. This is the main feature — quiet hours when Catalyst locks
+          the apps you picked.
+        </p>
+        {state.schedule.length > 0 ? (
+          <ul className="mt-4 space-y-2">
+            {state.schedule.map((window) => (
+              <li
+                key={window.id}
+                className="rounded-2xl bg-background/60 px-4 py-3 text-sm text-foreground"
+              >
+                {formatWindow(window)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm text-rose-300">
+            Add at least one lock window to finish setup.
+          </p>
+        )}
+        <div className="mt-5">
+          <LockHoursPicker
+            days={days}
+            start={start}
+            end={end}
+            error={lockError}
+            onToggleDay={(day) =>
+              setDays((current) =>
+                current.includes(day)
+                  ? current.filter((row) => row !== day)
+                  : [...current, day],
+              )
+            }
+            onStart={setStart}
+            onEnd={setEnd}
+            onAdd={addWindow}
+            onPreset={addWeeknights}
+          />
+        </div>
+      </section>
+
       <div className="mt-8 flex justify-end">
         <Button
           className="h-11 rounded-full px-6"
-          disabled={nemeses.length === 0 || !connected}
+          disabled={nemeses.length === 0 || !connected || state.schedule.length === 0}
           onClick={finish}
         >
           {state.setupComplete ? "Save setup" : "Lock in setup"}

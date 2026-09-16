@@ -8,7 +8,7 @@ import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
 import { TokenAmount } from "@/components/mint-chip";
 import { UnlockPanel } from "@/components/unlock-panel";
-import { type SparkMood } from "@/components/spark";
+import { Spark, type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -102,18 +102,33 @@ export default function FocusPage() {
   return (
     <div className="focus-session focus-session-stage" data-focus-canvas="">
       <FocusStage />
-      <FocusSpark
-        mood={mood}
-        taskId={session.taskId}
-        subject={session.subjectId}
-        hint={sessionHint(session)}
-        sit={sit}
-      />
+      {sit ? null : (
+        <FocusSpark
+          mood={mood}
+          taskId={session.taskId}
+          subject={session.subjectId}
+          hint={sessionHint(session)}
+        />
+      )}
       <FocusHud
         time={formatElapsed(elapsed)}
         progress={goalMs ? Math.min(1, elapsed / goalMs) : null}
         tokens={state.tokens}
         task={title}
+        buddy={
+          sit ? (
+            <Spark
+              mood={mood}
+              taskId={session.taskId}
+              subject={session.subjectId}
+              hint={sessionHint(session)}
+              size={92}
+              pettable
+              flourish="loop"
+              className="spark-sit"
+            />
+          ) : null
+        }
       />
 
       <div className="focus-session-panel" data-focus-board="">
