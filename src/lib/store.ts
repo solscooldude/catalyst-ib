@@ -63,12 +63,14 @@ import {
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
 import {
+  inferSubjectId,
   mergeSchoolTasks,
   mockTasksAsSchool,
   type SchoolTask,
 } from "@/lib/school-tasks";
 import { SAMPLE_CLASSROOM_TASKS } from "@/lib/classroom";
 import { SAMPLE_MANAGEBAC_TASKS, parseManageBacImport } from "@/lib/managebac";
+import type { SchoolProvider } from "@/lib/school-provider";
 import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
 import {
@@ -114,7 +116,14 @@ export function completeSetup(nemeses: NemesisId[]) {
         current.schoolTasks.length > 0
           ? current.schoolTasks
           : mockTasksAsSchool([]),
-      manageBacConnected: true,
+      manageBacConnected:
+        current.schoolProvider === "classroom"
+          ? current.manageBacConnected
+          : true,
+      classroomConnected:
+        current.schoolProvider === "managebac"
+          ? current.classroomConnected
+          : current.classroomConnected || current.schoolProvider === "classroom",
       setupComplete: true,
     };
   });
@@ -849,7 +858,9 @@ export function importSchoolTasks(
       | "classroomMode"
       | "manageBacConnected"
       | "manageBacSchoolUrl"
+      | "manageBacIcsUrl"
       | "manageBacMode"
+      | "schoolProvider"
     >
   >,
 ) {
@@ -864,8 +875,75 @@ export function importSchoolTasks(
   return { ok: true as const, count: incoming.length };
 }
 
+export function setSchoolProvider(provider: SchoolProvider) {
+  setState((current) => ({ ...current, schoolProvider: provider }));
+  return { ok: true as const, provider };
+}
+
+export function addManualSchoolTask(input: {
+  title: string;
+  subject?: string;
+  due?: string;
+  detail?: string;
+}) {
+  const title = input.title.trim();
+  if (title.length < 3) {
+    return { ok: false as const, reason: "Give the task a real title." };
+  }
+  const subject = (input.subject ?? "").trim() || "Other";
+  const task: SchoolTask = {
+    id: `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 36) || Date.now()}`,
+    title: title.slice(0, 120),
+    subject: subject.slice(0, 48),
+    subjectId: inferSubjectId(`${subject} ${title}`),
+    due: (input.due ?? "Soon").trim().slice(0, 32) || "Soon",
+    detail: (input.detail ?? "Added by hand.").trim().slice(0, 200),
+    source: getSnapshot().schoolProvider === "classroom" ? "classroom" : "managebac",
+    done: false,
+  };
+  return importSchoolTasks([task], {
+    schoolProvider: getSnapshot().schoolProvider ?? "managebac",
+    manageBacConnected: getSnapshot().schoolProvider !== "classroom",
+    manageBacMode: "manual",
+  });
+}
+
+export function markSchoolTaskSubmitted(taskId: string, submitted: boolean) {
+  setState((current) => ({
+    ...current,
+    schoolTasks: current.schoolTasks.map((task) =>
+      task.id === taskId
+        ? { ...task, submitted, done: submitted ? true : task.done }
+        : task,
+    ),
+  }));
+  return { ok: true as const };
+}
+
+export function applyClassroomSubmissionStates(
+  rows: Array<{ id: string; submitted?: boolean; done?: boolean }>,
+) {
+  setState((current) => {
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    return {
+      ...current,
+      schoolTasks: current.schoolTasks.map((task) => {
+        const hit = byId.get(task.id);
+        if (!hit) return task;
+        return {
+          ...task,
+          submitted: hit.submitted ?? task.submitted,
+          done: hit.done ?? (hit.submitted ? true : task.done),
+        };
+      }),
+    };
+  });
+  return { ok: true as const, count: rows.length };
+}
+
 export function connectClassroomSample() {
   return importSchoolTasks(SAMPLE_CLASSROOM_TASKS, {
+    schoolProvider: "classroom",
     classroomConnected: true,
     classroomEmail: "",
     classroomMode: "sample",
@@ -878,6 +956,7 @@ export function connectClassroomLive(input: {
 }) {
   const tasks = input.tasks.length ? input.tasks : SAMPLE_CLASSROOM_TASKS;
   return importSchoolTasks(tasks, {
+    schoolProvider: "classroom",
     classroomConnected: true,
     classroomEmail: input.email ?? "",
     classroomMode: input.tasks.length ? "oauth" : "sample",
@@ -886,6 +965,7 @@ export function connectClassroomLive(input: {
 
 export function connectManageBacSample(schoolUrl?: string) {
   return importSchoolTasks(SAMPLE_MANAGEBAC_TASKS, {
+    schoolProvider: "managebac",
     manageBacConnected: true,
     manageBacMode: "sample",
     manageBacSchoolUrl: schoolUrl?.trim().slice(0, 160) ?? getSnapshot().manageBacSchoolUrl,
@@ -901,9 +981,27 @@ export function connectManageBacImport(raw: string, schoolUrl?: string) {
     };
   }
   return importSchoolTasks(tasks, {
+    schoolProvider: "managebac",
     manageBacConnected: true,
     manageBacMode: "import",
     manageBacSchoolUrl: schoolUrl?.trim().slice(0, 160) ?? getSnapshot().manageBacSchoolUrl,
+  });
+}
+
+export function connectManageBacScan(tasks: SchoolTask[]) {
+  return importSchoolTasks(tasks, {
+    schoolProvider: "managebac",
+    manageBacConnected: true,
+    manageBacMode: "scan",
+  });
+}
+
+export function connectManageBacIcs(tasks: SchoolTask[], icsUrl?: string) {
+  return importSchoolTasks(tasks, {
+    schoolProvider: "managebac",
+    manageBacConnected: true,
+    manageBacMode: "ics",
+    manageBacIcsUrl: icsUrl?.trim().slice(0, 240) ?? getSnapshot().manageBacIcsUrl,
   });
 }
 
