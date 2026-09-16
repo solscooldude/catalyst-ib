@@ -44,6 +44,10 @@ import {
   type SchoolTask,
 } from "@/lib/school-tasks";
 import {
+  normalizeSchoolProvider,
+  type SchoolProvider,
+} from "@/lib/school-provider";
+import {
   defaultMotivation,
   defaultProfile,
   normalizeMotivation,
@@ -117,9 +121,11 @@ export type CatalystState = {
   hydrated: boolean;
   setupComplete: boolean;
   nemeses: NemesisId[];
+  schoolProvider: SchoolProvider | null;
   manageBacConnected: boolean;
   manageBacSchoolUrl: string;
-  manageBacMode: "import" | "sample" | null;
+  manageBacIcsUrl: string;
+  manageBacMode: "import" | "sample" | "scan" | "ics" | "manual" | null;
   classroomConnected: boolean;
   classroomEmail: string;
   classroomMode: "oauth" | "sample" | null;
@@ -174,8 +180,10 @@ export function createDefaultState(): CatalystState {
     hydrated: false,
     setupComplete: false,
     nemeses: [],
+    schoolProvider: null,
     manageBacConnected: false,
     manageBacSchoolUrl: "",
+    manageBacIcsUrl: "",
     manageBacMode: null,
     classroomConnected: false,
     classroomEmail: "",
@@ -458,12 +466,21 @@ export function hydrateStore(userId: string | null = null) {
         normalizeFriendCode(String(parsed.friendCode ?? "")) || makeFriendCode(),
       friends: normalizeFriends(parsed.friends),
       schoolTasks: normalizeSchoolTasks(parsed.schoolTasks),
+      schoolProvider: normalizeSchoolProvider(parsed.schoolProvider),
+      manageBacIcsUrl:
+        typeof parsed.manageBacIcsUrl === "string"
+          ? parsed.manageBacIcsUrl.slice(0, 240)
+          : "",
       manageBacSchoolUrl:
         typeof parsed.manageBacSchoolUrl === "string"
           ? parsed.manageBacSchoolUrl.slice(0, 160)
           : "",
       manageBacMode:
-        parsed.manageBacMode === "import" || parsed.manageBacMode === "sample"
+        parsed.manageBacMode === "import" ||
+        parsed.manageBacMode === "sample" ||
+        parsed.manageBacMode === "scan" ||
+        parsed.manageBacMode === "ics" ||
+        parsed.manageBacMode === "manual"
           ? parsed.manageBacMode
           : null,
       classroomConnected: Boolean(parsed.classroomConnected),
@@ -557,4 +574,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
