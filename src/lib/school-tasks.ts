@@ -18,6 +18,7 @@ export type SchoolTask = {
   source: TaskSource;
   courseName?: string;
   done: boolean;
+  submitted?: boolean;
 };
 
 const SOURCE: TaskSource[] = ["managebac", "classroom", "demo"];
@@ -26,6 +27,61 @@ export function sourceLabel(source: TaskSource) {
   if (source === "classroom") return "Google Classroom";
   if (source === "managebac") return "ManageBac";
   return "Demo";
+}
+
+export function subjectLabel(subjectId: SubjectId) {
+  return SUBJECTS.find((row) => row.id === subjectId)?.label ?? "Other";
+}
+
+export function groupSchoolTasksBySubject(
+  tasks: SchoolTask[],
+  diploma: Array<{ id: string; label: string; statId: SubjectId }>,
+) {
+  const assigned = new Set<string>();
+  const sections: Array<{ key: string; label: string; tasks: SchoolTask[] }> =
+    [];
+
+  for (const option of diploma) {
+    const exact = tasks.filter(
+      (task) =>
+        !assigned.has(task.id) &&
+        task.subject.toLowerCase() === option.label.toLowerCase(),
+    );
+    exact.forEach((task) => assigned.add(task.id));
+    const byStat = tasks.filter(
+      (task) => !assigned.has(task.id) && task.subjectId === option.statId,
+    );
+    byStat.forEach((task) => assigned.add(task.id));
+    sections.push({
+      key: option.id,
+      label: option.label,
+      tasks: [...exact, ...byStat],
+    });
+  }
+
+  const leftover = tasks.filter((task) => !assigned.has(task.id));
+  const extra = new Map<string, SchoolTask[]>();
+  for (const task of leftover) {
+    const label = task.subject || subjectLabel(task.subjectId);
+    const list = extra.get(label) ?? [];
+    list.push(task);
+    extra.set(label, list);
+  }
+  for (const [label, list] of extra) {
+    sections.push({ key: `extra-${label}`, label, tasks: list });
+  }
+
+  if (diploma.length === 0 && sections.length === 0) {
+    return [
+      {
+        key: "all",
+        label: "School tasks",
+        tasks,
+      },
+    ];
+  }
+
+  return sections;
 }
 
 export function inferSubjectId(label: string): SubjectId {
@@ -88,6 +144,7 @@ export function normalizeSchoolTask(raw: unknown): SchoolTask | null {
     source,
     courseName: item.courseName?.trim().slice(0, 80) || undefined,
     done: Boolean(item.done),
+    submitted: Boolean(item.submitted),
   };
 }
 
@@ -114,6 +171,7 @@ export function mergeSchoolTasks(
     byId.set(task.id, {
       ...task,
       done: prev?.done ?? task.done,
+      submitted: prev?.submitted ?? task.submitted,
     });
   }
   return [...byId.values()].slice(0, 80);
