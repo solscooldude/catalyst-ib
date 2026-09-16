@@ -203,6 +203,26 @@ function SparkAuraMark({
 }
 
 function GearBack({ id }: { id: SparkGearId }) {
+  if (id === "streak-mantle") {
+    return (
+      <g>
+        <path
+          d="M24 66C10 70 2 84 5 102c3 16 18 24 45 28 27-4 42-12 45-28 3-18-6-32-20-36-10 12-40 12-50 0Z"
+          fill="#312E81"
+        />
+        <path
+          d="M22 92c8 16 18 24 28 28 10-4 20-12 28-28"
+          fill="none"
+          stroke="#A78BFA"
+          strokeWidth="1.4"
+          opacity="0.7"
+        />
+        <circle cx="32" cy="108" r="1.4" fill="#FDE68A" />
+        <circle cx="50" cy="116" r="1.6" fill="#F8FAFC" />
+        <circle cx="68" cy="108" r="1.3" fill="#93C5FD" />
+      </g>
+    );
+  }
   if (id === "cape") {
     return (
       <g>
@@ -383,6 +403,49 @@ function Gear({ id }: { id: SparkGearId }) {
           strokeOpacity="0.45"
           strokeWidth="1.2"
         />
+      </g>
+    );
+  }
+  if (id === "streak-hood") {
+    return (
+      <g>
+        <path
+          d="M26 34C32 10 42 4 50 4c9 0 19 6 25 28-9 8-40 9-49 2Z"
+          fill="#18181B"
+        />
+        <path
+          d="M24 32c10 8 42 8 54 0-2 10-14 16-27 16S26 42 24 32Z"
+          fill="#27272A"
+        />
+        <path
+          d="M30 28c7-8 33-8 40 0"
+          fill="none"
+          stroke="#3F3F46"
+          strokeWidth="1.4"
+        />
+      </g>
+    );
+  }
+  if (id === "streak-crown") {
+    return (
+      <g>
+        <path
+          d="M24 28 32 12l10 12 8-16 8 16 10-12 8 16H24Z"
+          fill="#E8C547"
+          stroke="#A16207"
+          strokeWidth="1.1"
+        />
+        <circle cx="32" cy="14" r="2" fill="#FFF7D6" />
+        <circle cx="50" cy="8" r="2.2" fill="#FFFBEB" />
+        <circle cx="68" cy="14" r="2" fill="#FFF7D6" />
+      </g>
+    );
+  }
+  if (id === "streak-mantle") {
+    return (
+      <g>
+        <circle cx="50" cy="77.2" r="3.6" fill="#4C1D95" stroke="#FDE68A" strokeWidth="1.1" />
+        <circle cx="50" cy="77.2" r="1.3" fill="#FDE68A" />
       </g>
     );
   }
@@ -797,7 +860,16 @@ export function Spark({
             <stop offset="0%" stopColor={palette.lo} stopOpacity="0.55" />
             <stop offset="100%" stopColor={palette.lo} stopOpacity="0" />
           </radialGradient>
-          {palette.kind === "gradient" ? (
+          {tintId === "gold" ? (
+            <linearGradient id={bodyId} x1="8%" y1="4%" x2="92%" y2="98%">
+              <stop offset="0%" stopColor="#FFF8DC" />
+              <stop offset="18%" stopColor="#F6D365" />
+              <stop offset="38%" stopColor="#C9A227" />
+              <stop offset="58%" stopColor="#F0C14A" />
+              <stop offset="78%" stopColor="#B8860B" />
+              <stop offset="100%" stopColor="#7A5C10" />
+            </linearGradient>
+          ) : palette.kind === "gradient" ? (
             <linearGradient id={bodyId} x1="16%" y1="6%" x2="88%" y2="94%">
               <stop offset="0%" stopColor={palette.hi} />
               <stop offset="48%" stopColor={palette.mid} />
@@ -845,6 +917,56 @@ export function Spark({
             <SparkAuraMark id={auraId} blurId={auraBlurId} />
             <GearBack id={gearId} />
             <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
+            {tintId === "gold" ? (
+              <g className="spark-gold-shine">
+                <ellipse
+                  cx="38"
+                  cy="44"
+                  rx="13"
+                  ry="9"
+                  fill="#FFFBEB"
+                  opacity="0.7"
+                />
+                <path
+                  d="M26 54c10-14 28-16 38-7"
+                  fill="none"
+                  stroke="#FFF8D0"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  opacity="0.85"
+                />
+                <path
+                  d="M34 68c8-6 18-7 26-2"
+                  fill="none"
+                  stroke="#FFE27A"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  opacity="0.55"
+                />
+                <circle cx="62" cy="40" r="1.7" fill="#FFFBEB" />
+                <circle cx="70" cy="56" r="1.25" fill="#FDE68A" />
+                <circle cx="34" cy="70" r="1.35" fill="#FFF7D6" />
+                <circle cx="48" cy="36" r="1.1" fill="#FFFBEB" />
+              </g>
+            ) : null}
+            {tintId === "cosmic" ? (
+              <g className="spark-cosmic-stars" fill="#F8FAFC">
+                <circle className="spark-cosmic-dot" cx="36" cy="46" r="1.15" />
+                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="58" cy="40" r="0.9" />
+                <circle className="spark-cosmic-dot" cx="68" cy="58" r="1.05" />
+                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="42" cy="72" r="0.8" />
+                <circle className="spark-cosmic-dot" cx="54" cy="64" r="1.2" />
+                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="30" cy="60" r="0.7" />
+                <path
+                  d="M48 38l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"
+                  fill="#BFDBFE"
+                />
+                <path
+                  d="M63 48l.45 1.2 1.2.45-1.2.45-.45 1.2-.45-1.2-1.2-.45 1.2-.45Z"
+                  fill="#DBEAFE"
+                />
+              </g>
+            ) : null}
             <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
             <Gear id={gearId} />
             <g className={canGlance ? "spark-glance" : undefined}>
