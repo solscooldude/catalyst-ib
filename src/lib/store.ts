@@ -61,9 +61,18 @@ import {
   type LockWindow,
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
+import {
+  mergeSchoolTasks,
+  mockTasksAsSchool,
+  type SchoolTask,
+} from "@/lib/school-tasks";
+import { SAMPLE_CLASSROOM_TASKS } from "@/lib/classroom";
+import { SAMPLE_MANAGEBAC_TASKS, parseManageBacImport } from "@/lib/managebac";
 import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
 import {
+  claimFriendCode,
+  FRIEND_CODE_HINT,
   normalizeFriendCode,
   stubFriendFromCode,
 } from "@/lib/friends";
@@ -120,12 +129,14 @@ export function plannedLockMs(session: Session) {
 }
 
 export function startSession(input: { taskId: TaskId; goal: string }) {
-  const task = MOCK_TASKS.find((row) => row.id === input.taskId);
+  const school = state.schoolTasks.find((row) => row.id === input.taskId);
+  const mock = MOCK_TASKS.find((row) => row.id === input.taskId);
+  const task = school ?? mock;
   const session: Session = {
     id: crypto.randomUUID(),
     kind: "verified",
     taskId: input.taskId,
-    subjectId: TASK_SUBJECT[input.taskId],
+    subjectId: school?.subjectId ?? TASK_SUBJECT[input.taskId] ?? "other",
     title: task?.title ?? "Official task",
     goal: input.goal.trim(),
     plannedMinutes: null,
@@ -354,6 +365,12 @@ export function completeSession(tokensEarned?: number) {
             task.id === session.taskId ? { ...task, done: true } : task,
           )
         : current.tasks,
+    schoolTasks:
+      session.kind === "verified" && session.taskId
+        ? current.schoolTasks.map((task) =>
+            task.id === session.taskId ? { ...task, done: true } : task,
+          )
+        : current.schoolTasks,
     logs: [...current.logs, log],
     session: current.session
       ? {
@@ -756,9 +773,22 @@ export function completeIntro() {
   setState((current) => ({ ...current, introSeen: true }));
 }
 
+export function setFriendCode(raw: string) {
+  const code = normalizeFriendCode(raw);
+  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
+  if (code === state.friendCode) return { ok: true as const, code };
+  if (state.friends.some((row) => row.code === code)) {
+    return { ok: false as const, reason: "A friend already uses that code." };
+  }
+  const claimed = claimFriendCode(code);
+  if (!claimed.ok) return claimed;
+  setState((current) => ({ ...current, friendCode: code }));
+  return { ok: true as const, code };
+}
+
 export function addFriend(raw: string) {
   const code = normalizeFriendCode(raw);
-  if (!code) return { ok: false as const, reason: "Use a CAT-XXXXXX code." };
+  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
   if (code === state.friendCode) {
     return { ok: false as const, reason: "That's your own code." };
   }
@@ -780,6 +810,89 @@ export function removeFriend(code: string) {
   setState((current) => ({
     ...current,
     friends: current.friends.filter((row) => row.code !== code),
+  }));
+  return { ok: true as const };
+}
+
+export function importSchoolTasks(
+  incoming: SchoolTask[],
+  extras?: Partial<
+    Pick<
+      typeof state,
+      | "classroomConnected"
+      | "classroomEmail"
+      | "classroomMode"
+      | "manageBacConnected"
+      | "manageBacSchoolUrl"
+      | "manageBacMode"
+    >
+  >,
+) {
+  if (incoming.length === 0) {
+    return { ok: false as const, reason: "No tasks to import." };
+  }
+  setState((current) => ({
+    ...current,
+    schoolTasks: mergeSchoolTasks(current.schoolTasks, incoming),
+    ...extras,
+  }));
+  return { ok: true as const, count: incoming.length };
+}
+
+export function connectClassroomSample() {
+  return importSchoolTasks(SAMPLE_CLASSROOM_TASKS, {
+    classroomConnected: true,
+    classroomEmail: "",
+    classroomMode: "sample",
+  });
+}
+
+export function connectClassroomLive(input: {
+  email?: string;
+  tasks: SchoolTask[];
+}) {
+  const tasks = input.tasks.length ? input.tasks : SAMPLE_CLASSROOM_TASKS;
+  return importSchoolTasks(tasks, {
+    classroomConnected: true,
+    classroomEmail: input.email ?? "",
+    classroomMode: input.tasks.length ? "oauth" : "sample",
+  });
+}
+
+export function connectManageBacSample(schoolUrl?: string) {
+  return importSchoolTasks(SAMPLE_MANAGEBAC_TASKS, {
+    manageBacConnected: true,
+    manageBacMode: "sample",
+    manageBacSchoolUrl: schoolUrl?.trim().slice(0, 160) ?? state.manageBacSchoolUrl,
+  });
+}
+
+export function connectManageBacImport(raw: string, schoolUrl?: string) {
+  const tasks = parseManageBacImport(raw);
+  if (tasks.length === 0) {
+    return {
+      ok: false as const,
+      reason: "Paste lines like Title | Subject | Due, or an ICS calendar.",
+    };
+  }
+  return importSchoolTasks(tasks, {
+    manageBacConnected: true,
+    manageBacMode: "import",
+    manageBacSchoolUrl: schoolUrl?.trim().slice(0, 160) ?? state.manageBacSchoolUrl,
+  });
+}
+
+export function resetSchoolTasksToDemo() {
+  setState((current) => ({
+    ...current,
+    schoolTasks: mockTasksAsSchool(
+      current.tasks.filter((row) => row.done).map((row) => row.id),
+    ),
+    classroomConnected: false,
+    classroomEmail: "",
+    classroomMode: null,
+    manageBacConnected: current.setupComplete,
+    manageBacMode: null,
   }));
   return { ok: true as const };
 }
