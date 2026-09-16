@@ -41,7 +41,16 @@ const GROUPS = [
     items: [
       { href: ROUTES.sprite, label: "My Sprite" },
       { href: ROUTES.quiz, label: "Quiz" },
-      { href: ROUTES.friends, label: "Friends" },
+    ],
+  },
+  {
+    id: "friends",
+    label: "Friends",
+    href: ROUTES.friends,
+    items: [
+      { href: `${ROUTES.friends}#play`, label: "Minigames" },
+      { href: `${ROUTES.friends}#manage`, label: "Manage" },
+      { href: `${ROUTES.friends}#board`, label: "Leaderboard" },
     ],
   },
   {
@@ -70,6 +79,7 @@ const SPRITE_HASHES = new Set([
   "#trails",
 ]);
 const APP_HASHES = new Set(["#app", "#scenes", "#room", "#accents"]);
+const FRIEND_HASHES = new Set(["", "#", "#play", "#manage", "#board"]);
 
 function itemActive(pathname: string, hash: string, href: string) {
   const [path, anchor] = href.split("#");
@@ -78,6 +88,11 @@ function itemActive(pathname: string, hash: string, href: string) {
   }
   if (path === ROUTES.appearance && anchor === "app") {
     return pathname === path && APP_HASHES.has(hash);
+  }
+  if (path === ROUTES.friends) {
+    if (anchor === "play") return pathname === path && FRIEND_HASHES.has(hash || "");
+    if (anchor) return pathname === path && hash === `#${anchor}`;
+    return pathname === path;
   }
   if (anchor) return pathname === path && hash === `#${anchor}`;
   return pathname === path;
