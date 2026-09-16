@@ -37,6 +37,18 @@ export function verifiedStudyMs(logs: SessionLog[]) {
     .reduce((sum, log) => sum + log.durationMs, 0);
 }
 
+export function studyMinutesFromLogs(logs: SessionLog[]) {
+  return Math.round(
+    logs.reduce((sum, log) => sum + Math.max(0, log.durationMs), 0) / 60000,
+  );
+}
+
+export function formatStudyMinutes(minutes: number) {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = minutes / 60;
+  return `${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)} h`;
+}
+
 export const CARE_STAGES = [
   "egg",
   "hatchling",
