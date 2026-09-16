@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AvoidFall } from "@/components/avoid-fall";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,12 +19,12 @@ import {
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-type Section = "play" | "manage" | "board";
+type Section = "races" | "manage" | "board";
 
 function sectionFromHash(hash: string): Section {
   if (hash === "#manage") return "manage";
   if (hash === "#board") return "board";
-  return "play";
+  return "races";
 }
 
 export default function FriendsPage() {
@@ -35,7 +34,7 @@ export default function FriendsPage() {
   const [code, setCode] = useState("");
   const [ownCode, setOwnCode] = useState(state.friendCode);
   const [notice, setNotice] = useState<string | null>(null);
-  const [section, setSection] = useState<Section>("play");
+  const [section, setSection] = useState<Section>("races");
   const [raceFriend, setRaceFriend] = useState("");
   const [raceTask, setRaceTask] = useState("");
   const focusTasks = openSchoolTasks(state.schoolTasks);
@@ -136,13 +135,13 @@ export default function FriendsPage() {
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">Friends</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Choose your code, race a school task, and rank by study time then
-          tasks completed.
+          Race the same school task. Manage codes. Rank by study minutes, then
+          tasks completed. Minigames live on My Sprite.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           {(
             [
-              ["play", "Minigames"],
+              ["races", "Task races"],
               ["manage", "Manage"],
               ["board", "Leaderboard"],
             ] as const
@@ -164,64 +163,65 @@ export default function FriendsPage() {
         </div>
       </section>
 
-      {section === "play" ? (
-        <>
-          <section id="play" className="flux-card scroll-mt-24 px-6 py-6">
-            <h2 className="text-lg text-foreground">Task race — minigame</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Same school task. First to end the focus block wins.
+      {section === "races" ? (
+        <section id="races" className="flux-card scroll-mt-24 px-6 py-6">
+          <h2 className="text-lg text-foreground">Task race</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Same school task. First to end the focus block wins.
+          </p>
+          {state.friends.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Add a friend first, then come back to race.
             </p>
-            {state.friends.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">
-                Add a friend first, then come back to race.
-              </p>
-            ) : (
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="race-friend">Friend</Label>
-                  <select
-                    id="race-friend"
-                    value={raceFriend}
-                    onChange={(event) => setRaceFriend(event.target.value)}
-                    className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
-                  >
-                    <option value="">Choose</option>
-                    {state.friends.map((friend) => (
-                      <option key={friend.code} value={friend.code}>
-                        {friend.name} · {friend.code}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="race-task">School task</Label>
-                  <select
-                    id="race-task"
-                    value={raceTask}
-                    onChange={(event) => setRaceTask(event.target.value)}
-                    className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
-                  >
-                    <option value="">Choose</option>
-                    {focusTasks.map((task) => (
-                      <option key={task.id} value={task.id}>
-                        {sourceLabel(task.source)} · {task.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          ) : focusTasks.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              No open school tasks. Load some on Integrations, then race.
+            </p>
+          ) : (
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="race-friend">Friend</Label>
+                <select
+                  id="race-friend"
+                  value={raceFriend}
+                  onChange={(event) => setRaceFriend(event.target.value)}
+                  className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">Choose</option>
+                  {state.friends.map((friend) => (
+                    <option key={friend.code} value={friend.code}>
+                      {friend.name} · {friend.code}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
-            <Button
-              type="button"
-              className="mt-5 h-11 rounded-full px-6"
-              disabled={state.friends.length === 0}
-              onClick={beginRace}
-            >
-              Start task race
-            </Button>
-          </section>
-          <AvoidFall onNotice={setNotice} />
-        </>
+              <div className="space-y-2">
+                <Label htmlFor="race-task">School task</Label>
+                <select
+                  id="race-task"
+                  value={raceTask}
+                  onChange={(event) => setRaceTask(event.target.value)}
+                  className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">Choose</option>
+                  {focusTasks.map((task) => (
+                    <option key={task.id} value={task.id}>
+                      {sourceLabel(task.source)} · {task.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+          <Button
+            type="button"
+            className="mt-5 h-11 rounded-full px-6"
+            disabled={state.friends.length === 0 || focusTasks.length === 0}
+            onClick={beginRace}
+          >
+            Start task race
+          </Button>
+        </section>
       ) : null}
 
       {section === "manage" ? (

@@ -6,15 +6,19 @@ import Link from "next/link";
 import { Check, Link2 } from "lucide-react";
 import { DemoBadge } from "@/components/demo-badge";
 import { LockHoursPicker } from "@/components/lock-hours-picker";
+import { SchoolProviderPicker } from "@/components/school-provider-picker";
 import { Button } from "@/components/ui/button";
 import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
+import { providerLabel } from "@/lib/school-provider";
 import {
   addLockWindow,
   completeSetup,
+  connectClassroomSample,
   connectManageBacSample,
   saveNemeses,
+  setSchoolProvider,
   useCatalyst,
 } from "@/lib/store";
 import { sourceLabel } from "@/lib/school-tasks";
@@ -25,9 +29,10 @@ export default function SetupPage() {
   const state = useCatalyst();
   const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
   const schoolReady =
-    state.manageBacConnected ||
-    state.classroomConnected ||
-    state.schoolTasks.length > 0;
+    Boolean(state.schoolProvider) &&
+    (state.manageBacConnected ||
+      state.classroomConnected ||
+      state.schoolTasks.length > 0);
   const [connected, setConnected] = useState(schoolReady);
   const [connecting, setConnecting] = useState(false);
   const [setupError, setSetupError] = useState<string | null>(null);
@@ -53,10 +58,11 @@ export default function SetupPage() {
     });
   }
 
-  function connectManageBac() {
+  function loadChosenSample() {
     setConnecting(true);
     window.setTimeout(() => {
-      connectManageBacSample(state.manageBacSchoolUrl);
+      if (state.schoolProvider === "classroom") connectClassroomSample();
+      else connectManageBacSample(state.manageBacSchoolUrl);
       setConnected(true);
       setConnecting(false);
     }, 200);
@@ -144,24 +150,50 @@ export default function SetupPage() {
       <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-base text-foreground">School tasks</h2>
+            <h2 className="text-base text-foreground">School source</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Setup can stay simulated. Import or OAuth lives on Integrations.
+              Pick ManageBac or Google Classroom — one at a time. You can switch
+              later on Integrations.
             </p>
           </div>
-          <DemoBadge>Simulated unless imported</DemoBadge>
+          <DemoBadge>
+            {state.schoolProvider
+              ? providerLabel(state.schoolProvider)
+              : "Choose one"}
+          </DemoBadge>
         </div>
+        <div className="mt-5">
+          <SchoolProviderPicker
+            value={state.schoolProvider}
+            onPick={(provider) => {
+              setSchoolProvider(provider);
+              setConnected(false);
+            }}
+          />
+        </div>
+        {state.schoolProvider ? (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button
+              className="h-11 rounded-full px-5"
+              onClick={loadChosenSample}
+              disabled={connecting}
+            >
+              <Link2 className="size-4" />
+              {connecting
+                ? "Loading…"
+                : `Load ${providerLabel(state.schoolProvider)} sample`}
+            </Button>
+            <Button asChild variant="outline" className="h-11 rounded-full px-5">
+              <Link href={ROUTES.integrations}>
+                {state.schoolProvider === "classroom"
+                  ? "Connect Google / sync"
+                  : "Scan, ICS, or add by hand"}
+              </Link>
+            </Button>
+          </div>
+        ) : null}
 
-        {!tasksReady ? (
-          <Button
-            className="mt-5 h-11 rounded-full px-5"
-            onClick={connectManageBac}
-            disabled={connecting}
-          >
-            <Link2 className="size-4" />
-            {connecting ? "Connecting…" : "Connect ManageBac"}
-          </Button>
-        ) : (
+        {tasksReady ? (
           <div className="mt-5 space-y-2">
             {listedTasks.map((task) => (
               <div
@@ -181,10 +213,7 @@ export default function SetupPage() {
               </div>
             ))}
           </div>
-        )}
-        <Button asChild variant="outline" className="mt-5 h-11 rounded-full px-5">
-          <Link href={ROUTES.integrations}>Classroom + ManageBac import</Link>
-        </Button>
+        ) : null}
       </section>
 
       <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
