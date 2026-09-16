@@ -20,8 +20,8 @@ import {
   startOfMonth,
   subjectStacks,
   todayStudyMs,
-  weekDayMarks,
 } from "@/lib/stats";
+import { STREAK_REWARD_DAY, streakLoginPrize } from "@/lib/care";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
 import { WeekStoryShareDialog } from "@/components/week-story-share";
@@ -68,8 +68,12 @@ export default function DashboardPage() {
   const session = state.session;
   const evo = sparkEvolutionFromState(state);
   const todayMs = todayStudyMs(state.logs, now);
-  const week = weekDayMarks(state.logs, now);
   const dailyGoalMs = state.dailyGoalMinutes * 60 * 1000;
+  const streakSlots = Math.max(7, state.streakDays);
+  const nextWeekIn =
+    state.streakDays === 0
+      ? STREAK_REWARD_DAY
+      : STREAK_REWARD_DAY - (state.streakDays % STREAK_REWARD_DAY || STREAK_REWARD_DAY);
   const progress = Math.min(1, todayMs / dailyGoalMs);
   const continueHref =
     session?.status === "locked" || session?.status === "focus"
@@ -152,21 +156,31 @@ export default function DashboardPage() {
           <p className="font-heading mt-3 text-4xl tracking-tight text-foreground">
             {state.streakDays} day{state.streakDays === 1 ? "" : "s"}
           </p>
-          <div className="mt-5 flex items-center gap-1.5">
-            {week.map((day) => (
-              <span
-                key={day.key}
-                className={cn(
-                  "flex size-5 items-center justify-center rounded-full",
-                  day.studied
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-zinc-100 dark:bg-zinc-800",
-                )}
-                aria-label={day.studied ? "Studied" : "No session"}
-              >
-                {day.studied ? <Check className="size-3" strokeWidth={3} /> : null}
-              </span>
-            ))}
+          <p className="mt-2 text-sm text-muted-foreground">
+            Today +{streakLoginPrize(Math.max(1, state.streakDays))} token
+            {streakLoginPrize(Math.max(1, state.streakDays)) === 1 ? "" : "s"}
+            {nextWeekIn
+              ? ` · clothing in ${nextWeekIn} day${nextWeekIn === 1 ? "" : "s"}`
+              : " · clothing award today"}
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-1.5">
+            {Array.from({ length: streakSlots }, (_, index) => {
+              const on = index < state.streakDays;
+              return (
+                <span
+                  key={index}
+                  className={cn(
+                    "flex size-5 items-center justify-center rounded-full",
+                    on
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-zinc-100 dark:bg-zinc-800",
+                  )}
+                  aria-label={on ? `Day ${index + 1}` : "Not yet"}
+                >
+                  {on ? <Check className="size-3" strokeWidth={3} /> : null}
+                </span>
+              );
+            })}
           </div>
         </section>
 
