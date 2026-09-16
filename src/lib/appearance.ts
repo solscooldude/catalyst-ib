@@ -238,6 +238,27 @@ export const SPARK_GEAR = [
     collection: "starter" as const,
     blurb: "A tiny gold star on the left peak.",
   },
+  {
+    id: "streak-hood",
+    name: "Cool hood",
+    cost: 0,
+    collection: "starter" as const,
+    blurb: "Week 1 streak award. Dark hood, street-cool.",
+  },
+  {
+    id: "streak-mantle",
+    name: "Magical mantle",
+    cost: 0,
+    collection: "aurora" as const,
+    blurb: "Week 2 streak award. Star-lined cloak.",
+  },
+  {
+    id: "streak-crown",
+    name: "Elite crown",
+    cost: 0,
+    collection: "gold" as const,
+    blurb: "Week 3 streak award. Small gold crown.",
+  },
 ] as const;
 
 export const SPARK_TRAILS = [
