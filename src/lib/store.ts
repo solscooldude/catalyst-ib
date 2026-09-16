@@ -109,3 +109,7 @@ export function completeSetup(nemeses: NemesisId[]) {
   }));
   return { ok: true as const };
 }
+
+export function setDemoMode(demoMode: boolean) {
+  setState((current) => ({ ...current, demoMode }));
+}
