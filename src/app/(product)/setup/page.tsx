@@ -1,6 +1,6 @@
-"use client";
+use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Check, Link2 } from "lucide-react";
@@ -10,19 +10,32 @@ import { Button } from "@/components/ui/button";
 import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
-import { addLockWindow, completeSetup, useCatalyst } from "@/lib/store";
+import { addLockWindow, completeSetup, connectManageBacSample, useCatalyst } from "@/lib/store";
+import { sourceLabel } from "@/lib/school-tasks";
 import { cn } from "@/lib/utils";
 
 export default function SetupPage() {
   const router = useRouter();
   const state = useCatalyst();
   const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
-  const [connected, setConnected] = useState(state.manageBacConnected);
+  const schoolReady =
+    state.manageBacConnected ||
+    state.classroomConnected ||
+    state.schoolTasks.length > 0;
+  const [connected, setConnected] = useState(schoolReady);
   const [connecting, setConnecting] = useState(false);
+  const [setupError, setSetupError] = useState<string | null>(null);
+  const tasksReady = connected || schoolReady;
+  const listedTasks =
+    state.schoolTasks.length > 0 ? state.schoolTasks : MOCK_TASKS;
   const [days, setDays] = useState<number[]>(AFTER_SCHOOL_PRESET.days);
   const [start, setStart] = useState(AFTER_SCHOOL_PRESET.start);
   const [end, setEnd] = useState(AFTER_SCHOOL_PRESET.end);
   const [lockError, setLockError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (schoolReady) setConnected(true);
+  }, [schoolReady]);
 
   function toggle(id: NemesisId) {
     setNemeses((current) =>
@@ -35,9 +48,10 @@ export default function SetupPage() {
   function connectManageBac() {
     setConnecting(true);
     window.setTimeout(() => {
+      connectManageBacSample(state.manageBacSchoolUrl);
       setConnected(true);
       setConnecting(false);
-    }, 700);
+    }, 200);
   }
 
   function addWindow() {
@@ -56,8 +70,24 @@ export default function SetupPage() {
   }
 
   function finish() {
-    if (nemeses.length === 0 || !connected || state.schedule.length === 0) return;
-    completeSetup(nemeses);
+    if (nemeses.length === 0) {
+      setSetupError("Pick at least one Tier 3 app.");
+      return;
+    }
+    if (!tasksReady) {
+      setSetupError("Connect school tasks or load a sample first.");
+      return;
+    }
+    if (state.schedule.length === 0) {
+      setSetupError("Add lock hours first.");
+      return;
+    }
+    const result = completeSetup(nemeses);
+    if (!result.ok) {
+      setSetupError(result.reason);
+      return;
+    }
+    setSetupError(null);
     router.push(ROUTES.focus);
   }
 
@@ -114,7 +144,7 @@ export default function SetupPage() {
           <DemoBadge>Simulated unless imported</DemoBadge>
         </div>
 
-        {!connected ? (
+        {!tasksReady ? (
           <Button
             className="mt-5 h-11 rounded-full px-5"
             onClick={connectManageBac}
@@ -125,7 +155,7 @@ export default function SetupPage() {
           </Button>
         ) : (
           <div className="mt-5 space-y-2">
-            {MOCK_TASKS.map((task) => (
+            {listedTasks.map((task) => (
               <div
                 key={task.id}
                 className="flex items-start justify-between gap-3 rounded-2xl bg-background/60 px-4 py-3"
@@ -133,11 +163,12 @@ export default function SetupPage() {
                 <div>
                   <p className="text-sm text-foreground">{task.title}</p>
                   <p className="text-xs text-muted-foreground">
+                    {"source" in task ? `${sourceLabel(task.source)} · ` : ""}
                     {task.subject} · due {task.due}
                   </p>
                 </div>
                 <span className="font-mono text-[10px] tracking-wider text-primary uppercase">
-                  Open
+                  {"done" in task && task.done ? "Done" : "Open"}
                 </span>
               </div>
             ))}
@@ -192,10 +223,13 @@ export default function SetupPage() {
         </div>
       </section>
 
+      {setupError ? (
+        <p className="mt-6 text-sm text-rose-300">{setupError}</p>
+      ) : null}
       <div className="mt-8 flex justify-end">
         <Button
           className="h-11 rounded-full px-6"
-          disabled={nemeses.length === 0 || !connected || state.schedule.length === 0}
+          disabled={nemeses.length === 0 || !tasksReady || state.schedule.length === 0}
           onClick={finish}
         >
           {state.setupComplete ? "Save setup" : "Lock in setup"}
