@@ -36,8 +36,13 @@ import {
   type UnlockSpendId,
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
-import { normalizeFriends, type Friend } from "@/lib/friends";
+import { normalizeFriendCode, normalizeFriends, type Friend } from "@/lib/friends";
 import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
+import {
+  mockTasksAsSchool,
+  normalizeSchoolTasks,
+  type SchoolTask,
+} from "@/lib/school-tasks";
 import {
   defaultMotivation,
   defaultProfile,
@@ -113,9 +118,15 @@ export type CatalystState = {
   setupComplete: boolean;
   nemeses: NemesisId[];
   manageBacConnected: boolean;
+  manageBacSchoolUrl: string;
+  manageBacMode: "import" | "sample" | null;
+  classroomConnected: boolean;
+  classroomEmail: string;
+  classroomMode: "oauth" | "sample" | null;
   demoMode: boolean;
   tokens: number;
   tasks: TaskState[];
+  schoolTasks: SchoolTask[];
   session: Session | null;
   unlocks: Unlock[];
   logs: SessionLog[];
@@ -164,9 +175,15 @@ export function createDefaultState(): CatalystState {
     setupComplete: false,
     nemeses: [],
     manageBacConnected: false,
+    manageBacSchoolUrl: "",
+    manageBacMode: null,
+    classroomConnected: false,
+    classroomEmail: "",
+    classroomMode: null,
     demoMode: true,
     tokens: 0,
     tasks: defaultTasks.map((task) => ({ ...task })),
+    schoolTasks: mockTasksAsSchool(),
     session: null,
     unlocks: [],
     logs: [],
@@ -358,7 +375,7 @@ function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) 
     ...legacy,
     kind: "verified" as const,
     taskId,
-    subjectId: TASK_SUBJECT[taskId],
+    subjectId: TASK_SUBJECT[taskId] ?? "other",
     title: task?.title ?? "Focus session",
     plannedMinutes: legacy.plannedMinutes ?? null,
     pausedAt: legacy.pausedAt ?? null,
@@ -438,10 +455,26 @@ export function hydrateStore(userId: string | null = null) {
       avatarDataUrl: normalizeAvatar(parsed.avatarDataUrl),
       soundMuted: Boolean(parsed.soundMuted),
       friendCode:
-        typeof parsed.friendCode === "string" && parsed.friendCode.startsWith("CAT-")
-          ? parsed.friendCode
-          : makeFriendCode(),
+        normalizeFriendCode(String(parsed.friendCode ?? "")) || makeFriendCode(),
       friends: normalizeFriends(parsed.friends),
+      schoolTasks: normalizeSchoolTasks(parsed.schoolTasks),
+      manageBacSchoolUrl:
+        typeof parsed.manageBacSchoolUrl === "string"
+          ? parsed.manageBacSchoolUrl.slice(0, 160)
+          : "",
+      manageBacMode:
+        parsed.manageBacMode === "import" || parsed.manageBacMode === "sample"
+          ? parsed.manageBacMode
+          : null,
+      classroomConnected: Boolean(parsed.classroomConnected),
+      classroomEmail:
+        typeof parsed.classroomEmail === "string"
+          ? parsed.classroomEmail.slice(0, 80)
+          : "",
+      classroomMode:
+        parsed.classroomMode === "oauth" || parsed.classroomMode === "sample"
+          ? parsed.classroomMode
+          : null,
       plannerTodos: normalizePlannerTodos(parsed.plannerTodos),
       plannerEvents: normalizePlannerEvents(parsed.plannerEvents),
       hydrated: true,
@@ -488,7 +521,10 @@ export function resetDemo() {
 }
 
 export function getTask(id: TaskId) {
-  return MOCK_TASKS.find((task) => task.id === id);
+  return (
+    state.schoolTasks.find((task) => task.id === id) ??
+    MOCK_TASKS.find((task) => task.id === id)
+  );
 }
 
 export function getNemesis(id: NemesisId | null) {
@@ -521,4 +557,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
