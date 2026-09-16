@@ -18,10 +18,11 @@ import {
 import {
   FEED_COST,
   FEED_DAILY_LIMIT,
-  LOGIN_TOKEN,
   QUIZ_TOKEN,
   STREAK_REWARD_DAY,
   dayKey,
+  streakGearForWeek,
+  streakLoginPrize,
   yesterdayKey,
 } from "@/lib/care";
 import {
@@ -62,6 +63,10 @@ import {
 import { writeSessionRecap } from "@/lib/session-recap";
 import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
+import {
+  normalizeFriendCode,
+  stubFriendFromCode,
+} from "@/lib/friends";
 import { normalizeAvatar, normalizeUsername } from "@/lib/identity";
 import {
   normalizePlannerEvents,
@@ -82,6 +87,7 @@ export * from "@/lib/store-core";
 export function completeSetup(nemeses: NemesisId[]) {
   const next = [...new Set(nemeses.filter(isNemesisId))];
   if (next.length === 0) return;
+  if (state.schedule.length === 0) return;
   setState((current) => ({
     ...current,
     nemeses: next,
@@ -472,21 +478,27 @@ export function claimDailyLogin(now = new Date()) {
   }
   const streakDays =
     state.lastLoginDay === yesterdayKey(now) ? state.streakDays + 1 : 1;
+  const prize = streakLoginPrize(streakDays);
+  const weekGear = streakGearForWeek(streakDays);
   const weekReward = streakDays > 0 && streakDays % STREAK_REWARD_DAY === 0;
   setState((current) => ({
     ...current,
     lastLoginDay: today,
     streakDays,
-    tokens: current.tokens + LOGIN_TOKEN,
+    tokens: current.tokens + prize,
     appearance: weekReward
       ? normalizeAppearance({
           ...current.appearance,
           ownedTrails: [...current.appearance.ownedTrails, "week"],
+          ownedGear: weekGear
+            ? [...current.appearance.ownedGear, weekGear]
+            : current.appearance.ownedGear,
           trail: "week",
+          gear: weekGear ?? current.appearance.gear,
         })
       : current.appearance,
   }));
-  return { ok: true as const, awarded: true, streakDays, weekReward };
+  return { ok: true as const, awarded: true, streakDays, weekReward, prize };
 }
 
 export function feedSpark() {
@@ -742,6 +754,34 @@ export function setBackgroundShade(shade: AccentShadeId, hue?: BackgroundId) {
 
 export function completeIntro() {
   setState((current) => ({ ...current, introSeen: true }));
+}
+
+export function addFriend(raw: string) {
+  const code = normalizeFriendCode(raw);
+  if (!code) return { ok: false as const, reason: "Use a CAT-XXXXXX code." };
+  if (code === state.friendCode) {
+    return { ok: false as const, reason: "That's your own code." };
+  }
+  if (state.friends.some((row) => row.code === code)) {
+    return { ok: false as const, reason: "Already added." };
+  }
+  if (state.friends.length >= 24) {
+    return { ok: false as const, reason: "Friend list is full." };
+  }
+  const next = stubFriendFromCode(code);
+  setState((current) => ({
+    ...current,
+    friends: [...current.friends, next],
+  }));
+  return { ok: true as const, friend: next };
+}
+
+export function removeFriend(code: string) {
+  setState((current) => ({
+    ...current,
+    friends: current.friends.filter((row) => row.code !== code),
+  }));
+  return { ok: true as const };
 }
 
 export function setSoundMuted(soundMuted: boolean) {
