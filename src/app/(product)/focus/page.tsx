@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { StudyStartForm } from "@/components/study-start-form";
 import { SelectedTaskChip, TaskOption } from "@/components/task-option";
-import { MOCK_TASKS, type TaskId } from "@/lib/constants";
+import type { TaskId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
+import { sourceLabel } from "@/lib/school-tasks";
 import { PageFrame } from "@/components/page-frame";
 import { UnlockPanel } from "@/components/unlock-panel";
 import {
@@ -48,10 +49,8 @@ export default function AppHomePage() {
   if (!state.setupComplete) return null;
 
   const nemesisApps = getNemeses(state.nemeses);
-  const openTasks = MOCK_TASKS.filter(
-    (task) => !state.tasks.find((row) => row.id === task.id)?.done,
-  );
-  const selectedTask = MOCK_TASKS.find((task) => task.id === taskId);
+  const openTasks = state.schoolTasks.filter((task) => !task.done);
+  const selectedTask = state.schoolTasks.find((task) => task.id === taskId);
 
   function begin() {
     if (!taskId) return;
@@ -92,29 +91,33 @@ export default function AppHomePage() {
                 ? `${selectedTask.subject} · due ${selectedTask.due}`
                 : undefined
             }
-            empty="Pick a ManageBac task."
+            empty="Pick a school task."
           />
         </div>
 
         <div className="mt-5 space-y-3">
-          {MOCK_TASKS.map((task) => {
-            const done = state.tasks.find((row) => row.id === task.id)?.done;
-            return (
-              <TaskOption
-                key={task.id}
-                title={task.title}
-                detail={`${task.subject} · due ${task.due} · ${task.detail}`}
-                selected={taskId === task.id}
-                disabled={done}
-                onSelect={() => setTaskId(task.id)}
-              />
-            );
-          })}
+          {state.schoolTasks.map((task) => (
+            <TaskOption
+              key={task.id}
+              title={task.title}
+              detail={`${sourceLabel(task.source)} · ${task.subject} · due ${task.due}${task.detail ? ` · ${task.detail}` : ""}`}
+              selected={taskId === task.id}
+              disabled={task.done}
+              onSelect={() => setTaskId(task.id)}
+            />
+          ))}
         </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          <Link href={ROUTES.integrations} className="text-primary hover:underline">
+            Connect Classroom or ManageBac
+          </Link>
+          {" · "}
+          school sites stay allowed during a block.
+        </p>
 
         {openTasks.length === 0 ? (
           <p className="mt-6 text-sm text-muted-foreground">
-            All mock tasks are done.
+            All school tasks are done.
           </p>
         ) : null}
       </div>

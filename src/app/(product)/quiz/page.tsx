@@ -14,8 +14,13 @@ import { scoreQuiz, useCatalyst } from "@/lib/store";
 export default function QuizPage() {
   const state = useCatalyst();
   const items = useMemo(
-    () => pickQuiz(state.profile.subjects, QUIZ_LENGTH),
-    [state.profile.subjects],
+    () =>
+      pickQuiz(
+        state.profile.subjects,
+        QUIZ_LENGTH,
+        state.schoolTasks.map((task) => task.subjectId),
+      ),
+    [state.profile.subjects, state.schoolTasks],
   );
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -29,7 +34,9 @@ export default function QuizPage() {
 
   const item = items[index];
   const already = state.quizDay === todayLocal();
-  const caption = item ? quizItemCaption(item, state.profile.subjects) : null;
+  const caption = item
+    ? quizItemCaption(item, state.profile.subjects, state.schoolTasks)
+    : null;
 
   function choose(choice: number) {
     if (picked !== null || already) return;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Check, Link2 } from "lucide-react";
 import { DemoBadge } from "@/components/demo-badge";
 import { LockHoursPicker } from "@/components/lock-hours-picker";
@@ -100,9 +101,12 @@ export default function SetupPage() {
       <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-base text-foreground">Connect ManageBac</h2>
+            <h2 className="text-base text-foreground">School tasks</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Setup can stay simulated. Import or OAuth lives on Integrations.
+            </p>
           </div>
-          <DemoBadge>Simulated ManageBac</DemoBadge>
+          <DemoBadge>Simulated unless imported</DemoBadge>
         </div>
 
         {!connected ? (
@@ -134,6 +138,9 @@ export default function SetupPage() {
             ))}
           </div>
         )}
+        <Button asChild variant="outline" className="mt-5 h-11 rounded-full px-5">
+          <Link href={ROUTES.integrations}>Classroom + ManageBac import</Link>
+        </Button>
       </section>
 
       <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
