@@ -557,3 +557,4 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
+
