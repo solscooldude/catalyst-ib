@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
-import { addLockWindow, completeSetup, connectManageBacSample, useCatalyst } from "@/lib/store";
+import {
+  addLockWindow,
+  completeSetup,
+  connectManageBacSample,
+  saveNemeses,
+  useCatalyst,
+} from "@/lib/store";
 import { sourceLabel } from "@/lib/school-tasks";
 import { cn } from "@/lib/utils";
 
@@ -38,11 +44,13 @@ export default function SetupPage() {
   }, [schoolReady]);
 
   function toggle(id: NemesisId) {
-    setNemeses((current) =>
-      current.includes(id)
+    setNemeses((current) => {
+      const next = current.includes(id)
         ? current.filter((row) => row !== id)
-        : [...current, id],
-    );
+        : [...current, id];
+      saveNemeses(next);
+      return next;
+    });
   }
 
   function connectManageBac() {
@@ -88,7 +96,7 @@ export default function SetupPage() {
       return;
     }
     setSetupError(null);
-    router.push(ROUTES.focus);
+    router.replace(ROUTES.focus);
   }
 
   return (
