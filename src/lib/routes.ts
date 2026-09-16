@@ -7,6 +7,7 @@ export const ROUTES = {
   unlocks: "/unlocks",
   appearance: "/appearance",
   setup: "/setup",
+  integrations: "/integrations",
   profile: "/profile",
   subscription: "/account/subscription",
   settings: "/account/settings",
