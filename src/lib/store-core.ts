@@ -36,6 +36,7 @@ import {
   type UnlockSpendId,
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
+import { normalizeFriends, type Friend } from "@/lib/friends";
 import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
 import {
   defaultMotivation,
@@ -147,6 +148,7 @@ export type CatalystState = {
   avatarDataUrl: string | null;
   soundMuted: boolean;
   friendCode: string;
+  friends: Friend[];
   plannerTodos: PlannerTodo[];
   plannerEvents: PlannerEvent[];
 };
@@ -195,6 +197,7 @@ export function createDefaultState(): CatalystState {
     avatarDataUrl: null,
     soundMuted: false,
     friendCode: makeFriendCode(),
+    friends: [],
     plannerTodos: [],
     plannerEvents: [],
   };
@@ -438,6 +441,7 @@ export function hydrateStore(userId: string | null = null) {
         typeof parsed.friendCode === "string" && parsed.friendCode.startsWith("CAT-")
           ? parsed.friendCode
           : makeFriendCode(),
+      friends: normalizeFriends(parsed.friends),
       plannerTodos: normalizePlannerTodos(parsed.plannerTodos),
       plannerEvents: normalizePlannerEvents(parsed.plannerEvents),
       hydrated: true,
@@ -478,6 +482,7 @@ export function resetDemo() {
     clearCloset(userId);
   }
   state = { ...createDefaultState(), hydrated: true };
+  persist(state);
   setUiTheme("dark");
   emit();
 }
