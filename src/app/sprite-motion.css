@@ -300,6 +300,39 @@
   animation: spark-sit-breathe 7.2s ease-in-out infinite;
 }
 
+.spark-gold-shine {
+  animation: spark-gold-gleam 2.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgb(255 236 160 / 0.65));
+}
+
+@keyframes spark-gold-gleam {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.spark-cosmic-dot {
+  animation: spark-cosmic-twinkle 2.4s ease-in-out infinite;
+}
+
+.spark-cosmic-dot-b {
+  animation-delay: 0.9s;
+}
+
+@keyframes spark-cosmic-twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @keyframes spark-sit-breathe {
   0%,
   100% {
@@ -541,6 +574,8 @@
   .spark-tickle .spark-body,
   .spark-wave .spark-body,
   .spark-sit,
+  .spark-gold-shine,
+  .spark-cosmic-dot,
   .spark-celebrate,
   .spark-z,
   .spark-hatch,
