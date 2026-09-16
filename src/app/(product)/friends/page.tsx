@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
-import { MOCK_TASKS, type TaskId } from "@/lib/constants";
+import { FRIEND_CODE_HINT, rankFriends } from "@/lib/friends";
 import { ROUTES } from "@/lib/routes";
+import { openSchoolTasks, sourceLabel } from "@/lib/school-tasks";
+import { formatStudyMinutes, studyMinutesFromLogs } from "@/lib/stats";
 import {
   addFriend,
   removeFriend,
+  setFriendCode,
   startSession,
   useCatalyst,
 } from "@/lib/store";
@@ -30,10 +33,16 @@ export default function FriendsPage() {
   const state = useCatalyst();
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState("");
+  const [ownCode, setOwnCode] = useState(state.friendCode);
   const [notice, setNotice] = useState<string | null>(null);
   const [section, setSection] = useState<Section>("play");
   const [raceFriend, setRaceFriend] = useState("");
-  const [raceTask, setRaceTask] = useState<TaskId | "">("");
+  const [raceTask, setRaceTask] = useState("");
+  const focusTasks = openSchoolTasks(state.schoolTasks);
+
+  useEffect(() => {
+    setOwnCode(state.friendCode);
+  }, [state.friendCode]);
 
   useEffect(() => {
     function sync() {
@@ -44,18 +53,31 @@ export default function FriendsPage() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
 
+  const youMinutes = studyMinutesFromLogs(state.logs);
+  const youTasks = state.schoolTasks.filter((task) => task.done).length;
   const board = useMemo(() => {
     const you = {
       code: state.friendCode,
       name: state.username || "You",
       tokens: state.tokens,
       streakDays: Math.max(1, state.streakDays),
+      studyMinutes: youMinutes,
+      tasksCompleted: youTasks,
       you: true,
     };
-    return [you, ...state.friends.map((row) => ({ ...row, you: false }))].sort(
-      (a, b) => b.tokens - a.tokens || b.streakDays - a.streakDays,
-    );
-  }, [state.friendCode, state.friends, state.streakDays, state.tokens, state.username]);
+    return rankFriends([
+      you,
+      ...state.friends.map((row) => ({ ...row, you: false })),
+    ]);
+  }, [
+    state.friendCode,
+    state.friends,
+    state.streakDays,
+    state.tokens,
+    state.username,
+    youMinutes,
+    youTasks,
+  ]);
 
   async function copy() {
     try {
@@ -65,6 +87,16 @@ export default function FriendsPage() {
     } catch {
       setCopied(false);
     }
+  }
+
+  function saveCode(event: React.FormEvent) {
+    event.preventDefault();
+    const result = setFriendCode(ownCode);
+    if (!result.ok) {
+      setNotice(result.reason);
+      return;
+    }
+    setNotice(`Friend code set to ${result.code}.`);
   }
 
   function submitFriend(event: React.FormEvent) {
@@ -80,7 +112,7 @@ export default function FriendsPage() {
 
   function beginRace() {
     if (!raceFriend || !raceTask) {
-      setNotice("Pick a friend and a ManageBac task.");
+      setNotice("Pick a friend and a school task.");
       return;
     }
     const friend = state.friends.find((row) => row.code === raceFriend);
@@ -102,11 +134,10 @@ export default function FriendsPage() {
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Friends
         </p>
-        <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-          Friends
-        </h1>
+        <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">Friends</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Race a ManageBac task, manage your list, and see who is earning.
+          Choose your code, race a school task, and rank by study time then
+          tasks completed.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           {(
@@ -138,8 +169,7 @@ export default function FriendsPage() {
           <section id="play" className="flux-card scroll-mt-24 px-6 py-6">
             <h2 className="text-lg text-foreground">Task race — minigame</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Same ManageBac task. First to end the focus block wins. Local
-              demo — your friend is racing the same assignment title.
+              Same school task. First to end the focus block wins.
             </p>
             {state.friends.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
@@ -164,19 +194,17 @@ export default function FriendsPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="race-task">ManageBac task</Label>
+                  <Label htmlFor="race-task">School task</Label>
                   <select
                     id="race-task"
                     value={raceTask}
-                    onChange={(event) =>
-                      setRaceTask(event.target.value as TaskId | "")
-                    }
+                    onChange={(event) => setRaceTask(event.target.value)}
                     className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
                   >
                     <option value="">Choose</option>
-                    {MOCK_TASKS.map((task) => (
+                    {focusTasks.map((task) => (
                       <option key={task.id} value={task.id}>
-                        {task.title}
+                        {sourceLabel(task.source)} · {task.title}
                       </option>
                     ))}
                   </select>
@@ -198,31 +226,43 @@ export default function FriendsPage() {
 
       {section === "manage" ? (
         <section id="manage" className="space-y-6">
-          <div className="flux-card px-6 py-6">
+          <form className="flux-card px-6 py-6" onSubmit={saveCode}>
             <h2 className="text-lg text-foreground">Your friend code</h2>
-            <p className="font-heading mt-3 text-3xl tracking-[0.12em] text-foreground">
-              {state.friendCode}
-            </p>
-            <Button
-              type="button"
-              className="mt-5 h-11 rounded-full px-6"
-              onClick={copy}
-            >
-              {copied ? "Copied" : "Copy code"}
-            </Button>
-          </div>
-          <form className="flux-card px-6 py-6" onSubmit={submitFriend}>
-            <h2 className="text-lg text-foreground">Add a friend</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Codes look like CAT-XXXXXX.
+              {FRIEND_CODE_HINT}
             </p>
             <div className="mt-4 space-y-2">
-              <Label htmlFor="friend-code">Friend code</Label>
+              <Label htmlFor="own-code">Code</Label>
+              <Input
+                id="own-code"
+                value={ownCode}
+                onChange={(event) => setOwnCode(event.target.value.toUpperCase())}
+                className="h-11 rounded-xl"
+              />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button type="submit" className="h-11 rounded-full px-6">
+                Save code
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 rounded-full px-6"
+                onClick={copy}
+              >
+                {copied ? "Copied" : "Copy"}
+              </Button>
+            </div>
+          </form>
+          <form className="flux-card px-6 py-6" onSubmit={submitFriend}>
+            <h2 className="text-lg text-foreground">Add a friend</h2>
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="friend-code">Their code</Label>
               <Input
                 id="friend-code"
                 value={code}
                 onChange={(event) => setCode(event.target.value.toUpperCase())}
-                placeholder="CAT-AB12CD"
+                placeholder="SOLS-IB"
                 className="h-11 rounded-xl"
               />
             </div>
@@ -246,8 +286,8 @@ export default function FriendsPage() {
                     <div>
                       <p className="text-sm text-foreground">{friend.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {friend.code} · {friend.tokens} tokens ·{" "}
-                        {friend.streakDays} day streak
+                        {friend.code} · {formatStudyMinutes(friend.studyMinutes)}{" "}
+                        · {friend.tasksCompleted} tasks
                       </p>
                     </div>
                     <Button
@@ -273,7 +313,7 @@ export default function FriendsPage() {
         <section id="board" className="flux-card px-6 py-6">
           <h2 className="text-lg text-foreground">Friend leaderboard</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Ranked by tokens, then streak.
+            Ranked by study minutes, then tasks completed.
           </p>
           <ol className="mt-5 space-y-2">
             {board.map((row, index) => (
@@ -287,8 +327,12 @@ export default function FriendsPage() {
                   </p>
                   <p className="text-xs text-muted-foreground">{row.code}</p>
                 </div>
-                <p className="text-sm text-foreground">
-                  {row.tokens} · {row.streakDays}d
+                <p className="text-right text-sm text-foreground">
+                  {formatStudyMinutes(row.studyMinutes)}
+                  <span className="block text-xs text-muted-foreground">
+                    {row.tasksCompleted} task
+                    {row.tasksCompleted === 1 ? "" : "s"}
+                  </span>
                 </p>
               </li>
             ))}
