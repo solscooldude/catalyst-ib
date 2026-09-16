@@ -147,7 +147,7 @@ export default function AppearancePage() {
             Shop
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            Closet
+            Token shop
           </h1>
           <p className="mt-3 text-sm">
             <Link href={ROUTES.sprite} className="text-zinc-400 hover:text-foreground">
