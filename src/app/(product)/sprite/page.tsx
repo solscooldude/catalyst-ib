@@ -22,7 +22,7 @@ import {
   verifiedStudyMs,
 } from "@/lib/stats";
 import { CareStageInfo } from "@/components/care-stage-info";
-import { TokenCatch } from "@/components/token-catch";
+import { AvoidFall } from "@/components/avoid-fall";
 import { careMood, type SparkGiftKind } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { SparkHowTo } from "@/components/spark-howto";
@@ -37,6 +37,7 @@ import Link from "next/link";
 export default function SpritePage() {
   const state = useCatalyst();
   const [notice, setNotice] = useState<string | null>(null);
+  const [minigameLive, setMinigameLive] = useState(false);
   const tucked = state.spriteAsleep;
   const [mood, setMood] = useState<SparkMood>(() =>
     tucked ? "sleepy" : "idle",
@@ -136,7 +137,13 @@ export default function SpritePage() {
         <SpriteRename />
       </section>
 
-      <section id="snacks" className="flux-card scroll-mt-24 flex flex-col items-center px-5 py-8">
+      <section
+        id="snacks"
+        className={cn(
+          "flux-card scroll-mt-24 flex flex-col items-center px-5 py-8",
+          minigameLive && "opacity-35",
+        )}
+      >
         <SpritePlaypen
           mood={mood}
           petPulse={petPulse}
@@ -173,7 +180,7 @@ export default function SpritePage() {
         />
       </section>
 
-      <TokenCatch onNotice={setNotice} />
+      <AvoidFall onNotice={setNotice} onLiveChange={setMinigameLive} />
 
       <EquipRow
         title="Sprite colour"
