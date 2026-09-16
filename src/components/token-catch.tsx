@@ -78,7 +78,7 @@ export function TokenCatch({
     <section className="flux-card relative overflow-hidden px-6 py-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg text-foreground">Token catch</h2>
+          <h2 className="text-lg text-foreground">Token catch — minigame</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {live ? `${Math.ceil(leftMs / 1000)}s` : "Ten seconds. Tap the stars."}
           </p>

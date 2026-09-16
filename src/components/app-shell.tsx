@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
       {sessionView || introView ? null : (
         <header className="sticky top-0 z-50 overflow-visible bg-background/90 backdrop-blur-xl">
-          <div className="mx-auto grid h-16 max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-visible px-4 sm:h-[4.5rem]">
+          <div className="mx-auto grid h-[4.5rem] max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 overflow-visible px-4 sm:h-20">
             <Wordmark href={ROUTES.home} />
             <TopNav />
             <div className="flex items-center justify-end gap-2">

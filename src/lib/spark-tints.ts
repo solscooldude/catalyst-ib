@@ -45,9 +45,10 @@ export const SPARK_TINTS = [
     cost: 14,
     collection: "starter" as const,
     kind: "solid" as const,
-    hi: "#FFF4B8",
-    mid: "#F5D76A",
-    lo: "#D4A017",
+    blurb: "Metallic gold with a shine, not lemon.",
+    hi: "#FFF8D0",
+    mid: "#F0C14A",
+    lo: "#B8860B",
   },
   {
     id: "sky",
@@ -174,6 +175,17 @@ export const SPARK_TINTS = [
     hi: "#E9D5FF",
     mid: "#5EEAD4",
     lo: "#A78BFA",
+  },
+  {
+    id: "cosmic",
+    name: "Cosmic sprite",
+    cost: 48,
+    collection: "starter" as const,
+    kind: "gradient" as const,
+    blurb: "Dark blue, lighter blue, and stars.",
+    hi: "#93C5FD",
+    mid: "#2563EB",
+    lo: "#1E3A8A",
   },
 ] as const;
 
