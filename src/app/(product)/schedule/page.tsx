@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ROUTES } from "@/lib/routes";
 import {
   WEEKDAYS,
-  WEEKNIGHT_PRESET,
+  AFTER_SCHOOL_PRESET,
   activeWindow,
   formatRemaining,
   formatWindow,
@@ -31,9 +31,9 @@ const timeClass =
 export default function SchedulePage() {
   const router = useRouter();
   const state = useCatalyst();
-  const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]);
-  const [start, setStart] = useState("19:00");
-  const [end, setEnd] = useState("22:00");
+  const [days, setDays] = useState<number[]>(AFTER_SCHOOL_PRESET.days);
+  const [start, setStart] = useState(AFTER_SCHOOL_PRESET.start);
+  const [end, setEnd] = useState(AFTER_SCHOOL_PRESET.end);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
 
@@ -71,8 +71,8 @@ export default function SchedulePage() {
     setError(null);
   }
 
-  function addWeeknights() {
-    const result = addLockWindow(WEEKNIGHT_PRESET);
+  function addAfterSchool() {
+    const result = addLockWindow(AFTER_SCHOOL_PRESET);
     if (!result.ok) setError(result.reason);
     else setError(null);
   }
@@ -114,9 +114,9 @@ export default function SchedulePage() {
               <Button
                 className="mt-4 h-10 rounded-full"
                 variant="outline"
-                onClick={addWeeknights}
+                onClick={addAfterSchool}
               >
-                Add weeknights 7–10pm
+                Add after school 4:30–7:30
               </Button>
             </div>
           ) : (

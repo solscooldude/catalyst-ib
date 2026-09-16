@@ -10,6 +10,11 @@ import { applyUiTheme, restoreStoredUiTheme } from "@/lib/ui-theme";
 
 const SLIDES = [
   {
+    kicker: "Welcome",
+    title: "Welcome to Catalyst, let's get started",
+    body: "A short tour of why this exists, then you finish your account — profile and after-school lock hours — before Home.",
+  },
+  {
     kicker: "The problem",
     title: "The problem",
     body: "A lot of IB students struggle with procrastination, constant phone distractions, passive scrolling on other devices, or with staying motivated during intense workloads like IAs, TOK essays, or the full IB grind.",
@@ -35,11 +40,20 @@ const SLIDES = [
     body: "Tokens allow you to unlock your app tiers. More studying = more tokens.",
   },
   {
-    kicker: "Go to home",
-    title: "Go to home",
-    body: "Your central hub, the dashboard.",
+    kicker: "Account",
+    title: "Finish setting up account",
+    body: "Next: your IB profile and required lock hours. Default after-school window is 4:30–7:30. You can change it. Then you land on Home.",
   },
 ] as const;
+
+function nextAfterIntro(state: {
+  profile: { complete: boolean };
+  schedule: unknown[];
+}) {
+  return state.profile.complete && state.schedule.length > 0
+    ? ROUTES.home
+    : ROUTES.profile;
+}
 
 export default function IntroPage() {
   const router = useRouter();
@@ -53,13 +67,13 @@ export default function IntroPage() {
 
   useEffect(() => {
     if (state.hydrated && state.introSeen) {
-      router.replace(state.setupComplete ? ROUTES.home : ROUTES.profile);
+      router.replace(nextAfterIntro(state));
     }
-  }, [state.hydrated, state.introSeen, state.setupComplete, router]);
+  }, [state.hydrated, state.introSeen, state.profile.complete, state.schedule.length, router]);
 
   function finish() {
     completeIntro();
-    router.replace(state.profile.complete ? ROUTES.home : ROUTES.profile);
+    router.replace(nextAfterIntro(state));
   }
 
   const slide = SLIDES[index];
@@ -83,7 +97,7 @@ export default function IntroPage() {
           <p className="mt-4 text-sm leading-relaxed text-zinc-400">
             {slide.body}
           </p>
-          {index === 3 ? (
+          {index === 4 ? (
             <div className="mt-6 flex justify-center">
               <Spark mood="idle" size={120} />
             </div>
@@ -115,7 +129,7 @@ export default function IntroPage() {
                   else setIndex((value) => value + 1);
                 }}
               >
-                {last ? "Get started" : "Next"}
+                {last ? "Set up account" : "Next"}
               </Button>
             </div>
           </div>

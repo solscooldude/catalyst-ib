@@ -18,6 +18,7 @@ export function LockHoursPicker({
   onEnd,
   onAdd,
   onPreset,
+  onWeeknights,
   addLabel = "Save lock hours",
 }: {
   days: number[];
@@ -29,6 +30,7 @@ export function LockHoursPicker({
   onEnd: (value: string) => void;
   onAdd: () => void;
   onPreset: () => void;
+  onWeeknights?: () => void;
   addLabel?: string;
 }) {
   return (
@@ -89,8 +91,18 @@ export function LockHoursPicker({
           className="h-11 rounded-full px-5"
           onClick={onPreset}
         >
-          Weeknights 7–10pm
+          After school 4:30–7:30
         </Button>
+        {onWeeknights ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 rounded-full px-5"
+            onClick={onWeeknights}
+          >
+            Weeknights 7–10pm
+          </Button>
+        ) : null}
       </div>
     </div>
   );

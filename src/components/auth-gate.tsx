@@ -6,11 +6,14 @@ import { useAuth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
 import { useCatalyst } from "@/lib/store";
 
+const SETUP_PATHS = new Set<string>([ROUTES.profile, ROUTES.setup, ROUTES.schedule]);
+
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const auth = useAuth();
   const store = useCatalyst();
+  const accountReady = store.profile.complete && store.schedule.length > 0;
 
   useEffect(() => {
     if (auth.hydrated && !auth.user) {
@@ -32,19 +35,27 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       store.hydrated &&
       auth.user &&
       store.introSeen &&
-      !store.profile.complete &&
-      pathname !== ROUTES.profile
+      !accountReady &&
+      !SETUP_PATHS.has(pathname)
     ) {
       router.replace(ROUTES.profile);
     }
-  }, [auth.hydrated, auth.user, store.hydrated, store.introSeen, store.profile.complete, pathname, router]);
+  }, [
+    auth.hydrated,
+    auth.user,
+    store.hydrated,
+    store.introSeen,
+    accountReady,
+    pathname,
+    router,
+  ]);
 
   const waiting =
     !auth.hydrated ||
     !store.hydrated ||
     !auth.user ||
     (!store.introSeen && pathname !== ROUTES.intro) ||
-    (store.introSeen && !store.profile.complete && pathname !== ROUTES.profile);
+    (store.introSeen && !accountReady && !SETUP_PATHS.has(pathname));
 
   if (waiting) {
     return (

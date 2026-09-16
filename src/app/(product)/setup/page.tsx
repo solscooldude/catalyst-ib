@@ -9,7 +9,7 @@ import { LockHoursPicker } from "@/components/lock-hours-picker";
 import { Button } from "@/components/ui/button";
 import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
-import { WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
+import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
 import { addLockWindow, completeSetup, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +19,9 @@ export default function SetupPage() {
   const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
   const [connected, setConnected] = useState(state.manageBacConnected);
   const [connecting, setConnecting] = useState(false);
-  const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]);
-  const [start, setStart] = useState("19:00");
-  const [end, setEnd] = useState("22:00");
+  const [days, setDays] = useState<number[]>(AFTER_SCHOOL_PRESET.days);
+  const [start, setStart] = useState(AFTER_SCHOOL_PRESET.start);
+  const [end, setEnd] = useState(AFTER_SCHOOL_PRESET.end);
   const [lockError, setLockError] = useState<string | null>(null);
 
   function toggle(id: NemesisId) {
@@ -42,6 +42,11 @@ export default function SetupPage() {
 
   function addWindow() {
     const result = addLockWindow({ days, start, end, enabled: true });
+    setLockError(result.ok ? null : result.reason);
+  }
+
+  function addAfterSchool() {
+    const result = addLockWindow(AFTER_SCHOOL_PRESET);
     setLockError(result.ok ? null : result.reason);
   }
 
@@ -181,7 +186,8 @@ export default function SetupPage() {
             onStart={setStart}
             onEnd={setEnd}
             onAdd={addWindow}
-            onPreset={addWeeknights}
+            onPreset={addAfterSchool}
+            onWeeknights={addWeeknights}
           />
         </div>
       </section>

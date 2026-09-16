@@ -21,6 +21,13 @@ export type LockWindow = {
 const TIME = /^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?$/;
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] as const;
 
+export const AFTER_SCHOOL_PRESET: Omit<LockWindow, "id"> = {
+  days: [1, 2, 3, 4, 5],
+  start: "16:30",
+  end: "19:30",
+  enabled: true,
+};
+
 export const WEEKNIGHT_PRESET: Omit<LockWindow, "id"> = {
   days: [1, 2, 3, 4, 5],
   start: "19:00",
