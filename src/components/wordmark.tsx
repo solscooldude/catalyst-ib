@@ -16,8 +16,10 @@ export function Wordmark({
         className,
       )}
     >
-      <span className="text-[17px] font-semibold">Catalyst</span>
-      <span className="text-[13px] font-medium text-muted-foreground">IB</span>
+      <span className="text-[26px] font-semibold sm:text-[32px]">Catalyst</span>
+      <span className="text-[22px] font-semibold text-muted-foreground sm:text-[28px]">
+        IB
+      </span>
     </Link>
   );
 }

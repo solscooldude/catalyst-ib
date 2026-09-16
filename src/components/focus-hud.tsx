@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { SparkleMark } from "@/components/brand-marks";
 import { cn } from "@/lib/utils";
 
@@ -6,12 +7,14 @@ export function FocusHud({
   progress,
   tokens,
   task,
+  buddy,
   className,
 }: {
   time: string;
   progress?: number | null;
   tokens: number;
   task?: string;
+  buddy?: ReactNode;
   className?: string;
 }) {
   const showTrack = progress != null && Number.isFinite(progress);
@@ -19,18 +22,21 @@ export function FocusHud({
 
   return (
     <div className={cn("focus-hud", className)}>
-      <div className="focus-hud-timer" aria-label={`Session time ${time}`}>
-        {task ? (
-          <p className="focus-hud-task mb-1 text-center text-xs font-medium">
-            {task}
-          </p>
-        ) : null}
-        <p className="focus-hud-digits">{time}</p>
-        {showTrack ? (
-          <div className="focus-hud-track" aria-hidden>
-            <span className="focus-hud-fill" style={{ width: `${width}%` }} />
-          </div>
-        ) : null}
+      <div className={cn("focus-hud-cluster", buddy && "has-buddy")}>
+        {buddy ? <div className="focus-hud-buddy">{buddy}</div> : null}
+        <div className="focus-hud-timer" aria-label={`Session time ${time}`}>
+          {task ? (
+            <p className="focus-hud-task mb-1 text-center text-xs font-medium">
+              {task}
+            </p>
+          ) : null}
+          <p className="focus-hud-digits">{time}</p>
+          {showTrack ? (
+            <div className="focus-hud-track" aria-hidden>
+              <span className="focus-hud-fill" style={{ width: `${width}%` }} />
+            </div>
+          ) : null}
+        </div>
       </div>
       <div className="focus-hud-tokens" aria-label={`${tokens} tokens`}>
         <SparkleMark size={16} />
