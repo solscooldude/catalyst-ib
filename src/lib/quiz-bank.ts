@@ -17,6 +17,52 @@ export function quizCourseKey(subject: IbSubject): string {
   return id;
 }
 
+const COURSE_ASSIGNMENTS: Record<
+  string,
+  { source: "ManageBac" | "Google Classroom"; title: string }
+> = {
+  tok: { source: "ManageBac", title: "TOK essay — knowledge & technology" },
+  ee: { source: "ManageBac", title: "EE chapter 2 — literature review" },
+  cas: { source: "ManageBac", title: "CAS reflection — evidence log" },
+  biology: { source: "ManageBac", title: "Biology IA first draft" },
+  chemistry: { source: "Google Classroom", title: "Chemistry SL — energetics review" },
+  physics: { source: "Google Classroom", title: "Physics HL — past paper 2" },
+  "math-aa": { source: "Google Classroom", title: "Math AA problem set 8" },
+  "math-ai": { source: "Google Classroom", title: "Math AI — modelling homework" },
+  history: { source: "ManageBac", title: "History IA — investigation question" },
+  geography: { source: "ManageBac", title: "Geography IA — fieldwork write-up" },
+  economics: { source: "Google Classroom", title: "Economics commentary 2" },
+  business: { source: "Google Classroom", title: "Business IA — supporting docs" },
+  psychology: { source: "ManageBac", title: "Psychology IA — method section" },
+  "lang-a": { source: "ManageBac", title: "English A IO practice" },
+  "lang-b": { source: "Google Classroom", title: "Language B written assignment" },
+  "lang-ab": { source: "Google Classroom", title: "Ab initio — text-type draft" },
+  latin: { source: "Google Classroom", title: "Latin unseen + morphology" },
+  "visual-arts": { source: "ManageBac", title: "Visual Arts — comparative study" },
+  music: { source: "ManageBac", title: "Music — experimenting with music" },
+  theatre: { source: "ManageBac", title: "Theatre — research presentation" },
+  sehs: { source: "Google Classroom", title: "SEHS — energy systems quiz" },
+  cs: { source: "Google Classroom", title: "CS IA — criterion B plan" },
+  "computer-science": { source: "Google Classroom", title: "CS IA — criterion B plan" },
+  ess: { source: "ManageBac", title: "ESS IA — investigation design" },
+  philosophy: { source: "ManageBac", title: "Philosophy — stimulus paper" },
+  "global-politics": { source: "ManageBac", title: "Global politics — engagement activity" },
+  "digital-societies": { source: "Google Classroom", title: "Digital societies — inquiry draft" },
+  "design-tech": { source: "Google Classroom", title: "Design tech — design brief" },
+  film: { source: "ManageBac", title: "Film — textual analysis" },
+  dance: { source: "ManageBac", title: "Dance — composition task" },
+};
+
+export function quizAssignment(item: QuizItem) {
+  return (
+    COURSE_ASSIGNMENTS[item.course] ??
+    COURSE_ASSIGNMENTS[item.subjectId] ?? {
+      source: "ManageBac" as const,
+      title: `${item.topic} class task`,
+    }
+  );
+}
+
 export function quizItemCaption(item: QuizItem, subjectIds: string[]) {
   const match = subjectIds
     .map((id) => getIbSubject(id))
@@ -25,10 +71,13 @@ export function quizItemCaption(item: QuizItem, subjectIds: string[]) {
   const name = match?.label ?? catalog?.label ?? item.topic;
   const level =
     match?.level ?? (item.levels.length === 1 ? item.levels[0] : null);
+  const assignment = quizAssignment(item);
   return {
     name,
     topic: item.topic,
     level,
+    source: assignment.source,
+    assignment: assignment.title,
   };
 }
 
