@@ -83,7 +83,7 @@ export const MOCK_TASKS = [
   },
 ] as const;
 
-export type TaskId = (typeof MOCK_TASKS)[number]["id"];
+export type TaskId = string;
 
 export const SUBJECTS = [
   { id: "biology", label: "Biology HL" },
