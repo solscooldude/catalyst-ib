@@ -23,3 +23,25 @@ export function catchSparkToken() {
   }));
   return { ok: true as const, remaining: 2 - used };
 }
+
+export function awardDodgeBonus() {
+  if (typeof window === "undefined") {
+    return { ok: false as const, reason: "Unavailable." };
+  }
+  const today = dayKey();
+  const account = sessionAccountId() ?? "guest";
+  const key = `catalyst-v1:dodge:${account}:${today}`;
+  const used = Number(window.localStorage.getItem(key) ?? "0");
+  if (used >= 2) {
+    return { ok: false as const, reason: "Dodge bonus already claimed today." };
+  }
+  window.localStorage.setItem(key, String(used + 1));
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens + 1,
+    careActions: current.careActions + 1,
+    spriteHatched: true,
+    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
+  }));
+  return { ok: true as const, remaining: 1 - used };
+}

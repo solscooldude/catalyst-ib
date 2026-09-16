@@ -1,6 +1,6 @@
 import { getSnapshot } from "@/lib/store-core";
 
-export type SfxKind = "boop" | "hatch" | "unlock" | "catch";
+export type SfxKind = "boop" | "hatch" | "unlock" | "catch" | "hit";
 
 const TONES: Record<SfxKind, { freq: number; dur: number; type: OscillatorType }> =
   {
@@ -8,6 +8,7 @@ const TONES: Record<SfxKind, { freq: number; dur: number; type: OscillatorType }
     hatch: { freq: 380, dur: 0.18, type: "triangle" },
     unlock: { freq: 660, dur: 0.12, type: "sine" },
     catch: { freq: 740, dur: 0.08, type: "triangle" },
+    hit: { freq: 180, dur: 0.14, type: "sawtooth" },
   };
 
 let ctx: AudioContext | null = null;
