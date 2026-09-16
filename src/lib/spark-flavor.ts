@@ -215,7 +215,7 @@ export function sparkHintFromTask(taskId?: TaskId | null): string | undefined {
 export function sparkFlavorFromTask(taskId?: TaskId | null): SparkFlavor {
   if (!taskId) return "generic";
   return sparkFlavorFromContext({
-    subjectId: TASK_SUBJECT[taskId],
+    subjectId: TASK_SUBJECT[taskId] ?? "other",
     text: sparkHintFromTask(taskId),
   });
 }

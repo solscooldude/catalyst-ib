@@ -1,5 +1,6 @@
 import { SUBJECTS } from "@/lib/constants";
 import { getIbSubject, type IbLevel, type IbSubject } from "@/lib/ib";
+import { sourceLabel, type SchoolTask } from "@/lib/school-tasks";
 import { QUIZ_BANK_A, type QuizItem } from "@/lib/quiz-questions-a";
 import { QUIZ_BANK_B } from "@/lib/quiz-questions-b";
 
@@ -63,7 +64,11 @@ export function quizAssignment(item: QuizItem) {
   );
 }
 
-export function quizItemCaption(item: QuizItem, subjectIds: string[]) {
+export function quizItemCaption(
+  item: QuizItem,
+  subjectIds: string[],
+  schoolTasks: SchoolTask[] = [],
+) {
   const match = subjectIds
     .map((id) => getIbSubject(id))
     .find((row) => row && quizCourseKey(row) === item.course);
@@ -71,13 +76,20 @@ export function quizItemCaption(item: QuizItem, subjectIds: string[]) {
   const name = match?.label ?? catalog?.label ?? item.topic;
   const level =
     match?.level ?? (item.levels.length === 1 ? item.levels[0] : null);
+  const live = schoolTasks.find(
+    (task) =>
+      !task.done &&
+      (task.subjectId === item.subjectId ||
+        task.subject.toLowerCase().includes(item.topic.toLowerCase()) ||
+        task.title.toLowerCase().includes(item.topic.toLowerCase().split(" ")[0] ?? "")),
+  );
   const assignment = quizAssignment(item);
   return {
     name,
     topic: item.topic,
     level,
-    source: assignment.source,
-    assignment: assignment.title,
+    source: live ? sourceLabel(live.source) : assignment.source,
+    assignment: live ? live.title : assignment.title,
   };
 }
 
@@ -96,8 +108,12 @@ function matchesBucket(item: QuizItem, key: string, level: IbLevel | "core") {
   return item.levels.includes(level);
 }
 
-export function pickQuiz(subjectIds: string[], count = QUIZ_LENGTH): QuizItem[] {
-  const selected = subjectIds
+export function pickQuiz(
+  subjectIds: string[],
+  count = QUIZ_LENGTH,
+  extraSubjectIds: string[] = [],
+): QuizItem[] {
+  const selected = [...new Set([...subjectIds, ...extraSubjectIds])]
     .map((id) => getIbSubject(id))
     .filter((row): row is IbSubject => Boolean(row));
 
