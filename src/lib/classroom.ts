@@ -1,4 +1,8 @@
-import { inferSubjectId, type SchoolTask } from "@/lib/school-tasks";
+import {
+  inferSubjectId,
+  subjectLabel,
+  type SchoolTask,
+} from "@/lib/school-tasks";
 
 export const SAMPLE_CLASSROOM_TASKS: SchoolTask[] = [
   {
@@ -55,7 +59,8 @@ export function classroomWorkToTasks(
     return {
       id: item.id.startsWith("cls-") ? item.id : `cls-${item.id}`.slice(0, 64),
       title: title.slice(0, 120),
-      subject: item.courseName?.slice(0, 48) || inferSubjectId(title),
+      subject:
+        item.courseName?.slice(0, 48) || subjectLabel(inferSubjectId(title)),
       subjectId: inferSubjectId(`${item.courseName ?? ""} ${title}`),
       due,
       detail: (item.description || "Synced from Google Classroom.").slice(0, 200),
