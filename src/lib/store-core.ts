@@ -39,7 +39,6 @@ import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-g
 import { normalizeFriendCode, normalizeFriends, type Friend } from "@/lib/friends";
 import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
 import {
-  mockTasksAsSchool,
   normalizeSchoolTasks,
   type SchoolTask,
 } from "@/lib/school-tasks";
@@ -191,7 +190,7 @@ export function createDefaultState(): CatalystState {
     demoMode: true,
     tokens: 0,
     tasks: defaultTasks.map((task) => ({ ...task })),
-    schoolTasks: mockTasksAsSchool(),
+    schoolTasks: [],
     session: null,
     unlocks: [],
     logs: [],
