@@ -1,6 +1,11 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { OptionHelp } from "@/components/option-help";
+import {
+  CLASSROOM_HELP,
+  MANAGEBAC_HELP,
+} from "@/lib/integration-help";
 import type { SchoolProvider } from "@/lib/school-provider";
 import { providerLabel } from "@/lib/school-provider";
 import { cn } from "@/lib/utils";
@@ -16,30 +21,42 @@ export function SchoolProviderPicker({
     <div className="grid gap-3 sm:grid-cols-2">
       {(["managebac", "classroom"] as const).map((id) => {
         const selected = value === id;
+        const help = id === "classroom" ? CLASSROOM_HELP : MANAGEBAC_HELP;
         return (
-          <button
+          <div
             key={id}
-            type="button"
-            onClick={() => onPick(id)}
             className={cn(
-              "rounded-2xl bg-zinc-50 p-4 text-left ring-1 transition-colors dark:bg-zinc-900",
+              "rounded-2xl bg-zinc-50 p-4 ring-1 transition-colors dark:bg-zinc-900",
               selected
                 ? "ring-primary/50"
                 : "ring-transparent hover:ring-primary/20",
             )}
           >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-base text-foreground">
-                {providerLabel(id)}
-              </span>
-              {selected ? <Check className="size-4 text-primary" /> : null}
+            <div className="flex items-start justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => onPick(id)}
+                className="min-w-0 flex-1 text-left"
+              >
+                <span className="text-base text-foreground">
+                  {providerLabel(id)}
+                </span>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {id === "classroom"
+                    ? "Personal Google. Live pull when OAuth keys are set."
+                    : "No student OAuth. Scan, ICS, or add by hand — no scrape."}
+                </p>
+              </button>
+              <div className="flex items-center gap-2">
+                <OptionHelp title={help.title}>
+                  <p>{help.body}</p>
+                </OptionHelp>
+                {selected ? (
+                  <Check className="size-4 text-primary" aria-hidden />
+                ) : null}
+              </div>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {id === "classroom"
-                ? "Personal Google. Live pull when OAuth keys are set."
-                : "No student OAuth. Scan, ICS, or add by hand — no scrape."}
-            </p>
-          </button>
+          </div>
         );
       })}
     </div>

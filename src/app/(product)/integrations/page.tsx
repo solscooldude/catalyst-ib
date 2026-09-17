@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DemoBadge } from "@/components/demo-badge";
+import { OptionHelp } from "@/components/option-help";
 import { SchoolProviderPicker } from "@/components/school-provider-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
 import { ROUTES } from "@/lib/routes";
+import {
+  CLASSROOM_HELP,
+  MANAGEBAC_ICS_HELP,
+  MANAGEBAC_ICS_TIP,
+  MANAGEBAC_PASTE_HELP,
+  MANAGEBAC_SCAN_HELP,
+} from "@/lib/integration-help";
 import { sourceLabel, type SchoolTask } from "@/lib/school-tasks";
 import { providerLabel } from "@/lib/school-provider";
 import {
@@ -278,7 +286,12 @@ export default function IntegrationsPage() {
         <section className="flux-card space-y-4 px-6 py-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-lg text-foreground">Google Classroom</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg text-foreground">Google Classroom</h2>
+                <OptionHelp title={CLASSROOM_HELP.title}>
+                  <p>{CLASSROOM_HELP.body}</p>
+                </OptionHelp>
+              </div>
               <p className="mt-1 text-sm text-muted-foreground">
                 Personal Google. Live pull needs a Google Cloud OAuth client
                 with Classroom coursework read-only. The helper can check
@@ -378,7 +391,12 @@ export default function IntegrationsPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mb-scan">AI scan — screenshot, PDF, ICS, export</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="mb-scan">AI scan — screenshot, PDF, ICS, export</Label>
+              <OptionHelp title={MANAGEBAC_SCAN_HELP.title}>
+                <p>{MANAGEBAC_SCAN_HELP.body}</p>
+              </OptionHelp>
+            </div>
             <Input
               id="mb-scan"
               type="file"
@@ -407,7 +425,13 @@ export default function IntegrationsPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="mb-ics">Calendar / ICS URL</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="mb-ics">Calendar / ICS URL</Label>
+              <OptionHelp title={MANAGEBAC_ICS_HELP.title}>
+                <p>{MANAGEBAC_ICS_HELP.body}</p>
+                <p>{MANAGEBAC_ICS_TIP}</p>
+              </OptionHelp>
+            </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Input
                 id="mb-ics"
@@ -426,9 +450,15 @@ export default function IntegrationsPage() {
                 Fetch calendar
               </Button>
             </div>
+            <p className="text-xs text-muted-foreground">{MANAGEBAC_ICS_TIP}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="mb-paste">Paste tasks</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="mb-paste">Paste tasks</Label>
+              <OptionHelp title={MANAGEBAC_PASTE_HELP.title}>
+                <p>{MANAGEBAC_PASTE_HELP.body}</p>
+              </OptionHelp>
+            </div>
             <textarea
               id="mb-paste"
               value={paste}
@@ -452,7 +482,12 @@ export default function IntegrationsPage() {
           </div>
 
           <div className="rounded-3xl bg-zinc-50 p-4 dark:bg-zinc-900">
-            <h3 className="text-sm font-medium text-foreground">Add by hand</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-medium text-foreground">Add by hand</h3>
+              <OptionHelp title={MANAGEBAC_PASTE_HELP.title}>
+                <p>{MANAGEBAC_PASTE_HELP.body}</p>
+              </OptionHelp>
+            </div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="manual-title">Title</Label>
