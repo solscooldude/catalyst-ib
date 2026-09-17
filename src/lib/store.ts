@@ -26,7 +26,6 @@ import {
   yesterdayKey,
 } from "@/lib/care";
 import {
-  COMPLETION_BONUS,
   DEMO_TIME_COMPRESS_MS,
   DEMO_TOKEN_BLOCK_MS,
   DEMO_TOKENS_PER_BLOCK,
@@ -112,18 +111,7 @@ export function completeSetup(nemeses: NemesisId[]) {
       ...current,
       nemeses: next,
       schedule,
-      schoolTasks:
-        current.schoolTasks.length > 0
-          ? current.schoolTasks
-          : mockTasksAsSchool([]),
-      manageBacConnected:
-        current.schoolProvider === "classroom"
-          ? current.manageBacConnected
-          : true,
-      classroomConnected:
-        current.schoolProvider === "managebac"
-          ? current.classroomConnected
-          : current.classroomConnected || current.schoolProvider === "classroom",
+      schoolTasks: current.schoolTasks,
       setupComplete: true,
     };
   });
@@ -171,7 +159,7 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     kind: "verified",
     taskId: input.taskId,
     subjectId: school?.subjectId ?? TASK_SUBJECT[input.taskId] ?? "other",
-    title: task?.title ?? "Official task",
+    title: task?.title ?? "Focus task",
     goal: input.goal.trim(),
     plannedMinutes: null,
     demoMode: getSnapshot().demoMode,
@@ -344,9 +332,6 @@ export function completeSession(tokensEarned?: number) {
   if (!session) {
     return { ok: false as const, reason: "No session to complete." };
   }
-  if (session.kind === "verified" && !session.taskMarkedDone) {
-    return { ok: false as const, reason: "Mark the ManageBac task done first." };
-  }
   const startedAt = session.focusStartedAt ?? session.lockedAt;
   const elapsed = sessionElapsedMs(session);
   const computed = tokensFromElapsed(elapsed, session.demoMode);
@@ -355,8 +340,8 @@ export function completeSession(tokensEarned?: number) {
     tokensEarned ?? Math.max(session.timeTokens ?? 0, computed),
   );
   const leftover = Math.max(0, timeTokens - (session.timeTokens ?? 0));
-  const completionTokens = session.kind === "verified" ? COMPLETION_BONUS : 0;
-  const totalTokens = timeTokens + completionTokens;
+  const completionTokens = 0;
+  const totalTokens = timeTokens;
   const endedAt = Date.now();
   const subjectId = session.subjectId;
   const subjectLabel =
@@ -896,16 +881,25 @@ export function addManualSchoolTask(input: {
     title: title.slice(0, 120),
     subject: subject.slice(0, 48),
     subjectId: inferSubjectId(`${subject} ${title}`),
-    due: (input.due ?? "Soon").trim().slice(0, 32) || "Soon",
+    due: (input.due ?? "").trim().slice(0, 32),
     detail: (input.detail ?? "Added by hand.").trim().slice(0, 200),
-    source: getSnapshot().schoolProvider === "classroom" ? "classroom" : "managebac",
+    source: "manual",
     done: false,
   };
-  return importSchoolTasks([task], {
-    schoolProvider: getSnapshot().schoolProvider ?? "managebac",
-    manageBacConnected: getSnapshot().schoolProvider !== "classroom",
-    manageBacMode: "manual",
-  });
+  return importSchoolTasks([task]);
+}
+
+export function markSchoolTaskDone(taskId: string, done: boolean) {
+  setState((current) => ({
+    ...current,
+    schoolTasks: current.schoolTasks.map((task) =>
+      task.id === taskId ? { ...task, done } : task,
+    ),
+    tasks: current.tasks.map((task) =>
+      task.id === taskId ? { ...task, done } : task,
+    ),
+  }));
+  return { ok: true as const };
 }
 
 export function markSchoolTaskSubmitted(taskId: string, submitted: boolean) {
