@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
+import { ManualTaskForm } from "@/components/manual-task-form";
 import { StudyStartForm } from "@/components/study-start-form";
 import { SelectedTaskChip } from "@/components/task-option";
 import { SchoolTaskPick } from "@/components/school-task-pick";
@@ -16,7 +17,6 @@ import type { TaskId } from "@/lib/constants";
 import { studySubjectOptions } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { groupSchoolTasksBySubject } from "@/lib/school-tasks";
-import { providerLabel } from "@/lib/school-provider";
 import { PageFrame } from "@/components/page-frame";
 import { UnlockPanel } from "@/components/unlock-panel";
 import {
@@ -27,6 +27,11 @@ import {
   startSession,
   useCatalyst,
 } from "@/lib/store";
+
+function taskDetail(task: { subject: string; due: string }) {
+  const due = task.due ? `due ${task.due}` : "no due date";
+  return task.subject ? `${task.subject} · ${due}` : due;
+}
 
 export default function AppHomePage() {
   const router = useRouter();
@@ -98,53 +103,61 @@ export default function AppHomePage() {
         <div className="mt-6">
           <SelectedTaskChip
             title={selectedTask?.title}
-            detail={
-              selectedTask
-                ? `${selectedTask.subject} · due ${selectedTask.due}`
-                : undefined
-            }
-            empty="Pick a school task."
+            detail={selectedTask ? taskDetail(selectedTask) : undefined}
+            empty="Pick a task, or start a study block below."
           />
         </div>
 
+        <div className="mt-6 rounded-3xl bg-zinc-50 p-4 dark:bg-zinc-900">
+          <h2 className="text-sm font-medium text-foreground">Add a task</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Title is enough. Subject and due date are optional. Checking a task
+            done is a checklist only — tokens come from focus time.
+          </p>
+          <div className="mt-4">
+            <ManualTaskForm />
+          </div>
+        </div>
+
         <div className="mt-6 space-y-7">
-          {sections.map((section) => (
-            <section key={section.key}>
-              <h2 className="text-sm font-medium text-foreground">
-                {section.label}
-              </h2>
-              {section.tasks.length === 0 ? (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  No school tasks in this subject yet.
-                </p>
-              ) : (
-                <div className="mt-3 space-y-4">
-                  {section.tasks.map((task) => (
-                    <SchoolTaskPick
-                      key={task.id}
-                      task={task}
-                      selected={taskId === task.id}
-                      onSelect={() => setTaskId(task.id)}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          ))}
+          {state.schoolTasks.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No tasks yet. Add one above, or start a study block by subject.
+            </p>
+          ) : (
+            sections.map((section) => (
+              <section key={section.key}>
+                <h2 className="text-sm font-medium text-foreground">
+                  {section.label}
+                </h2>
+                {section.tasks.length === 0 ? (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    No tasks in this subject yet.
+                  </p>
+                ) : (
+                  <div className="mt-3 space-y-4">
+                    {section.tasks.map((task) => (
+                      <SchoolTaskPick
+                        key={task.id}
+                        task={task}
+                        selected={taskId === task.id}
+                        onSelect={() => setTaskId(task.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            ))
+          )}
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          <Link href={ROUTES.integrations} className="text-primary hover:underline">
-            {state.schoolProvider
-              ? `Manage ${providerLabel(state.schoolProvider)}`
-              : "Choose ManageBac or Classroom"}
-          </Link>
-          {" · "}
-          school sites stay allowed during a block.
+          Tokens come from focused time on this tab. Marking a task done does
+          not pay extra.
         </p>
 
-        {openTasks.length === 0 ? (
+        {state.schoolTasks.length > 0 && openTasks.length === 0 ? (
           <p className="mt-6 text-sm text-muted-foreground">
-            All school tasks are done.
+            All listed tasks are done. Add another, or start a study block.
           </p>
         ) : null}
       </div>
@@ -154,11 +167,7 @@ export default function AppHomePage() {
         <div className="mt-4">
           <SelectedTaskChip
             title={selectedTask?.title}
-            detail={
-              selectedTask
-                ? `${selectedTask.subject} · due ${selectedTask.due}`
-                : undefined
-            }
+            detail={selectedTask ? taskDetail(selectedTask) : undefined}
           />
         </div>
 
@@ -204,6 +213,10 @@ export default function AppHomePage() {
         className="flux-card h-fit p-6 sm:p-8 lg:col-span-2"
       >
         <h2 className="text-lg text-foreground">Study block</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Subject only — no task list required. Same earn path: stay on this
+          tab.
+        </p>
         <div className="mt-5 max-w-xl">
           <StudyStartForm />
         </div>
