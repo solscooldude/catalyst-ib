@@ -179,7 +179,7 @@ export default function StatsPage() {
                 <div>
                   <p className="text-foreground">{log.subjectLabel}</p>
                   <p className="text-xs text-muted-foreground">
-                    {log.kind === "verified" ? "Official task" : "Study block"}
+                    {log.kind === "verified" ? "Focus task" : "Study block"}
                     {log.note ? ` · ${log.note}` : ""}
                   </p>
                 </div>
