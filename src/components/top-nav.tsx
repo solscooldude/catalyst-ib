@@ -32,7 +32,6 @@ const GROUPS = [
     items: [
       { href: ROUTES.focus, label: "Focus" },
       { href: ROUTES.setup, label: "Setup" },
-      { href: ROUTES.integrations, label: "Integrations" },
     ],
   },
   {
