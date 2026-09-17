@@ -111,7 +111,7 @@ export default function FriendsPage() {
 
   function beginRace() {
     if (!raceFriend || !raceTask) {
-      setNotice("Pick a friend and a school task.");
+      setNotice("Pick a friend and a task.");
       return;
     }
     const friend = state.friends.find((row) => row.code === raceFriend);
@@ -135,7 +135,7 @@ export default function FriendsPage() {
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">Friends</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Race the same school task. Manage codes. Rank by study minutes, then
+          Race the same task. Manage codes. Rank by study minutes, then
           tasks completed. Minigames live on My Sprite.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export default function FriendsPage() {
         <section id="races" className="flux-card scroll-mt-24 px-6 py-6">
           <h2 className="text-lg text-foreground">Task race</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Same school task. First to end the focus block wins.
+            Same task. First to end the focus block wins.
           </p>
           {state.friends.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
@@ -175,7 +175,7 @@ export default function FriendsPage() {
             </p>
           ) : focusTasks.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
-              No open school tasks. Load some on Integrations, then race.
+              No open tasks. Add one on Focus, then race.
             </p>
           ) : (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -196,7 +196,7 @@ export default function FriendsPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="race-task">School task</Label>
+                <Label htmlFor="race-task">Task</Label>
                 <select
                   id="race-task"
                   value={raceTask}
