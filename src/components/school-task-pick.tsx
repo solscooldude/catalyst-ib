@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { TaskOption } from "@/components/task-option";
 import { Button } from "@/components/ui/button";
 import { sourceLabel, type SchoolTask } from "@/lib/school-tasks";
-import { markSchoolTaskSubmitted } from "@/lib/store";
+import { markSchoolTaskDone } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function SchoolTaskPick({
@@ -23,8 +23,8 @@ export function SchoolTaskPick({
     <div className="space-y-2">
       <TaskOption
         title={task.title}
-        detail={`${sourceLabel(task.source)} · due ${task.due}${
-          task.submitted ? " · submitted" : ""
+        detail={`${sourceLabel(task.source)}${
+          task.due ? ` · due ${task.due}` : ""
         }${task.done ? " · done" : ""}`}
         selected={selected}
         disabled={task.done}
@@ -57,9 +57,9 @@ export function SchoolTaskPick({
               type="button"
               variant="outline"
               className="h-9 rounded-full px-4"
-              onClick={() => markSchoolTaskSubmitted(task.id, !task.submitted)}
+              onClick={() => markSchoolTaskDone(task.id, !task.done)}
             >
-              {task.submitted ? "Undo submitted" : "Mark submitted"}
+              {task.done ? "Undo done" : "Mark done"}
             </Button>
           </div>
         ) : null}
