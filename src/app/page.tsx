@@ -17,14 +17,14 @@ const STEPS = [
   },
   {
     n: "02",
-    title: "Work",
-    copy: "Stay on the laptop. Pick a ManageBac task or a study block and finish it there.",
+    title: "Focus",
+    copy: "Start a session on a task you added, or a subject-only study block. Stay on this tab.",
     icon: NotebookPen,
   },
   {
     n: "03",
     title: "Tokens",
-    copy: "This demo pays 10 tokens per 20 seconds when you End. The production target is 1 token per 2 minutes.",
+    copy: "This demo pays 10 tokens per 20 seconds while the tab is focused. The production target is 1 token per 2 minutes.",
     icon: "chip" as const,
   },
   {
@@ -47,15 +47,15 @@ export default function LandingPage() {
               For IB Diploma Programme students
             </p>
             <h1 className="mt-5 max-w-xl text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-              Apps pull you off ManageBac. You unlock them after the work is
-              done.
+              The phone pulls you off homework. Focus time is how you earn it
+              back.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
               TikTok, Instagram, and the rest sit next to the IA, TOK essay, or
-              EE. Catalyst greys the apps you name. You stay on the laptop
-              until a task is marked done or a study block finishes. Tokens
-              come from those minutes of real work. Then you buy a short
-              unlock.
+              EE. Catalyst greys the apps you name. You stay in a focus
+              session — a task you added, or a study block by subject. Tokens
+              come from those minutes. Then you buy a short unlock. A sprite
+              grows with the same study time.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
@@ -73,7 +73,8 @@ export default function LandingPage() {
               </Button>
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              Free demo. Phone lock and ManageBac are simulated.
+              Free demo. Phone lock is simulated. Tokens come from focus time,
+              not from ticking a task done.
             </p>
           </div>
           <PhoneLock compact nemeses={["tiktok", "instagram"]} />
@@ -91,15 +92,14 @@ export default function LandingPage() {
             </div>
             <div className="self-end space-y-4 text-base leading-7 text-muted-foreground">
               <p>
-                ManageBac work is on the laptop. The distracting apps are on
-                the phone beside it. A five-minute check becomes the block you
+                The work is on the laptop. The distracting apps are on the
+                phone beside it. A five-minute check becomes the block you
                 meant for TOK or the EE.
               </p>
               <p>
-                You get those apps back only after a session that actually ran.
-                Tokens come from focus time, plus a bonus when an official
-                ManageBac task is marked complete. No unlock without that
-                proof.
+                You get those apps back after a session that actually ran.
+                Tokens come from focused time on the Catalyst tab. Checking a
+                task off the list does not pay extra.
               </p>
             </div>
           </div>
@@ -211,17 +211,18 @@ export default function LandingPage() {
                 What the demo includes
               </p>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Laptop focus plus a ManageBac task marked done. The apps you
-                named as Tier 3 nemeses cost the most tokens to unlock.
+                Laptop focus, a sprite, and tokens from time on the Catalyst
+                tab. The apps you named as Tier 3 nemeses cost the most to
+                unlock.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-3">
                   <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                  Personal lock. No social sprints in v1.
+                  Add tasks by hand, or start a study block by subject.
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                  Mock ManageBac list: Bio IA, TOK, Math AA, Chem, EE.
+                  Tokens from focus time only. Done is a checklist.
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
@@ -238,7 +239,7 @@ export default function LandingPage() {
           <Wordmark />
           <p className="inline-flex items-center gap-2">
             <BrandC size={18} />
-            v1 demo for IB DP students. Phone lock and ManageBac are simulated.
+            v1 demo for IB DP students. Phone lock is simulated.
           </p>
         </div>
       </footer>
