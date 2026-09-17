@@ -6,13 +6,11 @@ import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
-import { TokenAmount } from "@/components/mint-chip";
 import { UnlockPanel } from "@/components/unlock-panel";
 import { Spark, type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  COMPLETION_BONUS,
   DEMO_TOKENS_PER_BLOCK,
   REAL_TOKEN_MS,
   SUBJECTS,
@@ -222,14 +220,10 @@ export default function FocusPage() {
             />
             <span>
               <span className="text-sm text-white">
-                Mark school task done
+                Mark task done
               </span>
               <span className="focus-board-copy mt-1 block text-xs">
-                Adds{" "}
-                <TokenAmount
-                  value={COMPLETION_BONUS}
-                  className="text-white"
-                />
+                Checklist only. Tokens come from focus time.
               </span>
             </span>
           </label>
