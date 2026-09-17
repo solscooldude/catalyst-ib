@@ -3,11 +3,11 @@ export const ACCOUNTS_KEY = "catalyst-v1-accounts";
 export const AUTH_SESSION_KEY = "catalyst-v1-session";
 
 export const ESSENTIAL_APPS = [
-  { id: "chrome", name: "Chrome", glyph: "CH", blurb: "Browser for ManageBac and research." },
+  { id: "chrome", name: "Chrome", glyph: "CH", blurb: "Browser for research." },
   { id: "drive", name: "Google Drive", glyph: "GD", blurb: "IA folders and shared docs." },
-  { id: "docs", name: "Docs / Classroom", glyph: "DC", blurb: "Google Docs and Classroom." },
+  { id: "docs", name: "Docs", glyph: "DC", blurb: "Google Docs and class files." },
   { id: "gmail", name: "Gmail", glyph: "GM", blurb: "Teachers, CAS, university mail." },
-  { id: "managebac", name: "ManageBac", glyph: "MB", blurb: "The work this lock is for." },
+  { id: "managebac", name: "School portal", glyph: "MB", blurb: "Homework sites stay available." },
   { id: "calculator", name: "Calculator", glyph: "CA", blurb: "Math AA and science papers." },
   { id: "phone", name: "Phone / SOS / Clock", glyph: "SOS", blurb: "Calls, emergency, and time." },
   { id: "spotify", name: "Spotify", glyph: "SP", blurb: "Study music stays available." },
@@ -43,6 +43,7 @@ export const NEMESIS_APPS = [
 ] as const;
 
 export type NemesisId = (typeof NEMESIS_APPS)[number]["id"];
+
 export type Tier3Id = NemesisId;
 
 export const MOCK_TASKS = [
@@ -158,7 +159,7 @@ export const UNLOCK_TIER_ROWS = [
     name: "School / essentials",
     intensity: "Always allowed",
     cost: 0,
-    blurb: "Chrome, Drive, Docs/Classroom, Gmail, ManageBac, Calculator, Phone/SOS/Clock, Spotify, ChatGPT/Gemini, Maps. Cost 0 — not sold in the shop.",
+    blurb: "Chrome, Drive, Docs, Gmail, school portal, Calculator, Phone/SOS/Clock, Spotify, ChatGPT/Gemini, Maps. Cost 0 — not sold in the shop.",
   },
   {
     id: "tier2",
