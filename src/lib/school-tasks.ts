@@ -6,7 +6,7 @@ import {
   type TaskId,
 } from "@/lib/constants";
 
-export type TaskSource = "managebac" | "classroom" | "demo";
+export type TaskSource = "managebac" | "classroom" | "demo" | "manual";
 
 export type SchoolTask = {
   id: TaskId;
@@ -21,12 +21,10 @@ export type SchoolTask = {
   submitted?: boolean;
 };
 
-const SOURCE: TaskSource[] = ["managebac", "classroom", "demo"];
+const SOURCE: TaskSource[] = ["managebac", "classroom", "demo", "manual"];
 
-export function sourceLabel(source: TaskSource) {
-  if (source === "classroom") return "Google Classroom";
-  if (source === "managebac") return "ManageBac";
-  return "Demo";
+export function sourceLabel(_source: TaskSource) {
+  return "Task";
 }
 
 export function subjectLabel(subjectId: SubjectId) {
@@ -139,7 +137,7 @@ export function normalizeSchoolTask(raw: unknown): SchoolTask | null {
     title,
     subject,
     subjectId,
-    due: String(item.due ?? "Soon").trim().slice(0, 32) || "Soon",
+    due: String(item.due ?? "").trim().slice(0, 32),
     detail: String(item.detail ?? "").trim().slice(0, 200),
     source,
     courseName: item.courseName?.trim().slice(0, 80) || undefined,
@@ -149,7 +147,7 @@ export function normalizeSchoolTask(raw: unknown): SchoolTask | null {
 }
 
 export function normalizeSchoolTasks(raw: unknown): SchoolTask[] {
-  if (!Array.isArray(raw)) return mockTasksAsSchool();
+  if (!Array.isArray(raw)) return [];
   const seen = new Set<string>();
   const next: SchoolTask[] = [];
   for (const row of raw) {
@@ -158,7 +156,7 @@ export function normalizeSchoolTasks(raw: unknown): SchoolTask[] {
     seen.add(task.id);
     next.push(task);
   }
-  return next.length ? next.slice(0, 80) : mockTasksAsSchool();
+  return next.slice(0, 80);
 }
 
 export function mergeSchoolTasks(

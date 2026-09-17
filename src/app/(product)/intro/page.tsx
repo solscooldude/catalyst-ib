@@ -22,7 +22,7 @@ const SLIDES = [
   {
     kicker: "The tool",
     title: "The tool",
-    body: "An AI-powered productivity app that rewards verified active work (not just absence from phone) with a gamified token economy.",
+    body: "A study-focus app. You sit a block, stay on the Catalyst tab, and earn tokens from that time — not from ticking a task done.",
   },
   {
     kicker: "Focus",
@@ -32,7 +32,7 @@ const SLIDES = [
   {
     kicker: "Sprite",
     title: "Sprite",
-    body: "Your sprite will hatch now with a task completed or by feeding it, keep it growing by studying.",
+    body: "Your sprite hatches on the first focus block or a snack, then grows when you study.",
   },
   {
     kicker: "Tokens",

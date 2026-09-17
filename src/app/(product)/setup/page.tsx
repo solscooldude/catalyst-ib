@@ -1,52 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Check, Link2 } from "lucide-react";
-import { DemoBadge } from "@/components/demo-badge";
+import { Check } from "lucide-react";
 import { LockHoursPicker } from "@/components/lock-hours-picker";
-import { SchoolProviderPicker } from "@/components/school-provider-picker";
 import { Button } from "@/components/ui/button";
-import { MOCK_TASKS, NEMESIS_APPS, type NemesisId } from "@/lib/constants";
+import { NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
-import { providerLabel } from "@/lib/school-provider";
 import {
   addLockWindow,
   completeSetup,
-  connectClassroomSample,
-  connectManageBacSample,
   saveNemeses,
-  setSchoolProvider,
   useCatalyst,
 } from "@/lib/store";
-import { sourceLabel } from "@/lib/school-tasks";
 import { cn } from "@/lib/utils";
 
 export default function SetupPage() {
   const router = useRouter();
   const state = useCatalyst();
   const [nemeses, setNemeses] = useState<NemesisId[]>(state.nemeses);
-  const schoolReady =
-    Boolean(state.schoolProvider) &&
-    (state.manageBacConnected ||
-      state.classroomConnected ||
-      state.schoolTasks.length > 0);
-  const [connected, setConnected] = useState(schoolReady);
-  const [connecting, setConnecting] = useState(false);
   const [setupError, setSetupError] = useState<string | null>(null);
-  const tasksReady = connected || schoolReady;
-  const listedTasks =
-    state.schoolTasks.length > 0 ? state.schoolTasks : MOCK_TASKS;
   const [days, setDays] = useState<number[]>(AFTER_SCHOOL_PRESET.days);
   const [start, setStart] = useState(AFTER_SCHOOL_PRESET.start);
   const [end, setEnd] = useState(AFTER_SCHOOL_PRESET.end);
   const [lockError, setLockError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (schoolReady) setConnected(true);
-  }, [schoolReady]);
 
   function toggle(id: NemesisId) {
     setNemeses((current) => {
@@ -56,16 +34,6 @@ export default function SetupPage() {
       saveNemeses(next);
       return next;
     });
-  }
-
-  function loadChosenSample() {
-    setConnecting(true);
-    window.setTimeout(() => {
-      if (state.schoolProvider === "classroom") connectClassroomSample();
-      else connectManageBacSample(state.manageBacSchoolUrl);
-      setConnected(true);
-      setConnecting(false);
-    }, 200);
   }
 
   function addWindow() {
@@ -88,10 +56,6 @@ export default function SetupPage() {
       setSetupError("Pick at least one Tier 3 app.");
       return;
     }
-    if (!tasksReady) {
-      setSetupError("Connect school tasks or load a sample first.");
-      return;
-    }
     if (state.schedule.length === 0) {
       setSetupError("Add lock hours first.");
       return;
@@ -102,7 +66,7 @@ export default function SetupPage() {
       return;
     }
     setSetupError(null);
-    router.replace(ROUTES.focus);
+    router.replace(ROUTES.home);
   }
 
   return (
@@ -114,7 +78,8 @@ export default function SetupPage() {
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
         Pick which apps sit in Tier 3 for the simulated lock. Spending still
         unlocks the whole tier for the time block — not one app. School tools
-        stay free. YouTube stays in Tier 2.
+        stay free. YouTube stays in Tier 2. Add homework tasks later on Focus
+        if you want a list to pick from.
       </p>
 
       <section className="mt-10">
@@ -148,79 +113,9 @@ export default function SetupPage() {
       </section>
 
       <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-base text-foreground">School source</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Pick ManageBac or Google Classroom — one at a time. You can switch
-              later on Integrations.
-            </p>
-          </div>
-          <DemoBadge>
-            {state.schoolProvider
-              ? providerLabel(state.schoolProvider)
-              : "Choose one"}
-          </DemoBadge>
-        </div>
-        <div className="mt-5">
-          <SchoolProviderPicker
-            value={state.schoolProvider}
-            onPick={(provider) => {
-              setSchoolProvider(provider);
-              setConnected(false);
-            }}
-          />
-        </div>
-        {state.schoolProvider ? (
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button
-              className="h-11 rounded-full px-5"
-              onClick={loadChosenSample}
-              disabled={connecting}
-            >
-              <Link2 className="size-4" />
-              {connecting
-                ? "Loading…"
-                : `Load ${providerLabel(state.schoolProvider)} sample`}
-            </Button>
-            <Button asChild variant="outline" className="h-11 rounded-full px-5">
-              <Link href={ROUTES.integrations}>
-                {state.schoolProvider === "classroom"
-                  ? "Connect Google / sync"
-                  : "Scan, ICS, or add by hand"}
-              </Link>
-            </Button>
-          </div>
-        ) : null}
-
-        {tasksReady ? (
-          <div className="mt-5 space-y-2">
-            {listedTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-start justify-between gap-3 rounded-2xl bg-background/60 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm text-foreground">{task.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {"source" in task ? `${sourceLabel(task.source)} · ` : ""}
-                    {task.subject} · due {task.due}
-                  </p>
-                </div>
-                <span className="font-mono text-[10px] tracking-wider text-primary uppercase">
-                  {"done" in task && task.done ? "Done" : "Open"}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : null}
-      </section>
-
-      <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
         <h2 className="text-base text-foreground">Lock hours</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Required. This is the main feature — quiet hours when Catalyst locks
-          the apps you picked.
+          Required. Quiet hours when Catalyst locks the apps you picked.
         </p>
         {state.schedule.length > 0 ? (
           <ul className="mt-4 space-y-2">
@@ -266,7 +161,7 @@ export default function SetupPage() {
       <div className="mt-8 flex justify-end">
         <Button
           className="h-11 rounded-full px-6"
-          disabled={nemeses.length === 0 || !tasksReady || state.schedule.length === 0}
+          disabled={nemeses.length === 0 || state.schedule.length === 0}
           onClick={finish}
         >
           {state.setupComplete ? "Save setup" : "Lock in setup"}
