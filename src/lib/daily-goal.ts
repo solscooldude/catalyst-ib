@@ -2,6 +2,7 @@ export const MIN_DAILY_GOAL_MINUTES = 60;
 export const MAX_DAILY_GOAL_MINUTES = 8 * 60;
 export const DEFAULT_DAILY_GOAL_MINUTES = 60;
 export const DAILY_GOAL_STEP_MINUTES = 30;
+export const DAILY_GOAL_REWARD = 8;
 
 export function clampDailyGoalMinutes(raw: unknown) {
   const n = Math.round(Number(raw));
