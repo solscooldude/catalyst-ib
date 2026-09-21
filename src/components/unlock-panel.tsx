@@ -5,13 +5,15 @@ import Link from "next/link";
 import { TokenAmount } from "@/components/mint-chip";
 import { ROUTES } from "@/lib/routes";
 import {
+  NEMESIS_SURCHARGE,
+  NEMESIS_UNLOCK_COST,
   TIER2_COST,
   TIER3_COST,
   UNLOCK_TIER_ROWS,
   unlockTierSpendId,
   type UnlockTier,
 } from "@/lib/constants";
-import { spendUnlockTier, useCatalyst } from "@/lib/store";
+import { spendUnlockNemesis, spendUnlockTier, useCatalyst } from "@/lib/store";
 import { formatUnlockLeft } from "@/lib/unlock-time";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +54,19 @@ export function UnlockPanel({
       result.stacked
         ? `Added time to ${result.unlock.label}.`
         : `Unlocked ${result.unlock.label}.`,
+    );
+  }
+
+  function buyNemesis() {
+    const result = spendUnlockNemesis();
+    if (!result.ok) {
+      setNotice(result.reason);
+      return;
+    }
+    setNotice(
+      result.stacked
+        ? `Added time to ${result.unlock.label}.`
+        : `Opened ${result.unlock.label} (+${NEMESIS_SURCHARGE}).`,
     );
   }
 
@@ -101,8 +116,8 @@ export function UnlockPanel({
             </div>
           )}
           <p className="mt-3 text-xs leading-5 text-muted-foreground">
-            School tools stay allowed during lock. Spend unlocks a whole tier
-            — not one app at a time.
+            School tools stay allowed during lock. Tier 3 opens every social
+            app. Opening a nemesis costs +{NEMESIS_SURCHARGE} on top of that.
           </p>
         </div>
       ) : (
@@ -113,7 +128,8 @@ export function UnlockPanel({
             </p>
           )}
           <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-            School / essentials stay allowed. Unlock a whole tier.
+            School / essentials stay allowed. Tier 3 is social. Nemesis is +
+            {NEMESIS_SURCHARGE}.
           </p>
           {active.length > 0 ? (
             <p className="mt-1 font-mono text-xs text-primary">
@@ -135,7 +151,9 @@ export function UnlockPanel({
             active={active}
             now={now}
             compact={compact}
+            hasNemeses={state.nemeses.length > 0}
             onBuy={buy}
+            onBuyNemesis={buyNemesis}
           />
           {notice ? <p className="text-sm text-primary">{notice}</p> : null}
           <Link
@@ -156,14 +174,18 @@ export function UnlockTierShop({
   now,
   compact = false,
   detailed = false,
+  hasNemeses = false,
   onBuy,
+  onBuyNemesis,
 }: {
   tokens: number;
   active: { id: string; catalogId: string; expiresAt: number; label?: string }[];
   now: number;
   compact?: boolean;
   detailed?: boolean;
+  hasNemeses?: boolean;
   onBuy: (tier: UnlockTier) => void;
+  onBuyNemesis?: () => void;
 }) {
   return (
     <div className={cn("grid gap-3", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
@@ -212,7 +234,7 @@ export function UnlockTierShop({
                   value={cost}
                   mark={left > 0 || affordable ? "cream" : "ink"}
                 />
-                / 10 min · whole tier
+                / 10 min · {tier === 2 ? "whole tier" : "all social"}
               </span>
             </p>
             {left > 0 ? (
@@ -239,7 +261,125 @@ export function UnlockTierShop({
           </button>
         );
       })}
+      {hasNemeses && onBuyNemesis ? (
+        <NemesisUnlockButton
+          tokens={tokens}
+          active={active}
+          now={now}
+          compact={compact}
+          detailed={detailed}
+          onBuy={onBuyNemesis}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function NemesisUnlockButton({
+  tokens,
+  active,
+  now,
+  compact,
+  detailed,
+  onBuy,
+}: {
+  tokens: number;
+  active: { id: string; catalogId: string; expiresAt: number; label?: string }[];
+  now: number;
+  compact: boolean;
+  detailed: boolean;
+  onBuy: () => void;
+}) {
+  const cost = NEMESIS_UNLOCK_COST;
+  const row = UNLOCK_TIER_ROWS.find((item) => item.id === "nemesis");
+  const current = active.find((unlock) => unlock.catalogId === "nemesis");
+  const left = current ? Math.max(0, current.expiresAt - now) : 0;
+  const affordable = tokens >= cost;
+  return (
+    <button
+      type="button"
+      disabled={!affordable}
+      onClick={onBuy}
+      className={cn(
+        "text-left transition-colors disabled:opacity-45",
+        compact
+          ? "flex min-h-14 items-center justify-between rounded-2xl px-4 py-3"
+          : "min-h-[8.5rem] rounded-[1.75rem] px-6 py-6 sm:col-span-2",
+        left > 0 || affordable
+          ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+          : "bg-card text-foreground ring-2 ring-border",
+      )}
+    >
+      <div className={cn(compact && "flex flex-1 items-center justify-between gap-3")}>
+        <p
+          className={cn(
+            "font-semibold tracking-tight",
+            compact ? "text-lg" : "text-2xl",
+          )}
+        >
+          {left > 0 ? "Add time · Open nemesis" : "Open nemesis"}
+        </p>
+        <p
+          className={cn(
+            compact ? "text-sm" : "mt-2 text-sm",
+            left > 0 || affordable
+              ? "text-primary-foreground/80"
+              : "text-zinc-500",
+          )}
+        >
+          <span className="inline-flex flex-wrap items-center gap-1.5">
+            <TokenAmount
+              value={cost}
+              mark={left > 0 || affordable ? "cream" : "ink"}
+            />
+            / 10 min
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                left > 0 || affordable
+                  ? "bg-black/15 text-primary-foreground"
+                  : "bg-primary/15 text-primary",
+              )}
+            >
+              +{NEMESIS_SURCHARGE} on Tier 3
+            </span>
+          </span>
+        </p>
+      </div>
+      {left > 0 ? (
+        <p
+          className={cn(
+            "font-heading font-mono tabular-nums",
+            compact ? "mt-1 text-xs" : "mt-3 text-sm",
+          )}
+        >
+          {formatUnlockLeft(left)} left
+        </p>
+      ) : detailed && row ? (
+        <p
+          className={cn(
+            "mt-3 text-xs",
+            left > 0 || affordable
+              ? "text-primary-foreground/75"
+              : "text-zinc-500",
+          )}
+        >
+          {row.blurb}
+        </p>
+      ) : (
+        <p
+          className={cn(
+            compact ? "sr-only" : "mt-3 text-xs",
+            left > 0 || affordable
+              ? "text-primary-foreground/75"
+              : "text-zinc-500",
+          )}
+        >
+          {TIER3_COST}+{NEMESIS_SURCHARGE} = {NEMESIS_UNLOCK_COST}. Your worst
+          apps stay locked until you pay the extra token.
+        </p>
+      )}
+    </button>
   );
 }
 

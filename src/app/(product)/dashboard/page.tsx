@@ -21,17 +21,32 @@ import {
   subjectStacks,
   todayStudyMs,
 } from "@/lib/stats";
-import { STREAK_REWARD_DAY, streakLoginPrize } from "@/lib/care";
+import { STREAK_REWARD_DAY, dayKey, streakLoginPrize } from "@/lib/care";
 import { displaySpriteName } from "@/lib/sprite-name";
 import { PageFrame } from "@/components/page-frame";
 import { WeekStoryShareDialog } from "@/components/week-story-share";
-import { sessionHint, setDailyGoalMinutes, useCatalyst } from "@/lib/store";
 import {
+  claimDailyGoalReward,
+  confirmDailyGoal,
+  sessionHint,
+  useCatalyst,
+} from "@/lib/store";
+import {
+  DAILY_GOAL_REWARD,
   DAILY_GOAL_STEP_MINUTES,
   MAX_DAILY_GOAL_MINUTES,
   MIN_DAILY_GOAL_MINUTES,
   formatDailyGoal,
 } from "@/lib/daily-goal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { TokenAmount } from "@/components/mint-chip";
 import { buildWeekStory } from "@/lib/week-story";
 import { cn } from "@/lib/utils";
 
@@ -46,11 +61,25 @@ export default function DashboardPage() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => new Date());
   const [storyNow] = useState(() => new Date());
+  const [goalDraft, setGoalDraft] = useState(state.dailyGoalMinutes);
+  const [goalOpen, setGoalOpen] = useState(false);
+  const [goalNotice, setGoalNotice] = useState<string | null>(null);
 
   useEffect(() => {
     const tick = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(tick);
   }, []);
+
+  useEffect(() => {
+    if (state.hydrated) setGoalDraft(state.dailyGoalMinutes);
+  }, [state.hydrated, state.dailyGoalMinutes]);
+
+  useEffect(() => {
+    const result = claimDailyGoalReward(now);
+    if (result.ok) {
+      setGoalNotice(`Study goal hit. +${result.tokens} tokens.`);
+    }
+  }, [now, state.logs, state.dailyGoalMinutes, state.dailyGoalClaimedDay]);
   const story = useMemo(
     () =>
       buildWeekStory(
@@ -187,13 +216,18 @@ export default function DashboardPage() {
         <section className="flux-card px-6 py-8">
           <p className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
             <Clock3 className="size-3.5 text-primary" />
-            Study time
+            Today&apos;s study goal
           </p>
           <p className="font-heading mt-3 text-4xl tracking-tight text-foreground">
             {formatClock(todayMs)}
           </p>
           <p className="mt-2 text-sm text-zinc-500">
-            Goal {formatDailyGoal(state.dailyGoalMinutes)}
+            {state.dailyGoalSetDay === dayKey(now)
+              ? `Locked in · ${formatDailyGoal(state.dailyGoalMinutes)}`
+              : `Aim ${formatDailyGoal(state.dailyGoalMinutes)}`}
+            {state.dailyGoalClaimedDay === dayKey(now)
+              ? " · reward claimed"
+              : ` · +${DAILY_GOAL_REWARD} tokens when you finish`}
           </p>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
             <div
@@ -201,39 +235,91 @@ export default function DashboardPage() {
               style={{ width: `${Math.max(todayMs > 0 ? 8 : 0, progress * 100)}%` }}
             />
           </div>
-          <div className="mt-4 flex items-center gap-2">
-            <button
-              type="button"
-              className="inline-flex size-9 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
-              aria-label="Lower daily goal"
-              disabled={state.dailyGoalMinutes <= MIN_DAILY_GOAL_MINUTES}
-              onClick={() =>
-                setDailyGoalMinutes(state.dailyGoalMinutes - DAILY_GOAL_STEP_MINUTES)
-              }
-            >
-              <Minus className="size-4" />
-            </button>
-            <span className="min-w-[4.5rem] text-center text-sm text-foreground">
-              {formatDailyGoal(state.dailyGoalMinutes)}
-            </span>
-            <button
-              type="button"
-              className="inline-flex size-9 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
-              aria-label="Raise daily goal"
-              disabled={state.dailyGoalMinutes >= MAX_DAILY_GOAL_MINUTES}
-              onClick={() =>
-                setDailyGoalMinutes(state.dailyGoalMinutes + DAILY_GOAL_STEP_MINUTES)
-              }
-            >
-              <Plus className="size-4" />
-            </button>
+          <div className="mt-5 rounded-2xl bg-zinc-50 px-4 py-4 dark:bg-zinc-900">
+            <p className="text-xs font-medium tracking-[0.14em] text-zinc-400 uppercase">
+              Set hours, then tick to lock
+            </p>
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex size-10 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
+                aria-label="Lower daily goal"
+                disabled={goalDraft <= MIN_DAILY_GOAL_MINUTES}
+                onClick={() =>
+                  setGoalDraft((current) => current - DAILY_GOAL_STEP_MINUTES)
+                }
+              >
+                <Minus className="size-4" />
+              </button>
+              <span className="min-w-[5.5rem] text-center text-base font-medium text-foreground">
+                {formatDailyGoal(goalDraft)}
+              </span>
+              <button
+                type="button"
+                className="inline-flex size-10 items-center justify-center rounded-full ring-1 ring-border text-foreground disabled:opacity-40"
+                aria-label="Raise daily goal"
+                disabled={goalDraft >= MAX_DAILY_GOAL_MINUTES}
+                onClick={() =>
+                  setGoalDraft((current) => current + DAILY_GOAL_STEP_MINUTES)
+                }
+              >
+                <Plus className="size-4" />
+              </button>
+              <button
+                type="button"
+                className="ml-auto inline-flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+                aria-label="Confirm study goal"
+                onClick={() => setGoalOpen(true)}
+              >
+                <Check className="size-5" strokeWidth={3} />
+              </button>
+            </div>
           </div>
+          {goalNotice ? (
+            <p className="mt-3 text-sm text-primary">{goalNotice}</p>
+          ) : null}
           <Button
             asChild
             className="mt-5 h-11 w-full rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-none hover:bg-primary/85"
           >
             <Link href={continueHref}>{continueLabel}</Link>
           </Button>
+          <Dialog open={goalOpen} onOpenChange={setGoalOpen}>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Lock in today&apos;s study hours?</DialogTitle>
+                <DialogDescription>
+                  You chose {formatDailyGoal(goalDraft)}. Finish that focus time
+                  today and Catalyst pays{" "}
+                  <span className="inline-flex translate-y-0.5 items-center">
+                    <TokenAmount value={DAILY_GOAL_REWARD} />
+                  </span>
+                  .
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  className="h-10 rounded-full"
+                  onClick={() => setGoalOpen(false)}
+                >
+                  Back
+                </Button>
+                <Button
+                  className="h-10 rounded-full"
+                  onClick={() => {
+                    const result = confirmDailyGoal(goalDraft, now);
+                    setGoalOpen(false);
+                    setGoalNotice(
+                      `Locked in ${formatDailyGoal(result.minutes)}. +${result.reward} tokens when you finish.`,
+                    );
+                  }}
+                >
+                  Confirm {formatDailyGoal(goalDraft)}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </section>
       </div>
 
