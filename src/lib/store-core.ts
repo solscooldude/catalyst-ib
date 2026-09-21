@@ -27,6 +27,7 @@ import {
   getUnlockItem,
   isEssentialAppId,
   isNemesisId,
+  isNemesisOnlyId,
   isUnlockCatalogId,
   isUnlockSpendId,
   isUnlockTierSpendId,
@@ -149,6 +150,8 @@ export type CatalystState = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   dailyGoalMinutes: number;
+  dailyGoalSetDay: string | null;
+  dailyGoalClaimedDay: string | null;
   spriteHatched: boolean;
   careStage:
     | "egg"
@@ -212,6 +215,8 @@ export function createDefaultState(): CatalystState {
     spriteRenameCount: 0,
     spriteAsleep: false,
     dailyGoalMinutes: DEFAULT_DAILY_GOAL_MINUTES,
+    dailyGoalSetDay: null,
+    dailyGoalClaimedDay: null,
     spriteHatched: false,
     careStage: "egg",
     careActions: 0,
@@ -310,7 +315,7 @@ type RawUnlock = {
 
 export function normalizeUnlocks(
   unlocks: RawUnlock[] | Unlock[] | undefined,
-  nemeses: readonly NemesisId[] = [],
+  _nemeses: readonly NemesisId[] = [],
   now = Date.now(),
 ): Unlock[] {
   const migrated: Unlock[] = [];
@@ -318,17 +323,14 @@ export function normalizeUnlocks(
     const catalogId = unlock.catalogId;
     if (!catalogId || catalogId === "notes") continue;
     if (catalogId === "nemesis") {
-      for (const nemesisId of nemeses) {
-        const item = getUnlockItem(nemesisId);
-        migrated.push({
-          id: `${unlock.id ?? "legacy"}-${nemesisId}`,
-          catalogId: nemesisId,
-          label: item?.name ?? nemesisId,
-          cost: unlock.cost ?? item?.cost ?? 0,
-          startedAt: unlock.startedAt ?? now,
-          expiresAt: unlock.expiresAt ?? now,
-        });
-      }
+      migrated.push({
+        id: unlock.id ?? "nemesis",
+        catalogId: "nemesis",
+        label: unlock.label ?? "Nemesis apps",
+        cost: unlock.cost ?? 0,
+        startedAt: unlock.startedAt ?? now,
+        expiresAt: unlock.expiresAt ?? now,
+      });
       continue;
     }
     if (isUnlockTierSpendId(catalogId)) {
@@ -447,6 +449,12 @@ export function hydrateStore(userId: string | null = null) {
       spriteRenameCount: parsed.spriteRenameCount ?? 0,
       spriteAsleep: Boolean(parsed.spriteAsleep),
       dailyGoalMinutes: clampDailyGoalMinutes(parsed.dailyGoalMinutes),
+      dailyGoalSetDay:
+        typeof parsed.dailyGoalSetDay === "string" ? parsed.dailyGoalSetDay : null,
+      dailyGoalClaimedDay:
+        typeof parsed.dailyGoalClaimedDay === "string"
+          ? parsed.dailyGoalClaimedDay
+          : null,
       spriteHatched: Boolean(
         parsed.spriteHatched ||
           (parsed.logs?.length ?? 0) > 0 ||
@@ -565,8 +573,16 @@ export function isAppUnlocked(
   unlocks: Unlock[],
   appId: string,
   now = Date.now(),
+  nemeses: readonly NemesisId[] = state.nemeses,
 ) {
   if (isEssentialAppId(appId)) return true;
+  if (isNemesisId(appId) && nemeses.includes(appId)) {
+    return (
+      isUnlockActive(unlocks, "nemesis", now) ||
+      isUnlockActive(unlocks, appId, now)
+    );
+  }
+  if (isNemesisOnlyId(appId)) return true;
   if (!isUnlockCatalogId(appId)) return false;
   const item = getUnlockItem(appId);
   if (!item) return false;
