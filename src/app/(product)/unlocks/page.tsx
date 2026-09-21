@@ -15,13 +15,18 @@ import { readSessionRecap } from "@/lib/session-recap";
 import { PageFrame } from "@/components/page-frame";
 import { UnlockTierShop } from "@/components/unlock-panel";
 import {
+  spendUnlockNemesis,
   spendUnlockTier,
   useCatalyst,
 } from "@/lib/store";
 import {
   ESSENTIAL_APPS,
   NEMESIS_APPS,
+  NEMESIS_SURCHARGE,
+  NEMESIS_UNLOCK_COST,
   TIER2_APPS,
+  TIER3_APPS,
+  TIER3_COST,
   type UnlockTier,
 } from "@/lib/constants";
 
@@ -109,6 +114,19 @@ function UnlockInner() {
     );
   }
 
+  function buyNemesis() {
+    const result = spendUnlockNemesis();
+    if (!result.ok) {
+      setNotice(result.reason);
+      return;
+    }
+    setNotice(
+      result.stacked
+        ? `Added time to ${result.unlock.label}. One timer, stacked.`
+        : `Opened ${result.unlock.label} (+${NEMESIS_SURCHARGE}). Buy again to add more time.`,
+    );
+  }
+
   return (
     <PageFrame className="grid gap-6 space-y-0 lg:grid-cols-[1.05fr_0.95fr]">
       <div className="flux-card px-6 py-8 sm:px-8">
@@ -127,8 +145,10 @@ function UnlockInner() {
         </div>
 
         <p className="mt-6 text-sm leading-6 text-muted-foreground">
-          Buying unlocks a whole tier for the time block — not one app. Home
-          only shows Unlock Tier 2 and Unlock Tier 3.
+          Buying unlocks a whole tier for the time block — not one app. Tier 3
+          opens every social app. Opening a nemesis costs +{NEMESIS_SURCHARGE}{" "}
+          on top of the Tier 3 price ({TIER3_COST}+{NEMESIS_SURCHARGE} ={" "}
+          {NEMESIS_UNLOCK_COST}).
         </p>
 
         <div className="mt-5 space-y-3 text-sm">
@@ -143,9 +163,18 @@ function UnlockInner() {
             apps={TIER2_APPS}
           />
           <TierDescribe
-            title="Tier 3 includes"
-            note="15 tokens / 10 min for the whole tier. Setup picks which of these are yours."
-            apps={NEMESIS_APPS}
+            title="Tier 3 — social"
+            note="15 tokens / 10 min. Default-locked during quiet hours."
+            apps={TIER3_APPS}
+          />
+          <TierDescribe
+            title="Your nemeses"
+            note={`${NEMESIS_UNLOCK_COST} tokens / 10 min (+${NEMESIS_SURCHARGE} on Tier 3).`}
+            apps={
+              state.nemeses.length > 0
+                ? NEMESIS_APPS.filter((app) => state.nemeses.includes(app.id))
+                : [{ id: "none", name: "None picked yet — finish Setup" }]
+            }
           />
         </div>
 
@@ -154,7 +183,9 @@ function UnlockInner() {
             tokens={state.tokens}
             active={active}
             now={now}
+            hasNemeses={state.nemeses.length > 0}
             onBuy={buy}
+            onBuyNemesis={buyNemesis}
           />
         </div>
 

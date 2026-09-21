@@ -211,7 +211,7 @@ export default function ProfilePage() {
           id="username"
           value={username}
           onChange={(event) => setUsername(event.target.value)}
-          placeholder="sols"
+          placeholder="username"
           className="h-11 rounded-xl"
         />
       </div>
