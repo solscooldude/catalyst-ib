@@ -34,6 +34,7 @@ import {
   useCatalyst,
 } from "@/lib/store";
 import { nativeSelectClass } from "@/lib/select-class";
+import { rotateShopSection, shopRefreshCue } from "@/lib/shop-rotation";
 import { PageFrame } from "@/components/page-frame";
 import { cn } from "@/lib/utils";
 
@@ -207,7 +208,8 @@ export default function AppearancePage() {
             </div>
             <Group
               title="Clothes"
-              items={SPARK_GEAR}
+              cue={shopRefreshCue()}
+              items={rotateShopSection(SPARK_GEAR, "clothes", look.ownedGear)}
               owned={(id) => look.ownedGear.includes(id)}
               equipped={(id) => look.gear === id}
               previewing={(id) => preview.gear === id}
@@ -246,7 +248,12 @@ export default function AppearancePage() {
             </div>
             <Group
               title="Solid body"
-              items={SPARK_TINTS.filter((item) => item.kind === "solid")}
+              cue={shopRefreshCue()}
+              items={rotateShopSection(
+                SPARK_TINTS.filter((item) => item.kind === "solid"),
+                "colours",
+                look.ownedSparkTints,
+              )}
               owned={(id) => look.ownedSparkTints.includes(id)}
               equipped={(id) => look.sparkTint === id}
               previewing={(id) => preview.sparkTint === id}
@@ -269,7 +276,12 @@ export default function AppearancePage() {
             </div>
             <Group
               title="Gradient body"
-              items={SPARK_TINTS.filter((item) => item.kind === "gradient")}
+              cue={shopRefreshCue()}
+              items={rotateShopSection(
+                SPARK_TINTS.filter((item) => item.kind === "gradient"),
+                "gradients",
+                look.ownedSparkTints,
+              )}
               owned={(id) => look.ownedSparkTints.includes(id)}
               equipped={(id) => look.sparkTint === id}
               previewing={(id) => preview.sparkTint === id}
@@ -294,7 +306,8 @@ export default function AppearancePage() {
             </div>
             <Group
               title="Glow colour"
-              items={SPARK_AURAS}
+              cue={shopRefreshCue()}
+              items={rotateShopSection(SPARK_AURAS, "auras", look.ownedAuras)}
               owned={(id) => look.ownedAuras.includes(id)}
               equipped={(id) => look.aura === id}
               previewing={(id) => preview.aura === id}
@@ -326,8 +339,13 @@ export default function AppearancePage() {
             </div>
             <Group
               title="Motion"
-              items={SPARK_TRAILS.filter(
-                (item) => item.id !== "week" || look.ownedTrails.includes("week"),
+              cue={shopRefreshCue()}
+              items={rotateShopSection(
+                SPARK_TRAILS.filter(
+                  (item) => item.id !== "week" || look.ownedTrails.includes("week"),
+                ),
+                "trails",
+                look.ownedTrails,
               )}
               owned={(id) => look.ownedTrails.includes(id)}
               equipped={(id) => look.trail === id}
@@ -649,6 +667,7 @@ function Group<
   T extends { id: string; name: string; cost: number; blurb?: string },
 >({
   title,
+  cue,
   items,
   owned,
   equipped,
@@ -659,6 +678,7 @@ function Group<
   equipLabel = "Wear",
 }: {
   title: string;
+  cue?: string;
   items: readonly T[];
   owned: (id: T["id"]) => boolean;
   equipped: (id: T["id"]) => boolean;
@@ -672,6 +692,7 @@ function Group<
   return (
     <div>
       <h3 className="text-sm text-muted-foreground">{title}</h3>
+      {cue ? <p className="mt-1 text-xs text-zinc-500">{cue}</p> : null}
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {items.map((item) => {
           const has = owned(item.id);
