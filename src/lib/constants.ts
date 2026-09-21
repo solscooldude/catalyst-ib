@@ -19,32 +19,39 @@ export type EssentialAppId = (typeof ESSENTIAL_APPS)[number]["id"];
 
 export const TIER2_COST = 10;
 export const TIER3_COST = 15;
+export const NEMESIS_SURCHARGE = 1;
+export const NEMESIS_UNLOCK_COST = TIER3_COST + NEMESIS_SURCHARGE;
 
 export const TIER2_APPS = [
-  { id: "whatsapp", name: "WhatsApp", glyph: "WA", blurb: "Group chats that wait ten minutes." },
   { id: "photos", name: "Photos", glyph: "PH", blurb: "Camera roll, not a spiral." },
   { id: "food", name: "Food delivery", glyph: "FD", blurb: "Uber Eats, Deliveroo, and the rest." },
   { id: "flightradar", name: "Flightradar24", glyph: "FR", blurb: "Planes as a study break." },
-  { id: "youtube", name: "YouTube", glyph: "YT", blurb: "Videos. Medium token cost." },
   { id: "messages", name: "Messages", glyph: "SMS", blurb: "iMessage and texts." },
   { id: "camera", name: "Camera", glyph: "CAM", blurb: "A photo, then back to the IA." },
 ] as const;
 
 export type Tier2Id = (typeof TIER2_APPS)[number]["id"];
 
-export const NEMESIS_APPS = [
+export const TIER3_APPS = [
   { id: "instagram", name: "Instagram", glyph: "IG", blurb: "Stories, then Reels, then your IA." },
   { id: "tiktok", name: "TikTok", glyph: "TT", blurb: "The For You page that ate TOK." },
   { id: "snapchat", name: "Snapchat", glyph: "SC", blurb: "Streaks vs. the EE deadline." },
   { id: "reddit", name: "Reddit", glyph: "RD", blurb: "A ‘quick check’ with no bottom." },
   { id: "x", name: "X", glyph: "X", blurb: "One quote-tweet becomes an hour." },
-  { id: "bereal", name: "BeReal", glyph: "BR", blurb: "The two-minute ping that isn’t." },
   { id: "discord", name: "Discord", glyph: "DS", blurb: "Servers that eat the TOK hour." },
 ] as const;
 
-export type NemesisId = (typeof NEMESIS_APPS)[number]["id"];
+export type Tier3Id = (typeof TIER3_APPS)[number]["id"];
 
-export type Tier3Id = NemesisId;
+export const NEMESIS_ONLY_APPS = [
+  { id: "youtube", name: "YouTube", glyph: "YT", blurb: "One video becomes the whole block." },
+  { id: "whatsapp", name: "WhatsApp", glyph: "WA", blurb: "Group chats that wait ten minutes." },
+] as const;
+
+export const NEMESIS_APPS = [...NEMESIS_ONLY_APPS, ...TIER3_APPS] as const;
+
+export type NemesisId = (typeof NEMESIS_APPS)[number]["id"];
+export type NemesisOnlyId = (typeof NEMESIS_ONLY_APPS)[number]["id"];
 
 export const MOCK_TASKS = [
   {
@@ -127,11 +134,18 @@ export const UNLOCK_CATALOG = [
     cost: TIER2_COST,
     minutes: 10,
   })),
-  ...NEMESIS_APPS.map((app) => ({
+  ...TIER3_APPS.map((app) => ({
     ...app,
     tier: 3 as const,
-    intensity: "Tier 3 · nemesis",
+    intensity: "Tier 3 · social",
     cost: TIER3_COST,
+    minutes: 10,
+  })),
+  ...NEMESIS_ONLY_APPS.map((app) => ({
+    ...app,
+    tier: 3 as const,
+    intensity: "Nemesis · +1",
+    cost: NEMESIS_UNLOCK_COST,
     minutes: 10,
   })),
 ] as const;
@@ -139,7 +153,7 @@ export const UNLOCK_CATALOG = [
 export type UnlockCatalogId = (typeof UNLOCK_CATALOG)[number]["id"];
 export type UnlockTier = 2 | 3;
 export type UnlockTierSpendId = "tier2" | "tier3";
-export type UnlockSpendId = UnlockCatalogId | UnlockTierSpendId;
+export type UnlockSpendId = UnlockCatalogId | UnlockTierSpendId | "nemesis";
 
 export function unlockTierSpendId(tier: UnlockTier): UnlockTierSpendId {
   return tier === 2 ? "tier2" : "tier3";
@@ -149,8 +163,12 @@ export function isUnlockTierSpendId(id: string): id is UnlockTierSpendId {
   return id === "tier2" || id === "tier3";
 }
 
+export function isNemesisSpendId(id: string): id is "nemesis" {
+  return id === "nemesis";
+}
+
 export function isUnlockSpendId(id: string): id is UnlockSpendId {
-  return isUnlockTierSpendId(id) || isUnlockCatalogId(id);
+  return isNemesisSpendId(id) || isUnlockTierSpendId(id) || isUnlockCatalogId(id);
 }
 
 export const UNLOCK_TIER_ROWS = [
@@ -166,14 +184,21 @@ export const UNLOCK_TIER_ROWS = [
     name: "Tier 2",
     intensity: "Medium",
     cost: TIER2_COST,
-    blurb: "10 tokens per 10 minutes for the whole tier. WhatsApp, Photos, food delivery, Flightradar24, YouTube, Messages, Camera.",
+    blurb: "10 tokens per 10 minutes for the whole tier. Photos, food delivery, Flightradar24, Messages, Camera.",
   },
   {
     id: "tier3",
-    name: "Tier 3 — nemesis set",
+    name: "Tier 3 — social",
     intensity: "High",
     cost: TIER3_COST,
-    blurb: "15 tokens per 10 minutes for the whole tier. Instagram, TikTok, Snapchat, Reddit, X, BeReal, Discord. Setup picks which of these are yours.",
+    blurb: "15 tokens per 10 minutes for every social app: Instagram, TikTok, Snapchat, Reddit, X, Discord. Nemesis picks stay locked until you pay the +1.",
+  },
+  {
+    id: "nemesis",
+    name: "Open nemesis",
+    intensity: "High · +1",
+    cost: NEMESIS_UNLOCK_COST,
+    blurb: "16 tokens per 10 minutes (+1 on top of Tier 3). Opens the worst apps you picked in Setup — YouTube, WhatsApp, or a social you marked as a nemesis.",
   },
 ] as const;
 
@@ -203,6 +228,14 @@ export function isUnlockCatalogId(id: string): id is UnlockCatalogId {
 
 export function isNemesisId(id: string): id is NemesisId {
   return NEMESIS_APPS.some((app) => app.id === id);
+}
+
+export function isTier3Id(id: string): id is Tier3Id {
+  return TIER3_APPS.some((app) => app.id === id);
+}
+
+export function isNemesisOnlyId(id: string): id is NemesisOnlyId {
+  return NEMESIS_ONLY_APPS.some((app) => app.id === id);
 }
 
 export function getUnlockItem(id: string) {
