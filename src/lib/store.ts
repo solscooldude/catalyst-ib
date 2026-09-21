@@ -34,6 +34,7 @@ import {
   REAL_TIME_COMPRESS_MS,
   REAL_TOKEN_MS,
   REAL_UNLOCK_MS,
+  NEMESIS_UNLOCK_COST,
   SUBJECTS,
   TASK_SUBJECT,
   UNLOCK_CATALOG,
@@ -71,7 +72,11 @@ import { SAMPLE_CLASSROOM_TASKS } from "@/lib/classroom";
 import { SAMPLE_MANAGEBAC_TASKS, parseManageBacImport } from "@/lib/managebac";
 import type { SchoolProvider } from "@/lib/school-provider";
 import { displaySpriteName, isDefaultSpriteName } from "@/lib/sprite-name";
-import { clampDailyGoalMinutes } from "@/lib/daily-goal";
+import {
+  clampDailyGoalMinutes,
+  DAILY_GOAL_REWARD,
+} from "@/lib/daily-goal";
+import { todayStudyMs } from "@/lib/stats";
 import {
   claimFriendCode,
   FRIEND_CODE_HINT,
@@ -99,7 +104,7 @@ export * from "@/lib/store-core";
 export function completeSetup(nemeses: NemesisId[]) {
   const next = [...new Set(nemeses.filter(isNemesisId))];
   if (next.length === 0) {
-    return { ok: false as const, reason: "Pick at least one Tier 3 app." };
+    return { ok: false as const, reason: "Pick at least one nemesis app." };
   }
   setState((current) => {
     const schedule =
@@ -247,6 +252,35 @@ export function setDailyGoalMinutes(minutes: number) {
       ? current
       : { ...current, dailyGoalMinutes: next },
   );
+}
+
+export function confirmDailyGoal(minutes: number, now = new Date()) {
+  const next = clampDailyGoalMinutes(minutes);
+  const today = dayKey(now);
+  setState((current) => ({
+    ...current,
+    dailyGoalMinutes: next,
+    dailyGoalSetDay: today,
+  }));
+  return { ok: true as const, minutes: next, reward: DAILY_GOAL_REWARD };
+}
+
+export function claimDailyGoalReward(now = new Date()) {
+  const current = getSnapshot();
+  const today = dayKey(now);
+  if (current.dailyGoalClaimedDay === today) {
+    return { ok: false as const, reason: "already" as const };
+  }
+  const goalMs = current.dailyGoalMinutes * 60 * 1000;
+  if (todayStudyMs(current.logs, now) < goalMs) {
+    return { ok: false as const, reason: "short" as const };
+  }
+  setState((state) => ({
+    ...state,
+    tokens: state.tokens + DAILY_GOAL_REWARD,
+    dailyGoalClaimedDay: today,
+  }));
+  return { ok: true as const, tokens: DAILY_GOAL_REWARD };
 }
 
 export function sessionElapsedMs(session: Session, now = Date.now()) {
@@ -645,6 +679,49 @@ export function spendUnlockTier(tier: UnlockTier) {
     id: existing?.id ?? crypto.randomUUID(),
     catalogId,
     label,
+    cost: (existing?.cost ?? 0) + cost,
+    startedAt: existing?.startedAt ?? now,
+    expiresAt: now + remaining + duration,
+  };
+
+  setState((current) => ({
+    ...current,
+    tokens: current.tokens - cost,
+    unlocks: [
+      ...coalesceUnlocks(current.unlocks, now).filter(
+        (row) => row.catalogId !== catalogId,
+      ),
+      unlock,
+    ],
+  }));
+
+  playSfx("unlock");
+  return { ok: true as const, unlock, stacked };
+}
+
+export function spendUnlockNemesis() {
+  const catalogId = "nemesis" as const;
+  const cost = NEMESIS_UNLOCK_COST;
+  const snapshot = getSnapshot();
+  if (snapshot.nemeses.length === 0) {
+    return { ok: false as const, reason: "Pick a nemesis in Setup first." };
+  }
+  if (snapshot.tokens < cost) {
+    return { ok: false as const, reason: "Not enough tokens yet." };
+  }
+
+  const duration = snapshot.demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  const now = Date.now();
+  const existing = coalesceUnlocks(snapshot.unlocks, now).find(
+    (unlock) => unlock.catalogId === catalogId,
+  );
+  const remaining = existing ? Math.max(0, existing.expiresAt - now) : 0;
+  const stacked = remaining > 0;
+
+  const unlock: Unlock = {
+    id: existing?.id ?? crypto.randomUUID(),
+    catalogId,
+    label: "Nemesis apps",
     cost: (existing?.cost ?? 0) + cost,
     startedAt: existing?.startedAt ?? now,
     expiresAt: now + remaining + duration,
