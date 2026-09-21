@@ -14,8 +14,10 @@ import {
 import {
   ESSENTIAL_APPS,
   NEMESIS_APPS,
+  NEMESIS_SURCHARGE,
   TIER2_APPS,
   TIER2_COST,
+  TIER3_APPS,
   TIER3_COST,
   formatNemesisList,
   type NemesisId,
@@ -67,14 +69,18 @@ export function PhoneLock({
   const tier2 = TIER2_APPS.map((app) => ({
     ...app,
     isNemesis: false,
-    open: !locked || isAppUnlocked(unlocks, app.id),
+    open: !locked || isAppUnlocked(unlocks, app.id, Date.now(), nemeses),
   }));
-  const tier3 = NEMESIS_APPS.map((app) => {
+  const extraNemeses = NEMESIS_APPS.filter(
+    (app) =>
+      nemeses.includes(app.id) && !TIER3_APPS.some((row) => row.id === app.id),
+  );
+  const tier3 = [...TIER3_APPS, ...extraNemeses].map((app) => {
     const isNemesis = nemeses.includes(app.id);
     return {
       ...app,
       isNemesis,
-      open: !locked || isAppUnlocked(unlocks, app.id),
+      open: !locked || isAppUnlocked(unlocks, app.id, Date.now(), nemeses),
     };
   });
 
@@ -153,7 +159,8 @@ export function PhoneLock({
             </div>
 
             <p className="mt-4 mb-2 text-[10px] tracking-[0.16em] text-zinc-600 uppercase">
-              Tier 3 — {TIER3_COST} tokens / 10 min
+              Tier 3 — {TIER3_COST} tokens / 10 min · nemesis +
+              {NEMESIS_SURCHARGE}
             </p>
             <div className="grid grid-cols-3 gap-2">
               {tier3.map((app) => (

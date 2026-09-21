@@ -53,7 +53,7 @@ export default function SetupPage() {
 
   function finish() {
     if (nemeses.length === 0) {
-      setSetupError("Pick at least one Tier 3 app.");
+      setSetupError("Pick at least one nemesis app.");
       return;
     }
     if (state.schedule.length === 0) {
@@ -73,18 +73,19 @@ export default function SetupPage() {
     <div className="mx-auto w-full max-w-2xl flux-card px-6 py-8 sm:px-10">
       <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">Setup</p>
       <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-        Your Tier 3 nemeses
+        Your nemesis apps
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        Pick which apps sit in Tier 3 for the simulated lock. Spending still
-        unlocks the whole tier for the time block — not one app. School tools
-        stay free. YouTube stays in Tier 2. Add homework tasks later on Focus
-        if you want a list to pick from.
+        Tier 3 already locks every social app during quiet hours. Pick the
+        worst ones — YouTube, WhatsApp, or a social that wrecks the block.
+        Opening those costs +1 token on top of the Tier 3 unlock. School tools
+        stay free. Add homework tasks later on Focus if you want a list to
+        pick from.
       </p>
 
       <section className="mt-10">
         <h2 className="text-sm font-medium text-foreground">
-          Multi-select your nemesis set
+          Multi-select your worst offenders
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {NEMESIS_APPS.map((app) => {
