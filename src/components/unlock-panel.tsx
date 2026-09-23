@@ -13,6 +13,10 @@ import {
   unlockTierSpendId,
   type UnlockTier,
 } from "@/lib/constants";
+import {
+  UNLOCK_MINUTES,
+  type UnlockMinutes,
+} from "@/lib/domain-policy";
 import { spendUnlockNemesis, spendUnlockTier, useCatalyst } from "@/lib/store";
 import { formatUnlockLeft } from "@/lib/unlock-time";
 import { cn } from "@/lib/utils";
@@ -30,6 +34,7 @@ export function UnlockPanel({
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
   const [open, setOpen] = useState(!collapsible);
+  const [minutes, setMinutes] = useState<UnlockMinutes>(10);
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
@@ -45,7 +50,7 @@ export function UnlockPanel({
   );
 
   function buy(tier: UnlockTier) {
-    const result = spendUnlockTier(tier);
+    const result = spendUnlockTier(tier, minutes);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -58,7 +63,7 @@ export function UnlockPanel({
   }
 
   function buyNemesis() {
-    const result = spendUnlockNemesis();
+    const result = spendUnlockNemesis(minutes);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -116,9 +121,11 @@ export function UnlockPanel({
             </div>
           )}
           <p className="mt-3 text-xs leading-5 text-muted-foreground">
-            School tools stay allowed during lock. Tier 3 opens every social
-            app. Opening a nemesis costs +{NEMESIS_SURCHARGE} on top of that.
+            School tools stay allowed during lock. The Chrome extension
+            enforces this on other tabs. Tier 3 opens every social app.
+            Opening a nemesis costs +{NEMESIS_SURCHARGE} on top of that.
           </p>
+          <DurationPicker minutes={minutes} onChange={setMinutes} />
         </div>
       ) : (
         <div>
@@ -128,9 +135,10 @@ export function UnlockPanel({
             </p>
           )}
           <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-            School / essentials stay allowed. Tier 3 is social. Nemesis is +
-            {NEMESIS_SURCHARGE}.
+            School sites stay allowed. The extension blocks distractors.
+            Nemesis is +{NEMESIS_SURCHARGE}.
           </p>
+          <DurationPicker minutes={minutes} onChange={setMinutes} compact />
           {active.length > 0 ? (
             <p className="mt-1 font-mono text-xs text-primary">
               {active
@@ -150,6 +158,7 @@ export function UnlockPanel({
             tokens={state.tokens}
             active={active}
             now={now}
+            minutes={minutes}
             compact={compact}
             hasNemeses={state.nemeses.length > 0}
             onBuy={buy}
@@ -172,6 +181,7 @@ export function UnlockTierShop({
   tokens,
   active,
   now,
+  minutes = 10,
   compact = false,
   detailed = false,
   hasNemeses = false,
@@ -181,17 +191,19 @@ export function UnlockTierShop({
   tokens: number;
   active: { id: string; catalogId: string; expiresAt: number; label?: string }[];
   now: number;
+  minutes?: UnlockMinutes;
   compact?: boolean;
   detailed?: boolean;
   hasNemeses?: boolean;
   onBuy: (tier: UnlockTier) => void;
   onBuyNemesis?: () => void;
 }) {
+  const blocks = Math.max(1, Math.round(minutes / 10));
   return (
     <div className={cn("grid gap-3", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
       {([2, 3] as const).map((tier) => {
         const spendId = unlockTierSpendId(tier);
-        const cost = tier === 2 ? TIER2_COST : TIER3_COST;
+        const cost = (tier === 2 ? TIER2_COST : TIER3_COST) * blocks;
         const row = UNLOCK_TIER_ROWS.find((item) => item.id === spendId);
         const current = active.find((unlock) => unlock.catalogId === spendId);
         const left = current ? Math.max(0, current.expiresAt - now) : 0;
@@ -234,7 +246,7 @@ export function UnlockTierShop({
                   value={cost}
                   mark={left > 0 || affordable ? "cream" : "ink"}
                 />
-                / 10 min · {tier === 2 ? "whole tier" : "all social"}
+                / {minutes} min · {tier === 2 ? "whole tier" : "all social"}
               </span>
             </p>
             {left > 0 ? (
@@ -266,6 +278,7 @@ export function UnlockTierShop({
           tokens={tokens}
           active={active}
           now={now}
+          minutes={minutes}
           compact={compact}
           detailed={detailed}
           onBuy={onBuyNemesis}
@@ -275,10 +288,41 @@ export function UnlockTierShop({
   );
 }
 
+export function DurationPicker({
+  minutes,
+  onChange,
+  compact = false,
+}: {
+  minutes: UnlockMinutes;
+  onChange: (value: UnlockMinutes) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div className={cn("flex flex-wrap gap-2", compact ? "mt-2" : "mt-4")}>
+      {UNLOCK_MINUTES.map((value) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => onChange(value)}
+          className={cn(
+            "h-9 rounded-full px-3 text-xs ring-1",
+            minutes === value
+              ? "bg-primary/15 text-foreground ring-primary/40"
+              : "text-muted-foreground ring-border",
+          )}
+        >
+          {value} min
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function NemesisUnlockButton({
   tokens,
   active,
   now,
+  minutes = 10,
   compact,
   detailed,
   onBuy,
@@ -286,11 +330,13 @@ function NemesisUnlockButton({
   tokens: number;
   active: { id: string; catalogId: string; expiresAt: number; label?: string }[];
   now: number;
+  minutes?: UnlockMinutes;
   compact: boolean;
   detailed: boolean;
   onBuy: () => void;
 }) {
-  const cost = NEMESIS_UNLOCK_COST;
+  const blocks = Math.max(1, Math.round(minutes / 10));
+  const cost = NEMESIS_UNLOCK_COST * blocks;
   const row = UNLOCK_TIER_ROWS.find((item) => item.id === "nemesis");
   const current = active.find((unlock) => unlock.catalogId === "nemesis");
   const left = current ? Math.max(0, current.expiresAt - now) : 0;
@@ -332,7 +378,7 @@ function NemesisUnlockButton({
               value={cost}
               mark={left > 0 || affordable ? "cream" : "ink"}
             />
-            / 10 min
+            / {minutes} min
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
