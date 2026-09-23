@@ -1,0 +1,5 @@
+{
+  "name": "catalyst-lock-extension",
+  "private": true,
+  "type": "module"
+}

@@ -7,7 +7,9 @@
     "build": "next build",
     "vercel-build": "node scripts/bootstrap-github.mjs && next build",
     "start": "next start --port 43127",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:policy": "node --test extension/policy.test.mjs",
+    "pack:extension": "node scripts/pack-extension.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

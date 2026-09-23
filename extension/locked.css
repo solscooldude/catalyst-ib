@@ -1,0 +1,84 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0f;
+  --card: #18181b;
+  --mint: #5eead4;
+  --ink: #fafafa;
+  --muted: #a1a1aa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(440px, 100%);
+  border-radius: 28px;
+  background: var(--card);
+  padding: 32px 28px;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 14px 0 0;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.copy,
+.detail,
+.hint {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.copy {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+}
+
+.detail {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+}
+
+.button {
+  display: inline-flex;
+  margin-top: 24px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: #042f2e;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hint {
+  margin: 16px 0 0;
+  font-size: 0.8rem;
+}
