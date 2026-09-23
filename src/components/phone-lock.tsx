@@ -214,8 +214,8 @@ export function PhoneLock({
             <DialogTitle>Emergency stays available</DialogTitle>
             <DialogDescription>
               In a real install, calls, SOS, and parent contacts would still
-              work. This web demo only pretends to lock the home screen — your
-              actual phone is not restricted.
+              work. This preview does not restrict your real phone. Use the
+              Chrome lock extension for laptop sites during lock hours.
             </DialogDescription>
           </DialogHeader>
         </DialogContent>
