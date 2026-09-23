@@ -26,6 +26,7 @@ const STEPS = [
   "Turn on Developer mode (top right).",
   "Click Load unpacked. Select the extension folder — the one that contains manifest.json. Never select the .zip. Never select Downloads itself.",
   "Come back to this Catalyst tab so lock hours and unlocks can sync. Refresh if it still says not connected.",
+  "Click the Catalyst Lock toolbar icon for ON / OFF. After an update, open chrome://extensions and press Reload on Catalyst Lock.",
 ] as const;
 
 function downloadHref(href: string, filename: string) {

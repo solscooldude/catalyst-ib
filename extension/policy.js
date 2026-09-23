@@ -164,3 +164,130 @@ export function decideUrl(url, policy, now = Date.now()) {
     tier: app.tier,
   };
 }
+
+const DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const UNLOCK_LABELS = {
+  tier2: "Tier 2",
+  tier3: "Tier 3",
+  nemesis: "Nemesis",
+};
+
+export function formatClock(hhmm) {
+  const mins = parseClock(hhmm);
+  if (mins == null) return String(hhmm || "");
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+  const suffix = hours >= 12 ? "pm" : "am";
+  const hour12 = hours % 12 || 12;
+  return minutes === 0
+    ? `${hour12}${suffix}`
+    : `${hour12}:${String(minutes).padStart(2, "0")}${suffix}`;
+}
+
+export function formatDays(days) {
+  const list = Array.isArray(days) ? days : [];
+  const set = new Set(list);
+  if (list.length === 7 && [0, 1, 2, 3, 4, 5, 6].every((day) => set.has(day))) {
+    return "Every day";
+  }
+  if (list.length === 5 && [1, 2, 3, 4, 5].every((day) => set.has(day))) {
+    return "Weeknights";
+  }
+  if (list.length === 2 && set.has(0) && set.has(6)) return "Weekends";
+  return [1, 2, 3, 4, 5, 6, 0]
+    .filter((day) => set.has(day))
+    .map((day) => DAY_SHORT[day])
+    .join(" · ");
+}
+
+export function formatWindowLite(window) {
+  if (!window) return "";
+  const start = parseClock(window.start);
+  const end = parseClock(window.end);
+  const overnight = start != null && end != null && end <= start;
+  return `${formatDays(window.days)} · ${formatClock(window.start)}–${formatClock(window.end)}${
+    overnight ? " (overnight)" : ""
+  }`;
+}
+
+export function formatUnlockLeft(ms) {
+  if (ms <= 0) return "ended";
+  const total = Math.ceil(ms / 1000);
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h ${minutes % 60}m`;
+  }
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+export function formatSyncedAgo(at, now = Date.now()) {
+  if (!at) return null;
+  const delta = Math.max(0, now - Number(at));
+  const seconds = Math.floor(delta / 1000);
+  if (seconds < 10) return "just now";
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+export function policyIsSynced(policy) {
+  return Boolean(policy && typeof policy.updatedAt === "number");
+}
+
+export function lockStatus(policy, now = new Date()) {
+  if (!policyIsSynced(policy)) return "unknown";
+  return inLockHours(policy.schedule || [], now) ? "on" : "off";
+}
+
+export function activeUnlockRows(unlockedUntil = {}, now = Date.now()) {
+  return Object.entries(unlockedUntil)
+    .filter(([, exp]) => Number(exp) > now)
+    .map(([id, exp]) => ({
+      id,
+      label: UNLOCK_LABELS[id] || id,
+      leftMs: Number(exp) - now,
+    }))
+    .sort((a, b) => a.leftMs - b.leftMs);
+}
+
+export function catalystOrigin(policy) {
+  const raw = String(policy?.appOrigin || "https://catalyst-ib.vercel.app").trim();
+  return raw.replace(/\/$/, "") || "https://catalyst-ib.vercel.app";
+}
+
+export function describePopup(policy, now = Date.now(), receivedAt = null) {
+  const status = lockStatus(policy, new Date(now));
+  const synced = policyIsSynced(policy);
+  const windows = (policy?.schedule || []).filter((row) => row && row.enabled !== false);
+  const unlocks = activeUnlockRows(policy?.unlockedUntil, now);
+  const ago = formatSyncedAgo(receivedAt || policy?.updatedAt, now);
+  return {
+    status,
+    statusLabel: status === "on" ? "ON" : status === "off" ? "OFF" : "Unknown",
+    statusDetail:
+      status === "on"
+        ? "In lock hours"
+        : status === "off"
+          ? "Outside lock hours"
+          : "No policy synced yet",
+    hours:
+      !synced || windows.length === 0
+        ? "No schedule synced — open Catalyst"
+        : windows.map(formatWindowLite).join("\n"),
+    sync: synced
+      ? `Catalyst tab synced${ago ? ` · ${ago}` : ""}`
+      : "Not synced — open Catalyst",
+    unlocks:
+      unlocks.length === 0
+        ? "None"
+        : unlocks
+            .map((row) => `${row.label} · ${formatUnlockLeft(row.leftMs)} left`)
+            .join("\n"),
+    openHref: catalystOrigin(policy),
+  };
+}

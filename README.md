@@ -35,7 +35,8 @@ The extension lives in `extension/`. Keep the Catalyst tab open so it can write 
 4. Turn on **Developer mode**
 5. Click **Load unpacked** and select the **`extension` folder**. Never the `.zip`. Never Downloads itself. If the picker only shows a zip, cancel and unzip first
 6. Return to Catalyst so policy syncs
-7. During lock hours, open YouTube or Instagram — you should see the Locked page. Docs stays open.
+7. Click the **Catalyst Lock** toolbar icon for ON / OFF, hours, sync, and unlocks. After you replace files, open `chrome://extensions` and press **Reload** on Catalyst Lock
+8. During lock hours, open YouTube or Instagram — you should see the Locked page. Docs stays open. The toolbar popup also shows ON without opening `chrome://extensions`.
 
 To pack a zip:
 

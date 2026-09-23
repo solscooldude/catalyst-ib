@@ -1,4 +1,4 @@
-import { decideUrl } from "./policy.js";
+import { decideUrl, lockStatus } from "./policy.js";
 
 const CHECKED = new Set();
 
@@ -14,6 +14,28 @@ async function readPolicy() {
       appOrigin: "https://catalyst-ib.vercel.app",
     }
   );
+}
+
+async function refreshBadge() {
+  const stored = await chrome.storage.local.get("policy");
+  const status = lockStatus(stored.policy || null);
+  const text = status === "on" ? "ON" : status === "off" ? "OFF" : "?";
+  const title =
+    status === "on"
+      ? "Catalyst Lock · ON"
+      : status === "off"
+        ? "Catalyst Lock · OFF"
+        : "Catalyst Lock · not synced";
+  await chrome.action.setBadgeText({ text });
+  await chrome.action.setBadgeBackgroundColor({
+    color: status === "on" ? "#5EEAD4" : status === "off" ? "#3F3F46" : "#52525B",
+  });
+  if (chrome.action.setBadgeTextColor) {
+    await chrome.action.setBadgeTextColor({
+      color: status === "on" ? "#042F2E" : "#F4F4F5",
+    });
+  }
+  await chrome.action.setTitle({ title });
 }
 
 function isExtensionPage(url) {
@@ -48,17 +70,36 @@ async function enforce(tabId, url) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "SET_POLICY" && message.policy) {
-    chrome.storage.local.set({ policy: message.policy }, () => {
-      sendResponse({ ok: true });
-    });
+    chrome.storage.local.set(
+      { policy: message.policy, policyReceivedAt: Date.now() },
+      () => {
+        void refreshBadge();
+        sendResponse({ ok: true });
+      },
+    );
     return true;
   }
   if (message?.type === "GET_POLICY") {
     readPolicy().then((policy) => sendResponse({ ok: true, policy }));
     return true;
   }
+  if (message?.type === "REFRESH_BADGE") {
+    refreshBadge().then(() => sendResponse({ ok: true }));
+    return true;
+  }
   return false;
 });
+
+chrome.runtime.onInstalled.addListener(() => {
+  void refreshBadge();
+});
+chrome.runtime.onStartup.addListener(() => {
+  void refreshBadge();
+});
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.policy) void refreshBadge();
+});
+void refreshBadge();
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const url = changeInfo.url || tab.url;

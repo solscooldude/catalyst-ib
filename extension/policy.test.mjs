@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decideUrl } from "./policy.js";
+import { decideUrl, describePopup, lockStatus } from "./policy.js";
 
 const weekdayAfternoon = new Date("2026-09-23T17:00:00");
 const weekdayMorning = new Date("2026-09-23T10:00:00");
@@ -77,6 +77,48 @@ test("unknown school-like hosts stay open", () => {
   );
   assert.equal(decision.action, "allow");
   assert.equal(decision.reason, "unknown");
+});
+
+test("popup lock status is unknown until policy has updatedAt", () => {
+  assert.equal(lockStatus({ schedule }), "unknown");
+  assert.equal(
+    lockStatus({ ...base, updatedAt: weekdayAfternoon.getTime() }, weekdayAfternoon),
+    "on",
+  );
+  assert.equal(
+    lockStatus({ ...base, updatedAt: weekdayMorning.getTime() }, weekdayMorning),
+    "off",
+  );
+});
+
+test("popup copy names hours, unlocks, and Catalyst origin", () => {
+  const now = weekdayAfternoon.getTime();
+  const view = describePopup(
+    {
+      ...base,
+      updatedAt: now - 12_000,
+      unlockedUntil: { tier3: now + 8 * 60 * 1000, nemesis: now + 90 * 1000 },
+      appOrigin: "http://127.0.0.1:43127/",
+    },
+    now,
+    now - 12_000,
+  );
+  assert.equal(view.status, "on");
+  assert.equal(view.statusLabel, "ON");
+  assert.match(view.hours, /Weeknights/);
+  assert.match(view.hours, /4:30pm/);
+  assert.match(view.unlocks, /Tier 3/);
+  assert.match(view.unlocks, /Nemesis/);
+  assert.equal(view.openHref, "http://127.0.0.1:43127");
+  assert.match(view.sync, /Catalyst tab synced/);
+});
+
+test("popup unsynced state asks the user to open Catalyst", () => {
+  const view = describePopup(null, weekdayMorning.getTime());
+  assert.equal(view.status, "unknown");
+  assert.equal(view.hours, "No schedule synced — open Catalyst");
+  assert.equal(view.sync, "Not synced — open Catalyst");
+  assert.equal(view.openHref, "https://catalyst-ib.vercel.app");
 });
 
 test("YouTube stays open if it is not a chosen nemesis", () => {

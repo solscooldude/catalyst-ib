@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catalyst Lock</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <p class="kicker">Catalyst Lock</p>
+      <p id="status" class="status unknown">Unknown</p>
+      <p id="status-detail" class="muted">Reading policy…</p>
+    </header>
+
+    <section>
+      <h2>Hours</h2>
+      <p id="hours" class="body">No schedule synced — open Catalyst</p>
+    </section>
+
+    <section>
+      <h2>Sync</h2>
+      <p id="sync" class="body">Not synced — open Catalyst</p>
+    </section>
+
+    <section>
+      <h2>Unlocks</h2>
+      <p id="unlocks" class="body">None</p>
+    </section>
+
+    <a id="open" class="button" href="https://catalyst-ib.vercel.app">
+      Open Catalyst
+    </a>
+    <p class="hint">Keep Catalyst open so unlocks stay in sync</p>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
