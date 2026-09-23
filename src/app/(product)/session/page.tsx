@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
@@ -38,8 +38,6 @@ export default function FocusPage() {
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
   const [sit, setSit] = useState(false);
-  const [tabAway, setTabAway] = useState(false);
-  const autoAway = useRef(false);
   const session = state.session;
 
   useEffect(() => {
@@ -65,54 +63,15 @@ export default function FocusPage() {
   }, [state.hydrated, state.setupComplete, state.session, router]);
 
   useEffect(() => {
-    if (!session || session.status !== "focus") return;
-    let debounce = 0;
-    function apply() {
-      window.clearTimeout(debounce);
-      debounce = window.setTimeout(() => {
-        const away =
-          document.visibilityState === "hidden" || !document.hasFocus();
-        setTabAway(away);
-        if (away) {
-          if (!state.session?.pausedAt) {
-            autoAway.current = true;
-            pauseSession();
-          }
-        } else if (autoAway.current) {
-          autoAway.current = false;
-          resumeSession();
-        }
-      }, 160);
-    }
-    apply();
-    document.addEventListener("visibilitychange", apply);
-    window.addEventListener("blur", apply);
-    window.addEventListener("focus", apply);
-    return () => {
-      window.clearTimeout(debounce);
-      document.removeEventListener("visibilitychange", apply);
-      window.removeEventListener("blur", apply);
-      window.removeEventListener("focus", apply);
-    };
-  }, [session?.id, session?.status]);
-
-  useEffect(() => {
     const id = window.setInterval(() => {
       const stamp = Date.now();
       setNow(stamp);
-      if (
-        typeof document !== "undefined" &&
-        (document.visibilityState === "hidden" || !document.hasFocus())
-      ) {
-        return;
-      }
       creditLiveSessionTokens(stamp);
     }, 250);
     return () => window.clearInterval(id);
   }, []);
 
   const paused = Boolean(session?.pausedAt);
-  const awayPaused = tabAway && paused;
   const elapsed = session ? sessionElapsedMs(session, now) : 0;
   const demoMode = session?.demoMode ?? state.demoMode;
   const title = session ? sessionTitle(session) : "";
@@ -171,19 +130,8 @@ export default function FocusPage() {
       />
 
       <div className="focus-session-panel" data-focus-board="">
-        {awayPaused ? (
-          <div className="focus-away-banner mb-4 rounded-2xl bg-amber-400/15 px-4 py-3 ring-1 ring-amber-300/40">
-            <p className="text-sm font-medium text-amber-50">
-              Earn paused — Catalyst tab is not focused
-            </p>
-            <p className="mt-1 text-xs text-amber-100/80">
-              Come back to this tab to keep the timer and tokens moving.
-              School sites stay allowed. Unlock Tier 2 / 3 still works.
-            </p>
-          </div>
-        ) : null}
         <p className="focus-board-kicker">
-          {awayPaused ? "Away · earn paused" : paused ? "Paused" : "Focus session"}
+          {paused ? "Paused" : "Focus session"}
         </p>
         <h1 className="focus-board-title mt-2 font-heading text-2xl sm:text-3xl">
           {title}

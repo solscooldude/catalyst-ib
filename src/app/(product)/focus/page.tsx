@@ -18,6 +18,7 @@ import { studySubjectOptions } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { groupSchoolTasksBySubject } from "@/lib/school-tasks";
 import { PageFrame } from "@/components/page-frame";
+import { QuietHoursChip } from "@/components/quiet-hours-chip";
 import { UnlockPanel } from "@/components/unlock-panel";
 import {
   buyAppearance,
@@ -77,6 +78,9 @@ export default function AppHomePage() {
 
   return (
     <PageFrame className="grid gap-6 space-y-0 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="lg:col-span-2">
+        <QuietHoursChip />
+      </div>
       <div className="flux-card px-6 py-8 sm:px-8">
         <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
           Focus
@@ -214,8 +218,9 @@ export default function AppHomePage() {
       >
         <h2 className="text-lg text-foreground">Study block</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Subject only — no task list required. Same earn path: stay on this
-          tab.
+          Subject only — no task list required. Tokens come from this
+          session. Switching to Docs or another allowlisted school site does
+          not pause earn.
         </p>
         <div className="mt-5 max-w-xl">
           <StudyStartForm />

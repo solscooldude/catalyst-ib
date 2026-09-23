@@ -18,13 +18,13 @@ const STEPS = [
   {
     n: "02",
     title: "Focus",
-    copy: "Start a session on a task you added, or a subject-only study block. Stay on this tab.",
+    copy: "Start a session on a task you added, or a subject-only study block. Docs and other school sites stay allowed.",
     icon: NotebookPen,
   },
   {
     n: "03",
     title: "Tokens",
-    copy: "This demo pays 10 tokens per 20 seconds while the tab is focused. The production target is 1 token per 2 minutes.",
+    copy: "This demo pays 10 tokens per 20 seconds during a focus session. The production target is 1 token per 2 minutes.",
     icon: "chip" as const,
   },
   {
@@ -52,10 +52,11 @@ export default function LandingPage() {
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
               TikTok, Instagram, and the rest sit next to the IA, TOK essay, or
-              EE. Catalyst greys the apps you name. You stay in a focus
-              session — a task you added, or a study block by subject. Tokens
-              come from those minutes. Then you buy a short unlock. A sprite
-              grows with the same study time.
+              EE. During lock hours the Chrome extension blocks those
+              distractors. Docs and other school sites stay open. You sit a
+              focus session — a task you added, or a study block by subject.
+              Tokens come from those minutes. Then you buy a short unlock. A
+              sprite grows with the same study time.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">

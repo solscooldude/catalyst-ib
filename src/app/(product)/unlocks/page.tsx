@@ -13,7 +13,8 @@ import { ROUTES } from "@/lib/routes";
 import { SessionRecapCard } from "@/components/session-recap";
 import { readSessionRecap } from "@/lib/session-recap";
 import { PageFrame } from "@/components/page-frame";
-import { UnlockTierShop } from "@/components/unlock-panel";
+import { DurationPicker, UnlockTierShop } from "@/components/unlock-panel";
+import { type UnlockMinutes } from "@/lib/domain-policy";
 import {
   spendUnlockNemesis,
   spendUnlockTier,
@@ -36,6 +37,7 @@ function UnlockInner() {
   const state = useCatalyst();
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
+  const [unlockMinutes, setUnlockMinutes] = useState<UnlockMinutes>(10);
   const [arrivedAt] = useState(() => Date.now());
   const earned = params.get("earned") === "1";
 
@@ -102,7 +104,7 @@ function UnlockInner() {
   if (!state.setupComplete) return null;
 
   function buy(tier: UnlockTier) {
-    const result = spendUnlockTier(tier);
+    const result = spendUnlockTier(tier, unlockMinutes);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -115,7 +117,7 @@ function UnlockInner() {
   }
 
   function buyNemesis() {
-    const result = spendUnlockNemesis();
+    const result = spendUnlockNemesis(unlockMinutes);
     if (!result.ok) {
       setNotice(result.reason);
       return;
@@ -145,11 +147,12 @@ function UnlockInner() {
         </div>
 
         <p className="mt-6 text-sm leading-6 text-muted-foreground">
-          Buying unlocks a whole tier for the time block — not one app. Tier 3
-          opens every social app. Opening a nemesis costs +{NEMESIS_SURCHARGE}{" "}
-          on top of the Tier 3 price ({TIER3_COST}+{NEMESIS_SURCHARGE} ={" "}
-          {NEMESIS_UNLOCK_COST}).
+          Buying unlocks a whole tier for the time you pick. The Chrome
+          extension reads that timer. Tier 3 opens every social app. Opening a
+          nemesis costs +{NEMESIS_SURCHARGE} on top of the Tier 3 price (
+          {TIER3_COST}+{NEMESIS_SURCHARGE} = {NEMESIS_UNLOCK_COST}).
         </p>
+        <DurationPicker minutes={unlockMinutes} onChange={setUnlockMinutes} />
 
         <div className="mt-5 space-y-3 text-sm">
           <TierDescribe
@@ -183,6 +186,7 @@ function UnlockInner() {
             tokens={state.tokens}
             active={active}
             now={now}
+            minutes={unlockMinutes}
             hasNemeses={state.nemeses.length > 0}
             onBuy={buy}
             onBuyNemesis={buyNemesis}
