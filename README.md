@@ -29,11 +29,11 @@ Chrome will not install an unpacked extension from a website. Setup and Account 
 
 The extension lives in `extension/`. Keep the Catalyst tab open so it can write lock hours, unlocks, and the allowlist into `chrome.storage`. After install, the page shows **Extension connected** when the extension pings this tab.
 
-1. Download `catalyst-lock-extension.zip` from Setup, Settings, or the link above
-2. Unzip it
+1. Download `catalyst-lock-extension.zip` (or `unzip-then-select-the-extension-folder.zip` — same files)
+2. **Unzip / Extract** it. You must get a folder named `extension` with `manifest.json` inside
 3. Open Chrome → `chrome://extensions`
 4. Turn on **Developer mode**
-5. Click **Load unpacked** and select the unzipped `extension` folder
+5. Click **Load unpacked** and select the **`extension` folder**. Never the `.zip`. Never Downloads itself. If the picker only shows a zip, cancel and unzip first
 6. Return to Catalyst so policy syncs
 7. During lock hours, open YouTube or Instagram — you should see the Locked page. Docs stays open.
 
