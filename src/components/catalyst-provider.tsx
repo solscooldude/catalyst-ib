@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { ExtensionSync } from "@/components/extension-sync";
 import { ThemeApplier } from "@/components/theme-applier";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getAuthSnapshot, hydrateAuth } from "@/lib/auth";
@@ -17,6 +18,7 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
   return (
     <TooltipProvider>
       <ThemeApplier />
+      <ExtensionSync />
       {children}
     </TooltipProvider>
   );

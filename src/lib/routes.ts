@@ -3,6 +3,7 @@ export const ROUTES = {
   focus: "/focus",
   session: "/session",
   lock: "/lock",
+  locked: "/locked",
   stats: "/stats",
   unlocks: "/unlocks",
   appearance: "/appearance",

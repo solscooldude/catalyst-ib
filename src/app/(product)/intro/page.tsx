@@ -22,7 +22,7 @@ const SLIDES = [
   {
     kicker: "The tool",
     title: "The tool",
-    body: "A study-focus app. You sit a block, stay on the Catalyst tab, and earn tokens from that time — not from ticking a task done.",
+    body: "A study-focus app. You sit a block and earn tokens from that time — not from ticking a task done. School sites stay allowed.",
   },
   {
     kicker: "Focus",

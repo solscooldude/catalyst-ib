@@ -35,8 +35,8 @@ export function QuietHoursChip() {
     <section className="flux-card flex flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <p className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
         <Moon className="size-3.5 text-primary" />
-        <span className="sr-only">Quiet hours</span>
-        {line}
+        <span className="sr-only">Lock hours</span>
+        Lock hours · {line}
       </p>
       <Link
         href={ROUTES.schedule}

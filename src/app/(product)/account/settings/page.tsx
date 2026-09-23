@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
 import { updateEmail, updatePassword, useAuth } from "@/lib/auth";
+import { AllowlistSettings } from "@/components/allowlist-settings";
 import { setSoundMuted, useCatalyst } from "@/lib/store";
 
 export default function SettingsPage() {
@@ -44,10 +45,19 @@ export default function SettingsPage() {
           Settings
         </p>
         <h1 className="mt-3 text-4xl text-foreground">Account</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Lock hours, unlocks, and the school allowlist sync to the Chrome
+          extension from this tab. Load unpacked from the repo{" "}
+          <span className="font-mono">extension/</span> folder.
+        </p>
       </div>
 
       <div className="flux-card px-6 py-8">
         <SpriteRename />
+      </div>
+
+      <div className="flux-card px-6 py-8">
+        <AllowlistSettings />
       </div>
 
       <div className="flux-card px-6 py-8">

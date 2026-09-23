@@ -55,8 +55,9 @@ export function ScheduleStatus() {
           {formatWindow(next.window)}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {formatRemaining(remainingMs(next.window, now))}. Simulated phone
-          lock — start a session if you want tokens.
+          {formatRemaining(remainingMs(next.window, now))}. The Chrome
+          extension blocks YouTube, Instagram, and other distractors. Docs
+          stays open.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button asChild className="h-10 rounded-full">
