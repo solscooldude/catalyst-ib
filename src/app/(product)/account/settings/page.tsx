@@ -2,41 +2,38 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
-import { updateEmail, updatePassword, useAuth } from "@/lib/auth";
+import { logOut, useAuth } from "@/lib/auth";
 import { AllowlistSettings } from "@/components/allowlist-settings";
+import { ConnectAuthCard } from "@/components/connect-auth";
 import { LockExtensionSetup } from "@/components/lock-extension-setup";
+import { isClerkConfigured } from "@/lib/clerk-config";
+import { saveCloudState } from "@/lib/cloud-sync";
 import { setSoundMuted, useCatalyst } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const auth = useAuth();
   const store = useCatalyst();
-  const [emailDraft, setEmailDraft] = useState<string | null>(null);
-  const email = emailDraft ?? auth.user?.email ?? "";
-  const [emailPassword, setEmailPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [nextPassword, setNextPassword] = useState("");
-  const [emailNotice, setEmailNotice] = useState<string | null>(null);
-  const [passwordNotice, setPasswordNotice] = useState<string | null>(null);
+  const clerkReady = isClerkConfigured();
+  const [syncNotice, setSyncNotice] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  async function saveEmail(event: React.FormEvent) {
-    event.preventDefault();
-    const result = await updateEmail(email, emailPassword);
-    setEmailNotice(result.ok ? "Email updated." : result.reason);
-    if (result.ok) setEmailPassword("");
-  }
-
-  async function savePassword(event: React.FormEvent) {
-    event.preventDefault();
-    const result = await updatePassword(currentPassword, nextPassword);
-    setPasswordNotice(result.ok ? "Password updated." : result.reason);
-    if (result.ok) {
-      setCurrentPassword("");
-      setNextPassword("");
+  async function saveNow() {
+    if (auth.user?.source !== "clerk") {
+      setSyncNotice("Sign in with Google or email to save across browsers.");
+      return;
     }
+    setPending(true);
+    try {
+      await saveCloudState();
+      setSyncNotice("Saved to your account.");
+    } catch {
+      setSyncNotice("Could not save. Check Clerk keys and try again.");
+    }
+    setPending(false);
   }
 
   return (
@@ -48,9 +45,50 @@ export default function SettingsPage() {
         <h1 className="mt-3 text-4xl text-foreground">Account</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           Lock hours, unlocks, and the school allowlist sync to the Chrome
-          extension from this tab.
+          extension from this tab. Signed-in accounts also save tokens, sprite
+          care, and your schedule to Clerk.
         </p>
       </div>
+
+      {!clerkReady ? (
+        <div className="flux-card px-6 py-8">
+          <ConnectAuthCard compact />
+        </div>
+      ) : (
+        <div className="flux-card space-y-4 px-6 py-8">
+          <h2 className="text-lg text-foreground">Signed in</h2>
+          <p className="text-sm text-muted-foreground">
+            {auth.user?.email || "Google or email account"}
+            {auth.user?.source === "clerk"
+              ? " · saved on this account"
+              : ""}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              className="h-11 rounded-full px-6"
+              disabled={pending}
+              onClick={() => void saveNow()}
+            >
+              {pending ? "Saving…" : "Save to account"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-full px-6"
+              onClick={async () => {
+                await logOut();
+                router.push("/sign-in");
+              }}
+            >
+              Sign out
+            </Button>
+          </div>
+          {syncNotice ? (
+            <p className="text-sm text-foreground">{syncNotice}</p>
+          ) : null}
+        </div>
+      )}
 
       <div className="flux-card px-6 py-8">
         <LockExtensionSetup />
@@ -76,64 +114,6 @@ export default function SettingsPage() {
           Mute soft sounds
         </label>
       </div>
-
-      <form className="flux-card space-y-4 px-6 py-8" onSubmit={saveEmail}>
-        <h2 className="text-lg text-foreground">Email</h2>
-        <div className="space-y-2">
-          <Label htmlFor="email">Linked email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmailDraft(event.target.value)}
-            className="h-11 rounded-xl"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email-password">Current password</Label>
-          <Input
-            id="email-password"
-            type="password"
-            value={emailPassword}
-            onChange={(event) => setEmailPassword(event.target.value)}
-            className="h-11 rounded-xl"
-          />
-        </div>
-        {emailNotice ? <p className="text-sm text-foreground">{emailNotice}</p> : null}
-        <Button type="submit" className="h-11 rounded-full px-6">
-          Save email
-        </Button>
-      </form>
-
-      <form className="flux-card space-y-4 px-6 py-8" onSubmit={savePassword}>
-        <h2 className="text-lg text-foreground">Reset password</h2>
-        <div className="space-y-2">
-          <Label htmlFor="current-password">Current password</Label>
-          <Input
-            id="current-password"
-            type="password"
-            value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
-            className="h-11 rounded-xl"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="next-password">New password</Label>
-          <Input
-            id="next-password"
-            type="password"
-            value={nextPassword}
-            onChange={(event) => setNextPassword(event.target.value)}
-            className="h-11 rounded-xl"
-          />
-        </div>
-        {passwordNotice ? (
-          <p className="text-sm text-foreground">{passwordNotice}</p>
-        ) : null}
-        <Button type="submit" className="h-11 rounded-full px-6">
-          Save password
-        </Button>
-      </form>
     </PageFrame>
   );
 }

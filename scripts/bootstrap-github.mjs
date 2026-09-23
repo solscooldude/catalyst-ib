@@ -31,6 +31,23 @@ const localSrc = collectTree(join(root, "src"), "src");
 const localExt = collectTree(join(root, "extension"), "extension");
 const localPack = join(root, "scripts/pack-extension.mjs");
 const localPackBuf = existsSync(localPack) ? readFileSync(localPack) : null;
+const overlayFiles = [
+  "package.json",
+  "package-lock.json",
+  "README.md",
+  ".env.example",
+  ".gitignore",
+].flatMap((rel) => {
+  const full = join(root, rel);
+  return existsSync(full) ? [[rel, readFileSync(full)]] : [];
+});
+const localPublicZips = [
+  "public/catalyst-lock-extension.zip",
+  "public/unzip-then-select-the-extension-folder.zip",
+].flatMap((rel) => {
+  const full = join(root, rel);
+  return existsSync(full) ? [[rel, readFileSync(full)]] : [];
+});
 
 const staging = join(tmpdir(), `catalyst-ib-${Date.now()}`);
 mkdirSync(staging, { recursive: true });
@@ -42,7 +59,12 @@ execSync(
 cpSync(staging, root, { recursive: true });
 rmSync(staging, { recursive: true, force: true });
 
-for (const [rel, buf] of [...localSrc, ...localExt]) {
+for (const [rel, buf] of [
+  ...localSrc,
+  ...localExt,
+  ...overlayFiles,
+  ...localPublicZips,
+]) {
   const dest = join(root, rel);
   mkdirSync(dirname(dest), { recursive: true });
   writeFileSync(dest, buf);

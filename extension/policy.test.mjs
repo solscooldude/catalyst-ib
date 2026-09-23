@@ -121,6 +121,25 @@ test("popup unsynced state asks the user to open Catalyst", () => {
   assert.equal(view.openHref, "https://catalyst-ib.vercel.app");
 });
 
+test("string weekdays and HH:MM:SS still count as lock hours", () => {
+  const decision = decideUrl(
+    "https://www.instagram.com/",
+    {
+      ...base,
+      schedule: [
+        {
+          days: ["1", "2", "3", "4", "5"],
+          start: "16:30:00",
+          end: "19:30:00",
+        },
+      ],
+    },
+    weekdayAfternoon.getTime(),
+  );
+  assert.equal(decision.action, "block");
+  assert.equal(decision.appId, "instagram");
+});
+
 test("YouTube stays open if it is not a chosen nemesis", () => {
   const decision = decideUrl(
     "https://www.youtube.com/",
