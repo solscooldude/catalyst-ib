@@ -99,22 +99,61 @@ function parseClock(hhmm) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+function coerceDays(raw) {
+  const list = Array.isArray(raw)
+    ? raw
+    : typeof raw === "string"
+      ? raw.split(/[,\s]+/)
+      : [];
+  return [
+    ...new Set(
+      list
+        .map((day) => Number(day))
+        .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6),
+    ),
+  ];
+}
+
+export function normalizePolicyWindow(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const days = coerceDays(raw.days ?? raw.day ?? raw.weekdays);
+  const start = raw.start ?? raw.from ?? raw.begin;
+  const end = raw.end ?? raw.to ?? raw.finish;
+  if (!days.length || parseClock(start) == null || parseClock(end) == null) {
+    return null;
+  }
+  return {
+    days,
+    start: String(start),
+    end: String(end),
+    enabled: raw.enabled !== false && raw.on !== false,
+  };
+}
+
+export function normalizePolicySchedule(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.map(normalizePolicyWindow).filter(Boolean);
+}
+
 export function windowContains(window, now) {
-  if (!window || window.enabled === false) return false;
-  const start = parseClock(window.start);
-  const end = parseClock(window.end);
+  const normalized = normalizePolicyWindow(window);
+  if (!normalized || normalized.enabled === false) return false;
+  const start = parseClock(normalized.start);
+  const end = parseClock(normalized.end);
   if (start == null || end == null || start === end) return false;
   const mins = now.getHours() * 60 + now.getMinutes();
   const today = now.getDay();
   const yesterday = (today + 6) % 7;
-  const days = window.days || [];
+  const days = normalized.days;
   if (end > start) return days.includes(today) && mins >= start && mins < end;
   if (mins >= start) return days.includes(today);
   return mins < end && days.includes(yesterday);
 }
 
 export function inLockHours(schedule, now = new Date()) {
-  return (schedule || []).some((window) => windowContains(window, now));
+  return normalizePolicySchedule(schedule).some((window) =>
+    windowContains(window, now),
+  );
 }
 
 export function isAllowlisted(host, extra = []) {
