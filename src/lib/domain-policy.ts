@@ -219,13 +219,13 @@ export function normalizeHost(raw: string) {
     const url = trimmed.includes("://")
       ? new URL(trimmed)
       : new URL(`https://${trimmed}`);
-    return url.hostname.replace(/\.+$/, "");
+    return url.hostname.replace(/\.$/, "");
   } catch {
     return trimmed
       .replace(/^https?:\/\//, "")
       .split("/")[0]
       .replace(/^www\./, "")
-      .replace(/\.+$/, "");
+      .replace(/\.$/, "");
   }
 }
 
@@ -257,19 +257,61 @@ function parseClock(hhmm: string) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+function coerceDays(raw: unknown): number[] {
+  const list = Array.isArray(raw)
+    ? raw
+    : typeof raw === "string"
+      ? raw.split(/[,\s]+/)
+      : [];
+  return [
+    ...new Set(
+      list
+        .map((day) => Number(day))
+        .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6),
+    ),
+  ];
+}
+
+export function normalizePolicyWindow(
+  raw?: (LockWindowLite & Record<string, unknown>) | null,
+): LockWindowLite | null {
+  if (!raw || typeof raw !== "object") return null;
+  const days = coerceDays(raw.days ?? raw.day ?? raw.weekdays);
+  const start = raw.start ?? raw.from ?? raw.begin;
+  const end = raw.end ?? raw.to ?? raw.finish;
+  if (!days.length || typeof start !== "string" || typeof end !== "string") {
+    return null;
+  }
+  if (parseClock(start) == null || parseClock(end) == null) return null;
+  return {
+    days,
+    start,
+    end,
+    enabled: raw.enabled !== false && raw.on !== false,
+  };
+}
+
+export function normalizePolicySchedule(raw?: unknown): LockWindowLite[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((row) => normalizePolicyWindow(row as LockWindowLite))
+    .filter((row): row is LockWindowLite => Boolean(row));
+}
+
 export function windowContains(window: LockWindowLite, now: Date) {
-  if (window.enabled === false) return false;
-  const start = parseClock(window.start);
-  const end = parseClock(window.end);
+  const normalized = normalizePolicyWindow(window);
+  if (!normalized || normalized.enabled === false) return false;
+  const start = parseClock(normalized.start);
+  const end = parseClock(normalized.end);
   if (start == null || end == null || start === end) return false;
   const mins = now.getHours() * 60 + now.getMinutes();
   const today = now.getDay();
   const yesterday = (today + 6) % 7;
   if (end > start) {
-    return window.days.includes(today) && mins >= start && mins < end;
+    return normalized.days.includes(today) && mins >= start && mins < end;
   }
-  if (mins >= start) return window.days.includes(today);
-  return mins < end && window.days.includes(yesterday);
+  if (mins >= start) return normalized.days.includes(today);
+  return mins < end && normalized.days.includes(yesterday);
 }
 
 export function inLockHours(schedule: LockWindowLite[], now = new Date()) {

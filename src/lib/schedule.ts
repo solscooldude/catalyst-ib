@@ -105,27 +105,43 @@ export function validateWindow(input: {
   return { ok: true };
 }
 
+function coerceDays(raw: unknown): number[] {
+  const list = Array.isArray(raw)
+    ? raw
+    : typeof raw === "string"
+      ? raw.split(/[,\s]+/)
+      : [];
+  return [
+    ...new Set(
+      list
+        .map((day) => Number(day))
+        .filter((day) => WEEKDAYS.some((row) => row.day === day)),
+    ),
+  ];
+}
+
 export function normalizeWindow(
-  raw?: Partial<LockWindow> | null,
+  raw?: (Partial<LockWindow> & Record<string, unknown>) | null,
 ): LockWindow | null {
   if (!raw) return null;
+  const days = coerceDays(raw.days ?? raw.day ?? raw.weekdays);
+  const startRaw = String(raw.start ?? raw.from ?? raw.begin ?? "");
+  const endRaw = String(raw.end ?? raw.to ?? raw.finish ?? "");
   const check = validateWindow({
-    days: raw.days ?? [],
-    start: raw.start ?? "",
-    end: raw.end ?? "",
+    days,
+    start: startRaw,
+    end: endRaw,
   });
   if (!check.ok) return null;
-  const start = normalizeTime(raw.start ?? "");
-  const end = normalizeTime(raw.end ?? "");
+  const start = normalizeTime(startRaw);
+  const end = normalizeTime(endRaw);
   if (!start || !end) return null;
   return {
     id: typeof raw.id === "string" && raw.id ? raw.id : crypto.randomUUID(),
-    days: [...new Set(raw.days)].filter((day) =>
-      WEEKDAYS.some((row) => row.day === day),
-    ),
+    days,
     start,
     end,
-    enabled: raw.enabled !== false,
+    enabled: raw.enabled !== false && raw.on !== false,
   };
 }
 
