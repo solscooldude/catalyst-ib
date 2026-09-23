@@ -15,7 +15,13 @@ import { startStudySession, useCatalyst } from "@/lib/store";
 
 const GOALS = [15, 25, 45, 60] as const;
 
-export function StudyStartForm() {
+export function StudyStartForm({
+  formId,
+  hideStart = false,
+}: {
+  formId?: string;
+  hideStart?: boolean;
+}) {
   const router = useRouter();
   const state = useCatalyst();
   const options = studySubjectOptions(state.profile);
@@ -39,7 +45,7 @@ export function StudyStartForm() {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={begin}>
+    <form id={formId} className="grid gap-4" onSubmit={begin}>
       <div className="space-y-2">
         <Label htmlFor="study-subject">Subject</Label>
         <AppSelect
@@ -86,10 +92,12 @@ export function StudyStartForm() {
         </div>
       </div>
       {error ? <p className="text-sm text-rose-300">{error}</p> : null}
-      <Button type="submit" className="h-11 rounded-full">
-        Start focus
-        <ArrowRight className="size-4" />
-      </Button>
+      {hideStart ? null : (
+        <Button type="submit" className="h-11 rounded-full">
+          Start focus
+          <ArrowRight className="size-4" />
+        </Button>
+      )}
     </form>
   );
 }
