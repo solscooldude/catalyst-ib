@@ -49,6 +49,10 @@ import {
   unlockTierSpendId,
 } from "@/lib/constants";
 import {
+  normalizeHostList,
+  type UnlockMinutes,
+} from "@/lib/domain-policy";
+import {
   normalizeMotivation,
   normalizeProfile,
   validateDiploma,
@@ -620,14 +624,49 @@ export function grantFocusGift() {
   return { ok: true as const };
 }
 
-export function spendUnlock(catalogId: UnlockCatalogId) {
+function unlockBlocks(minutes?: number) {
+  const rounded = Math.round((minutes ?? 10) / 10);
+  return Math.min(3, Math.max(1, rounded));
+}
+
+function unlockDurationMs(minutes?: number) {
+  const blocks = unlockBlocks(minutes);
+  const unit = getSnapshot().demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  return unit * blocks;
+}
+
+export function setAllowlistExtra(raw: string[]) {
+  const next = normalizeHostList(raw);
+  setState((current) => ({ ...current, allowlistExtra: next }));
+  return { ok: true as const, hosts: next };
+}
+
+export function addAllowlistHost(raw: string) {
+  const host = normalizeHostList([raw])[0];
+  if (!host) return { ok: false as const, reason: "Enter a site like school.edu" };
+  const current = getSnapshot().allowlistExtra;
+  if (current.includes(host)) {
+    return { ok: true as const, hosts: current };
+  }
+  return setAllowlistExtra([...current, host]);
+}
+
+export function removeAllowlistHost(host: string) {
+  return setAllowlistExtra(
+    getSnapshot().allowlistExtra.filter((row) => row !== host),
+  );
+}
+
+export function spendUnlock(catalogId: UnlockCatalogId, minutes?: UnlockMinutes) {
   const item = UNLOCK_CATALOG.find((entry) => entry.id === catalogId);
   if (!item) return { ok: false as const, reason: "Unknown unlock." };
-  if (getSnapshot().tokens < item.cost) {
+  const blocks = unlockBlocks(minutes);
+  const cost = item.cost * blocks;
+  if (getSnapshot().tokens < cost) {
     return { ok: false as const, reason: "Not enough tokens yet." };
   }
 
-  const duration = getSnapshot().demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  const duration = unlockDurationMs(minutes);
   const now = Date.now();
   const label = item.name;
   const existing = coalesceUnlocks(getSnapshot().unlocks, now).find(
@@ -640,14 +679,14 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
     id: existing?.id ?? crypto.randomUUID(),
     catalogId,
     label,
-    cost: (existing?.cost ?? 0) + item.cost,
+    cost: (existing?.cost ?? 0) + cost,
     startedAt: existing?.startedAt ?? now,
     expiresAt: now + remaining + duration,
   };
 
   setState((current) => ({
     ...current,
-    tokens: current.tokens - item.cost,
+    tokens: current.tokens - cost,
     unlocks: [
       ...coalesceUnlocks(current.unlocks, now).filter(
         (row) => row.catalogId !== catalogId,
@@ -659,15 +698,16 @@ export function spendUnlock(catalogId: UnlockCatalogId) {
   return { ok: true as const, unlock, stacked };
 }
 
-export function spendUnlockTier(tier: UnlockTier) {
+export function spendUnlockTier(tier: UnlockTier, minutes?: UnlockMinutes) {
   const catalogId = unlockTierSpendId(tier);
-  const cost = tier === 2 ? TIER2_COST : TIER3_COST;
+  const blocks = unlockBlocks(minutes);
+  const cost = (tier === 2 ? TIER2_COST : TIER3_COST) * blocks;
   const label = tier === 2 ? "Tier 2" : "Tier 3";
   if (getSnapshot().tokens < cost) {
     return { ok: false as const, reason: "Not enough tokens yet." };
   }
 
-  const duration = getSnapshot().demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  const duration = unlockDurationMs(minutes);
   const now = Date.now();
   const existing = coalesceUnlocks(getSnapshot().unlocks, now).find(
     (unlock) => unlock.catalogId === catalogId,
@@ -699,9 +739,10 @@ export function spendUnlockTier(tier: UnlockTier) {
   return { ok: true as const, unlock, stacked };
 }
 
-export function spendUnlockNemesis() {
+export function spendUnlockNemesis(minutes?: UnlockMinutes) {
   const catalogId = "nemesis" as const;
-  const cost = NEMESIS_UNLOCK_COST;
+  const blocks = unlockBlocks(minutes);
+  const cost = NEMESIS_UNLOCK_COST * blocks;
   const snapshot = getSnapshot();
   if (snapshot.nemeses.length === 0) {
     return { ok: false as const, reason: "Pick a nemesis in Setup first." };
@@ -710,7 +751,7 @@ export function spendUnlockNemesis() {
     return { ok: false as const, reason: "Not enough tokens yet." };
   }
 
-  const duration = snapshot.demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
+  const duration = unlockDurationMs(minutes);
   const now = Date.now();
   const existing = coalesceUnlocks(snapshot.unlocks, now).find(
     (unlock) => unlock.catalogId === catalogId,
