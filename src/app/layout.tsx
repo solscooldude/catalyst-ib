@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { CatalystClerkProvider } from "@/components/catalyst-clerk";
 import { CatalystProvider } from "@/components/catalyst-provider";
 import "./globals.css";
 import "./shell-theme.css";
@@ -46,7 +47,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               'try{var t=localStorage.getItem("catalyst-v1:ui-theme");var d=t!=="light";document.documentElement.classList.toggle("dark",d);document.documentElement.classList.toggle("light",!d);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}',
           }}
         />
-        <CatalystProvider>{children}</CatalystProvider>
+        <CatalystClerkProvider>
+          <CatalystProvider>{children}</CatalystProvider>
+        </CatalystClerkProvider>
       </body>
     </html>
   );

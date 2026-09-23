@@ -17,7 +17,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (auth.hydrated && !auth.user) {
-      router.replace("/login");
+      router.replace("/sign-in");
       return;
     }
     if (
