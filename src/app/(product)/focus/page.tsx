@@ -287,7 +287,13 @@ export default function AppHomePage() {
               checked={state.demoMode}
               onCheckedChange={(value) => setDemoMode(Boolean(value))}
             />
-            <span className="text-foreground">Demo speed</span>
+            <span className="text-foreground">
+              Demo token rate
+              <span className="mt-1 block text-xs text-muted-foreground">
+                Testing only. 10 tokens every 20 seconds instead of 1 token per
+                2 minutes. Lock hours stay the same.
+              </span>
+            </span>
           </label>
 
           {mode === "task" ? (
