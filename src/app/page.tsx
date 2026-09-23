@@ -24,7 +24,7 @@ const STEPS = [
   {
     n: "03",
     title: "Tokens",
-    copy: "This demo pays 10 tokens per 20 seconds during a focus session. The production target is 1 token per 2 minutes.",
+    copy: "Focus time pays tokens. The live rate is 1 token per 2 minutes. A clearly labeled testing toggle can use 10 tokens per 20 seconds.",
     icon: "chip" as const,
   },
   {
@@ -60,8 +60,8 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-12 rounded-full px-6 text-sm">
-                <Link href="/signup">
-                  Open the demo
+                <Link href="/sign-up">
+                  Create an account
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
@@ -74,8 +74,9 @@ export default function LandingPage() {
               </Button>
             </div>
             <p className="mt-5 text-sm text-muted-foreground">
-              Free demo. Phone lock is simulated. Tokens come from focus time,
-              not from ticking a task done.
+              Free to start. Sign in with Google or email so lock hours and
+              tokens follow you. Tokens come from focus time, not from ticking
+              a task done.
             </p>
           </div>
           <PhoneLock compact nemeses={["tiktok", "instagram"]} />
@@ -148,8 +149,8 @@ export default function LandingPage() {
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-                This demo pays 10 tokens per 20 seconds when you End. Production
-                target is 1 token per 2 minutes.
+                Live earn is 1 token per 2 minutes. Use Demo token rate on Focus
+                only when you need faster testing.
               </p>
             </div>
             <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-border">
@@ -192,24 +193,25 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-20 lg:grid-cols-2">
             <div>
               <p className="text-xs tracking-[0.2em] text-primary uppercase">
-                Free demo
+                Your account
               </p>
               <h2 className="mt-3 text-4xl text-foreground sm:text-5xl">
-                Use it here.
+                Sign in and keep going.
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-                Sign up creates a demo account in this browser.
+                Google or email. Browser A and browser B load the same lock
+                hours, tokens, sprite, and unlocks after you sign in.
               </p>
               <Button asChild className="mt-8 h-12 rounded-full px-6">
-                <Link href="/signup">
-                  Try the demo
+                <Link href="/sign-up">
+                  Sign up
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
             </div>
             <div className="rounded-[2rem] bg-card p-8 ring-1 ring-border">
               <p className="font-heading text-3xl text-foreground">
-                What the demo includes
+                What you get
               </p>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Laptop focus, a sprite, and tokens from time on the Catalyst
@@ -240,7 +242,7 @@ export default function LandingPage() {
           <Wordmark />
           <p className="inline-flex items-center gap-2">
             <BrandC size={18} />
-            v1 demo for IB DP students. Phone lock is simulated.
+            Catalyst for IB DP students. Chrome lock extension plus a sprite.
           </p>
         </div>
       </footer>

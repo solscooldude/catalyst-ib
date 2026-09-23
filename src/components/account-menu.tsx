@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { logOut, useAuth } from "@/lib/auth";
+import { displayAvatar } from "@/lib/identity";
 import { claimDailyLogin, resetDemo, useCatalyst } from "@/lib/store";
 import { setUiTheme, useUiTheme } from "@/lib/ui-theme";
 
@@ -54,8 +55,17 @@ export function AccountMenu() {
         onClick={() => setOpen((current) => !current)}
         className="font-heading grid size-9 place-items-center overflow-hidden rounded-full bg-primary text-sm font-semibold text-primary-foreground"
       >
-        {store.avatarDataUrl ? (
-          <img src={store.avatarDataUrl} alt="" className="size-full object-cover" />
+        {displayAvatar(store.avatarDataUrl, store.avatarUrl || auth.user?.imageUrl) ? (
+          <img
+            src={
+              displayAvatar(
+                store.avatarDataUrl,
+                store.avatarUrl || auth.user?.imageUrl,
+              ) ?? ""
+            }
+            alt=""
+            className="size-full object-cover"
+          />
         ) : (
           label
         )}
@@ -93,8 +103,7 @@ export function AccountMenu() {
             className="flex min-h-11 w-full items-center rounded-xl px-3.5 text-left text-sm text-zinc-600 dark:text-zinc-300"
             onClick={() => {
               setOpen(false);
-              logOut();
-              router.push("/");
+              void logOut().then(() => router.push("/"));
             }}
           >
             Log out
@@ -109,7 +118,7 @@ export function AccountMenu() {
               router.push(ROUTES.setup);
             }}
           >
-            Reset demo
+            Reset this account
           </button>
         </div>
       ) : null}
