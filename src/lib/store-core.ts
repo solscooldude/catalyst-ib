@@ -37,6 +37,7 @@ import {
   type UnlockSpendId,
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
+import { normalizeHostList } from "@/lib/domain-policy";
 import { normalizeFriendCode, normalizeFriends, type Friend } from "@/lib/friends";
 import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
 import {
@@ -167,6 +168,7 @@ export type CatalystState = {
   avatarDataUrl: string | null;
   soundMuted: boolean;
   friendCode: string;
+  allowlistExtra: string[];
   friends: Friend[];
   plannerTodos: PlannerTodo[];
   plannerEvents: PlannerEvent[];
@@ -226,6 +228,7 @@ export function createDefaultState(): CatalystState {
     avatarDataUrl: null,
     soundMuted: false,
     friendCode: makeFriendCode(),
+    allowlistExtra: [],
     friends: [],
     plannerTodos: [],
     plannerEvents: [],
@@ -471,6 +474,7 @@ export function hydrateStore(userId: string | null = null) {
       soundMuted: Boolean(parsed.soundMuted),
       friendCode:
         normalizeFriendCode(String(parsed.friendCode ?? "")) || makeFriendCode(),
+      allowlistExtra: normalizeHostList(parsed.allowlistExtra),
       friends: normalizeFriends(parsed.friends),
       schoolTasks: normalizeSchoolTasks(parsed.schoolTasks),
       schoolProvider: normalizeSchoolProvider(parsed.schoolProvider),
