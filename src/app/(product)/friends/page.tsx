@@ -262,7 +262,7 @@ export default function FriendsPage() {
                 id="friend-code"
                 value={code}
                 onChange={(event) => setCode(event.target.value.toUpperCase())}
-                placeholder="SOLS-IB"
+                placeholder="friend-code"
                 className="h-11 rounded-xl"
               />
             </div>
@@ -310,7 +310,7 @@ export default function FriendsPage() {
       ) : null}
 
       {section === "board" ? (
-        <section id="board" className="flux-card px-6 py-6">
+        <section id="board" className="flux-card scroll-mt-24 px-6 py-6">
           <h2 className="text-lg text-foreground">Friend leaderboard</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Ranked by study minutes, then tasks completed.
