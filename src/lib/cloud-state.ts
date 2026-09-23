@@ -1,0 +1,195 @@
+import { normalizeAppearance, type AppearanceState } from "@/lib/appearance";
+import { clampDailyGoalMinutes } from "@/lib/daily-goal";
+import { normalizeHostList } from "@/lib/domain-policy";
+import { normalizeFriendCode } from "@/lib/friends";
+import { normalizeAvatarUrl, normalizeUsername } from "@/lib/identity";
+import { normalizeProfile, type ProfileState } from "@/lib/ib";
+import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
+import { isNemesisId, type NemesisId } from "@/lib/constants";
+
+export const CLOUD_STATE_VERSION = 1;
+
+export type CloudUnlock = {
+  id: string;
+  catalogId: string;
+  label: string;
+  cost: number;
+  startedAt: number;
+  expiresAt: number;
+};
+
+export type CloudCareStage =
+  | "egg"
+  | "hatchling"
+  | "sparklet"
+  | "steady"
+  | "bright"
+  | "luminary";
+
+export type CloudSnapshot = {
+  v: typeof CLOUD_STATE_VERSION;
+  updatedAt: number;
+  username: string;
+  avatarUrl: string | null;
+  tokens: number;
+  schedule: LockWindow[];
+  nemeses: NemesisId[];
+  allowlistExtra: string[];
+  unlocks: CloudUnlock[];
+  appearance: AppearanceState;
+  spriteName: string;
+  spriteRenameCount: number;
+  spriteAsleep: boolean;
+  spriteHatched: boolean;
+  careStage: CloudCareStage;
+  careActions: number;
+  dailyGoalMinutes: number;
+  dailyGoalSetDay: string | null;
+  dailyGoalClaimedDay: string | null;
+  friendCode: string;
+  setupComplete: boolean;
+  introSeen: boolean;
+  profile: ProfileState;
+  lastLoginDay: string | null;
+  streakDays: number;
+  demoMode: boolean;
+};
+
+const CARE_STAGES: CloudCareStage[] = [
+  "egg",
+  "hatchling",
+  "sparklet",
+  "steady",
+  "bright",
+  "luminary",
+];
+
+export type CloudSource = {
+  username?: string;
+  avatarUrl?: string | null;
+  avatarDataUrl?: string | null;
+  tokens?: number;
+  schedule?: unknown;
+  nemeses?: unknown;
+  allowlistExtra?: unknown;
+  unlocks?: unknown;
+  appearance?: unknown;
+  spriteName?: string;
+  spriteRenameCount?: number;
+  spriteAsleep?: boolean;
+  spriteHatched?: boolean;
+  careStage?: string;
+  careActions?: number;
+  dailyGoalMinutes?: number;
+  dailyGoalSetDay?: string | null;
+  dailyGoalClaimedDay?: string | null;
+  friendCode?: string;
+  setupComplete?: boolean;
+  introSeen?: boolean;
+  profile?: unknown;
+  lastLoginDay?: string | null;
+  streakDays?: number;
+  demoMode?: boolean;
+};
+
+function asUnlocks(raw: unknown): CloudUnlock[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((row) => {
+      if (!row || typeof row !== "object") return null;
+      const item = row as Record<string, unknown>;
+      const catalogId = String(item.catalogId ?? "");
+      const expiresAt = Number(item.expiresAt ?? 0);
+      if (!catalogId || !Number.isFinite(expiresAt)) return null;
+      return {
+        id: String(item.id ?? catalogId),
+        catalogId,
+        label: String(item.label ?? catalogId),
+        cost: Number(item.cost ?? 0) || 0,
+        startedAt: Number(item.startedAt ?? Date.now()) || Date.now(),
+        expiresAt,
+      };
+    })
+    .filter((row): row is CloudUnlock => Boolean(row))
+    .slice(0, 24);
+}
+
+export function extractCloudSnapshot(
+  raw: CloudSource,
+  now = Date.now(),
+): CloudSnapshot {
+  const nemeses = [...new Set((Array.isArray(raw.nemeses) ? raw.nemeses : []).filter(isNemesisId))];
+  return {
+    v: CLOUD_STATE_VERSION,
+    updatedAt: now,
+    username: normalizeUsername(raw.username),
+    avatarUrl: normalizeAvatarUrl(raw.avatarUrl),
+    tokens: Math.max(0, Math.floor(Number(raw.tokens ?? 0) || 0)),
+    schedule: normalizeSchedule(raw.schedule),
+    nemeses,
+    allowlistExtra: normalizeHostList(raw.allowlistExtra),
+    unlocks: asUnlocks(raw.unlocks),
+    appearance: normalizeAppearance(raw.appearance as AppearanceState | undefined),
+    spriteName: String(raw.spriteName ?? "Sprite").slice(0, 24) || "Sprite",
+    spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
+    spriteAsleep: Boolean(raw.spriteAsleep),
+    spriteHatched: Boolean(raw.spriteHatched),
+    careStage: CARE_STAGES.includes(raw.careStage as CloudCareStage)
+      ? (raw.careStage as CloudCareStage)
+      : "egg",
+    careActions: Math.max(0, Number(raw.careActions ?? 0) || 0),
+    dailyGoalMinutes: clampDailyGoalMinutes(raw.dailyGoalMinutes),
+    dailyGoalSetDay:
+      typeof raw.dailyGoalSetDay === "string" ? raw.dailyGoalSetDay : null,
+    dailyGoalClaimedDay:
+      typeof raw.dailyGoalClaimedDay === "string" ? raw.dailyGoalClaimedDay : null,
+    friendCode: normalizeFriendCode(String(raw.friendCode ?? "")) || "CAT-WAIT1",
+    setupComplete: Boolean(raw.setupComplete),
+    introSeen: Boolean(raw.introSeen),
+    profile: normalizeProfile(raw.profile as ProfileState | undefined),
+    lastLoginDay: typeof raw.lastLoginDay === "string" ? raw.lastLoginDay : null,
+    streakDays: Math.max(0, Number(raw.streakDays ?? 0) || 0),
+    demoMode: Boolean(raw.demoMode),
+  };
+}
+
+export function isCloudEmpty(snapshot: CloudSnapshot | null | undefined) {
+  if (!snapshot) return true;
+  return (
+    snapshot.tokens === 0 &&
+    snapshot.schedule.length === 0 &&
+    snapshot.nemeses.length === 0 &&
+    snapshot.allowlistExtra.length === 0 &&
+    snapshot.unlocks.length === 0 &&
+    !snapshot.username &&
+    !snapshot.setupComplete &&
+    !snapshot.introSeen &&
+    snapshot.careActions === 0 &&
+    !snapshot.spriteHatched
+  );
+}
+
+export function isLocalWorthMigrating(raw: CloudSource | null | undefined) {
+  if (!raw) return false;
+  const snapshot = extractCloudSnapshot(raw);
+  return !isCloudEmpty(snapshot);
+}
+
+export function compactCloudSnapshot(snapshot: CloudSnapshot) {
+  const json = JSON.stringify(snapshot);
+  if (json.length <= 7500) return snapshot;
+  return {
+    ...snapshot,
+    avatarUrl: null,
+    appearance: normalizeAppearance({
+      ...snapshot.appearance,
+      ownedAccents: snapshot.appearance.ownedAccents.slice(0, 12),
+      ownedBackgrounds: snapshot.appearance.ownedBackgrounds.slice(0, 12),
+      ownedSparkTints: snapshot.appearance.ownedSparkTints.slice(0, 12),
+      ownedGear: snapshot.appearance.ownedGear.slice(0, 16),
+      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 8),
+      ownedTrails: snapshot.appearance.ownedTrails.slice(0, 8),
+      ownedFocusThemes: snapshot.appearance.ownedFocusThemes.slice(0, 8),
+    }),
+  };
+}
