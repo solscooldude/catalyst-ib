@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
+import { ConnectAuthCard } from "@/components/connect-auth";
 import { LockHoursPicker } from "@/components/lock-hours-picker";
 import { LockExtensionSetup } from "@/components/lock-extension-setup";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,10 @@ export default function SetupPage() {
         stay free. Add homework tasks later on Focus if you want a list to
         pick from.
       </p>
+
+      <div className="mt-8">
+        <ConnectAuthCard compact />
+      </div>
 
       <section className="mt-10">
         <h2 className="text-sm font-medium text-foreground">

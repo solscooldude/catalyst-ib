@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
 import { AFTER_SCHOOL_PRESET, WEEKNIGHT_PRESET, formatWindow } from "@/lib/schedule";
 import { PageFrame } from "@/components/page-frame";
-import { readImageAsAvatar } from "@/lib/identity";
+import { displayAvatar, readImageAsAvatar } from "@/lib/identity";
 import { commitSpriteName, displaySpriteName } from "@/lib/sprite-name";
 import {
   addLockWindow,
@@ -218,9 +218,9 @@ export default function ProfilePage() {
       <div className="space-y-2">
         <Label htmlFor="avatar">Profile picture</Label>
         <div className="flex items-center gap-3">
-          {state.avatarDataUrl ? (
+          {displayAvatar(state.avatarDataUrl, state.avatarUrl) ? (
             <img
-              src={state.avatarDataUrl}
+              src={displayAvatar(state.avatarDataUrl, state.avatarUrl) ?? ""}
               alt=""
               className="size-12 rounded-full object-cover ring-1 ring-border"
             />
