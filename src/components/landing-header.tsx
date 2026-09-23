@@ -16,7 +16,7 @@ export function LandingHeader() {
       <Wordmark />
       <div className="flex items-center gap-2 sm:gap-3">
         <ThemeToggle />
-        <DemoBadge className="hidden sm:inline-flex">Interactive demo</DemoBadge>
+        <DemoBadge className="hidden sm:inline-flex">IB DP</DemoBadge>
         {auth.user ? (
           <Button asChild className="h-9 rounded-full px-4">
             <Link href="/dashboard">
@@ -31,10 +31,10 @@ export function LandingHeader() {
               variant="ghost"
               className="h-9 rounded-full px-3 text-muted-foreground"
             >
-              <Link href="/login">Log in</Link>
+              <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button asChild className="h-9 rounded-full px-4">
-              <Link href="/signup">Sign up</Link>
+              <Link href="/sign-up">Sign up</Link>
             </Button>
           </>
         )}
