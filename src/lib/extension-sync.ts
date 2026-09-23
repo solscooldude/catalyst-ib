@@ -1,4 +1,8 @@
-import { unlockedUntilFromUnlocks, type ExtensionPolicy } from "@/lib/domain-policy";
+import {
+  normalizePolicySchedule,
+  unlockedUntilFromUnlocks,
+  type ExtensionPolicy,
+} from "@/lib/domain-policy";
 import { ROUTES } from "@/lib/routes";
 import type { CatalystState } from "@/lib/store-core";
 
@@ -14,12 +18,7 @@ export function buildExtensionPolicy(
   return {
     version: 1,
     updatedAt: now,
-    schedule: state.schedule.map((window) => ({
-      days: window.days,
-      start: window.start,
-      end: window.end,
-      enabled: window.enabled,
-    })),
+    schedule: normalizePolicySchedule(state.schedule),
     nemeses: [...state.nemeses],
     allowlistExtra: [...state.allowlistExtra],
     unlockedUntil: unlockedUntilFromUnlocks(state.unlocks, now),

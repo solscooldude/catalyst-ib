@@ -21,6 +21,21 @@ export function normalizeAvatar(raw?: string | null) {
   return raw;
 }
 
+export function normalizeAvatarUrl(raw?: string | null) {
+  if (!raw || typeof raw !== "string") return null;
+  const next = raw.trim();
+  if (!/^https:\/\//i.test(next)) return null;
+  if (next.length > 500) return null;
+  return next;
+}
+
+export function displayAvatar(
+  dataUrl?: string | null,
+  remoteUrl?: string | null,
+) {
+  return normalizeAvatar(dataUrl) ?? normalizeAvatarUrl(remoteUrl);
+}
+
 export function readImageAsAvatar(file: File): Promise<string | null> {
   return new Promise((resolve) => {
     const reader = new FileReader();

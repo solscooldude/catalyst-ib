@@ -203,9 +203,8 @@ export const UNLOCK_TIER_ROWS = [
 ] as const;
 
 /**
- * Token award rates. `demoMode` stays ON for the Vercel web demo.
- * Production target (flip demoMode off later): 1 token per 2 minutes.
- * Demo (current): 10 tokens per 20 seconds, tallied once on End.
+ * Token award rates. New accounts use the live rate (1 token / 2 minutes).
+ * `demoMode` is a labeled testing toggle only: 10 tokens per 20 seconds.
  */
 export const DEMO_TOKEN_BLOCK_MS = 20 * 1000;
 export const DEMO_TOKENS_PER_BLOCK = 10;
