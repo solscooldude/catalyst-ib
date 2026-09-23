@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { LockHoursPicker } from "@/components/lock-hours-picker";
+import { LockExtensionSetup } from "@/components/lock-extension-setup";
 import { Button } from "@/components/ui/button";
 import { NEMESIS_APPS, type NemesisId } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
@@ -154,6 +155,10 @@ export default function SetupPage() {
             onWeeknights={addWeeknights}
           />
         </div>
+      </section>
+
+      <section className="mt-10 rounded-3xl bg-zinc-50 p-6 dark:bg-zinc-900">
+        <LockExtensionSetup />
       </section>
 
       {setupError ? (

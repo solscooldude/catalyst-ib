@@ -28,6 +28,9 @@ function collectTree(dir, prefix = "") {
 }
 
 const localSrc = collectTree(join(root, "src"), "src");
+const localExt = collectTree(join(root, "extension"), "extension");
+const localPack = join(root, "scripts/pack-extension.mjs");
+const localPackBuf = existsSync(localPack) ? readFileSync(localPack) : null;
 
 const staging = join(tmpdir(), `catalyst-ib-${Date.now()}`);
 mkdirSync(staging, { recursive: true });
@@ -39,10 +42,14 @@ execSync(
 cpSync(staging, root, { recursive: true });
 rmSync(staging, { recursive: true, force: true });
 
-for (const [rel, buf] of localSrc) {
+for (const [rel, buf] of [...localSrc, ...localExt]) {
   const dest = join(root, rel);
   mkdirSync(dirname(dest), { recursive: true });
   writeFileSync(dest, buf);
+}
+if (localPackBuf) {
+  mkdirSync(join(root, "scripts"), { recursive: true });
+  writeFileSync(join(root, "scripts/pack-extension.mjs"), localPackBuf);
 }
 
 rmSync(join(root, "src/lib/focus-plates.ts"), { force: true });
@@ -87,3 +94,5 @@ await Promise.all(
     console.log("assembled", name);
   }),
 );
+
+execSync("node scripts/pack-extension.mjs", { cwd: root, stdio: "inherit" });

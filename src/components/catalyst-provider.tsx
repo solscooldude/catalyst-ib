@@ -18,8 +18,7 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
   return (
     <TooltipProvider>
       <ThemeApplier />
-      <ExtensionSync />
-      {children}
+      <ExtensionSync>{children}</ExtensionSync>
     </TooltipProvider>
   );
 }

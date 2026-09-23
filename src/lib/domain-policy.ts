@@ -208,6 +208,7 @@ export type ExtensionPolicy = {
 };
 
 export const POLICY_MESSAGE = "CATALYST_LOCK_POLICY";
+export const PRESENT_MESSAGE = "CATALYST_LOCK_PRESENT";
 export const UNLOCK_MINUTES = [10, 20, 30] as const;
 export type UnlockMinutes = (typeof UNLOCK_MINUTES)[number];
 
@@ -218,13 +219,13 @@ export function normalizeHost(raw: string) {
     const url = trimmed.includes("://")
       ? new URL(trimmed)
       : new URL(`https://${trimmed}`);
-    return url.hostname.replace(/\.$/, "");
+    return url.hostname.replace(/\.+$/, "");
   } catch {
     return trimmed
       .replace(/^https?:\/\//, "")
       .split("/")[0]
       .replace(/^www\./, "")
-      .replace(/\.$/, "");
+      .replace(/\.+$/, "");
   }
 }
 
