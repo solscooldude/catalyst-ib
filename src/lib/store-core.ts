@@ -39,7 +39,16 @@ import {
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
 import { normalizeHostList } from "@/lib/domain-policy";
 import { normalizeFriendCode, normalizeFriends, type Friend } from "@/lib/friends";
-import { makeFriendCode, normalizeAvatar, normalizeUsername } from "@/lib/identity";
+import {
+  makeFriendCode,
+  normalizeAvatar,
+  normalizeAvatarUrl,
+  normalizeUsername,
+} from "@/lib/identity";
+import {
+  extractCloudSnapshot,
+  type CloudSnapshot,
+} from "@/lib/cloud-state";
 import {
   normalizeSchoolTasks,
   type SchoolTask,
@@ -166,6 +175,7 @@ export type CatalystState = {
   introSeen: boolean;
   username: string;
   avatarDataUrl: string | null;
+  avatarUrl: string | null;
   soundMuted: boolean;
   friendCode: string;
   allowlistExtra: string[];
@@ -192,7 +202,7 @@ export function createDefaultState(): CatalystState {
     classroomConnected: false,
     classroomEmail: "",
     classroomMode: null,
-    demoMode: true,
+    demoMode: false,
     tokens: 0,
     tasks: defaultTasks.map((task) => ({ ...task })),
     schoolTasks: [],
@@ -226,6 +236,7 @@ export function createDefaultState(): CatalystState {
     introSeen: false,
     username: "",
     avatarDataUrl: null,
+    avatarUrl: null,
     soundMuted: false,
     friendCode: makeFriendCode(),
     allowlistExtra: [],
@@ -471,6 +482,7 @@ export function hydrateStore(userId: string | null = null) {
       introSeen: Boolean(parsed.introSeen),
       username: normalizeUsername(parsed.username),
       avatarDataUrl: normalizeAvatar(parsed.avatarDataUrl),
+      avatarUrl: normalizeAvatarUrl(parsed.avatarUrl),
       soundMuted: Boolean(parsed.soundMuted),
       friendCode:
         normalizeFriendCode(String(parsed.friendCode ?? "")) || makeFriendCode(),
@@ -534,6 +546,78 @@ export function getServerSnapshot() {
 
 export function useCatalyst() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+export function applyCloudSnapshot(snapshot: CloudSnapshot) {
+  setState((current) => ({
+    ...current,
+    username: snapshot.username || current.username,
+    avatarUrl: snapshot.avatarUrl,
+    avatarDataUrl: snapshot.avatarUrl ? null : current.avatarDataUrl,
+    tokens: snapshot.tokens,
+    schedule: snapshot.schedule,
+    nemeses: snapshot.nemeses,
+    allowlistExtra: snapshot.allowlistExtra,
+    unlocks: normalizeUnlocks(snapshot.unlocks, snapshot.nemeses),
+    appearance: mergeAppearance(snapshot.appearance, storageAccountId),
+    spriteName: snapshot.spriteName,
+    spriteRenameCount: snapshot.spriteRenameCount,
+    spriteAsleep: snapshot.spriteAsleep,
+    spriteHatched: snapshot.spriteHatched,
+    careStage: snapshot.careStage,
+    careActions: snapshot.careActions,
+    dailyGoalMinutes: snapshot.dailyGoalMinutes,
+    dailyGoalSetDay: snapshot.dailyGoalSetDay,
+    dailyGoalClaimedDay: snapshot.dailyGoalClaimedDay,
+    friendCode: snapshot.friendCode || current.friendCode,
+    setupComplete: snapshot.setupComplete,
+    introSeen: snapshot.introSeen,
+    profile: snapshot.profile,
+    lastLoginDay: snapshot.lastLoginDay,
+    streakDays: snapshot.streakDays,
+    demoMode: snapshot.demoMode,
+    hydrated: true,
+  }));
+}
+
+export function exportCloudSnapshot(now = Date.now()) {
+  return extractCloudSnapshot(getSnapshot(), now);
+}
+
+export function readLegacyLocalSnapshots(): CloudSnapshot[] {
+  if (typeof window === "undefined") return [];
+  const found: CloudSnapshot[] = [];
+  try {
+    const keys = Object.keys(window.localStorage);
+    for (const key of keys) {
+      if (key !== STORAGE_KEY && !key.startsWith(`${STORAGE_KEY}:user:`)) {
+        continue;
+      }
+      const raw = window.localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as CloudSourceLike;
+      found.push(extractCloudSnapshot(parsed));
+    }
+  } catch {
+    /* private mode */
+  }
+  return found;
+}
+
+type CloudSourceLike = Parameters<typeof extractCloudSnapshot>[0];
+
+export function pickLegacyLocalSnapshot() {
+  const current = extractCloudSnapshot(getSnapshot());
+  const extras = readLegacyLocalSnapshots();
+  return [current, ...extras].sort((a, b) => {
+    const score = (row: CloudSnapshot) =>
+      row.tokens +
+      row.schedule.length * 10 +
+      row.nemeses.length * 4 +
+      (row.setupComplete ? 20 : 0) +
+      (row.username ? 5 : 0);
+    return score(b) - score(a);
+  })[0];
 }
 
 export function resetDemo() {
