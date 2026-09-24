@@ -5,6 +5,9 @@ import {
   type SubjectId,
   type TaskId,
 } from "@/lib/constants";
+import { TASK_DESCRIPTION_MAX } from "@/lib/task-description";
+
+export { TASK_DESCRIPTION_MAX } from "@/lib/task-description";
 
 export type TaskSource = "managebac" | "classroom" | "demo" | "manual";
 
@@ -138,7 +141,7 @@ export function normalizeSchoolTask(raw: unknown): SchoolTask | null {
     subject,
     subjectId,
     due: String(item.due ?? "").trim().slice(0, 32),
-    detail: String(item.detail ?? "").trim().slice(0, 200),
+    detail: String(item.detail ?? "").trim().slice(0, TASK_DESCRIPTION_MAX),
     source,
     courseName: item.courseName?.trim().slice(0, 80) || undefined,
     done: Boolean(item.done),

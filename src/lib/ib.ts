@@ -278,6 +278,57 @@ export function studySubjectOptions(profile: ProfileState) {
   );
 }
 
+export type ChosenSubjectOption = {
+  id: string;
+  label: string;
+  statId: SubjectId;
+};
+
+/** Subjects the user already saved in Setup/Profile. Empty until they pick some. */
+export function chosenSubjectOptions(
+  profile: ProfileState,
+): ChosenSubjectOption[] {
+  if (profile.subjects.length === 0) return [];
+  const groups = profile.subjects
+    .map((id) => getIbSubject(id))
+    .filter((row): row is IbSubject => Boolean(row))
+    .map((row) => ({
+      id: row.id,
+      label: row.label,
+      statId: row.statId,
+    }));
+  const core = CORE_DIPLOMA.filter((row) => profile.core.includes(row.id)).map(
+    (row) => ({
+      id: row.statId,
+      label: row.label,
+      statId: row.statId,
+    }),
+  );
+  const seen = new Set<string>();
+  return alphaByLabel(
+    [...groups, ...core].filter((row) => {
+      if (seen.has(row.id)) return false;
+      seen.add(row.id);
+      return true;
+    }),
+  );
+}
+
+export function hasChosenSubjects(profile: ProfileState) {
+  return chosenSubjectOptions(profile).length > 0;
+}
+
+export function findChosenSubject(
+  profile: ProfileState,
+  key: string,
+): ChosenSubjectOption | undefined {
+  const needle = key.trim();
+  if (!needle) return undefined;
+  return chosenSubjectOptions(profile).find(
+    (row) => row.id === needle || row.statId === needle || row.label === needle,
+  );
+}
+
 export function motivationReady(motivation: MotivationState) {
   return Boolean(
     motivation.colleges.trim() &&
