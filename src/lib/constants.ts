@@ -203,8 +203,7 @@ export const UNLOCK_TIER_ROWS = [
 ] as const;
 
 /**
- * Token award rates. New accounts use the live rate (1 token / 2 minutes).
- * `demoMode` is a labeled testing toggle only: 10 tokens per 20 seconds.
+ * Token award rate is 1 token / 2 minutes. Older `demoMode` fields are ignored.
  */
 export const DEMO_TOKEN_BLOCK_MS = 20 * 1000;
 export const DEMO_TOKENS_PER_BLOCK = 10;

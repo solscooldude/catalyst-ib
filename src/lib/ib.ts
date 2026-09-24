@@ -193,7 +193,7 @@ export function validateDiploma(
 ): { ok: true } | { ok: false; reason: string } {
   if (!classYear) return { ok: false, reason: "Pick your graduating class." };
   if (subjects.length !== 6) {
-    return { ok: false, reason: "Choose exactly six DP subjects." };
+    return { ok: false, reason: "Choose exactly six subjects." };
   }
   const unique = new Set(subjects);
   if (unique.size !== 6) {
@@ -201,7 +201,7 @@ export function validateDiploma(
   }
   const rows = subjects.map((id) => getIbSubject(id)).filter(Boolean) as IbSubject[];
   if (rows.length !== 6) {
-    return { ok: false, reason: "One of those subjects is not on the IB list." };
+    return { ok: false, reason: "One of those subjects is not on the list." };
   }
   if (rows.some((row) => !row.level)) {
     return { ok: false, reason: "Every subject needs HL or SL." };

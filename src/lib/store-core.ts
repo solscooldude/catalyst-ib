@@ -386,6 +386,7 @@ function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) 
   if (raw.kind && raw.subjectId && raw.title) {
     return {
       ...raw,
+      demoMode: false,
       pausedAt: raw.pausedAt ?? null,
       pauseAccumMs: raw.pauseAccumMs ?? 0,
     };
@@ -400,6 +401,7 @@ function normalizeSession(raw: Session | (Session & { taskId: TaskId }) | null) 
     taskId,
     subjectId: TASK_SUBJECT[taskId] ?? "other",
     title: task?.title ?? "Focus session",
+    demoMode: false,
     plannedMinutes: legacy.plannedMinutes ?? null,
     pausedAt: legacy.pausedAt ?? null,
     pauseAccumMs: legacy.pauseAccumMs ?? 0,
@@ -517,6 +519,7 @@ export function hydrateStore(userId: string | null = null) {
           : null,
       plannerTodos: normalizePlannerTodos(parsed.plannerTodos),
       plannerEvents: normalizePlannerEvents(parsed.plannerEvents),
+      demoMode: false,
       hydrated: true,
     };
     state = withGrowth(state);
@@ -575,7 +578,7 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     profile: snapshot.profile,
     lastLoginDay: snapshot.lastLoginDay,
     streakDays: snapshot.streakDays,
-    demoMode: snapshot.demoMode,
+    demoMode: false,
     hydrated: true,
   }));
 }

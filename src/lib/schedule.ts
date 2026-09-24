@@ -105,6 +105,39 @@ export function validateWindow(input: {
   return { ok: true };
 }
 
+const DAY_ALIASES: Record<string, number> = {
+  sun: 0,
+  sunday: 0,
+  mon: 1,
+  monday: 1,
+  tue: 2,
+  tues: 2,
+  tuesday: 2,
+  wed: 3,
+  wednesday: 3,
+  thu: 4,
+  thur: 4,
+  thurs: 4,
+  thursday: 4,
+  fri: 5,
+  friday: 5,
+  sat: 6,
+  saturday: 6,
+};
+
+export function parseWeekday(day: unknown): number | null {
+  if (typeof day === "number" && Number.isInteger(day) && day >= 0 && day <= 6) {
+    return day;
+  }
+  const raw = String(day ?? "")
+    .trim()
+    .toLowerCase();
+  if (raw in DAY_ALIASES) return DAY_ALIASES[raw];
+  const numeric = Number(raw);
+  if (Number.isInteger(numeric) && numeric >= 0 && numeric <= 6) return numeric;
+  return null;
+}
+
 function coerceDays(raw: unknown): number[] {
   const list = Array.isArray(raw)
     ? raw
@@ -114,8 +147,8 @@ function coerceDays(raw: unknown): number[] {
   return [
     ...new Set(
       list
-        .map((day) => Number(day))
-        .filter((day) => WEEKDAYS.some((row) => row.day === day)),
+        .map((day) => parseWeekday(day))
+        .filter((day): day is number => day != null),
     ),
   ];
 }
