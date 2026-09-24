@@ -42,7 +42,7 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "ethereal",
     label: "Ethereal",
-    how: "Final form after Luminary. Mystical glow, still a natural body. Extra Magical is optional.",
+    how: "Final form after Luminary. Signature glow, still a natural body. Extra Magical is optional: glowing eyes, stronger aura, more sparkles, faint halo.",
   },
 ];
 

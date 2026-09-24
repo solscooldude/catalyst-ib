@@ -37,7 +37,7 @@ export function CareStageInfo() {
           Luminary at care score 64. Ethereal uses that species’ signature
           glow — Fox amber, Bunny pearl, Deer gold-green, Cat magenta,
           Axolotl rose, Dragon mint-teal. Bodies stay natural. Extra Magical
-          is optional on Ethereal.
+          is optional on Ethereal (glowing eyes, bloom, sparkles, halo).
         </p>
       </PopoverContent>
     </Popover>

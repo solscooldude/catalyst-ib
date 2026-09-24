@@ -16,7 +16,7 @@ export function ExtraMagicalToggle({
         <p className="text-sm font-medium text-foreground">Extra Magical</p>
         <p className="text-xs text-muted-foreground">
           {unlocked
-            ? "Glowy eyes, stronger aura, more motes. Ethereal only."
+            ? "Glowing eyes, stronger aura, more sparkles, faint halo. Ethereal only."
             : "Unlocks at Ethereal."}
         </p>
       </div>
