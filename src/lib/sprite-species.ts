@@ -1,19 +1,22 @@
 import { getSparkTint, type SparkTintId } from "@/lib/spark-tints";
+import {
+  BRAND_MINT,
+  CAT_HEART,
+  ETHEREAL_GLOWS,
+  SPRITE_SPECIES,
+  type SpriteSpeciesId,
+} from "@/lib/species-glows";
 
-export const SPRITE_SPECIES = [
-  "fox",
-  "bunny",
-  "deer",
-  "cat",
-  "axolotl",
-  "dragon",
-] as const;
-
-export type SpriteSpeciesId = (typeof SPRITE_SPECIES)[number];
+export {
+  BRAND_MINT,
+  CAT_HEART,
+  ETHEREAL_GLOWS,
+  SPRITE_SPECIES,
+  type EtherealFx,
+  type SpriteSpeciesId,
+} from "@/lib/species-glows";
 
 export const DEFAULT_SPECIES: SpriteSpeciesId = "fox";
-
-export const BRAND_MINT = "#5EEAD4";
 
 export type SpeciesPalette = {
   id: SpriteSpeciesId;
@@ -26,6 +29,9 @@ export type SpeciesPalette = {
   nose: string;
   glow: string;
   glowDeep: string;
+  egg: string;
+  eggWash: string;
+  eggMark: string;
   mark?: string;
 };
 
@@ -39,20 +45,24 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     accent: "#2A211C",
     ink: "#14110F",
     nose: "#1A1412",
-    glow: "#F5B942",
-    glowDeep: "#F59E0B",
+    ...ETHEREAL_GLOWS.fox,
+    egg: "#F3D2A8",
+    eggWash: "#E07A2F",
+    eggMark: "#C26A2A",
   },
   bunny: {
     id: "bunny",
     label: "Bunny",
-    fur: "#F3E6D6",
-    furDeep: "#D6C2AE",
-    belly: "#FFFBF5",
-    accent: "#F4B4B8",
+    fur: "#FFF6EC",
+    furDeep: "#E8D4C4",
+    belly: "#FFFCF8",
+    accent: "#F4B4C8",
     ink: "#2A211C",
-    nose: "#E8A0A8",
-    glow: "#F5D0FE",
-    glowDeep: "#C4B5FD",
+    nose: "#E8A0B0",
+    ...ETHEREAL_GLOWS.bunny,
+    egg: "#FFF8F2",
+    eggWash: "#F8D5DE",
+    eggMark: "#F4B4C8",
   },
   deer: {
     id: "deer",
@@ -63,8 +73,10 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     accent: "#7A5530",
     ink: "#2A211C",
     nose: "#3A2A20",
-    glow: "#FDE68A",
-    glowDeep: "#A3E635",
+    ...ETHEREAL_GLOWS.deer,
+    egg: "#E8D2A8",
+    eggWash: "#C4A06A",
+    eggMark: "#FFF8EE",
     mark: "#FFF8EE",
   },
   cat: {
@@ -73,35 +85,41 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     fur: "#1C1C1E",
     furDeep: "#0B0B0F",
     belly: "#2A2A2E",
-    accent: "#F4A4B8",
+    accent: CAT_HEART,
     ink: "#F8FAFC",
-    nose: "#F4A4B8",
-    glow: "#E879F9",
-    glowDeep: "#C084FC",
+    nose: CAT_HEART,
+    ...ETHEREAL_GLOWS.cat,
+    egg: "#2A2A30",
+    eggWash: "#18181C",
+    eggMark: CAT_HEART,
   },
   axolotl: {
     id: "axolotl",
     label: "Axolotl",
-    fur: "#F5B6C4",
+    fur: "#F7C4D0",
     furDeep: "#E07A96",
     belly: "#FFE4EC",
     accent: "#E87A9A",
     ink: "#3A2430",
     nose: "#C45A78",
-    glow: "#F472B6",
-    glowDeep: "#FB7185",
+    ...ETHEREAL_GLOWS.axolotl,
+    egg: "#F8D0DA",
+    eggWash: "#F4A4B8",
+    eggMark: "#E87A9A",
   },
   dragon: {
     id: "dragon",
     label: "Dragon",
-    fur: "#8BA888",
-    furDeep: "#5F7A5C",
-    belly: "#D7E6CF",
+    fur: "#86C4A4",
+    furDeep: "#5A9A7E",
+    belly: "#D4F0E4",
     accent: "#E8D7B0",
     ink: "#1F2A1E",
     nose: "#3A4638",
-    glow: "#5EEAD4",
-    glowDeep: "#2DD4BF",
+    ...ETHEREAL_GLOWS.dragon,
+    egg: "#C8E8D8",
+    eggWash: "#86C4A4",
+    eggMark: "#5A9A7E",
   },
 };
 
@@ -114,7 +132,7 @@ export function normalizeSpriteSpecies(
   return DEFAULT_SPECIES;
 }
 
-/** Default mint tint means natural species fur — mint is glow only. */
+/** Default mint tint means natural species fur — mint glow is Dragon + brand only. */
 export function usesNaturalBody(tint: SparkTintId | string | undefined) {
   return !tint || tint === "mint";
 }

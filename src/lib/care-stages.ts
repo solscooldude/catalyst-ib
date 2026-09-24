@@ -73,6 +73,9 @@ export function sparkEvolutionLabel(stage: CareStage) {
   return CARE_STAGE_GUIDE.find((row) => row.stage === stage)?.label ?? "Egg";
 }
 
-export function mintGlowForStage(stage: CareStage) {
+/** Luminary/Ethereal use the species signature glow — not a shared mint wash. */
+export function signatureGlowForStage(stage: CareStage) {
   return stage === "luminary" || stage === "ethereal";
 }
+
+export const mintGlowForStage = signatureGlowForStage;
