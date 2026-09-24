@@ -49,6 +49,23 @@ export function formatStudyMinutes(minutes: number) {
   return `${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)} h`;
 }
 
+/** Local Monday 00:00 through Sunday 23:59:59.999. */
+export function endOfWeek(now = new Date()) {
+  const start = startOfWeek(now);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+export function weeklyStudyMinutes(logs: SessionLog[], now = new Date()) {
+  return studyMinutesFromLogs(logsInRange(logs, startOfWeek(now), endOfWeek(now)));
+}
+
+export function formatWeeklyStudy(minutes: number) {
+  return `This week · ${formatStudyMinutes(minutes)}`;
+}
+
 export const CARE_STAGES = [
   "egg",
   "hatchling",
