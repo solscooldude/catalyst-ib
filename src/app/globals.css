@@ -1346,6 +1346,18 @@ html.light .spark-dot {
   transition: width 280ms linear;
 }
 
+.focus-fullscreen-btn {
+  pointer-events: auto;
+  position: fixed;
+  top: 1.3rem;
+  left: 1.15rem;
+  z-index: 45;
+  background: rgb(11 11 15 / 0.55);
+  color: #f4f4f5;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
 .focus-hud-tokens {
   position: absolute;
   top: 0.15rem;
@@ -1529,6 +1541,11 @@ html.light .spark-dot {
 }
 
 @media (max-width: 640px) {
+  .focus-fullscreen-btn {
+    top: 0.85rem;
+    left: 0.75rem;
+  }
+
   .focus-hud-tokens {
     top: auto;
     right: 50%;
