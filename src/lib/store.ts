@@ -82,12 +82,7 @@ import {
   DAILY_GOAL_REWARD,
 } from "@/lib/daily-goal";
 import { todayStudyMs } from "@/lib/stats";
-import {
-  claimFriendCode,
-  FRIEND_CODE_HINT,
-  normalizeFriendCode,
-  stubFriendFromCode,
-} from "@/lib/friends";
+import { FRIEND_CODE_HINT, normalizeFriendCode, stubFriendFromCode } from "@/lib/friends";
 import {
   normalizeAvatar,
   normalizeAvatarUrl,
@@ -1006,19 +1001,6 @@ export function setBackgroundShade(shade: AccentShadeId, hue?: BackgroundId) {
 
 export function completeIntro() {
   setState((current) => ({ ...current, introSeen: true }));
-}
-
-export function setFriendCode(raw: string) {
-  const code = normalizeFriendCode(raw);
-  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
-  if (code === getSnapshot().friendCode) return { ok: true as const, code };
-  if (getSnapshot().friends.some((row) => row.code === code)) {
-    return { ok: false as const, reason: "A friend already uses that code." };
-  }
-  const claimed = claimFriendCode(code);
-  if (!claimed.ok) return claimed;
-  setState((current) => ({ ...current, friendCode: code }));
-  return { ok: true as const, code };
 }
 
 export function addFriend(raw: string) {
