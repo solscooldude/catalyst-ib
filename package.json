@@ -11,6 +11,7 @@
     "test:policy": "node --test extension/policy.test.mjs",
     "test:schedule": "node --experimental-strip-types --test src/lib/schedule.test.ts",
     "test:stats": "node --experimental-strip-types --test src/lib/stats.test.ts",
+    "test:pet-quiz": "node --experimental-strip-types --test src/lib/pet-quiz.test.ts",
     "pack:extension": "node scripts/pack-extension.mjs"
   },
   "dependencies": {

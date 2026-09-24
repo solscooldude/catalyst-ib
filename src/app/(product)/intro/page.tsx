@@ -32,7 +32,7 @@ const SLIDES = [
   {
     kicker: "Sprite",
     title: "Sprite",
-    body: "Your sprite hatches on the first focus block or a snack, then grows when you study.",
+    body: "A short quiz matches you to a sprite. It hatches on the first focus block or a snack, then grows when you study.",
   },
   {
     kicker: "Tokens",
@@ -42,14 +42,16 @@ const SLIDES = [
   {
     kicker: "Account",
     title: "Finish setting up account",
-    body: "Next: your profile and required lock hours. Default after-school window is 4:30–7:30. You can change it. Then you land on Home.",
+    body: "Next: a short quiz assigns your sprite, then profile and required lock hours. Default after-school window is 4:30–7:30.",
   },
 ] as const;
 
 function nextAfterIntro(state: {
+  petQuizComplete: boolean;
   profile: { complete: boolean };
   schedule: unknown[];
 }) {
+  if (!state.petQuizComplete) return ROUTES.pet;
   return state.profile.complete && state.schedule.length > 0
     ? ROUTES.home
     : ROUTES.profile;
@@ -129,7 +131,7 @@ export default function IntroPage() {
                   else setIndex((value) => value + 1);
                 }}
               >
-                {last ? "Set up account" : "Next"}
+                {last ? "Find your sprite" : "Next"}
               </Button>
             </div>
           </div>
