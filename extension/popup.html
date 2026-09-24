@@ -9,8 +9,23 @@
   <body>
     <header>
       <p class="kicker">Catalyst Lock</p>
-      <p id="status" class="status unknown">Unknown</p>
+      <div class="toggle-row">
+        <p id="status" class="status unknown">Unknown</p>
+        <button
+          type="button"
+          id="toggle"
+          class="toggle"
+          role="switch"
+          aria-checked="false"
+          aria-label="Catalyst Lock on or off"
+        >
+          <span class="toggle-track" aria-hidden="true">
+            <span class="toggle-knob"></span>
+          </span>
+        </button>
+      </div>
       <p id="status-detail" class="muted">Reading policy…</p>
+      <p id="toggle-hint" class="hint">Open Catalyst so lock hours can sync.</p>
     </header>
 
     <section>

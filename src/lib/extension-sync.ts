@@ -15,6 +15,12 @@ export function buildExtensionPolicy(
   state: CatalystState,
   now = Date.now(),
 ): ExtensionPolicy {
+  const session = state.session;
+  const sessionActive = Boolean(
+    session &&
+      (session.status === "locked" || session.status === "focus") &&
+      !session.pausedAt,
+  );
   return {
     version: 1,
     updatedAt: now,
@@ -23,6 +29,7 @@ export function buildExtensionPolicy(
     allowlistExtra: [...state.allowlistExtra],
     unlockedUntil: unlockedUntilFromUnlocks(state.unlocks, now),
     appOrigin: appOrigin(),
+    sessionActive,
   };
 }
 

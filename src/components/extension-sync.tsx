@@ -46,6 +46,7 @@ export function ExtensionSync({ children }: { children?: React.ReactNode }) {
     state.nemeses,
     state.allowlistExtra,
     state.unlocks,
+    state.session,
   ]);
 
   return (

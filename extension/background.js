@@ -1,24 +1,29 @@
-import { decideUrl, lockStatus } from "./policy.js";
+import { decideUrl, lockForcedOn, lockStatus } from "./policy.js";
 
 const CHECKED = new Set();
 
+function defaultPolicy() {
+  return {
+    version: 1,
+    schedule: [],
+    nemeses: [],
+    allowlistExtra: [],
+    unlockedUntil: {},
+    appOrigin: "https://catalyst-study.vercel.app",
+  };
+}
+
 async function readPolicy() {
-  const stored = await chrome.storage.local.get("policy");
-  return (
-    stored.policy || {
-      version: 1,
-      schedule: [],
-      nemeses: [],
-      allowlistExtra: [],
-      unlockedUntil: {},
-      appOrigin: "https://catalyst-study.vercel.app",
-    }
-  );
+  const stored = await chrome.storage.local.get(["policy", "extensionEnabled"]);
+  return {
+    ...(stored.policy || defaultPolicy()),
+    extensionEnabled: stored.extensionEnabled !== false,
+  };
 }
 
 async function refreshBadge() {
-  const stored = await chrome.storage.local.get("policy");
-  const status = lockStatus(stored.policy || null);
+  const policy = await readPolicy();
+  const status = lockStatus(policy);
   const text = status === "on" ? "ON" : status === "off" ? "OFF" : "?";
   const title =
     status === "on"
@@ -70,13 +75,39 @@ async function enforce(tabId, url) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "SET_POLICY" && message.policy) {
-    chrome.storage.local.set(
-      { policy: message.policy, policyReceivedAt: Date.now() },
-      () => {
+    chrome.storage.local.get(["extensionEnabled"], (stored) => {
+      const policy = { ...message.policy };
+      delete policy.extensionEnabled;
+      chrome.storage.local.set(
+        { policy, policyReceivedAt: Date.now() },
+        () => {
+          void refreshBadge();
+          sendResponse({ ok: true, forcedOn: lockForcedOn(policy) });
+        },
+      );
+      if (stored.extensionEnabled === undefined) {
+        chrome.storage.local.set({ extensionEnabled: true });
+      }
+    });
+    return true;
+  }
+  if (message?.type === "SET_ENABLED") {
+    chrome.storage.local.get(["policy", "extensionEnabled"], (stored) => {
+      const policy = {
+        ...(stored.policy || defaultPolicy()),
+        extensionEnabled: stored.extensionEnabled !== false,
+      };
+      if (lockForcedOn(policy)) {
         void refreshBadge();
-        sendResponse({ ok: true });
-      },
-    );
+        sendResponse({ ok: true, enabled: true, forced: true });
+        return;
+      }
+      const enabled = message.enabled !== false;
+      chrome.storage.local.set({ extensionEnabled: enabled }, () => {
+        void refreshBadge();
+        sendResponse({ ok: true, enabled, forced: false });
+      });
+    });
     return true;
   }
   if (message?.type === "GET_POLICY") {
@@ -91,13 +122,23 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  void refreshBadge();
+  chrome.storage.local.get("extensionEnabled", (stored) => {
+    if (stored.extensionEnabled === undefined) {
+      chrome.storage.local.set({ extensionEnabled: true }, () => {
+        void refreshBadge();
+      });
+      return;
+    }
+    void refreshBadge();
+  });
 });
 chrome.runtime.onStartup.addListener(() => {
   void refreshBadge();
 });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.policy) void refreshBadge();
+  if (area === "local" && (changes.policy || changes.extensionEnabled)) {
+    void refreshBadge();
+  }
 });
 void refreshBadge();
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Catalyst Lock",
-  "version": "0.2.0",
-  "description": "During Catalyst lock hours, block distracting sites. School tools stay open.",
+  "version": "0.3.0",
+  "description": "Block distracting sites when Catalyst Lock is on. Lock hours and study blocks keep it on. School tools stay open.",
   "permissions": ["tabs", "storage", "webNavigation"],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -13,6 +13,7 @@
     {
       "matches": [
         "https://catalyst-study.vercel.app/*",
+        "https://catalyst-focus.vercel.app/*",
         "https://catalyst-ib.vercel.app/*",
         "http://localhost:43127/*",
         "http://127.0.0.1:43127/*"
