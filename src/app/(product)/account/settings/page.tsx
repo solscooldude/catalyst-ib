@@ -51,8 +51,27 @@ export default function SettingsPage() {
       </div>
 
       {!clerkReady ? (
-        <div className="flux-card px-6 py-8">
+        <div className="flux-card space-y-6 px-6 py-8">
           <ConnectAuthCard compact />
+          {auth.user?.source === "local" ? (
+            <div className="space-y-3 border-t border-white/8 pt-6">
+              <h2 className="text-lg text-foreground">On this device</h2>
+              <p className="text-sm text-muted-foreground">
+                This session stays here until you sign in with Google or email.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 rounded-full px-6"
+                onClick={async () => {
+                  await logOut();
+                  router.push("/sign-in");
+                }}
+              >
+                Sign out
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="flux-card space-y-4 px-6 py-8">

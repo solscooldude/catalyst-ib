@@ -147,12 +147,12 @@ export default function ProfilePage() {
           {firstRun ? "Account setup" : "Profile"}
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">
-          {firstRun ? "Finish setting up account" : "IB profile"}
+          {firstRun ? "Finish setting up account" : "Profile"}
         </h1>
         {firstRun ? (
           <p className="mt-3 text-sm text-muted-foreground">
             Required lock hours default to after school, 4:30–7:30. Change them
-            if that is not your block. Then save your IB profile to open Home.
+            if that is not your block. Then save your profile to open Home.
           </p>
         ) : null}
       </div>

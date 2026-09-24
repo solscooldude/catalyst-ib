@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
@@ -24,7 +23,6 @@ import {
   buyAppearance,
   equipAppearance,
   getNemeses,
-  setDemoMode,
   startSession,
   useCatalyst,
 } from "@/lib/store";
@@ -282,20 +280,6 @@ export default function AppHomePage() {
         ) : null}
 
         <div className="mt-5 space-y-4">
-          <label className="flex items-start gap-3 rounded-2xl bg-background/70 p-3 text-sm">
-            <Checkbox
-              checked={state.demoMode}
-              onCheckedChange={(value) => setDemoMode(Boolean(value))}
-            />
-            <span className="text-foreground">
-              Demo token rate
-              <span className="mt-1 block text-xs text-muted-foreground">
-                Testing only. 10 tokens every 20 seconds instead of 1 token per
-                2 minutes. Lock hours stay the same.
-              </span>
-            </span>
-          </label>
-
           {mode === "task" ? (
             <Button
               className="h-11 w-full rounded-full"

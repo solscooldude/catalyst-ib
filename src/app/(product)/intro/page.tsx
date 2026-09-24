@@ -17,7 +17,7 @@ const SLIDES = [
   {
     kicker: "The problem",
     title: "The problem",
-    body: "A lot of IB students struggle with procrastination, constant phone distractions, passive scrolling on other devices, or with staying motivated during intense workloads like IAs, TOK essays, or the full IB grind.",
+    body: "A lot of students struggle with procrastination, constant phone distractions, passive scrolling, or staying motivated through long essays, projects, and heavy weeks.",
   },
   {
     kicker: "The tool",
@@ -42,7 +42,7 @@ const SLIDES = [
   {
     kicker: "Account",
     title: "Finish setting up account",
-    body: "Next: your IB profile and required lock hours. Default after-school window is 4:30–7:30. You can change it. Then you land on Home.",
+    body: "Next: your profile and required lock hours. Default after-school window is 4:30–7:30. You can change it. Then you land on Home.",
   },
 ] as const;
 

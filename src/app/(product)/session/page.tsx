@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DemoBadge } from "@/components/demo-badge";
 import { FocusHud } from "@/components/focus-hud";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
@@ -10,11 +9,7 @@ import { UnlockPanel } from "@/components/unlock-panel";
 import { Spark, type SparkMood } from "@/components/spark";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DEMO_TOKENS_PER_BLOCK,
-  REAL_TOKEN_MS,
-  SUBJECTS,
-} from "@/lib/constants";
+import { REAL_TOKEN_MS, SUBJECTS } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 import {
   completeSession,
@@ -73,7 +68,6 @@ export default function FocusPage() {
 
   const paused = Boolean(session?.pausedAt);
   const elapsed = session ? sessionElapsedMs(session, now) : 0;
-  const demoMode = session?.demoMode ?? state.demoMode;
   const title = session ? sessionTitle(session) : "";
   const subjectLabel = session
     ? (SUBJECTS.find((row) => row.id === session.subjectId)?.label ?? null)
@@ -186,15 +180,9 @@ export default function FocusPage() {
           </p>
         ) : null}
 
-        {demoMode ? (
-          <DemoBadge className="mt-4">
-            Demo · {DEMO_TOKENS_PER_BLOCK} tokens / 20s, live
-          </DemoBadge>
-        ) : (
-          <p className="mt-4 text-xs text-muted-foreground">
-            {REAL_TOKEN_MS / 60000} minutes = 1 token, live
-          </p>
-        )}
+        <p className="mt-4 text-xs text-muted-foreground">
+          {REAL_TOKEN_MS / 60000} minutes = 1 token
+        </p>
 
         {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
 
