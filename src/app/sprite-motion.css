@@ -72,11 +72,191 @@
 .sprite-playpen {
   position: relative;
   display: flex;
-  min-height: 22rem;
+  min-height: 24rem;
   width: 100%;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding-bottom: 1.4rem;
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(ellipse 36% 24% at 80% 34%, rgb(94 234 212 / 0.07), transparent 64%),
+    linear-gradient(180deg, #16161b 0%, #0d0d11 52%, #09090b 100%);
+}
+
+.sprite-room {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.sprite-room-shelf {
+  position: absolute;
+  top: 14%;
+  left: 8%;
+  display: flex;
+  width: 42%;
+  justify-content: space-between;
+  border-bottom: 2px solid rgb(255 255 255 / 0.06);
+  padding-bottom: 0.35rem;
+}
+
+.sprite-room-shelf span {
+  display: block;
+  height: 1.6rem;
+  width: 22%;
+  border-radius: 0.2rem;
+  background: rgb(255 255 255 / 0.05);
+}
+
+.sprite-room-art {
+  position: absolute;
+  top: 16%;
+  right: 18%;
+  width: 2.1rem;
+  height: 1.6rem;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  background: rgb(255 255 255 / 0.03);
+}
+
+.sprite-room-lamp {
+  position: absolute;
+  top: 18%;
+  right: 8%;
+  width: 1.15rem;
+  height: 1.7rem;
+  border-radius: 0.2rem 0.2rem 0.7rem 0.7rem;
+  background: rgb(94 234 212 / 0.12);
+  box-shadow: 0 0 24px 8px rgb(94 234 212 / 0.08);
+}
+
+.sprite-room-rug {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  width: 11rem;
+  height: 3.2rem;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at 50% 50%, #5eead4 0%, #2dd4bf 38%, #134e4a 100%);
+  opacity: 0.88;
+  transform: translateX(-50%);
+  filter: blur(0.2px);
+}
+
+.sprite-care-kicker {
+  margin-top: 1.1rem;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground, #a1a1aa);
+}
+
+.sprite-care-rail {
+  display: flex;
+  width: min(100%, 28rem);
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+
+.sprite-care-rail-item {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.4rem 0.55rem;
+  font-size: 11px;
+  color: var(--muted-foreground, #71717a);
+}
+
+.sprite-care-rail-item.is-on {
+  color: var(--foreground, #18181b);
+  box-shadow: inset 0 0 0 1px rgb(94 234 212 / 0.7);
+}
+
+.sprite-care-rail-item.is-reached {
+  color: var(--foreground, #3f3f46);
+}
+
+.sprite-care-rail-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #3f3f46;
+}
+
+.sprite-care-rail-item.is-on .sprite-care-rail-dot {
+  background: #5eead4;
+  box-shadow: 0 0 0 4px rgb(94 234 212 / 0.16);
+}
+
+.sprite-care-rail-item.is-reached .sprite-care-rail-dot {
+  background: #a1a1aa;
+}
+
+@keyframes sprite-ethereal-drift {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.sprite-ethereal-wisps {
+  animation: sprite-ethereal-drift 3.4s ease-in-out infinite;
+}
+
+.sprite-extra-magical {
+  display: flex;
+  width: min(100%, 28rem);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+.sprite-extra-switch {
+  position: relative;
+  width: 2.7rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #3f3f46;
+  transition: background 160ms ease;
+}
+
+.sprite-extra-switch.is-on {
+  background: #5eead4;
+}
+
+.sprite-extra-switch.is-locked {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.sprite-extra-knob {
+  position: absolute;
+  top: 0.16rem;
+  left: 0.16rem;
+  width: 1.18rem;
+  height: 1.18rem;
+  border-radius: 999px;
+  background: #f8fafc;
+  transition: transform 160ms ease;
+}
+
+.sprite-extra-switch.is-on .sprite-extra-knob {
+  transform: translateX(1.18rem);
 }
 
 .sprite-spark-stage {
