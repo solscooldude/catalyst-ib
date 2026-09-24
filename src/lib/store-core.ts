@@ -76,7 +76,12 @@ import {
   type PlannerTodo,
 } from "@/lib/planner";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
-import { sparkEvolutionFromState } from "@/lib/stats";
+import { sparkEvolutionFromState, type CareStage } from "@/lib/stats";
+import {
+  DEFAULT_SPECIES,
+  normalizeSpriteSpecies,
+  type SpriteSpeciesId,
+} from "@/lib/sprite-species";
 import {
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
@@ -174,13 +179,9 @@ export type CatalystState = {
   dailyGoalSetDay: string | null;
   dailyGoalClaimedDay: string | null;
   spriteHatched: boolean;
-  careStage:
-    | "egg"
-    | "hatchling"
-    | "sparklet"
-    | "steady"
-    | "bright"
-    | "luminary";
+  spriteSpecies: SpriteSpeciesId;
+  extraMagical: boolean;
+  careStage: CareStage;
   careActions: number;
   hatchBurstAt: number | null;
   introSeen: boolean;
@@ -243,6 +244,8 @@ export function createDefaultState(): CatalystState {
     dailyGoalSetDay: null,
     dailyGoalClaimedDay: null,
     spriteHatched: false,
+    spriteSpecies: DEFAULT_SPECIES,
+    extraMagical: false,
     careStage: "egg",
     careActions: 0,
     hatchBurstAt: null,
@@ -303,6 +306,12 @@ export function setState(updater: (current: CatalystState) => CatalystState) {
 export function setSpriteAsleep(asleep: boolean) {
   setState((current) =>
     current.spriteAsleep === asleep ? current : { ...current, spriteAsleep: asleep },
+  );
+}
+
+export function setExtraMagical(on: boolean) {
+  setState((current) =>
+    current.extraMagical === on ? current : { ...current, extraMagical: on },
   );
 }
 
@@ -502,6 +511,8 @@ export function hydrateStore(userId: string | null = null) {
           (parsed.logs?.length ?? 0) > 0 ||
           (parsed.careActions ?? 0) > 0,
       ),
+      spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
+      extraMagical: Boolean(parsed.extraMagical),
       careActions:
         typeof parsed.careActions === "number"
           ? Math.max(0, parsed.careActions)
@@ -594,6 +605,8 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteRenameCount: snapshot.spriteRenameCount,
     spriteAsleep: snapshot.spriteAsleep,
     spriteHatched: snapshot.spriteHatched,
+    spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
+    extraMagical: Boolean(snapshot.extraMagical),
     careStage: snapshot.careStage,
     careActions: snapshot.careActions,
     dailyGoalMinutes: snapshot.dailyGoalMinutes,
@@ -727,4 +740,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
