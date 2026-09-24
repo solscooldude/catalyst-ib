@@ -5,7 +5,7 @@ export const SPARK_TINTS = [
     cost: 0,
     collection: "starter" as const,
     kind: "solid" as const,
-    blurb: "Species colours. Mint is reserved for the glow.",
+    blurb: "Natural species fur. Mint glow is Dragon and brand only.",
     hi: "#FFF4E5",
     mid: "#E07A2F",
     lo: "#B45316",
