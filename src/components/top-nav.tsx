@@ -10,6 +10,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { friendTabHref, parseFriendTab } from "@/lib/friends";
+import { listenInPageNav, onSamePathNavClick } from "@/lib/in-page-nav";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -48,9 +50,9 @@ const GROUPS = [
     label: "Friends",
     href: ROUTES.friends,
     items: [
-      { href: `${ROUTES.friends}#races`, label: "Task races" },
-      { href: `${ROUTES.friends}#manage`, label: "Manage" },
-      { href: `${ROUTES.friends}#board`, label: "Leaderboard" },
+      { href: friendTabHref("races"), label: "Task races" },
+      { href: friendTabHref("manage"), label: "Friends" },
+      { href: friendTabHref("board"), label: "Leaderboard" },
     ],
   },
   {
@@ -65,7 +67,7 @@ const GROUPS = [
 ] as const;
 
 function itemPath(href: string) {
-  return href.split("#")[0] ?? href;
+  return href.split("#")[0]?.split("?")[0] ?? href;
 }
 
 const SPRITE_HASHES = new Set([
@@ -79,10 +81,10 @@ const SPRITE_HASHES = new Set([
   "#trails",
 ]);
 const APP_HASHES = new Set(["#app", "#scenes", "#room", "#accents"]);
-const FRIEND_HASHES = new Set(["", "#", "#play", "#races", "#manage", "#board"]);
 
-function itemActive(pathname: string, hash: string, href: string) {
-  const [path, anchor] = href.split("#");
+function itemActive(pathname: string, hash: string, search: string, href: string) {
+  const path = itemPath(href);
+  const anchor = href.includes("#") ? href.split("#")[1] : undefined;
   if (path === ROUTES.appearance && anchor === "sprite") {
     return pathname === path && SPRITE_HASHES.has(hash || "");
   }
@@ -90,14 +92,16 @@ function itemActive(pathname: string, hash: string, href: string) {
     return pathname === path && APP_HASHES.has(hash);
   }
   if (path === ROUTES.friends) {
-    if (anchor === "play" || anchor === "races") {
-      return (
-        pathname === path &&
-        (hash === "#races" || hash === "#play" || hash === "" || hash === "#")
-      );
-    }
-    if (anchor) return pathname === path && hash === `#${anchor}`;
-    return pathname === path;
+    if (pathname !== path) return false;
+    const hrefTab = parseFriendTab(
+      href.includes("tab=")
+        ? new URL(href, "https://catalyst.local").searchParams.get("tab")
+        : (anchor ?? "races"),
+    );
+    const current = parseFriendTab(
+      new URLSearchParams(search).get("tab") || hash,
+    );
+    return current === hrefTab;
   }
   if (anchor) return pathname === path && hash === `#${anchor}`;
   return pathname === path;
@@ -114,10 +118,12 @@ function groupActive(pathname: string, group: (typeof GROUPS)[number]) {
 function MenuLinks({
   pathname,
   hash,
+  search,
   onPick,
 }: {
   pathname: string;
   hash: string;
+  search: string;
   onPick?: () => void;
 }) {
   const [open, setOpen] = useState<string | null>(
@@ -154,10 +160,13 @@ function MenuLinks({
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={onPick}
+                    onClick={(event) => {
+                      onSamePathNavClick(event, item.href);
+                      onPick?.();
+                    }}
                     className={cn(
                       "flex min-h-12 items-center rounded-xl px-3.5 py-3 text-sm",
-                      itemActive(pathname, hash, item.href)
+                      itemActive(pathname, hash, search, item.href)
                         ? "bg-primary/15 text-foreground"
                         : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
                     )}
@@ -179,16 +188,15 @@ export function TopNav() {
   const [open, setOpen] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
   const [hash, setHash] = useState("");
+  const [search, setSearch] = useState("");
   const root = useRef<HTMLElement>(null);
   const current = GROUPS.find((group) => groupActive(pathname, group));
 
   useEffect(() => {
-    function syncHash() {
+    return listenInPageNav(() => {
       setHash(window.location.hash);
-    }
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
+      setSearch(window.location.search);
+    });
   }, [pathname]);
 
   useEffect(() => {
@@ -272,10 +280,13 @@ export function TopNav() {
                         key={item.href}
                         href={item.href}
                         role="menuitem"
-                        onClick={() => setOpen(null)}
+                        onClick={(event) => {
+                          onSamePathNavClick(event, item.href);
+                          setOpen(null);
+                        }}
                         className={cn(
                           "flex min-h-11 items-center rounded-xl px-3.5 py-2.5 text-sm",
-                          itemActive(pathname, hash, item.href)
+                          itemActive(pathname, hash, search, item.href)
                             ? "bg-primary/15 text-foreground"
                             : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
                         )}
@@ -313,6 +324,7 @@ export function TopNav() {
               <MenuLinks
                 pathname={pathname}
                 hash={hash}
+                search={search}
                 onPick={() => setSheet(false)}
               />
             </div>
