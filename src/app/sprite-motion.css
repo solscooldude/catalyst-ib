@@ -236,7 +236,12 @@
 }
 
 .sprite-extra-switch.is-on {
-  background: #5eead4;
+  background: var(--spark-glow, #5eead4);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--spark-glow, #5eead4) 46%, transparent);
+}
+
+.sprite-magical-halo {
+  animation: sprite-ethereal-drift 3.4s ease-in-out infinite;
 }
 
 .sprite-extra-switch.is-locked {
@@ -275,6 +280,74 @@
   transform-box: fill-box;
   transform-origin: 50% 86%;
   backface-visibility: hidden;
+}
+
+.spark-body.sprite-plate {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  transform-box: border-box;
+  transform-origin: 50% 88%;
+}
+
+.sprite-plate-img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sprite-plate-fx {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.sprite-plate-fx.is-under {
+  z-index: 0;
+}
+
+.sprite-plate-fx.is-over {
+  z-index: 3;
+}
+
+.sprite-magical-eyes {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.sprite-magical-eye {
+  position: absolute;
+  top: 31%;
+  width: 15%;
+  height: 13%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff6c8 0%,
+    color-mix(in srgb, var(--spark-glow, #fbbf24) 80%, transparent) 38%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.92;
+}
+
+.sprite-magical-eye.is-left {
+  left: 29%;
+}
+
+.sprite-magical-eye.is-right {
+  left: 55%;
 }
 
 .sprite-spark-stage.is-held {
@@ -823,6 +896,7 @@
   .spark-spin .spark-body,
   .spark-tickle .spark-body,
   .spark-wave .spark-body,
+  .sprite-magical-eye,
   .spark-sit,
   .spark-gold-shine,
   .spark-cosmic-dot,
