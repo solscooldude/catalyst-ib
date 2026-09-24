@@ -19,6 +19,7 @@ const base = {
   nemeses: ["youtube"],
   allowlistExtra: [],
   unlockedUntil: {},
+  extensionEnabled: false,
 };
 
 test("allows Google Docs during lock hours", () => {
@@ -51,7 +52,7 @@ test("blocks Instagram during lock hours", () => {
   assert.equal(decision.appId, "instagram");
 });
 
-test("does not block YouTube outside lock hours", () => {
+test("does not block YouTube outside lock hours when the user turned Lock off", () => {
   const decision = decideUrl(
     "https://www.youtube.com/",
     base,
@@ -59,6 +60,36 @@ test("does not block YouTube outside lock hours", () => {
   );
   assert.equal(decision.action, "allow");
   assert.equal(decision.reason, "outside-hours");
+});
+
+test("blocks YouTube outside lock hours when the user turned Lock on", () => {
+  const decision = decideUrl(
+    "https://www.youtube.com/",
+    { ...base, extensionEnabled: true },
+    weekdayMorning.getTime(),
+  );
+  assert.equal(decision.action, "block");
+  assert.equal(decision.appId, "youtube");
+});
+
+test("lock hours force the extension on even if the user left it off", () => {
+  const decision = decideUrl(
+    "https://www.instagram.com/",
+    { ...base, extensionEnabled: false },
+    weekdayAfternoon.getTime(),
+  );
+  assert.equal(decision.action, "block");
+  assert.equal(decision.appId, "instagram");
+});
+
+test("a live study block forces the extension on", () => {
+  const decision = decideUrl(
+    "https://www.instagram.com/",
+    { ...base, extensionEnabled: false, sessionActive: true },
+    weekdayMorning.getTime(),
+  );
+  assert.equal(decision.action, "block");
+  assert.equal(decision.appId, "instagram");
 });
 
 test("token unlock opens a blocked site", () => {
@@ -85,7 +116,7 @@ test("unknown school-like hosts stay open", () => {
 });
 
 test("popup lock status is unknown until policy has updatedAt", () => {
-  assert.equal(lockStatus({ schedule }), "unknown");
+  assert.equal(lockStatus({ schedule, extensionEnabled: false }), "unknown");
   assert.equal(
     lockStatus({ ...base, updatedAt: weekdayAfternoon.getTime() }, weekdayAfternoon),
     "on",
@@ -93,6 +124,13 @@ test("popup lock status is unknown until policy has updatedAt", () => {
   assert.equal(
     lockStatus({ ...base, updatedAt: weekdayMorning.getTime() }, weekdayMorning),
     "off",
+  );
+  assert.equal(
+    lockStatus(
+      { ...base, extensionEnabled: false, updatedAt: weekdayAfternoon.getTime() },
+      weekdayAfternoon,
+    ),
+    "on",
   );
 });
 
@@ -110,6 +148,9 @@ test("popup copy names hours, unlocks, and Catalyst origin", () => {
   );
   assert.equal(view.status, "on");
   assert.equal(view.statusLabel, "ON");
+  assert.equal(view.toggleOn, true);
+  assert.equal(view.toggleLocked, true);
+  assert.match(view.statusDetail, /Lock hours require/);
   assert.match(view.hours, /Weeknights/);
   assert.match(view.hours, /4:30pm/);
   assert.match(view.unlocks, /Tier 3/);
@@ -121,9 +162,27 @@ test("popup copy names hours, unlocks, and Catalyst origin", () => {
 test("popup unsynced state asks the user to open Catalyst", () => {
   const view = describePopup(null, weekdayMorning.getTime());
   assert.equal(view.status, "unknown");
-  assert.equal(view.hours, "No schedule synced \u2014 open Catalyst");
-  assert.equal(view.sync, "Not synced \u2014 open Catalyst");
+  assert.equal(view.toggleLocked, true);
+  assert.equal(view.hours, "No schedule synced — open Catalyst");
+  assert.equal(view.sync, "Not synced — open Catalyst");
   assert.equal(view.openHref, "https://catalyst-study.vercel.app");
+});
+
+test("outside lock hours the popup toggle follows the user preference", () => {
+  const off = describePopup(
+    { ...base, updatedAt: weekdayMorning.getTime(), extensionEnabled: false },
+    weekdayMorning.getTime(),
+  );
+  assert.equal(off.status, "off");
+  assert.equal(off.toggleOn, false);
+  assert.equal(off.toggleLocked, false);
+  const on = describePopup(
+    { ...base, updatedAt: weekdayMorning.getTime(), extensionEnabled: true },
+    weekdayMorning.getTime(),
+  );
+  assert.equal(on.status, "on");
+  assert.equal(on.toggleOn, true);
+  assert.equal(on.toggleLocked, false);
 });
 
 test("weekday names still count as lock hours", () => {

@@ -105,7 +105,11 @@ export const DEFAULT_ALLOWLIST: readonly HostEntry[] = [
   {
     id: "catalyst",
     label: "Catalyst",
-    hosts: ["catalyst-study.vercel.app", "catalyst-ib.vercel.app"],
+    hosts: [
+      "catalyst-study.vercel.app",
+      "catalyst-focus.vercel.app",
+      "catalyst-ib.vercel.app",
+    ],
   },
 ];
 
@@ -205,6 +209,7 @@ export type ExtensionPolicy = {
   allowlistExtra: string[];
   unlockedUntil: Partial<Record<string, number>>;
   appOrigin: string;
+  sessionActive?: boolean;
 };
 
 export const POLICY_MESSAGE = "CATALYST_LOCK_POLICY";
@@ -407,8 +412,8 @@ export function decideUrl(
   url: string,
   policy: Pick<
     ExtensionPolicy,
-    "schedule" | "nemeses" | "allowlistExtra" | "unlockedUntil"
-  >,
+    "schedule" | "nemeses" | "allowlistExtra" | "unlockedUntil" | "sessionActive"
+  > & { extensionEnabled?: boolean },
   now = Date.now(),
 ): PolicyDecision {
   if (url.startsWith("chrome") || url.startsWith("about:") || url.startsWith("moz-extension")) {
@@ -419,7 +424,10 @@ export function decideUrl(
   if (isAllowlisted(host, policy.allowlistExtra)) {
     return { action: "allow", reason: "allowlist" };
   }
-  if (!inLockHours(policy.schedule, new Date(now))) {
+  const forced =
+    inLockHours(policy.schedule, new Date(now)) || Boolean(policy.sessionActive);
+  const preferred = policy.extensionEnabled !== false;
+  if (!forced && !preferred) {
     return { action: "allow", reason: "outside-hours" };
   }
   const app = findBlockApp(host);

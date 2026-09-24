@@ -22,6 +22,7 @@ export const DEFAULT_ALLOW_HOSTS = [
   "localhost",
   "127.0.0.1",
   "catalyst-study.vercel.app",
+  "catalyst-focus.vercel.app",
   "catalyst-ib.vercel.app",
 ];
 
@@ -236,7 +237,7 @@ export function decideUrl(url, policy, now = Date.now()) {
   if (isAllowlisted(host, policy.allowlistExtra || [])) {
     return { action: "allow", reason: "allowlist" };
   }
-  if (!inLockHours(policy.schedule || [], new Date(now))) {
+  if (!lockIsOn(policy, new Date(now))) {
     return { action: "allow", reason: "outside-hours" };
   }
   const app = findBlockApp(host);
@@ -327,9 +328,24 @@ export function policyIsSynced(policy) {
   return Boolean(policy && typeof policy.updatedAt === "number");
 }
 
+export function lockForcedOn(policy, now = new Date()) {
+  return (
+    inLockHours(policy?.schedule || [], now) || Boolean(policy?.sessionActive)
+  );
+}
+
+/** User preference. Missing means On so a stored Off cannot silently stick. */
+export function lockPreferredOn(policy) {
+  return policy?.extensionEnabled !== false;
+}
+
+export function lockIsOn(policy, now = new Date()) {
+  return lockForcedOn(policy, now) || lockPreferredOn(policy);
+}
+
 export function lockStatus(policy, now = new Date()) {
   if (!policyIsSynced(policy)) return "unknown";
-  return inLockHours(policy.schedule || [], now) ? "on" : "off";
+  return lockIsOn(policy, now) ? "on" : "off";
 }
 
 export function activeUnlockRows(unlockedUntil = {}, now = Date.now()) {
@@ -349,20 +365,41 @@ export function catalystOrigin(policy) {
 }
 
 export function describePopup(policy, now = Date.now(), receivedAt = null) {
-  const status = lockStatus(policy, new Date(now));
+  const clock = new Date(now);
+  const status = lockStatus(policy, clock);
+  const forced = lockForcedOn(policy, clock);
+  const preferred = lockPreferredOn(policy);
+  const inHours = inLockHours(policy?.schedule || [], clock);
   const synced = policyIsSynced(policy);
   const windows = (policy?.schedule || []).filter((row) => row && row.enabled !== false);
   const unlocks = activeUnlockRows(policy?.unlockedUntil, now);
   const ago = formatSyncedAgo(receivedAt || policy?.updatedAt, now);
+  let statusDetail = "No policy synced yet";
+  let toggleHint = "Open Catalyst so lock hours can sync.";
+  if (synced && forced) {
+    statusDetail = inHours
+      ? "Lock hours require Catalyst Lock on"
+      : "A study block requires Catalyst Lock on";
+    toggleHint = inHours
+      ? "Lock hours are on. The toggle stays on until the window ends."
+      : "A study block is running. The toggle stays on until you finish.";
+  } else if (synced && status === "on") {
+    statusDetail = "On · blocking distractors";
+    toggleHint =
+      "Outside lock hours you can turn this off. Lock hours will turn it back on.";
+  } else if (synced) {
+    statusDetail = "Off · sites are open";
+    toggleHint =
+      "Turn on to block distractors now. Lock hours still force it on.";
+  }
   return {
     status,
     statusLabel: status === "on" ? "ON" : status === "off" ? "OFF" : "Unknown",
-    statusDetail:
-      status === "on"
-        ? "In lock hours"
-        : status === "off"
-          ? "Outside lock hours"
-          : "No policy synced yet",
+    statusDetail,
+    toggleOn: status === "on",
+    toggleLocked: !synced || forced,
+    toggleHint,
+    preferredOn: preferred,
     hours:
       !synced || windows.length === 0
         ? "No schedule synced — open Catalyst"
