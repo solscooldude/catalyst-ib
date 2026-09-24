@@ -48,6 +48,7 @@ export type CloudSnapshot = {
   spriteHatched: boolean;
   spriteSpecies: SpriteSpeciesId;
   extraMagical: boolean;
+  petQuizComplete: boolean;
   careStage: CloudCareStage;
   careActions: number;
   dailyGoalMinutes: number;
@@ -80,6 +81,7 @@ export type CloudSource = {
   spriteHatched?: boolean;
   spriteSpecies?: string;
   extraMagical?: boolean;
+  petQuizComplete?: boolean;
   careStage?: string;
   careActions?: number;
   dailyGoalMinutes?: number;
@@ -143,6 +145,7 @@ export function extractCloudSnapshot(
     spriteHatched: Boolean(raw.spriteHatched),
     spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
     extraMagical: Boolean(raw.extraMagical),
+    petQuizComplete: Boolean(raw.petQuizComplete),
     careStage: normalizeCareStage(raw.careStage),
     careActions: Math.max(0, Number(raw.careActions ?? 0) || 0),
     dailyGoalMinutes: clampDailyGoalMinutes(raw.dailyGoalMinutes),

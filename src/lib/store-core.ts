@@ -181,6 +181,7 @@ export type CatalystState = {
   spriteHatched: boolean;
   spriteSpecies: SpriteSpeciesId;
   extraMagical: boolean;
+  petQuizComplete: boolean;
   careStage: CareStage;
   careActions: number;
   hatchBurstAt: number | null;
@@ -246,6 +247,7 @@ export function createDefaultState(): CatalystState {
     spriteHatched: false,
     spriteSpecies: DEFAULT_SPECIES,
     extraMagical: false,
+    petQuizComplete: false,
     careStage: "egg",
     careActions: 0,
     hatchBurstAt: null,
@@ -313,6 +315,22 @@ export function setExtraMagical(on: boolean) {
   setState((current) =>
     current.extraMagical === on ? current : { ...current, extraMagical: on },
   );
+}
+
+export function setSpriteSpecies(species: SpriteSpeciesId) {
+  setState((current) =>
+    current.spriteSpecies === species
+      ? current
+      : { ...current, spriteSpecies: species },
+  );
+}
+
+export function completePetQuiz(species: SpriteSpeciesId) {
+  setState((current) => ({
+    ...current,
+    spriteSpecies: species,
+    petQuizComplete: true,
+  }));
 }
 
 function pruneUnlocks(unlocks: Unlock[], now = Date.now()) {
@@ -513,6 +531,7 @@ export function hydrateStore(userId: string | null = null) {
       ),
       spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
       extraMagical: Boolean(parsed.extraMagical),
+      petQuizComplete: Boolean(parsed.petQuizComplete),
       careActions:
         typeof parsed.careActions === "number"
           ? Math.max(0, parsed.careActions)
@@ -607,6 +626,7 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteHatched: snapshot.spriteHatched,
     spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
     extraMagical: Boolean(snapshot.extraMagical),
+    petQuizComplete: Boolean(snapshot.petQuizComplete),
     careStage: snapshot.careStage,
     careActions: snapshot.careActions,
     dailyGoalMinutes: snapshot.dailyGoalMinutes,
