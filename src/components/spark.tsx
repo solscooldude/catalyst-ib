@@ -26,8 +26,6 @@ import {
   spriteBodyPalette,
 } from "@/lib/sprite-species";
 import { SpeciesEgg, SpriteCritter } from "@/components/sprite-critter";
-import { SpriteFxLayers } from "@/components/sprite-fx-layers";
-import { spriteArtSrc } from "@/lib/sprite-art";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -822,9 +820,6 @@ export function Spark({
     Boolean(store.hatchBurstAt) &&
     Date.now() - (store.hatchBurstAt ?? 0) < 1600;
   const showEgg = evolve && evo.stage === "egg";
-  const plateStage = showEgg || hatching ? "egg" : evo.stage;
-  const [artFailed, setArtFailed] = useState(false);
-  const artSrc = artFailed ? null : spriteArtSrc(species, plateStage);
   const drawn = size * evo.scale;
   const frameClass = cn(
     "spark-float relative isolate z-20 overflow-visible",
@@ -869,92 +864,7 @@ export function Spark({
           {say}
         </span>
       ) : null}
-      {artSrc ? (
-        <div
-          className={cn("spark-body sprite-plate", hatching && "spark-hatch")}
-        >
-          <svg
-            viewBox="-22 -18 144 150"
-            className="sprite-plate-fx is-under"
-            aria-hidden
-          >
-            <defs>
-              <radialGradient id={glowId} cx="50%" cy="58%" r="48%">
-                <stop
-                  offset="0%"
-                  stopColor={glowHex}
-                  stopOpacity={stageGlow ? (extraMagical ? 0.72 : 0.42) : 0.18}
-                />
-                <stop offset="100%" stopColor={glowHex} stopOpacity="0" />
-              </radialGradient>
-              <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
-                <feGaussianBlur stdDeviation="5.4" />
-              </filter>
-            </defs>
-            <ellipse cx="50" cy="72" rx="34" ry="30" fill={`url(#${glowId})`} />
-            <SpriteFxLayers
-              species={species}
-              palette={bodyPalette}
-              stage={evo.stage}
-              stageGlow={stageGlow}
-              extraMagical={extraMagical}
-              uid={`${uid}-art`}
-            />
-            {showEgg || hatching ? null : (
-              <>
-                <SparkAuraMark id={auraId} blurId={auraBlurId} />
-                <GearBack id={gearId} />
-              </>
-            )}
-          </svg>
-          <img
-            src={artSrc}
-            alt=""
-            className="sprite-plate-img"
-            draggable={false}
-            onError={() => setArtFailed(true)}
-          />
-          {extraMagical ? (
-            <span className="sprite-magical-eyes" aria-hidden>
-              <span className="sprite-magical-eye is-left" />
-              <span className="sprite-magical-eye is-right" />
-            </span>
-          ) : null}
-          {showEgg || hatching ? null : (
-            <svg
-              viewBox="-22 -18 144 150"
-              className="sprite-plate-fx is-over"
-              aria-hidden
-            >
-              {tintId === "gold" ? (
-                <g className="spark-gold-shine">
-                  <ellipse
-                    cx="40"
-                    cy="40"
-                    rx="11"
-                    ry="7"
-                    fill="#FFFBEB"
-                    opacity="0.55"
-                  />
-                </g>
-              ) : null}
-              {tintId === "cosmic" ? (
-                <g className="spark-cosmic-stars" fill="#F8FAFC">
-                  <circle className="spark-cosmic-dot" cx="36" cy="40" r="1.1" />
-                  <circle
-                    className="spark-cosmic-dot spark-cosmic-dot-b"
-                    cx="60"
-                    cy="36"
-                    r="0.9"
-                  />
-                </g>
-              ) : null}
-              <Gear id={gearId} />
-              <GearFront id={gearId} />
-            </svg>
-          )}
-        </div>
-      ) : (
+      <div className={cn("spark-body spark-svg-critter", hatching && "spark-hatch")}>
         <svg
           viewBox="-22 -18 144 150"
           width={drawn}
@@ -975,10 +885,10 @@ export function Spark({
             </filter>
           </defs>
 
-          <ellipse cx="50" cy="72" rx="28" ry="24" fill={`url(#${glowId})`} />
+          <ellipse cx="50" cy="78" rx="26" ry="16" fill={`url(#${glowId})`} />
 
           {showEgg || hatching ? (
-            <g className={cn(hatching && "spark-hatch")}>
+            <g>
               <SpeciesEgg
                 palette={bodyPalette}
                 species={species}
@@ -986,7 +896,7 @@ export function Spark({
               />
             </g>
           ) : (
-            <g className="spark-body">
+            <g>
               <SparkAuraMark id={auraId} blurId={auraBlurId} />
               <GearBack id={gearId} />
               <SpriteCritter
@@ -1033,7 +943,17 @@ export function Spark({
             </g>
           )}
         </svg>
-      )}
+        {extraMagical ? (
+          <span className="sprite-magical-dust" aria-hidden>
+            {Array.from({ length: 10 }, (_, index) => (
+              <span
+                key={index}
+                className={`sprite-magical-mote mote-${index}`}
+              />
+            ))}
+          </span>
+        ) : null}
+      </div>
       <svg
         viewBox="-22 -18 144 150"
         width={drawn}
