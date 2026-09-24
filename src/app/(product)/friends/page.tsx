@@ -6,77 +6,55 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageFrame } from "@/components/page-frame";
-import { FRIEND_CODE_HINT, rankFriends } from "@/lib/friends";
+import {
+  FRIEND_CODE_COPY,
+  FRIEND_CODE_HINT,
+  friendTabFromLocation,
+  friendTabHref,
+  rankFriends,
+  type FriendTab,
+} from "@/lib/friends";
+import { followInPageHref, listenInPageNav } from "@/lib/in-page-nav";
 import { ROUTES } from "@/lib/routes";
 import { openSchoolTasks, sourceLabel } from "@/lib/school-tasks";
-import { formatStudyMinutes, studyMinutesFromLogs } from "@/lib/stats";
-import {
-  addFriend,
-  removeFriend,
-  setFriendCode,
-  startSession,
-  useCatalyst,
-} from "@/lib/store";
+import { formatWeeklyStudy, weeklyStudyMinutes } from "@/lib/stats";
+import { addFriend, removeFriend, startSession, useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-type Section = "races" | "manage" | "board";
-
-function sectionFromHash(hash: string): Section {
-  if (hash === "#manage") return "manage";
-  if (hash === "#board") return "board";
-  return "races";
-}
+const TABS = [
+  ["races", "Task races"],
+  ["manage", "Friends"],
+  ["board", "Leaderboard"],
+] as const;
 
 export default function FriendsPage() {
   const router = useRouter();
   const state = useCatalyst();
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState("");
-  const [ownCode, setOwnCode] = useState(state.friendCode);
   const [notice, setNotice] = useState<string | null>(null);
-  const [section, setSection] = useState<Section>("races");
+  const [section, setSection] = useState<FriendTab>(() =>
+    typeof window === "undefined" ? "races" : friendTabFromLocation(),
+  );
   const [raceFriend, setRaceFriend] = useState("");
   const [raceTask, setRaceTask] = useState("");
   const focusTasks = openSchoolTasks(state.schoolTasks);
 
-  useEffect(() => {
-    setOwnCode(state.friendCode);
-  }, [state.friendCode]);
+  useEffect(() => listenInPageNav(() => setSection(friendTabFromLocation())), []);
 
-  useEffect(() => {
-    function sync() {
-      setSection(sectionFromHash(window.location.hash));
-    }
-    sync();
-    window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
-  }, []);
-
-  const youMinutes = studyMinutesFromLogs(state.logs);
-  const youTasks = state.schoolTasks.filter((task) => task.done).length;
+  const youWeekly = weeklyStudyMinutes(state.logs);
   const board = useMemo(() => {
     const you = {
       code: state.friendCode,
       name: state.username || "You",
-      tokens: state.tokens,
-      streakDays: Math.max(1, state.streakDays),
-      studyMinutes: youMinutes,
-      tasksCompleted: youTasks,
+      weeklyStudyMinutes: youWeekly,
       you: true,
     };
     return rankFriends([
       you,
       ...state.friends.map((row) => ({ ...row, you: false })),
     ]);
-  }, [
-    state.friendCode,
-    state.friends,
-    state.streakDays,
-    state.tokens,
-    state.username,
-    youMinutes,
-    youTasks,
-  ]);
+  }, [state.friendCode, state.friends, state.username, youWeekly]);
 
   async function copy() {
     try {
@@ -86,16 +64,6 @@ export default function FriendsPage() {
     } catch {
       setCopied(false);
     }
-  }
-
-  function saveCode(event: React.FormEvent) {
-    event.preventDefault();
-    const result = setFriendCode(ownCode);
-    if (!result.ok) {
-      setNotice(result.reason);
-      return;
-    }
-    setNotice(`Friend code set to ${result.code}.`);
   }
 
   function submitFriend(event: React.FormEvent) {
@@ -126,9 +94,9 @@ export default function FriendsPage() {
     router.push(ROUTES.session);
   }
 
-  function go(next: Section) {
+  function go(next: FriendTab) {
     setSection(next);
-    window.history.replaceState(null, "", `${ROUTES.friends}#${next}`);
+    followInPageHref(friendTabHref(next));
   }
 
   return (
@@ -139,17 +107,12 @@ export default function FriendsPage() {
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">Friends</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Race the same task. Manage codes. Rank by study minutes, then
-          tasks completed. Minigames live on My Sprite.
+          Race the same task. Add friends with their assigned code. The
+          leaderboard ranks study time this week — Monday to Sunday, your local
+          time. Minigames live on My Sprite.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
-          {(
-            [
-              ["races", "Task races"],
-              ["manage", "Manage"],
-              ["board", "Leaderboard"],
-            ] as const
-          ).map(([id, label]) => (
+          {TABS.map(([id, label]) => (
             <button
               key={id}
               type="button"
@@ -230,36 +193,32 @@ export default function FriendsPage() {
 
       {section === "manage" ? (
         <section id="manage" className="space-y-6">
-          <form className="flux-card px-6 py-6" onSubmit={saveCode}>
+          <div className="flux-card px-6 py-6">
             <h2 className="text-lg text-foreground">Your friend code</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {FRIEND_CODE_HINT}
-            </p>
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="own-code">Code</Label>
-              <Input
-                id="own-code"
-                value={ownCode}
-                onChange={(event) => setOwnCode(event.target.value.toUpperCase())}
-                className="h-11 rounded-xl"
-              />
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button type="submit" className="h-11 rounded-full px-6">
-                Save code
-              </Button>
+            <p className="mt-2 text-sm text-muted-foreground">{FRIEND_CODE_COPY}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <p
+                className="font-mono text-xl tracking-wide text-foreground"
+                aria-label="Your friend code"
+              >
+                {state.friendCode || "Assigning…"}
+              </p>
               <Button
                 type="button"
                 variant="outline"
                 className="h-11 rounded-full px-6"
                 onClick={copy}
+                disabled={!state.friendCode}
               >
                 {copied ? "Copied" : "Copy"}
               </Button>
             </div>
-          </form>
+          </div>
           <form className="flux-card px-6 py-6" onSubmit={submitFriend}>
             <h2 className="text-lg text-foreground">Add a friend</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Enter the code Catalyst assigned them. {FRIEND_CODE_HINT}
+            </p>
             <div className="mt-4 space-y-2">
               <Label htmlFor="friend-code">Their code</Label>
               <Input
@@ -290,8 +249,7 @@ export default function FriendsPage() {
                     <div>
                       <p className="text-sm text-foreground">{friend.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {friend.code} · {formatStudyMinutes(friend.studyMinutes)}{" "}
-                        · {friend.tasksCompleted} tasks
+                        {friend.code} · {formatWeeklyStudy(friend.weeklyStudyMinutes)}
                       </p>
                     </div>
                     <Button
@@ -317,7 +275,7 @@ export default function FriendsPage() {
         <section id="board" className="flux-card px-6 py-6">
           <h2 className="text-lg text-foreground">Friend leaderboard</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Ranked by study minutes, then tasks completed.
+            Ranked by study time this week (Monday–Sunday, your local time).
           </p>
           <ol className="mt-5 space-y-2">
             {board.map((row, index) => (
@@ -332,11 +290,7 @@ export default function FriendsPage() {
                   <p className="text-xs text-muted-foreground">{row.code}</p>
                 </div>
                 <p className="text-right text-sm text-foreground">
-                  {formatStudyMinutes(row.studyMinutes)}
-                  <span className="block text-xs text-muted-foreground">
-                    {row.tasksCompleted} task
-                    {row.tasksCompleted === 1 ? "" : "s"}
-                  </span>
+                  {formatWeeklyStudy(row.weeklyStudyMinutes)}
                 </p>
               </li>
             ))}
