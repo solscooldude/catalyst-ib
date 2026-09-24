@@ -1,4 +1,9 @@
 import { normalizeAppearance, type AppearanceState } from "@/lib/appearance";
+import {
+  normalizePendingStreakAward,
+  normalizeStreakAwardsShown,
+  type StreakAward,
+} from "@/lib/care";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
 import { normalizeHostList } from "@/lib/domain-policy";
 import { normalizeFriendCode } from "@/lib/friends";
@@ -52,6 +57,8 @@ export type CloudSnapshot = {
   profile: ProfileState;
   lastLoginDay: string | null;
   streakDays: number;
+  streakAwardsShown: string[];
+  pendingStreakAward: StreakAward | null;
   demoMode: boolean;
 };
 
@@ -89,6 +96,8 @@ export type CloudSource = {
   profile?: unknown;
   lastLoginDay?: string | null;
   streakDays?: number;
+  streakAwardsShown?: unknown;
+  pendingStreakAward?: unknown;
   demoMode?: boolean;
 };
 
@@ -119,6 +128,9 @@ export function extractCloudSnapshot(
   now = Date.now(),
 ): CloudSnapshot {
   const nemeses = [...new Set((Array.isArray(raw.nemeses) ? raw.nemeses : []).filter(isNemesisId))];
+  const appearance = normalizeAppearance(
+    raw.appearance as AppearanceState | undefined,
+  );
   return {
     v: CLOUD_STATE_VERSION,
     updatedAt: now,
@@ -129,7 +141,7 @@ export function extractCloudSnapshot(
     nemeses,
     allowlistExtra: normalizeHostList(raw.allowlistExtra),
     unlocks: asUnlocks(raw.unlocks),
-    appearance: normalizeAppearance(raw.appearance as AppearanceState | undefined),
+    appearance,
     spriteName: String(raw.spriteName ?? "Sprite").slice(0, 24) || "Sprite",
     spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
     spriteAsleep: Boolean(raw.spriteAsleep),
@@ -149,6 +161,18 @@ export function extractCloudSnapshot(
     profile: normalizeProfile(raw.profile as ProfileState | undefined),
     lastLoginDay: typeof raw.lastLoginDay === "string" ? raw.lastLoginDay : null,
     streakDays: Math.max(0, Number(raw.streakDays ?? 0) || 0),
+    streakAwardsShown: normalizeStreakAwardsShown(raw.streakAwardsShown, [
+      ...appearance.ownedGear,
+      ...appearance.ownedTrails,
+    ]),
+    pendingStreakAward: (() => {
+      const pending = normalizePendingStreakAward(raw.pendingStreakAward);
+      const shown = normalizeStreakAwardsShown(raw.streakAwardsShown, [
+        ...appearance.ownedGear,
+        ...appearance.ownedTrails,
+      ]);
+      return pending && shown.includes(pending.id) ? null : pending;
+    })(),
     demoMode: false,
   };
 }
