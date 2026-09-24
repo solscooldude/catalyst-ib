@@ -27,3 +27,34 @@ import {
 import { SpeciesEgg, SpriteCritter } from "@/components/sprite-critter";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
+
+export type SparkMood =
+  | "idle"
+  | "locked"
+  | "earning"
+  | "done"
+  | "tempted"
+  | "annoyed"
+  | "sleepy"
+  | "eating";
+
+type SparkProps = {
+  mood?: SparkMood;
+  subject?: SubjectId | null;
+  taskId?: TaskId | null;
+  flavor?: SparkFlavor;
+  hint?: string | null;
+  tint?: SparkTintId;
+  gear?: SparkGearId;
+  aura?: SparkAuraId;
+  trail?: SparkTrailId;
+  size?: number;
+  className?: string;
+  pettable?: boolean;
+  petPulse?: number;
+  flourish?: "loop" | "now";
+  evolve?: boolean;
+  act?: SparkAct;
+  snack?: SnackId | null;
+  trackEyes?: boolean;
+};
