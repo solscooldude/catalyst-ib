@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
@@ -24,7 +24,8 @@ import {
   normalizeSpriteSpecies,
   spriteBodyPalette,
 } from "@/lib/sprite-species";
-import { SpeciesEgg, SpriteCritter, SpriteFxLayers } from "@/components/sprite-critter";
+import { SpeciesEgg, SpriteCritter } from "@/components/sprite-critter";
+import { SpriteFxLayers } from "@/components/sprite-fx-layers";
 import { spriteArtSrc } from "@/lib/sprite-art";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -821,7 +822,8 @@ export function Spark({
     Date.now() - (store.hatchBurstAt ?? 0) < 1600;
   const showEgg = evolve && evo.stage === "egg";
   const plateStage = showEgg || hatching ? "egg" : evo.stage;
-  const artSrc = spriteArtSrc(species, plateStage);
+  const [artFailed, setArtFailed] = useState(false);
+  const artSrc = artFailed ? null : spriteArtSrc(species, plateStage);
   const drawn = size * evo.scale;
   const frameClass = cn(
     "spark-float relative isolate z-20 overflow-visible",
@@ -909,6 +911,7 @@ export function Spark({
             alt=""
             className="sprite-plate-img"
             draggable={false}
+            onError={() => setArtFailed(true)}
           />
           {extraMagical ? (
             <span className="sprite-magical-eyes" aria-hidden>
