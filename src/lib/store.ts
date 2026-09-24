@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import {
   ACCENTS,
@@ -48,6 +48,8 @@ import {
   type UnlockMinutes,
 } from "@/lib/domain-policy";
 import {
+  findChosenSubject,
+  hasChosenSubjects,
   normalizeMotivation,
   normalizeProfile,
   validateDiploma,
@@ -63,9 +65,9 @@ import {
 } from "@/lib/schedule";
 import { writeSessionRecap } from "@/lib/session-recap";
 import {
-  inferSubjectId,
   mergeSchoolTasks,
   mockTasksAsSchool,
+  TASK_DESCRIPTION_MAX,
   type SchoolTask,
 } from "@/lib/school-tasks";
 import { SAMPLE_CLASSROOM_TASKS } from "@/lib/classroom";
@@ -157,16 +159,33 @@ export function plannedLockMs(session: Session) {
 }
 
 export function startSession(input: { taskId: TaskId; goal: string }) {
-  const school = getSnapshot().schoolTasks.find((row) => row.id === input.taskId);
+  const goal = input.goal.trim();
+  if (!goal) {
+    return { ok: false as const, reason: "Describe what you are working on." };
+  }
+  const snapshot = getSnapshot();
+  if (!hasChosenSubjects(snapshot.profile)) {
+    return {
+      ok: false as const,
+      reason: "Add subjects in Setup or Profile first.",
+    };
+  }
+  if (snapshot.session?.status === "locked" || snapshot.session?.status === "focus") {
+    return { ok: false as const, reason: "Finish the session already running." };
+  }
+  const school = snapshot.schoolTasks.find((row) => row.id === input.taskId);
   const mock = MOCK_TASKS.find((row) => row.id === input.taskId);
   const task = school ?? mock;
+  if (!task) {
+    return { ok: false as const, reason: "Pick a task." };
+  }
   const session: Session = {
     id: crypto.randomUUID(),
     kind: "verified",
     taskId: input.taskId,
     subjectId: school?.subjectId ?? TASK_SUBJECT[input.taskId] ?? "other",
-    title: task?.title ?? "Focus task",
-    goal: input.goal.trim(),
+    title: task.title,
+    goal,
     plannedMinutes: null,
     demoMode: false,
     status: "focus",
@@ -181,6 +200,7 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     completionTokens: 0,
   };
   setState((current) => ({ ...current, session }));
+  return { ok: true as const, session };
 }
 
 export function startStudySession(input: {
@@ -191,17 +211,31 @@ export function startStudySession(input: {
   const minutes =
     input.minutes == null ? null : Math.floor(input.minutes);
   const title = input.title.trim();
-  if (title.length < 3) {
-    return { ok: false as const, reason: "Say what you are studying." };
+  if (!title) {
+    return { ok: false as const, reason: "Describe what you are working on." };
   }
   if (minutes != null && (!Number.isFinite(minutes) || minutes < 5)) {
     return { ok: false as const, reason: "Soft goal must be at least 5 minutes." };
   }
-  const subject = SUBJECTS.find((row) => row.id === input.subjectId);
+  const snapshot = getSnapshot();
+  const chosen = findChosenSubject(snapshot.profile, input.subjectId);
+  if (!hasChosenSubjects(snapshot.profile)) {
+    return {
+      ok: false as const,
+      reason: "Add subjects in Setup or Profile first.",
+    };
+  }
+  if (!chosen) {
+    return {
+      ok: false as const,
+      reason: "Pick a subject from your Setup/Profile list.",
+    };
+  }
+  const subject = SUBJECTS.find((row) => row.id === chosen.statId);
   if (!subject) {
     return { ok: false as const, reason: "Pick a subject." };
   }
-  if (getSnapshot().session?.status === "locked" || getSnapshot().session?.status === "focus") {
+  if (snapshot.session?.status === "locked" || snapshot.session?.status === "focus") {
     return { ok: false as const, reason: "Finish the session already running." };
   }
 
@@ -992,26 +1026,52 @@ export function setSchoolProvider(provider: SchoolProvider) {
 
 export function addManualSchoolTask(input: {
   title: string;
-  subject?: string;
+  subject: string;
+  subjectId?: SubjectId;
   due?: string;
-  detail?: string;
+  detail: string;
 }) {
   const title = input.title.trim();
+  const subject = (input.subject ?? "").trim();
+  const detail = (input.detail ?? "").trim();
   if (title.length < 3) {
     return { ok: false as const, reason: "Give the task a real title." };
   }
-  const subject = (input.subject ?? "").trim() || "Other";
+  if (!subject) {
+    return { ok: false as const, reason: "Pick a subject." };
+  }
+  if (!detail) {
+    return { ok: false as const, reason: "Add a task description." };
+  }
+  const snapshot = getSnapshot();
+  if (!hasChosenSubjects(snapshot.profile)) {
+    return {
+      ok: false as const,
+      reason: "Add subjects in Setup or Profile first.",
+    };
+  }
+  const chosen =
+    findChosenSubject(snapshot.profile, input.subjectId ?? "") ??
+    findChosenSubject(snapshot.profile, subject);
+  if (!chosen) {
+    return {
+      ok: false as const,
+      reason: "Pick a subject from your Setup/Profile list.",
+    };
+  }
   const task: SchoolTask = {
     id: `manual-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 36) || Date.now()}`,
     title: title.slice(0, 120),
-    subject: subject.slice(0, 48),
-    subjectId: inferSubjectId(`${subject} ${title}`),
+    subject: chosen.label.slice(0, 48),
+    subjectId: chosen.statId,
     due: (input.due ?? "").trim().slice(0, 32),
-    detail: (input.detail ?? "Added by hand.").trim().slice(0, 200),
+    detail: detail.slice(0, TASK_DESCRIPTION_MAX),
     source: "manual",
     done: false,
   };
-  return importSchoolTasks([task]);
+  const imported = importSchoolTasks([task]);
+  if (!imported.ok) return imported;
+  return { ok: true as const, task };
 }
 
 export function markSchoolTaskDone(taskId: string, done: boolean) {
