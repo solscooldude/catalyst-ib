@@ -397,6 +397,16 @@ export function SpritePlaypen({
         if (!hold.current) maybeWave(event.clientX, event.clientY);
       }}
     >
+      <div className="sprite-room" aria-hidden>
+        <div className="sprite-room-shelf">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="sprite-room-art" />
+        <div className="sprite-room-lamp" />
+        <div className="sprite-room-rug" />
+      </div>
       <div
         ref={sparkRef}
         className={cn(

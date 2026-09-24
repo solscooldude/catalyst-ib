@@ -22,6 +22,8 @@ import {
   verifiedStudyMs,
 } from "@/lib/stats";
 import { CareStageInfo } from "@/components/care-stage-info";
+import { CareStageRail } from "@/components/care-stage-rail";
+import { ExtraMagicalToggle } from "@/components/extra-magical-toggle";
 import { AvoidFall } from "@/components/avoid-fall";
 import { careMood, type SparkGiftKind } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
@@ -157,6 +159,12 @@ export default function SpritePage() {
           onCatch={(ok, reason) => {
             if (!ok && reason) setNotice(reason);
           }}
+        />
+        <p className="sprite-care-kicker">Care</p>
+        <CareStageRail stage={state.careStage} />
+        <ExtraMagicalToggle
+          on={state.extraMagical}
+          unlocked={state.careStage === "ethereal"}
         />
         {feedsLeft === 0 ? (
           <p className="mt-3 text-center text-xs text-zinc-400">Snacks tomorrow.</p>
