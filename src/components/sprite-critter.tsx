@@ -108,3 +108,89 @@ function GlossyEye({
     </g>
   );
 }
+
+function Face({
+  mood,
+  ink,
+  nose,
+  species,
+  glow,
+  glowDeep,
+  extraMagical,
+  uid,
+}: {
+  mood: CritterMood;
+  ink: string;
+  nose: string;
+  species: SpriteSpeciesId;
+  glow: string;
+  glowDeep: string;
+  extraMagical: boolean;
+  uid: string;
+}) {
+  const look = mood === "tempted" ? 2.2 : 0;
+  if (mood === "done") {
+    return (
+      <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+        <path d="M36 49c2.4-3.4 7.6-3.4 10 0" />
+        <path d="M54 49c2.4-3.4 7.6-3.4 10 0" />
+        <path d="M46 61c1.4 1.6 6.6 1.6 8 0" />
+      </g>
+    );
+  }
+  if (mood === "annoyed") {
+    return (
+      <g fill="none" stroke={ink} strokeWidth="2.1" strokeLinecap="round">
+        <path d="M35 48h11" />
+        <path d="M54 48h11" />
+      </g>
+    );
+  }
+  if (mood === "sleepy") {
+    return (
+      <g fill="none" stroke={ink} strokeWidth="2.1" strokeLinecap="round">
+        <path d="M35 51c2.6 2.2 8.2 2.2 10.8 0" />
+        <path d="M54.2 51c2.6 2.2 8.2 2.2 10.8 0" />
+      </g>
+    );
+  }
+  if (mood === "eating") {
+    return (
+      <g>
+        <ellipse cx="40.2" cy="50.4" rx="4.1" ry="3" fill={EYE_INK} />
+        <ellipse cx="59.8" cy="50.4" rx="4.1" ry="3" fill={EYE_INK} />
+        <ellipse className="spark-chew" cx="50" cy="62.4" rx="5.8" ry="3.1" fill="#0B0B0F" />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <GlossyEye
+        cx={39.6}
+        cy={49.2}
+        look={look}
+        extraMagical={extraMagical}
+        glow={glow}
+        glowDeep={glowDeep}
+        fillId={`${uid}-eye`}
+      />
+      <GlossyEye
+        cx={60.4}
+        cy={49.2}
+        look={look}
+        extraMagical={extraMagical}
+        glow={glow}
+        glowDeep={glowDeep}
+        fillId={`${uid}-eye`}
+      />
+      {species === "cat" ? (
+        <path
+          d="M50 58.4c-2.4 2.6-5.4.4-3.2-1.8 1.3-1.3 3.2-.4 3.2 1.8 0-2.2 1.9-3.1 3.2-1.8 2.2 2.2-.8 4.4-3.2 1.8Z"
+          fill={nose}
+        />
+      ) : (
+        <ellipse cx="50" cy="58.8" rx="2.15" ry="1.55" fill={nose} />
+      )}
+    </g>
+  );
+}
