@@ -11,6 +11,12 @@ import { normalizeAvatarUrl, normalizeUsername } from "@/lib/identity";
 import { normalizeProfile, type ProfileState } from "@/lib/ib";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
 import { isNemesisId, type NemesisId } from "@/lib/constants";
+import { normalizeCareStage, type CareStage } from "@/lib/stats";
+import {
+  DEFAULT_SPECIES,
+  normalizeSpriteSpecies,
+  type SpriteSpeciesId,
+} from "@/lib/sprite-species";
 
 export const CLOUD_STATE_VERSION = 1;
 
@@ -23,13 +29,7 @@ export type CloudUnlock = {
   expiresAt: number;
 };
 
-export type CloudCareStage =
-  | "egg"
-  | "hatchling"
-  | "sparklet"
-  | "steady"
-  | "bright"
-  | "luminary";
+export type CloudCareStage = CareStage;
 
 export type CloudSnapshot = {
   v: typeof CLOUD_STATE_VERSION;
@@ -46,6 +46,8 @@ export type CloudSnapshot = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   spriteHatched: boolean;
+  spriteSpecies: SpriteSpeciesId;
+  extraMagical: boolean;
   careStage: CloudCareStage;
   careActions: number;
   dailyGoalMinutes: number;
@@ -62,15 +64,6 @@ export type CloudSnapshot = {
   demoMode: boolean;
 };
 
-const CARE_STAGES: CloudCareStage[] = [
-  "egg",
-  "hatchling",
-  "sparklet",
-  "steady",
-  "bright",
-  "luminary",
-];
-
 export type CloudSource = {
   username?: string;
   avatarUrl?: string | null;
@@ -85,6 +78,8 @@ export type CloudSource = {
   spriteRenameCount?: number;
   spriteAsleep?: boolean;
   spriteHatched?: boolean;
+  spriteSpecies?: string;
+  extraMagical?: boolean;
   careStage?: string;
   careActions?: number;
   dailyGoalMinutes?: number;
@@ -146,9 +141,9 @@ export function extractCloudSnapshot(
     spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
     spriteAsleep: Boolean(raw.spriteAsleep),
     spriteHatched: Boolean(raw.spriteHatched),
-    careStage: CARE_STAGES.includes(raw.careStage as CloudCareStage)
-      ? (raw.careStage as CloudCareStage)
-      : "egg",
+    spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
+    extraMagical: Boolean(raw.extraMagical),
+    careStage: normalizeCareStage(raw.careStage),
     careActions: Math.max(0, Number(raw.careActions ?? 0) || 0),
     dailyGoalMinutes: clampDailyGoalMinutes(raw.dailyGoalMinutes),
     dailyGoalSetDay:

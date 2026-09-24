@@ -13,7 +13,7 @@ export const SPARK_HOW_TO = [
   { name: "Pet", how: "Drag the sprite around." },
   { name: "Poke", how: "Tap a side — bigger squash." },
   { name: "Boop", how: "Tap the face." },
-  { name: "Peak scrunch", how: "Drag the twin peaks." },
+  { name: "Scrunch", how: "Drag the head or belly." },
   { name: "Spin", how: "Double-tap for a twirl." },
   { name: "Tickle", how: "Drag across the belly." },
   { name: "Mirror pose", how: "Wave the cursor nearby — the sprite copies." },
