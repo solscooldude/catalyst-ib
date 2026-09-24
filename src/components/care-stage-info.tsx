@@ -32,8 +32,10 @@ export function CareStageInfo() {
           ))}
         </ul>
         <p className="mt-3 text-xs text-muted-foreground">
-          Egg → Hatchling → Sparklet → Steady → Bright → Luminary. Study time,
-          streak, and care (snacks, quiz, catch) move it up.
+          Egg → Hatchling → Growing → Luminary → Ethereal. Study time, streak,
+          and care (snacks, quiz, catch) move it up. Ethereal unlocks after
+          Luminary at care score 64. Extra Magical is an optional glow on
+          Ethereal.
         </p>
       </PopoverContent>
     </Popover>
