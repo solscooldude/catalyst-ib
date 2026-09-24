@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decideUrl, describePopup, lockStatus } from "./policy.js";
+import {
+  decideUrl,
+  describePopup,
+  lockStatus,
+  normalizePolicySchedule,
+} from "./policy.js";
 
 const weekdayAfternoon = new Date("2026-09-23T17:00:00");
 const weekdayMorning = new Date("2026-09-23T10:00:00");
@@ -116,8 +121,8 @@ test("popup copy names hours, unlocks, and Catalyst origin", () => {
 test("popup unsynced state asks the user to open Catalyst", () => {
   const view = describePopup(null, weekdayMorning.getTime());
   assert.equal(view.status, "unknown");
-  assert.equal(view.hours, "No schedule synced — open Catalyst");
-  assert.equal(view.sync, "Not synced — open Catalyst");
+  assert.equal(view.hours, "No schedule synced \u2014 open Catalyst");
+  assert.equal(view.sync, "Not synced \u2014 open Catalyst");
   assert.equal(view.openHref, "https://catalyst-study.vercel.app");
 });
 
@@ -166,4 +171,16 @@ test("YouTube stays open if it is not a chosen nemesis", () => {
     weekdayAfternoon.getTime(),
   );
   assert.equal(decision.action, "allow");
+});
+
+test("normalizePolicySchedule drops duplicate day and time windows", () => {
+  const schedule = normalizePolicySchedule([
+    { days: [1, 2, 3, 4, 5], start: "16:30", end: "19:30" },
+    { days: [5, 4, 3, 2, 1], start: "16:30:00", end: "19:30" },
+    { days: [1, 2, 3, 4, 5], start: "19:00", end: "22:00" },
+  ]);
+  assert.equal(schedule.length, 2);
+  assert.deepEqual(schedule[0].days, [1, 2, 3, 4, 5]);
+  assert.equal(schedule[0].start, "16:30");
+  assert.equal(schedule[1].start, "19:00");
 });

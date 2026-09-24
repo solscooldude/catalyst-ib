@@ -160,9 +160,28 @@ export function normalizePolicyWindow(raw) {
   };
 }
 
+function policyWindowKey(window) {
+  const start = parseClock(window.start);
+  const end = parseClock(window.end);
+  const days = [...window.days]
+    .filter((day) => day >= 0 && day <= 6)
+    .sort((a, b) => a - b);
+  return `${days.join(",")}|${start}|${end}`;
+}
+
 export function normalizePolicySchedule(raw) {
   if (!Array.isArray(raw)) return [];
-  return raw.map(normalizePolicyWindow).filter(Boolean);
+  const out = [];
+  const seen = new Set();
+  for (const row of raw) {
+    const window = normalizePolicyWindow(row);
+    if (!window) continue;
+    const key = policyWindowKey(window);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(window);
+  }
+  return out;
 }
 
 export function windowContains(window, now) {
