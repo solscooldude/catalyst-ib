@@ -1,4 +1,5 @@
-use client";
+// Spark renderer — keep this comment so GitHub file writes do not strip the directive.
+"use client";
 
 import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
