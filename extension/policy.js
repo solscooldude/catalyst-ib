@@ -21,6 +21,7 @@ export const DEFAULT_ALLOW_HOSTS = [
   "managebac.com",
   "localhost",
   "127.0.0.1",
+  "catalyst-study.vercel.app",
   "catalyst-ib.vercel.app",
 ];
 
@@ -99,6 +100,39 @@ function parseClock(hhmm) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+const DAY_ALIASES = {
+  sun: 0,
+  sunday: 0,
+  mon: 1,
+  monday: 1,
+  tue: 2,
+  tues: 2,
+  tuesday: 2,
+  wed: 3,
+  wednesday: 3,
+  thu: 4,
+  thur: 4,
+  thurs: 4,
+  thursday: 4,
+  fri: 5,
+  friday: 5,
+  sat: 6,
+  saturday: 6,
+};
+
+function parseWeekday(day) {
+  if (typeof day === "number" && Number.isInteger(day) && day >= 0 && day <= 6) {
+    return day;
+  }
+  const raw = String(day ?? "")
+    .trim()
+    .toLowerCase();
+  if (Object.hasOwn(DAY_ALIASES, raw)) return DAY_ALIASES[raw];
+  const numeric = Number(raw);
+  if (Number.isInteger(numeric) && numeric >= 0 && numeric <= 6) return numeric;
+  return null;
+}
+
 function coerceDays(raw) {
   const list = Array.isArray(raw)
     ? raw
@@ -106,11 +140,7 @@ function coerceDays(raw) {
       ? raw.split(/[,\s]+/)
       : [];
   return [
-    ...new Set(
-      list
-        .map((day) => Number(day))
-        .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6),
-    ),
+    ...new Set(list.map((day) => parseWeekday(day)).filter((day) => day != null)),
   ];
 }
 
@@ -295,8 +325,8 @@ export function activeUnlockRows(unlockedUntil = {}, now = Date.now()) {
 }
 
 export function catalystOrigin(policy) {
-  const raw = String(policy?.appOrigin || "https://catalyst-ib.vercel.app").trim();
-  return raw.replace(/\/$/, "") || "https://catalyst-ib.vercel.app";
+  const raw = String(policy?.appOrigin || "https://catalyst-study.vercel.app").trim();
+  return raw.replace(/\/$/, "") || "https://catalyst-study.vercel.app";
 }
 
 export function describePopup(policy, now = Date.now(), receivedAt = null) {

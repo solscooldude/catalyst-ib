@@ -118,7 +118,26 @@ test("popup unsynced state asks the user to open Catalyst", () => {
   assert.equal(view.status, "unknown");
   assert.equal(view.hours, "No schedule synced — open Catalyst");
   assert.equal(view.sync, "Not synced — open Catalyst");
-  assert.equal(view.openHref, "https://catalyst-ib.vercel.app");
+  assert.equal(view.openHref, "https://catalyst-study.vercel.app");
+});
+
+test("weekday names still count as lock hours", () => {
+  const decision = decideUrl(
+    "https://www.instagram.com/",
+    {
+      ...base,
+      schedule: [
+        {
+          days: ["Mon", "Tue", "Wednesday", "4", "friday"],
+          start: "16:30:00",
+          end: "19:30:00",
+        },
+      ],
+    },
+    weekdayAfternoon.getTime(),
+  );
+  assert.equal(decision.action, "block");
+  assert.equal(decision.appId, "instagram");
 });
 
 test("string weekdays and HH:MM:SS still count as lock hours", () => {

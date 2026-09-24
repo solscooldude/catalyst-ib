@@ -188,10 +188,6 @@ export function drawWeekStory(
   ctx.font = headingFont(700, 42);
   ctx.textBaseline = "middle";
   ctx.fillText("Catalyst", 158, 166);
-  const catalystWidth = ctx.measureText("Catalyst").width;
-  ctx.fillStyle = "#A1A1AA";
-  ctx.font = headingFont(600, 28);
-  ctx.fillText("IB", 158 + catalystWidth + 14, 168);
 
   ctx.fillStyle = "#A1A1AA";
   ctx.font = bodyFont(500, 22);
