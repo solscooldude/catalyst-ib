@@ -1,2 +1,2 @@
-/** Future billing stub — demo is free. No live subscribe UI. */
+/** Future billing stub — no live subscribe UI. */
 export {};

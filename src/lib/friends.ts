@@ -63,7 +63,7 @@ export function stubFriendFromCode(code: string): Friend {
   for (const ch of code) hash = (hash * 33 + ch.charCodeAt(0)) >>> 0;
   return {
     code,
-    name: `IB ${code.slice(-4)}`,
+    name: `Friend ${code.slice(-4)}`,
     tokens: 6 + (hash % 48),
     streakDays: 1 + (hash % 18),
     studyMinutes: 40 + (hash % 320),

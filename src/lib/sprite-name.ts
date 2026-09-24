@@ -38,7 +38,7 @@ export function commitSpriteName(next: string) {
 export function renameSprite(next: string) {
   const name = normalizeSpriteName(next);
   if (/^flux$/i.test(name)) {
-    return { ok: false as const, reason: "That's the old prototype name." };
+    return { ok: false as const, reason: "That's the old sprite name." };
   }
   const current = getSnapshot();
   if (name === displaySpriteName(current.spriteName)) {

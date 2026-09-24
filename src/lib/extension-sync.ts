@@ -1,3 +1,4 @@
+import { defaultAppOrigin } from "@/lib/app-origin";
 import {
   normalizePolicySchedule,
   unlockedUntilFromUnlocks,
@@ -7,8 +8,7 @@ import { ROUTES } from "@/lib/routes";
 import type { CatalystState } from "@/lib/store-core";
 
 export function appOrigin() {
-  if (typeof window === "undefined") return "https://catalyst-ib.vercel.app";
-  return window.location.origin;
+  return defaultAppOrigin();
 }
 
 export function buildExtensionPolicy(
