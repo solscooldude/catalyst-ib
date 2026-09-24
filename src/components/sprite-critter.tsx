@@ -734,6 +734,45 @@ export function SpeciesEgg({
   );
 }
 
+export function SpriteFxLayers({
+  species,
+  palette,
+  stage,
+  stageGlow,
+  extraMagical = false,
+  uid = "sprite-fx",
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  stage: CareStage;
+  stageGlow: boolean;
+  extraMagical?: boolean;
+  uid?: string;
+}) {
+  const magical = extraMagical && stage === "ethereal";
+  return (
+    <g className="sprite-fx-layers" aria-hidden>
+      <PaintDefs uid={uid} palette={palette} />
+      {stageGlow ? (
+        <StageGlow
+          species={species}
+          stage={stage}
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          extraMagical={magical}
+        />
+      ) : null}
+      {magical ? (
+        <MagicalHalo
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          bloomId={`${uid}-halo`}
+        />
+      ) : null}
+    </g>
+  );
+}
+
 export function SpriteCritter({
   species,
   palette,
