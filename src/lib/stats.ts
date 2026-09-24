@@ -66,62 +66,22 @@ export function formatWeeklyStudy(minutes: number) {
   return `This week · ${formatStudyMinutes(minutes)}`;
 }
 
-export const CARE_STAGES = [
-  "egg",
-  "hatchling",
-  "sparklet",
-  "steady",
-  "bright",
-  "luminary",
-] as const;
-
-export type CareStage = (typeof CARE_STAGES)[number];
-
-export const CARE_STAGE_GUIDE: {
-  stage: CareStage;
-  label: string;
-  how: string;
-}[] = [
-  {
-    stage: "egg",
-    label: "Egg",
-    how: "Closed egg. First real focus or snack hatches it into Hatchling.",
-  },
-  {
-    stage: "hatchling",
-    label: "Hatchling",
-    how: "Just out. Tiny body, dim glow.",
-  },
-  {
-    stage: "sparklet",
-    label: "Sparklet",
-    how: "Growing. Study hours plus a short streak or snacks.",
-  },
-  {
-    stage: "steady",
-    label: "Steady",
-    how: "Baseline size and glow. Regular blocks and care.",
-  },
-  {
-    stage: "bright",
-    label: "Bright",
-    how: "Bigger body, stronger glow. Longer official hours and streak.",
-  },
-  {
-    stage: "luminary",
-    label: "Luminary",
-    how: "Largest body and brightest glow.",
-  },
-];
-
-const STAGE_LOOK: Record<CareStage, { scale: number; glow: number }> = {
-  egg: { scale: 0.8, glow: 0.32 },
-  hatchling: { scale: 0.72, glow: 0.48 },
-  sparklet: { scale: 0.88, glow: 0.78 },
-  steady: { scale: 1, glow: 1.05 },
-  bright: { scale: 1.16, glow: 1.62 },
-  luminary: { scale: 1.28, glow: 2.15 },
-};
+export {
+  CARE_STAGE_GUIDE,
+  CARE_STAGES,
+  ETHEREAL_SCORE,
+  LUMINARY_SCORE,
+  mintGlowForStage,
+  normalizeCareStage,
+  sparkEvolutionLabel,
+  stageFromScore,
+  type CareStage,
+} from "@/lib/care-stages";
+import {
+  ETHEREAL_SCORE,
+  STAGE_LOOK,
+  stageFromScore,
+} from "@/lib/care-stages";
 
 export type EvolutionExtras = {
   streakDays?: number;
@@ -137,15 +97,6 @@ export function careScore(input: {
   return input.hours + input.streakDays * 0.45 + input.careActions * 0.3;
 }
 
-export function stageFromScore(score: number, hatched: boolean): CareStage {
-  if (!hatched) return "egg";
-  if (score < 2.2) return "hatchling";
-  if (score < 7) return "sparklet";
-  if (score < 16) return "steady";
-  if (score < 32) return "bright";
-  return "luminary";
-}
-
 export function sparkEvolution(logs: SessionLog[], extras: EvolutionExtras = {}) {
   const hours = verifiedStudyMs(logs) / 3_600_000;
   const streakDays = extras.streakDays ?? 0;
@@ -155,7 +106,7 @@ export function sparkEvolution(logs: SessionLog[], extras: EvolutionExtras = {})
   const score = careScore({ hours, streakDays, careActions });
   const stage = stageFromScore(score, hatched);
   const look = STAGE_LOOK[stage];
-  const t = Math.min(1, score / 32);
+  const t = Math.min(1, score / ETHEREAL_SCORE);
   return {
     hours,
     score,
@@ -177,10 +128,6 @@ export function sparkEvolutionFromState(state: {
     careActions: state.careActions,
     hatched: state.spriteHatched,
   });
-}
-
-export function sparkEvolutionLabel(stage: CareStage) {
-  return CARE_STAGE_GUIDE.find((row) => row.stage === stage)?.label ?? "Egg";
 }
 
 export function formatHours(ms: number) {
