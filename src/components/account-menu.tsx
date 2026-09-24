@@ -37,7 +37,7 @@ export function AccountMenu() {
   }, []);
 
   const items = [
-    { href: ROUTES.profile, label: "IB profile" },
+    { href: ROUTES.profile, label: "Profile" },
     { href: ROUTES.settings, label: "Account settings" },
   ];
   const handle = store.username || auth.user?.email?.split("@")[0] || "Account";

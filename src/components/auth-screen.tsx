@@ -56,17 +56,17 @@ export function AuthScreen({ mode }: { mode: "sign-in" | "sign-up" }) {
         <div className="mt-8 space-y-6">
           <ConnectAuthCard />
           <div className="rounded-[1.6rem] bg-[#121218] p-6 ring-1 ring-[#F4F4F5]/10">
-            <h2 className="text-lg text-foreground">This browser only</h2>
+            <h2 className="text-lg text-foreground">Continue on this device</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Use Catalyst here while Clerk keys are missing. This is not a
-              cross-browser account.
+              Sign-in is unavailable in this environment. You can still set up
+              lock hours and focus here.
             </p>
             {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
             <Button
               className="mt-5 h-11 w-full rounded-full"
               onClick={continueLocally}
             >
-              Continue in this browser
+              Continue
             </Button>
           </div>
         </div>

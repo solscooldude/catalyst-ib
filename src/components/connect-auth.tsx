@@ -19,16 +19,14 @@ export function ConnectAuthCard({
       }
     >
       <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
-        Connect auth
+        Sign-in
       </p>
       <h2 className="mt-2 text-lg text-foreground">
-        Google + email sign-in is not connected yet
+        Google and email are not available here
       </h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        Catalyst is wired for Clerk. Set the Clerk keys on Vercel, then enable
-        Google and email codes in the Clerk dashboard. Until then this browser
-        can keep a local session, but it will not follow you to another
-        browser.
+        Set Clerk keys on Vercel and enable Google plus email codes in the
+        Clerk dashboard. Until then you can still use Catalyst on this device.
       </p>
       <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
         <li>
@@ -44,8 +42,19 @@ export function ConnectAuthCard({
           code) and Google. Leave passwords off.
         </li>
         <li>
-          Add those keys in Vercel → Settings → Environment Variables for
-          Production, Preview, and Development. Redeploy.
+          Add those two keys in Vercel → Settings → Environment Variables for
+          Production, Preview, and Development. Path vars are already set:{" "}
+          <span className="font-mono text-foreground">
+            NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+          </span>
+          ,{" "}
+          <span className="font-mono text-foreground">
+            NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+          </span>
+          , after-sign-in{" "}
+          <span className="font-mono text-foreground">/dashboard</span>,
+          after-sign-up{" "}
+          <span className="font-mono text-foreground">/intro</span>. Redeploy.
         </li>
       </ol>
       <div className="mt-5 flex flex-wrap gap-2">

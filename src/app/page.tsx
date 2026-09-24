@@ -24,7 +24,7 @@ const STEPS = [
   {
     n: "03",
     title: "Tokens",
-    copy: "Focus time pays tokens. The live rate is 1 token per 2 minutes. A clearly labeled testing toggle can use 10 tokens per 20 seconds.",
+    copy: "Focus time pays tokens. The rate is 1 token per 2 minutes.",
     icon: "chip" as const,
   },
   {
@@ -44,7 +44,7 @@ export default function LandingPage() {
         <section className="mx-auto grid w-full max-w-6xl items-center gap-16 px-5 pt-8 pb-20 lg:grid-cols-[1.1fr_0.9fr] lg:pt-16">
           <div>
             <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
-              For IB Diploma Programme students
+              Built for IB students
             </p>
             <h1 className="mt-5 max-w-xl text-5xl leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
               The phone pulls you off homework. Focus time is how you earn it
@@ -149,8 +149,8 @@ export default function LandingPage() {
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-                Live earn is 1 token per 2 minutes. Use Demo token rate on Focus
-                only when you need faster testing.
+                Earn is 1 token per 2 minutes of focus. Marking a task done does
+                not pay extra.
               </p>
             </div>
             <div className="mt-8 overflow-hidden rounded-2xl ring-1 ring-border">
@@ -242,7 +242,7 @@ export default function LandingPage() {
           <Wordmark />
           <p className="inline-flex items-center gap-2">
             <BrandC size={18} />
-            Catalyst for IB DP students. Chrome lock extension plus a sprite.
+            Catalyst. Chrome lock extension plus a sprite.
           </p>
         </div>
       </footer>
