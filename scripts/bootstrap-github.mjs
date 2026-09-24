@@ -48,6 +48,7 @@ const localPublicZips = [
   const full = join(root, rel);
   return existsSync(full) ? [[rel, readFileSync(full)]] : [];
 });
+const localSprites = collectTree(join(root, "public/sprites"), "public/sprites");
 
 const staging = join(tmpdir(), `catalyst-ib-${Date.now()}`);
 mkdirSync(staging, { recursive: true });
@@ -64,6 +65,7 @@ for (const [rel, buf] of [
   ...localExt,
   ...overlayFiles,
   ...localPublicZips,
+  ...localSprites,
 ]) {
   const dest = join(root, rel);
   mkdirSync(dirname(dest), { recursive: true });
@@ -76,6 +78,7 @@ if (localPackBuf) {
 
 rmSync(join(root, "src/lib/focus-plates.ts"), { force: true });
 rmSync(join(root, "src/app/api/plates"), { recursive: true, force: true });
+rmSync(join(root, "src/components/auth-form.tsx"), { force: true });
 
 const focusScene = join(root, "src/lib/focus-scene.ts");
 if (existsSync(focusScene)) {
@@ -85,6 +88,35 @@ if (existsSync(focusScene)) {
     source.replaceAll("/api/plates/", "/focus/"),
   );
 }
+
+const spriteSpecies = ["fox", "bunny", "deer", "cat", "axolotl", "dragon"];
+const spriteStages = ["egg", "hatchling", "growing", "luminary", "ethereal"];
+const spriteChunkBase =
+  "https://raw.githubusercontent.com/solscooldude/catalyst-ib/main/public/sprites/chunks";
+
+await Promise.all(
+  spriteSpecies.flatMap((species) =>
+    spriteStages.map(async (stage) => {
+      const dest = join(root, "public/sprites", species, `${stage}.webp`);
+      const url = `${spriteChunkBase}/${species}-${stage}.webp.b64`;
+      const res = await fetch(url);
+      if (res.ok) {
+        mkdirSync(dirname(dest), { recursive: true });
+        writeFileSync(
+          dest,
+          Buffer.from((await res.text()).replace(/\s/g, ""), "base64"),
+        );
+        console.log("assembled sprite", `${species}/${stage}.webp`);
+        return;
+      }
+      if (existsSync(dest) && statSync(dest).size > 32) {
+        console.log("keep sprite", `${species}/${stage}.webp`);
+        return;
+      }
+      console.warn("missing sprite chunk", url, res.status);
+    }),
+  ),
+);
 
 const chunkBase =
   "https://raw.githubusercontent.com/solscooldude/catalyst-ib/main/public/focus/chunks";
