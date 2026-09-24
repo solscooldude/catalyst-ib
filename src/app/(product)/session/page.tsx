@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FocusFullscreenButton } from "@/components/focus-fullscreen-button";
 import { FocusHud } from "@/components/focus-hud";
 import { FocusSpark } from "@/components/focus-spark";
 import { FocusStage } from "@/components/focus-stage";
@@ -93,6 +94,7 @@ export default function FocusPage() {
 
   return (
     <div className="focus-session focus-session-stage" data-focus-canvas="">
+      <FocusFullscreenButton className="focus-fullscreen-btn" />
       <FocusStage />
       {sit ? null : (
         <FocusSpark
