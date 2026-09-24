@@ -48,7 +48,7 @@ export const BACKGROUNDS = [
   {
     id: "mint",
     name: "Mint room",
-    cost: 12,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "One mint wash. Pastel / Normal / Deep after you buy.",
@@ -61,7 +61,7 @@ export const BACKGROUNDS = [
   {
     id: "red",
     name: "Red room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Warm red paper. Shade is a dropdown, not another buy.",
@@ -74,7 +74,7 @@ export const BACKGROUNDS = [
   {
     id: "orange",
     name: "Orange room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Peach through burnt paper.",
@@ -87,7 +87,7 @@ export const BACKGROUNDS = [
   {
     id: "yellow",
     name: "Yellow room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Soft lemon paper, three depths.",
@@ -100,7 +100,7 @@ export const BACKGROUNDS = [
   {
     id: "green",
     name: "Green room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Grove green. Deep is the old library-lamp shade.",
@@ -113,7 +113,7 @@ export const BACKGROUNDS = [
   {
     id: "blue",
     name: "Blue room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Baby blue through ink. Pastel is the morning-sky wash.",
@@ -126,7 +126,7 @@ export const BACKGROUNDS = [
   {
     id: "indigo",
     name: "Indigo room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "The last rainbow stop for the room.",
@@ -139,7 +139,7 @@ export const BACKGROUNDS = [
   {
     id: "pink",
     name: "Pink room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Blush paper. Pastel is the old light-pink wash.",
@@ -152,7 +152,7 @@ export const BACKGROUNDS = [
   {
     id: "violet",
     name: "Violet room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Lilac through dusk. Pastel is the old lilac wash.",
@@ -165,7 +165,7 @@ export const BACKGROUNDS = [
   {
     id: "amber",
     name: "Amber room",
-    cost: 14,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Quiet gold paper for late sessions.",
@@ -178,7 +178,7 @@ export const BACKGROUNDS = [
   {
     id: "slate",
     name: "Slate room",
-    cost: 12,
+    cost: 10,
     collection: "starter" as const,
     kind: "wash" as const,
     blurb: "Cool mist gray. The old Mist room lives here.",

@@ -83,7 +83,7 @@ export const ACCENTS = [
   {
     id: "red",
     name: "Red",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Rainbow red. Shades are free after you buy the colour.",
     shades: shade("#FECACA", "#F87171", "#B91C1C", "#7f1d1d", "#fff7f7"),
@@ -91,7 +91,7 @@ export const ACCENTS = [
   {
     id: "orange",
     name: "Orange",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Warm orange. Pastel / Normal / Deep in the dropdown.",
     shades: shade("#FED7AA", "#FB923C", "#C2410C", "#7c2d12", "#fff7ed"),
@@ -99,7 +99,7 @@ export const ACCENTS = [
   {
     id: "yellow",
     name: "Yellow",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Bright yellow chrome, three shades included.",
     shades: shade("#FEF08A", "#FACC15", "#CA8A04", "#713f12", "#fffbeb"),
@@ -107,7 +107,7 @@ export const ACCENTS = [
   {
     id: "green",
     name: "Green",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Leaf green, not mint. Shade is a dropdown, not another buy.",
     shades: shade("#BBF7D0", "#4ADE80", "#15803D", "#14532d", "#f0fdf4"),
@@ -115,7 +115,7 @@ export const ACCENTS = [
   {
     id: "blue",
     name: "Blue",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Sky blue through ink blue.",
     shades: shade("#BFDBFE", "#60A5FA", "#1D4ED8", "#1e3a8a", "#eff6ff"),
@@ -123,7 +123,7 @@ export const ACCENTS = [
   {
     id: "indigo",
     name: "Indigo",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "The last rainbow stop.",
     shades: shade("#C7D2FE", "#818CF8", "#3730A3", "#312e81", "#eef2ff"),
@@ -131,7 +131,7 @@ export const ACCENTS = [
   {
     id: "pink",
     name: "Blush",
-    cost: 20,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Warm pink buttons. All three shades come with the colour.",
     shades: shade("#FBCFE8", "#F9A8D4", "#DB2777", "#831843", "#fdf2f8"),
@@ -139,7 +139,7 @@ export const ACCENTS = [
   {
     id: "violet",
     name: "Violet",
-    cost: 18,
+    cost: 5,
     collection: "starter" as const,
     blurb: "Lilac through deep violet.",
     shades: shade("#DDD6FE", "#C4B5FD", "#6D28D9", "#4c1d95", "#f5f3ff"),
@@ -147,7 +147,7 @@ export const ACCENTS = [
   {
     id: "amber",
     name: "Amber",
-    cost: 16,
+    cost: 5,
     collection: "starter" as const,
     blurb: "A quieter gold for late sessions.",
     shades: shade("#FDE68A", "#FBBF24", "#B45309", "#78350f", "#fffbeb"),
