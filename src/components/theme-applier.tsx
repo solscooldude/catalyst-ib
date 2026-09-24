@@ -6,7 +6,7 @@ import { getAccentShade, getBackgroundShade } from "@/lib/appearance";
 import { ROUTES } from "@/lib/routes";
 import { applyUiTheme, restoreStoredUiTheme, useUiTheme } from "@/lib/ui-theme";
 import { spriteBodyPalette } from "@/lib/sprite-species";
-import { mintGlowForStage } from "@/lib/stats";
+import { signatureGlowForStage } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 
 const ROOM_VARS = [
@@ -76,11 +76,12 @@ export function ThemeApplier() {
       }
     }
     const body = spriteBodyPalette(spriteSpecies, appearance.sparkTint);
-    const glow = mintGlowForStage(careStage) ? body.glow : body.fur;
+    const glow = signatureGlowForStage(careStage) ? body.glow : body.fur;
     root.style.setProperty("--spark-hi", body.belly);
     root.style.setProperty("--spark-mid", body.fur);
     root.style.setProperty("--spark-lo", body.furDeep);
     root.style.setProperty("--spark-glow", glow);
+    root.style.setProperty("--spark-glow-deep", body.glowDeep);
     root.dataset.extraMagical = extraMagical && careStage === "ethereal" ? "on" : "off";
   }, [hydrated, appearance, uiTheme, spriteSpecies, careStage, extraMagical]);
 
