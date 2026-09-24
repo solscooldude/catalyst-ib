@@ -57,8 +57,8 @@ function GlossyEye({
       <ellipse
         cx={x}
         cy={cy}
-        rx={extraMagical ? 7.8 : 7.2}
-        ry={extraMagical ? 9.2 : 8.6}
+        rx={extraMagical ? 8.8 : 8.2}
+        ry={extraMagical ? 10.4 : 9.8}
         fill={extraMagical ? `url(#${fillId})` : EYE_INK}
       />
       {extraMagical ? (
@@ -198,9 +198,11 @@ function Face({
 function SpeciesExtras({
   species,
   palette,
+  stage,
 }: {
   species: SpriteSpeciesId;
   palette: SpeciesPalette;
+  stage: CareStage;
 }) {
   if (species === "bunny") {
     return (
@@ -223,24 +225,73 @@ function SpeciesExtras({
     );
   }
   if (species === "deer") {
+    const grown = stage === "luminary" || stage === "ethereal";
+    const sprout = stage === "hatchling";
     return (
       <g>
-        <path
-          d="M38 18 34 6c4 2 7 8 8 14"
-          fill="none"
-          stroke={palette.accent}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-        <path
-          d="M62 18 66 6c-4 2-7 8-8 14"
-          fill="none"
-          stroke={palette.accent}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
+        {sprout ? (
+          <>
+            <path
+              d="M38 22v-5"
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M62 22v-5"
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </>
+        ) : (
+          <>
+            <path
+              d={grown ? "M37 16 31 1c4 2 8 9 10 16" : "M38 18 34 6c4 2 7 8 8 14"}
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth={grown ? 2 : 1.7}
+              strokeLinecap="round"
+            />
+            <path
+              d={grown ? "M63 16 69 1c-4 2-8 9-10 16" : "M62 18 66 6c-4 2-7 8-8 14"}
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth={grown ? 2 : 1.7}
+              strokeLinecap="round"
+            />
+            {grown ? (
+              <>
+                <path
+                  d="M34 8l-6-5"
+                  fill="none"
+                  stroke={palette.accent}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M66 8l6-5"
+                  fill="none"
+                  stroke={palette.accent}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </>
+            ) : null}
+            {stage === "ethereal" ? (
+              <>
+                <circle cx="31" cy="2" r="1.3" fill={palette.glow} />
+                <circle cx="69" cy="2" r="1.3" fill={palette.glowDeep} />
+              </>
+            ) : null}
+          </>
+        )}
         <ellipse cx="44" cy="82" rx="2.1" ry="1.5" fill={palette.mark ?? palette.belly} />
         <ellipse cx="56" cy="84" rx="1.8" ry="1.3" fill={palette.mark ?? palette.belly} />
+        <ellipse cx="40" cy="88" rx="1.5" ry="1.1" fill={palette.mark ?? palette.belly} />
+        <ellipse cx="60" cy="87" rx="1.4" ry="1" fill={palette.mark ?? palette.belly} />
       </g>
     );
   }
@@ -478,6 +529,9 @@ function PaintDefs({
         <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.1" />
         <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
       </radialGradient>
+      <filter id={`${uid}-sit`} x="-30%" y="-40%" width="160%" height="180%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
     </defs>
   );
 }
@@ -704,7 +758,7 @@ export function SpeciesEgg({
 }) {
   return (
     <g className="spark-body">
-      <ellipse cx="52" cy="86" rx="16" ry="4.5" fill="#0B0B0F" opacity="0.18" />
+      <ellipse cx="50" cy="94" rx="20" ry="5.4" fill="#0B0B0F" opacity="0.2" />
       <ellipse cx="50" cy="62" rx="22.5" ry="29.5" fill={palette.egg} />
       <ellipse cx="50" cy="64" rx="20" ry="26" fill={palette.eggWash} opacity="0.32" />
       <ellipse cx="42" cy="50" rx="8" ry="6" fill="#FFF8E7" opacity="0.55" />
@@ -784,6 +838,8 @@ export function SpriteCritter({
 }: SpriteCritterProps) {
   const hatchling = stage === "hatchling";
   const magical = extraMagical && stage === "ethereal";
+  const stageScale =
+    stage === "hatchling" ? 0.86 : stage === "luminary" ? 1.04 : stage === "ethereal" ? 1.06 : 1;
   return (
     <g className="sprite-critter">
       <PaintDefs uid={uid} palette={palette} />
@@ -803,10 +859,24 @@ export function SpriteCritter({
           bloomId={`${uid}-halo`}
         />
       ) : null}
-      <ellipse cx="50" cy="104" rx="18" ry="4.2" fill="#0B0B0F" opacity="0.22" />
-      <g transform={hatchling ? "translate(50 96) scale(0.9) translate(-50 -96)" : undefined}>
+      <ellipse
+        cx="50"
+        cy="108"
+        rx="22"
+        ry="5.6"
+        fill="#0B0B0F"
+        opacity="0.28"
+        filter={`url(#${uid}-sit)`}
+      />
+      <g
+        transform={
+          hatchling || stageScale !== 1
+            ? `translate(50 108) scale(${stageScale}) translate(-50 -108)`
+            : undefined
+        }
+      >
         <Tail species={species} palette={palette} />
-        <SpeciesExtras species={species} palette={palette} />
+        <SpeciesExtras species={species} palette={palette} stage={stage} />
         <ellipse cx="50" cy="90" rx="16.5" ry="12.2" fill={palette.furDeep} />
         <ellipse cx="50" cy="88.6" rx="15.4" ry="11.2" fill={palette.fur} />
         <ellipse cx="50" cy="88.6" rx="15.4" ry="11.2" fill={`url(#${uid}-body)`} />
