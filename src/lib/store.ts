@@ -55,6 +55,7 @@ import {
 } from "@/lib/ib";
 import {
   AFTER_SCHOOL_PRESET,
+  findDuplicateWindow,
   normalizeSchedule,
   normalizeWindow,
   validateWindow,
@@ -112,7 +113,7 @@ export function completeSetup(nemeses: NemesisId[]) {
   setState((current) => {
     const schedule =
       current.schedule.length > 0
-        ? current.schedule
+        ? normalizeSchedule(current.schedule)
         : normalizeSchedule([AFTER_SCHOOL_PRESET]);
     if (schedule.length === 0) return current;
     return {
@@ -493,6 +494,12 @@ export function saveSchedule(windows: LockWindow[]) {
 export function addLockWindow(input: Omit<LockWindow, "id">) {
   const check = validateWindow(input);
   if (!check.ok) return { ok: false as const, reason: check.reason };
+  if (findDuplicateWindow(getSnapshot().schedule, input)) {
+    return {
+      ok: false as const,
+      reason: "That window is already saved.",
+    };
+  }
   if (getSnapshot().schedule.length >= 8) {
     return { ok: false as const, reason: "Eight windows is enough." };
   }
@@ -507,7 +514,7 @@ export function addLockWindow(input: Omit<LockWindow, "id">) {
   }
   setState((current) => ({
     ...current,
-    schedule: [...current.schedule, window],
+    schedule: normalizeSchedule([...current.schedule, window]),
   }));
   return { ok: true as const, window };
 }
@@ -520,9 +527,17 @@ export function updateLockWindow(
   if (!existing) return { ok: false as const, reason: "Window not found." };
   const next = normalizeWindow({ ...existing, ...patch, id });
   if (!next) return { ok: false as const, reason: "Could not update that window." };
+  if (findDuplicateWindow(getSnapshot().schedule, next, id)) {
+    return {
+      ok: false as const,
+      reason: "That window is already saved.",
+    };
+  }
   setState((current) => ({
     ...current,
-    schedule: current.schedule.map((row) => (row.id === id ? next : row)),
+    schedule: normalizeSchedule(
+      current.schedule.map((row) => (row.id === id ? next : row)),
+    ),
   }));
   return { ok: true as const };
 }
