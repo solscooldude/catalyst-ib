@@ -282,72 +282,65 @@
   backface-visibility: hidden;
 }
 
-.spark-body.sprite-plate {
+.spark-body.spark-svg-critter {
   position: relative;
   z-index: 10;
   width: 100%;
   height: 100%;
-  transform-box: border-box;
+  transform-box: fill-box;
   transform-origin: 50% 88%;
 }
 
-.sprite-plate-img {
-  position: relative;
-  z-index: 1;
+.spark-svg-critter > svg {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  user-select: none;
-}
-
-.sprite-plate-fx {
-  position: absolute;
-  inset: -6%;
-  width: 112%;
-  height: 112%;
-  pointer-events: none;
   overflow: visible;
 }
 
-.sprite-plate-fx.is-under {
-  z-index: 0;
-}
-
-.sprite-plate-fx.is-over {
-  z-index: 3;
-}
-
-.sprite-magical-eyes {
+.sprite-magical-dust {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 2;
+  overflow: visible;
 }
 
-.sprite-magical-eye {
+.sprite-magical-mote {
   position: absolute;
-  top: 31%;
-  width: 15%;
-  height: 13%;
+  width: 7%;
+  height: 7%;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    #fff6c8 0%,
-    color-mix(in srgb, var(--spark-glow, #fbbf24) 80%, transparent) 38%,
-    transparent 72%
+    #fff7ed 0%,
+    color-mix(in srgb, var(--spark-glow, #fbbf24) 78%, transparent) 42%,
+    transparent 74%
   );
   mix-blend-mode: screen;
-  opacity: 0.92;
+  opacity: 0.72;
+  animation: sprite-mote-drift 2.8s ease-in-out infinite;
 }
 
-.sprite-magical-eye.is-left {
-  left: 29%;
-}
+.sprite-magical-mote.mote-0 { top: 14%; left: 22%; animation-delay: 0s; }
+.sprite-magical-mote.mote-1 { top: 18%; left: 68%; width: 5%; height: 5%; animation-delay: 0.35s; }
+.sprite-magical-mote.mote-2 { top: 36%; left: 12%; width: 4.5%; height: 4.5%; animation-delay: 0.7s; }
+.sprite-magical-mote.mote-3 { top: 42%; left: 78%; animation-delay: 0.15s; }
+.sprite-magical-mote.mote-4 { top: 58%; left: 18%; width: 5.5%; height: 5.5%; animation-delay: 0.9s; }
+.sprite-magical-mote.mote-5 { top: 62%; left: 72%; width: 4%; height: 4%; animation-delay: 1.1s; }
+.sprite-magical-mote.mote-6 { top: 8%; left: 48%; width: 6%; height: 6%; animation-delay: 0.5s; }
+.sprite-magical-mote.mote-7 { top: 74%; left: 38%; width: 4.5%; height: 4.5%; animation-delay: 1.4s; }
+.sprite-magical-mote.mote-8 { top: 28%; left: 40%; width: 3.5%; height: 3.5%; animation-delay: 1.8s; }
+.sprite-magical-mote.mote-9 { top: 80%; left: 58%; width: 5%; height: 5%; animation-delay: 0.25s; }
 
-.sprite-magical-eye.is-right {
-  left: 55%;
+@keyframes sprite-mote-drift {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0) scale(0.82);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-7px) scale(1.08);
+  }
 }
 
 .sprite-spark-stage.is-held {
@@ -896,7 +889,7 @@
   .spark-spin .spark-body,
   .spark-tickle .spark-body,
   .spark-wave .spark-body,
-  .sprite-magical-eye,
+  .sprite-magical-mote,
   .spark-sit,
   .spark-gold-shine,
   .spark-cosmic-dot,
