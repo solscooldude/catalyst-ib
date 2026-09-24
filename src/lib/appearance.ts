@@ -243,21 +243,24 @@ export const SPARK_GEAR = [
     name: "Cool hood",
     cost: 0,
     collection: "starter" as const,
-    blurb: "Week 1 streak award. Dark hood, street-cool.",
+    unlock: "streak" as const,
+    blurb: "7-day streak award. Dark hood, street-cool.",
   },
   {
     id: "streak-mantle",
     name: "Magical mantle",
     cost: 0,
     collection: "aurora" as const,
-    blurb: "Week 2 streak award. Star-lined cloak.",
+    unlock: "streak" as const,
+    blurb: "14-day streak award. Star-lined cloak.",
   },
   {
     id: "streak-crown",
     name: "Elite crown",
     cost: 0,
     collection: "gold" as const,
-    blurb: "Week 3 streak award. Small gold crown.",
+    unlock: "streak" as const,
+    blurb: "14-day streak award. Small gold crown.",
   },
 ] as const;
 
@@ -316,7 +319,8 @@ export const SPARK_TRAILS = [
     name: "Seven-day flare",
     cost: 0,
     collection: "gold" as const,
-    blurb: "Login seven days in a row. Warm gold motes.",
+    unlock: "streak" as const,
+    blurb: "7-day streak award. Warm gold motes.",
   },
 ] as const;
 
@@ -360,6 +364,16 @@ export type AccentId = (typeof ACCENTS)[number]["id"];
 export type SparkGearId = (typeof SPARK_GEAR)[number]["id"];
 export type SparkTrailId = (typeof SPARK_TRAILS)[number]["id"];
 export type FocusThemeId = (typeof FOCUS_THEMES)[number]["id"];
+
+export function isStreakUnlockItem(item: { unlock?: string; id?: string }) {
+  return item.unlock === "streak";
+}
+
+export function shopCatalog<T extends { id: string; cost: number }>(
+  items: readonly T[],
+): T[] {
+  return items.filter((item) => !isStreakUnlockItem(item));
+}
 
 const LEGACY_ACCENT: Record<string, { hue: AccentId; shade: AccentShadeId }> = {
   "red-deep": { hue: "red", shade: "deep" },

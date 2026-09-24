@@ -1,3 +1,4 @@
+import { isStreakUnlockItem } from "@/lib/appearance";
 import { dayKey } from "@/lib/care";
 
 /** For-sale cap per sprite shop section — not a shop-wide SKU cap. */
@@ -38,7 +39,9 @@ function shuffle<T>(items: readonly T[], seed: string) {
   return next;
 }
 
-export function rotateShopSection<T extends { id: string; cost: number }>(
+export function rotateShopSection<
+  T extends { id: string; cost: number; unlock?: string },
+>(
   items: readonly T[],
   section: string,
   ownedIds: readonly string[],
@@ -50,6 +53,7 @@ export function rotateShopSection<T extends { id: string; cost: number }>(
   const rotating: T[] = [];
 
   for (const item of items) {
+    if (isStreakUnlockItem(item)) continue;
     if (item.cost === 0 || owned.has(item.id)) {
       keep.add(item.id);
       continue;
