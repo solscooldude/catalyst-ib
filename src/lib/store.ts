@@ -8,6 +8,7 @@ import {
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  isStreakUnlockItem,
   normalizeAppearance,
   roomHasShades,
   type AccentId,
@@ -20,10 +21,12 @@ import {
   FEED_DAILY_LIMIT,
   QUIZ_TOKEN,
   STREAK_REWARD_DAY,
+  STREAK_TRAIL,
   dayKey,
   streakGearForWeek,
   streakLoginPrize,
   yesterdayKey,
+  type StreakAward,
 } from "@/lib/care";
 import {
   MOCK_TASKS,
@@ -587,6 +590,17 @@ export function clearSession() {
   setState((current) => ({ ...current, session: null }));
 }
 
+function streakAwardFromId(
+  id: StreakAward["id"],
+  days: number,
+): StreakAward | null {
+  const gear = SPARK_GEAR.find((row) => row.id === id);
+  if (gear) return { id, kind: "gear", name: gear.name, days };
+  const trail = SPARK_TRAILS.find((row) => row.id === id);
+  if (trail) return { id, kind: "trail", name: trail.name, days };
+  return null;
+}
+
 export function claimDailyLogin(now = new Date()) {
   const today = dayKey(now);
   if (getSnapshot().lastLoginDay === today) {
@@ -597,24 +611,64 @@ export function claimDailyLogin(now = new Date()) {
   const prize = streakLoginPrize(streakDays);
   const weekGear = streakGearForWeek(streakDays);
   const weekReward = streakDays > 0 && streakDays % STREAK_REWARD_DAY === 0;
+  setState((current) => {
+    if (!weekReward) {
+      return {
+        ...current,
+        lastLoginDay: today,
+        streakDays,
+        tokens: current.tokens + prize,
+      };
+    }
+    const shown = new Set(current.streakAwardsShown);
+    const newGear = Boolean(
+      weekGear && !current.appearance.ownedGear.includes(weekGear),
+    );
+    const newTrail = !current.appearance.ownedTrails.includes(STREAK_TRAIL);
+    const gifts: StreakAward[] = [];
+    if (weekGear) {
+      const award = streakAwardFromId(weekGear, streakDays);
+      if (award) gifts.push(award);
+    }
+    if (newTrail) {
+      const award = streakAwardFromId(STREAK_TRAIL, streakDays);
+      if (award) gifts.push(award);
+    }
+    const fresh = gifts.filter((gift) => !shown.has(gift.id));
+    const pending =
+      current.pendingStreakAward ??
+      fresh.find((gift) => gift.kind === "gear") ??
+      fresh[0] ??
+      null;
+    return {
+      ...current,
+      lastLoginDay: today,
+      streakDays,
+      tokens: current.tokens + prize,
+      pendingStreakAward: pending,
+      appearance: normalizeAppearance({
+        ...current.appearance,
+        ownedTrails: [...current.appearance.ownedTrails, STREAK_TRAIL],
+        ownedGear: weekGear
+          ? [...current.appearance.ownedGear, weekGear]
+          : current.appearance.ownedGear,
+        trail: newTrail ? STREAK_TRAIL : current.appearance.trail,
+        gear: newGear && weekGear ? weekGear : current.appearance.gear,
+      }),
+    };
+  });
+  return { ok: true as const, awarded: true, streakDays, weekReward, prize };
+}
+
+export function dismissStreakAward() {
+  const pending = getSnapshot().pendingStreakAward;
+  if (!pending) return { ok: true as const };
   setState((current) => ({
     ...current,
-    lastLoginDay: today,
-    streakDays,
-    tokens: current.tokens + prize,
-    appearance: weekReward
-      ? normalizeAppearance({
-          ...current.appearance,
-          ownedTrails: [...current.appearance.ownedTrails, "week"],
-          ownedGear: weekGear
-            ? [...current.appearance.ownedGear, weekGear]
-            : current.appearance.ownedGear,
-          trail: "week",
-          gear: weekGear ?? current.appearance.gear,
-        })
-      : current.appearance,
+    pendingStreakAward: null,
+    streakAwardsShown: [...new Set([...current.streakAwardsShown, pending.id])],
   }));
-  return { ok: true as const, awarded: true, streakDays, weekReward, prize };
+  return { ok: true as const };
 }
 
 export function feedSpark() {
@@ -866,8 +920,11 @@ function equippedKey(kind: AppearanceKind): keyof AppearanceState {
 export function buyAppearance(kind: AppearanceKind, id: string) {
   const item = catalogFor(kind).find((row) => row.id === id);
   if (!item) return { ok: false as const, reason: "Unknown item." };
-  if (id === "week") {
-    return { ok: false as const, reason: "Login seven days in a row." };
+  if (isStreakUnlockItem(item) || id === "week") {
+    return {
+      ok: false as const,
+      reason: "A login streak unlocks this for your sprite.",
+    };
   }
   const owned = getSnapshot().appearance[ownedKey(kind)] as string[];
   if (owned.includes(id)) {
