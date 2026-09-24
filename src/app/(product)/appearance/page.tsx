@@ -25,6 +25,7 @@ import {
   type SparkTrailId,
 } from "@/lib/appearance";
 import { FEED_COST, FEED_DAILY_LIMIT } from "@/lib/care";
+import { followInPageHref, listenInPageNav } from "@/lib/in-page-nav";
 import { ROUTES } from "@/lib/routes";
 import {
   buyAppearance,
@@ -98,12 +99,9 @@ export default function AppearancePage() {
   }
 
   useEffect(() => {
-    function sync() {
+    return listenInPageNav(() => {
       setTab(tabFromHash(window.location.hash));
-    }
-    sync();
-    window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
+    });
   }, []);
 
   const shownRealm: ShopRealm =
@@ -115,8 +113,7 @@ export default function AppearancePage() {
 
   function openTab(next: ShopTab) {
     setTab(next);
-    const url = `${ROUTES.appearance}#${next}`;
-    window.history.replaceState(null, "", url);
+    followInPageHref(`${ROUTES.appearance}#${next}`);
   }
 
   function tryOn(kind: AppearanceKind, id: string) {
