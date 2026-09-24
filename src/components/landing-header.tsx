@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { DemoBadge } from "@/components/demo-badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,6 @@ export function LandingHeader() {
       <Wordmark />
       <div className="flex items-center gap-2 sm:gap-3">
         <ThemeToggle />
-        <DemoBadge className="hidden sm:inline-flex">IB DP</DemoBadge>
         {auth.user ? (
           <Button asChild className="h-9 rounded-full px-4">
             <Link href="/dashboard">

@@ -64,7 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {sessionView || introView ? null : (
         <footer className="relative z-10 px-4 py-8">
           <p className="mx-auto max-w-5xl text-center text-xs text-muted-foreground">
-            Demo accounts · no real Screen Time
+            Simulated lock. Your OS Screen Time is untouched.
           </p>
         </footer>
       )}

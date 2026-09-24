@@ -24,9 +24,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Catalyst — focus tool for IB DP",
+  title: "Catalyst — focus, then unlock",
   description:
-    "For IB DP students. Phone apps pull you off homework. Focus sessions earn tokens. Then you buy a short unlock for the apps that steal the block.",
+    "Phone apps pull you off homework. Focus sessions earn tokens. Then you buy a short unlock for the apps that steal the block.",
+  openGraph: {
+    title: "Catalyst — focus, then unlock",
+    description:
+      "Phone apps pull you off homework. Focus sessions earn tokens. Then you buy a short unlock for the apps that steal the block.",
+    siteName: "Catalyst",
+  },
+  twitter: {
+    card: "summary",
+    title: "Catalyst — focus, then unlock",
+    description:
+      "Phone apps pull you off homework. Focus sessions earn tokens. Then you buy a short unlock for the apps that steal the block.",
+  },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-icon" }],

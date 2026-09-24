@@ -6,7 +6,12 @@ import { useAuth } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
 import { useCatalyst } from "@/lib/store";
 
-const SETUP_PATHS = new Set<string>([ROUTES.profile, ROUTES.setup, ROUTES.schedule]);
+const SETUP_PATHS = new Set<string>([
+  ROUTES.profile,
+  ROUTES.setup,
+  ROUTES.schedule,
+  ROUTES.settings,
+]);
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
