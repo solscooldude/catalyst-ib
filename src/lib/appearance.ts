@@ -260,7 +260,7 @@ export const SPARK_GEAR = [
     cost: 0,
     collection: "gold" as const,
     unlock: "streak" as const,
-    blurb: "14-day streak award. Small gold crown.",
+    blurb: "21-day streak award. Small gold crown.",
   },
 ] as const;
 
