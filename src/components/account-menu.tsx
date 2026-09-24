@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { logOut, useAuth } from "@/lib/auth";
 import { displayAvatar } from "@/lib/identity";
-import { claimDailyLogin, resetDemo, useCatalyst } from "@/lib/store";
+import { useCatalyst } from "@/lib/store";
 import { setUiTheme, useUiTheme } from "@/lib/ui-theme";
 
 export function AccountMenu() {
@@ -107,18 +107,6 @@ export function AccountMenu() {
             }}
           >
             Log out
-          </button>
-          <button
-            type="button"
-            className="flex min-h-11 w-full items-center rounded-xl px-3.5 text-left text-sm text-zinc-600 dark:text-zinc-300"
-            onClick={() => {
-              setOpen(false);
-              resetDemo();
-              claimDailyLogin();
-              router.push(ROUTES.setup);
-            }}
-          >
-            Reset this account
           </button>
         </div>
       ) : null}
