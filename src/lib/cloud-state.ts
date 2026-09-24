@@ -149,7 +149,7 @@ export function extractCloudSnapshot(
     profile: normalizeProfile(raw.profile as ProfileState | undefined),
     lastLoginDay: typeof raw.lastLoginDay === "string" ? raw.lastLoginDay : null,
     streakDays: Math.max(0, Number(raw.streakDays ?? 0) || 0),
-    demoMode: Boolean(raw.demoMode),
+    demoMode: false,
   };
 }
 

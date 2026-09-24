@@ -67,7 +67,7 @@ export async function scanTasksWithOpenAi(input: {
   const content: Array<Record<string, unknown>> = [
     {
       type: "text",
-      text: "Extract IB / school assignments. Return JSON {\"tasks\":[{\"title\",\"subject\",\"due\",\"detail\"}]}. No scrape. Only tasks you can see.",
+      text: "Extract school assignments. Return JSON {\"tasks\":[{\"title\",\"subject\",\"due\",\"detail\"}]}. No scrape. Only tasks you can see.",
     },
   ];
   if (isImage) {

@@ -12,6 +12,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://catalyst-study.vercel.app/*",
         "https://catalyst-ib.vercel.app/*",
         "http://localhost:43127/*",
         "http://127.0.0.1:43127/*"

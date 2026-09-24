@@ -3,7 +3,7 @@ const name = params.get("app") || "This site";
 const host = params.get("host") || "";
 const tier = params.get("tier") || "";
 const next =
-  params.get("next") || "https://catalyst-ib.vercel.app/unlocks";
+  params.get("next") || "https://catalyst-study.vercel.app/unlocks";
 
 const title = document.getElementById("title");
 const copy = document.getElementById("copy");
