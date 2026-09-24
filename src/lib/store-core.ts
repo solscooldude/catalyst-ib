@@ -38,7 +38,11 @@ import {
 } from "@/lib/constants";
 import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-goal";
 import { normalizeHostList } from "@/lib/domain-policy";
-import { normalizeFriendCode, normalizeFriends, type Friend } from "@/lib/friends";
+import {
+  assignUniqueFriendCode,
+  normalizeFriends,
+  type Friend,
+} from "@/lib/friends";
 import {
   makeFriendCode,
   normalizeAvatar,
@@ -433,10 +437,12 @@ export function hydrateStore(userId: string | null = null) {
   try {
     const raw = window.localStorage.getItem(accountStorageKey(id));
     if (!raw) {
+      const fresh = createDefaultState();
       state = {
-        ...createDefaultState(),
+        ...fresh,
         appearance: mergeAppearance(undefined, id),
         spriteName: pickPersistedSpriteName(undefined, readDeviceSpriteName()),
+        friendCode: assignUniqueFriendCode(fresh.friendCode, id),
         hydrated: true,
       };
       persist(state);
@@ -506,8 +512,7 @@ export function hydrateStore(userId: string | null = null) {
       avatarDataUrl: normalizeAvatar(parsed.avatarDataUrl),
       avatarUrl: normalizeAvatarUrl(parsed.avatarUrl),
       soundMuted: Boolean(parsed.soundMuted),
-      friendCode:
-        normalizeFriendCode(String(parsed.friendCode ?? "")) || makeFriendCode(),
+      friendCode: assignUniqueFriendCode(String(parsed.friendCode ?? ""), id),
       allowlistExtra: normalizeHostList(parsed.allowlistExtra),
       friends: normalizeFriends(parsed.friends),
       schoolTasks: normalizeSchoolTasks(parsed.schoolTasks),
@@ -544,9 +549,11 @@ export function hydrateStore(userId: string | null = null) {
     };
     state = withGrowth(state);
   } catch {
+    const fresh = createDefaultState();
     state = {
-      ...createDefaultState(),
+      ...fresh,
       appearance: mergeAppearance(undefined, id),
+      friendCode: assignUniqueFriendCode(fresh.friendCode, id),
       hydrated: true,
     };
   }
@@ -592,7 +599,9 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     dailyGoalMinutes: snapshot.dailyGoalMinutes,
     dailyGoalSetDay: snapshot.dailyGoalSetDay,
     dailyGoalClaimedDay: snapshot.dailyGoalClaimedDay,
-    friendCode: snapshot.friendCode || current.friendCode,
+    friendCode: assignUniqueFriendCode(
+      snapshot.friendCode || current.friendCode,
+    ),
     setupComplete: snapshot.setupComplete,
     introSeen: snapshot.introSeen,
     profile: snapshot.profile,
@@ -718,3 +727,4 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
+
