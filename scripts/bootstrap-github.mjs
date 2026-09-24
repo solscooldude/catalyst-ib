@@ -91,26 +91,38 @@ if (existsSync(focusScene)) {
 
 const spriteSpecies = ["fox", "bunny", "deer", "cat", "axolotl", "dragon"];
 const spriteStages = ["egg", "hatchling", "growing", "luminary", "ethereal"];
+const spriteChunkDir = join(root, "public/sprites/chunks");
 const spriteChunkBase =
   "https://raw.githubusercontent.com/solscooldude/catalyst-ib/main/public/sprites/chunks";
+
+function writeSpriteWebp(dest, b64) {
+  mkdirSync(dirname(dest), { recursive: true });
+  const buf = Buffer.from(String(b64).replace(/\s/g, ""), "base64");
+  if (buf.length < 32 || buf.subarray(0, 4).toString() !== "RIFF") {
+    throw new Error(`invalid webp payload for ${dest}`);
+  }
+  writeFileSync(dest, buf);
+}
 
 await Promise.all(
   spriteSpecies.flatMap((species) =>
     spriteStages.map(async (stage) => {
       const dest = join(root, "public/sprites", species, `${stage}.webp`);
-      const url = `${spriteChunkBase}/${species}-${stage}.webp.b64`;
-      const res = await fetch(url);
-      if (res.ok) {
-        mkdirSync(dirname(dest), { recursive: true });
-        writeFileSync(
-          dest,
-          Buffer.from((await res.text()).replace(/\s/g, ""), "base64"),
-        );
+      const localChunk = join(spriteChunkDir, `${species}-${stage}.webp.b64`);
+      if (existsSync(localChunk)) {
+        writeSpriteWebp(dest, readFileSync(localChunk, "utf8"));
         console.log("assembled sprite", `${species}/${stage}.webp`);
         return;
       }
       if (existsSync(dest) && statSync(dest).size > 32) {
         console.log("keep sprite", `${species}/${stage}.webp`);
+        return;
+      }
+      const url = `${spriteChunkBase}/${species}-${stage}.webp.b64`;
+      const res = await fetch(url);
+      if (res.ok) {
+        writeSpriteWebp(dest, await res.text());
+        console.log("fetched sprite", `${species}/${stage}.webp`);
         return;
       }
       console.warn("missing sprite chunk", url, res.status);
