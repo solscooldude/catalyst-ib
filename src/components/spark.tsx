@@ -4,14 +4,12 @@ import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
 import {
   getSparkAura,
-  getSparkTint,
   type SparkAuraId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
 } from "@/lib/appearance";
 import { SparkParticleRing, SubjectFlourish } from "@/components/spark-flourishes";
-import { SPARK_BODY_PATH } from "@/lib/spark-silhouette";
 import {
   SPARK_FLAVOR_INK,
   sparkFlavorFromContext,
@@ -21,7 +19,12 @@ import {
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
 import { type SnackId, type SparkAct } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
-import { sparkEvolutionFromState } from "@/lib/stats";
+import { mintGlowForStage, sparkEvolutionFromState, type CareStage } from "@/lib/stats";
+import {
+  normalizeSpriteSpecies,
+  spriteBodyPalette,
+} from "@/lib/sprite-species";
+import { SpriteCritter } from "@/components/sprite-critter";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -183,20 +186,24 @@ function SparkAuraMark({
   return (
     <g aria-hidden className="spark-aura-body">
       {spec.glowB ? (
-        <path
-          d={SPARK_BODY_PATH}
+        <ellipse
+          cx="50"
+          cy="68"
+          rx="36"
+          ry="40"
           fill={spec.glowB}
-          fillOpacity="0.55"
+          fillOpacity="0.5"
           filter={`url(#${blurId})`}
-          transform="translate(50 62) scale(1.22) translate(-50 -62)"
         />
       ) : null}
-      <path
-        d={SPARK_BODY_PATH}
+      <ellipse
+        cx="50"
+        cy="68"
+        rx="32"
+        ry="36"
         fill={spec.glow}
-        fillOpacity="0.7"
+        fillOpacity="0.62"
         filter={`url(#${blurId})`}
-        transform="translate(50 62) scale(1.18) translate(-50 -62)"
       />
     </g>
   );
@@ -664,15 +671,12 @@ export function Spark({
   const wrapRef = useRef<HTMLDivElement | HTMLButtonElement | null>(null);
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
-  const bodyId = `spark-body-${uid}`;
-  const specId = `spark-spec-${uid}`;
   const auraBlurId = `spark-aura-blur-${uid}`;
   const store = useCatalyst();
   const tintId = tint ?? store.appearance.sparkTint;
   const gearId = gear ?? store.appearance.gear;
   const auraId = aura ?? store.appearance.aura;
   const trailId = trail ?? store.appearance.trail;
-  const palette = getSparkTint(tintId);
   const resolved =
     flavor ??
     sparkFlavorFromContext({
@@ -805,7 +809,12 @@ export function Spark({
   }, [trackEyes, asleep]);
   const evo = evolve
     ? sparkEvolutionFromState(store)
-    : { scale: 1, glow: 1, stage: "steady" as const };
+    : { scale: 1, glow: 1, stage: "growing" as CareStage };
+  const species = normalizeSpriteSpecies(store.spriteSpecies);
+  const bodyPalette = spriteBodyPalette(species, tintId);
+  const stageGlow = evolve && mintGlowForStage(evo.stage);
+  const extraMagical = Boolean(store.extraMagical) && evo.stage === "ethereal";
+  const glowHex = stageGlow ? bodyPalette.glow : bodyPalette.fur;
   const hatching =
     Boolean(store.hatchBurstAt) &&
     Date.now() - (store.hatchBurstAt ?? 0) < 1600;
@@ -835,9 +844,13 @@ export function Spark({
   const frameStyle = {
     width: drawn,
     height: drawn,
-    color: palette.lo,
-    ["--spark-evo-glow" as string]: String(evo.glow),
+    color: glowHex,
+    ["--spark-evo-glow" as string]: String(extraMagical ? evo.glow * 1.2 : evo.glow),
     ["--spark-aura" as string]: getSparkAura(auraId).glow,
+    ["--spark-hi" as string]: bodyPalette.belly,
+    ["--spark-mid" as string]: bodyPalette.fur,
+    ["--spark-lo" as string]: bodyPalette.furDeep,
+    ["--spark-glow" as string]: glowHex,
   };
 
   const body = (
@@ -857,34 +870,12 @@ export function Spark({
       >
         <defs>
           <radialGradient id={glowId} cx="50%" cy="58%" r="48%">
-            <stop offset="0%" stopColor={palette.lo} stopOpacity="0.55" />
-            <stop offset="100%" stopColor={palette.lo} stopOpacity="0" />
-          </radialGradient>
-          {tintId === "gold" ? (
-            <linearGradient id={bodyId} x1="8%" y1="4%" x2="92%" y2="98%">
-              <stop offset="0%" stopColor="#FFF8DC" />
-              <stop offset="18%" stopColor="#F6D365" />
-              <stop offset="38%" stopColor="#C9A227" />
-              <stop offset="58%" stopColor="#F0C14A" />
-              <stop offset="78%" stopColor="#B8860B" />
-              <stop offset="100%" stopColor="#7A5C10" />
-            </linearGradient>
-          ) : palette.kind === "gradient" ? (
-            <linearGradient id={bodyId} x1="16%" y1="6%" x2="88%" y2="94%">
-              <stop offset="0%" stopColor={palette.hi} />
-              <stop offset="48%" stopColor={palette.mid} />
-              <stop offset="100%" stopColor={palette.lo} />
-            </linearGradient>
-          ) : (
-            <radialGradient id={bodyId} cx="38%" cy="32%" r="72%">
-              <stop offset="0%" stopColor={palette.hi} />
-              <stop offset="42%" stopColor={palette.mid} />
-              <stop offset="100%" stopColor={palette.lo} />
-            </radialGradient>
-          )}
-          <radialGradient id={specId} cx="35%" cy="30%" r="22%">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop
+              offset="0%"
+              stopColor={glowHex}
+              stopOpacity={stageGlow ? (extraMagical ? 0.55 : 0.42) : 0.18}
+            />
+            <stop offset="100%" stopColor={glowHex} stopOpacity="0" />
           </radialGradient>
           <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
             <feGaussianBlur stdDeviation="5.4" />
@@ -916,62 +907,40 @@ export function Spark({
           <g className="spark-body">
             <SparkAuraMark id={auraId} blurId={auraBlurId} />
             <GearBack id={gearId} />
-            <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
+            <SpriteCritter
+              species={species}
+              palette={bodyPalette}
+              mood={shownMood}
+              stage={evo.stage}
+              stageGlow={stageGlow}
+              extraMagical={extraMagical}
+            />
             {tintId === "gold" ? (
               <g className="spark-gold-shine">
                 <ellipse
-                  cx="38"
-                  cy="44"
-                  rx="13"
-                  ry="9"
+                  cx="40"
+                  cy="40"
+                  rx="11"
+                  ry="7"
                   fill="#FFFBEB"
-                  opacity="0.7"
-                />
-                <path
-                  d="M26 54c10-14 28-16 38-7"
-                  fill="none"
-                  stroke="#FFF8D0"
-                  strokeWidth="2.6"
-                  strokeLinecap="round"
-                  opacity="0.85"
-                />
-                <path
-                  d="M34 68c8-6 18-7 26-2"
-                  fill="none"
-                  stroke="#FFE27A"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
                   opacity="0.55"
                 />
-                <circle cx="62" cy="40" r="1.7" fill="#FFFBEB" />
-                <circle cx="70" cy="56" r="1.25" fill="#FDE68A" />
-                <circle cx="34" cy="70" r="1.35" fill="#FFF7D6" />
-                <circle cx="48" cy="36" r="1.1" fill="#FFFBEB" />
+                <circle cx="62" cy="38" r="1.4" fill="#FFFBEB" />
+                <circle cx="34" cy="58" r="1.1" fill="#FFF7D6" />
               </g>
             ) : null}
             {tintId === "cosmic" ? (
               <g className="spark-cosmic-stars" fill="#F8FAFC">
-                <circle className="spark-cosmic-dot" cx="36" cy="46" r="1.15" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="58" cy="40" r="0.9" />
-                <circle className="spark-cosmic-dot" cx="68" cy="58" r="1.05" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="42" cy="72" r="0.8" />
-                <circle className="spark-cosmic-dot" cx="54" cy="64" r="1.2" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="30" cy="60" r="0.7" />
+                <circle className="spark-cosmic-dot" cx="36" cy="40" r="1.1" />
+                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="60" cy="36" r="0.9" />
+                <circle className="spark-cosmic-dot" cx="66" cy="54" r="1" />
                 <path
-                  d="M48 38l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"
+                  d="M48 34l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"
                   fill="#BFDBFE"
-                />
-                <path
-                  d="M63 48l.45 1.2 1.2.45-1.2.45-.45 1.2-.45-1.2-1.2-.45 1.2-.45Z"
-                  fill="#DBEAFE"
                 />
               </g>
             ) : null}
-            <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
             <Gear id={gearId} />
-            <g className={canGlance ? "spark-glance" : undefined}>
-              <Eyes mood={shownMood} fill="#0B0B0F" />
-            </g>
             <GearFront id={gearId} />
           </g>
         )}
