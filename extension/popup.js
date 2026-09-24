@@ -1,6 +1,6 @@
 import { describePopup } from "./policy.js";
 
-const FALLBACK = "https://catalyst-ib.vercel.app";
+const FALLBACK = "https://catalyst-study.vercel.app";
 
 const statusEl = document.getElementById("status");
 const detailEl = document.getElementById("status-detail");

@@ -11,7 +11,7 @@ async function readPolicy() {
       nemeses: [],
       allowlistExtra: [],
       unlockedUntil: {},
-      appOrigin: "https://catalyst-ib.vercel.app",
+      appOrigin: "https://catalyst-study.vercel.app",
     }
   );
 }
@@ -59,7 +59,7 @@ async function enforce(tabId, url) {
     "next",
     policy.appOrigin
       ? `${policy.appOrigin.replace(/\/$/, "")}/unlocks`
-      : "https://catalyst-ib.vercel.app/unlocks",
+      : "https://catalyst-study.vercel.app/unlocks",
   );
   try {
     await chrome.tabs.update(tabId, { url: locked.toString() });

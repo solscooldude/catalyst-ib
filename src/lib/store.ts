@@ -26,12 +26,7 @@ import {
   yesterdayKey,
 } from "@/lib/care";
 import {
-  DEMO_TIME_COMPRESS_MS,
-  DEMO_TOKEN_BLOCK_MS,
-  DEMO_TOKENS_PER_BLOCK,
-  DEMO_UNLOCK_MS,
   MOCK_TASKS,
-  REAL_TIME_COMPRESS_MS,
   REAL_TOKEN_MS,
   REAL_UNLOCK_MS,
   NEMESIS_UNLOCK_COST,
@@ -140,8 +135,8 @@ export function saveNemeses(nemeses: NemesisId[]) {
   return { ok: true as const, nemeses: next };
 }
 
-export function setDemoMode(demoMode: boolean) {
-  setState((current) => ({ ...current, demoMode }));
+export function setDemoMode(_demoMode: boolean) {
+  setState((current) => ({ ...current, demoMode: false }));
 }
 
 export function sessionTitle(session: Session) {
@@ -157,10 +152,7 @@ export function sessionHint(session: Session) {
 
 export function plannedLockMs(session: Session) {
   if (!session.plannedMinutes) return null;
-  const realMs = session.plannedMinutes * 60 * 1000;
-  return session.demoMode
-    ? Math.round(realMs * (DEMO_TIME_COMPRESS_MS / REAL_TIME_COMPRESS_MS))
-    : realMs;
+  return session.plannedMinutes * 60 * 1000;
 }
 
 export function startSession(input: { taskId: TaskId; goal: string }) {
@@ -175,7 +167,7 @@ export function startSession(input: { taskId: TaskId; goal: string }) {
     title: task?.title ?? "Focus task",
     goal: input.goal.trim(),
     plannedMinutes: null,
-    demoMode: getSnapshot().demoMode,
+    demoMode: false,
     status: "focus",
     lockedAt: Date.now(),
     focusStartedAt: Date.now(),
@@ -219,7 +211,7 @@ export function startStudySession(input: {
     title,
     goal: title,
     plannedMinutes: minutes,
-    demoMode: getSnapshot().demoMode,
+    demoMode: false,
     status: "focus",
     lockedAt: Date.now(),
     focusStartedAt: Date.now(),
@@ -334,11 +326,8 @@ export function markTaskDone(done: boolean) {
   });
 }
 
-export function tokensFromElapsed(elapsedMs: number, demoMode: boolean) {
+export function tokensFromElapsed(elapsedMs: number, _demoMode = false) {
   const ms = Math.max(0, elapsedMs);
-  if (demoMode) {
-    return Math.floor(ms / DEMO_TOKEN_BLOCK_MS) * DEMO_TOKENS_PER_BLOCK;
-  }
   return Math.floor(ms / REAL_TOKEN_MS);
 }
 
@@ -635,8 +624,7 @@ function unlockBlocks(minutes?: number) {
 
 function unlockDurationMs(minutes?: number) {
   const blocks = unlockBlocks(minutes);
-  const unit = getSnapshot().demoMode ? DEMO_UNLOCK_MS : REAL_UNLOCK_MS;
-  return unit * blocks;
+  return REAL_UNLOCK_MS * blocks;
 }
 
 export function setAllowlistExtra(raw: string[]) {
