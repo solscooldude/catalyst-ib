@@ -83,6 +83,43 @@ export function formatWindow(window: LockWindow) {
   }`;
 }
 
+export function sortedDays(days: number[]) {
+  const set = new Set(
+    days.filter((day) => WEEKDAYS.some((row) => row.day === day)),
+  );
+  return DAY_ORDER.filter((day) => set.has(day));
+}
+
+export function windowSignature(input: {
+  days: number[];
+  start: string;
+  end: string;
+}) {
+  const start = normalizeTime(input.start) ?? String(input.start).trim();
+  const end = normalizeTime(input.end) ?? String(input.end).trim();
+  return `${sortedDays(input.days).join(",")}|${start}|${end}`;
+}
+
+export function sameLockWindow(
+  a: { days: number[]; start: string; end: string },
+  b: { days: number[]; start: string; end: string },
+) {
+  return windowSignature(a) === windowSignature(b);
+}
+
+export function findDuplicateWindow<T extends { days: number[]; start: string; end: string; id?: string }>(
+  schedule: T[],
+  candidate: { days: number[]; start: string; end: string },
+  exceptId?: string,
+) {
+  const key = windowSignature(candidate);
+  return (
+    schedule.find(
+      (row) => row.id !== exceptId && windowSignature(row) === key,
+    ) ?? null
+  );
+}
+
 export function validateWindow(input: {
   days: number[];
   start: string;
@@ -171,19 +208,36 @@ export function normalizeWindow(
   if (!start || !end) return null;
   return {
     id: typeof raw.id === "string" && raw.id ? raw.id : crypto.randomUUID(),
-    days,
+    days: sortedDays(days),
     start,
     end,
     enabled: raw.enabled !== false && raw.on !== false,
   };
 }
 
+export function dedupeSchedule(windows: LockWindow[]): LockWindow[] {
+  const out: LockWindow[] = [];
+  for (const window of windows) {
+    const existing = findDuplicateWindow(out, window);
+    if (!existing) {
+      out.push(window);
+      continue;
+    }
+    if (window.enabled && !existing.enabled) {
+      const index = out.findIndex((row) => row.id === existing.id);
+      if (index >= 0) out[index] = window;
+    }
+  }
+  return out.slice(0, 8);
+}
+
 export function normalizeSchedule(raw?: unknown): LockWindow[] {
   if (!Array.isArray(raw)) return [];
-  return raw
-    .map((row) => normalizeWindow(row as Partial<LockWindow>))
-    .filter((row): row is LockWindow => Boolean(row))
-    .slice(0, 8);
+  return dedupeSchedule(
+    raw
+      .map((row) => normalizeWindow(row as Partial<LockWindow>))
+      .filter((row): row is LockWindow => Boolean(row)),
+  );
 }
 
 function minutesNow(now: Date) {
