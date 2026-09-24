@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { FocusStagePicker } from "@/components/focus-stage";
 import { ManualTaskForm } from "@/components/manual-task-form";
+import { MissingSubjectsNote } from "@/components/missing-subjects-note";
 import { StudyStartForm } from "@/components/study-start-form";
 import { SelectedTaskChip } from "@/components/task-option";
+import { TaskDescriptionField } from "@/components/task-description-field";
 import { SchoolTaskPick } from "@/components/school-task-pick";
 import type { TaskId } from "@/lib/constants";
-import { studySubjectOptions } from "@/lib/ib";
+import { chosenSubjectOptions, hasChosenSubjects } from "@/lib/ib";
 import { ROUTES } from "@/lib/routes";
 import { groupSchoolTasksBySubject } from "@/lib/school-tasks";
 import { PageFrame } from "@/components/page-frame";
@@ -43,7 +43,8 @@ export default function AppHomePage() {
   const router = useRouter();
   const state = useCatalyst();
   const [taskId, setTaskId] = useState<TaskId | "">("");
-  const [goal, setGoal] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<FocusMode>("task");
 
   useEffect(() => {
@@ -71,13 +72,14 @@ export default function AppHomePage() {
   }, []);
 
   const diploma = useMemo(
-    () => studySubjectOptions(state.profile),
+    () => chosenSubjectOptions(state.profile),
     [state.profile],
   );
   const sections = useMemo(
     () => groupSchoolTasksBySubject(state.schoolTasks, diploma),
     [state.schoolTasks, diploma],
   );
+  const subjectsReady = hasChosenSubjects(state.profile);
 
   if (!state.setupComplete) return null;
 
@@ -90,9 +92,31 @@ export default function AppHomePage() {
     window.history.replaceState(null, "", `${ROUTES.focus}#${next}`);
   }
 
+  function pickTask(id: TaskId) {
+    setTaskId(id);
+    const task = state.schoolTasks.find((row) => row.id === id);
+    setDescription((current) => task?.detail.trim() || current);
+    setError(null);
+  }
+
   function begin() {
-    if (!taskId) return;
-    startSession({ taskId, goal });
+    if (!subjectsReady) {
+      setError("Add subjects in Setup or Profile first.");
+      return;
+    }
+    if (!taskId) {
+      setError("Pick a task.");
+      return;
+    }
+    if (!description.trim()) {
+      setError("Describe what you are working on.");
+      return;
+    }
+    const result = startSession({ taskId, goal: description });
+    if (!result.ok) {
+      setError(result.reason);
+      return;
+    }
     router.push(ROUTES.session);
   }
 
@@ -108,7 +132,8 @@ export default function AppHomePage() {
           {mode === "task" ? "Pick the task." : "Start a study block."}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Choose task or study, fill in this block, then start at the bottom.
+          Choose task or study, pick a subject from your list, describe the
+          work, then start at the bottom.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">
@@ -170,11 +195,17 @@ export default function AppHomePage() {
           <div className="mt-6 rounded-3xl bg-zinc-50 p-4 dark:bg-zinc-900">
             <h3 className="text-sm font-medium text-foreground">Add a task</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Title is enough. Subject and due date are optional. Checking a
-              task done is a checklist only — tokens come from focus time.
+              Subject and task description are required. Due date is optional.
+              Checking a task done is a checklist only — tokens come from focus
+              time.
             </p>
             <div className="mt-4">
-              <ManualTaskForm />
+              <ManualTaskForm
+                onAdded={(task) => {
+                  pickTask(task.id);
+                  setDescription(task.detail);
+                }}
+              />
             </div>
           </div>
 
@@ -200,7 +231,7 @@ export default function AppHomePage() {
                           key={task.id}
                           task={task}
                           selected={taskId === task.id}
-                          onSelect={() => setTaskId(task.id)}
+                          onSelect={() => pickTask(task.id)}
                         />
                       ))}
                     </div>
@@ -214,7 +245,7 @@ export default function AppHomePage() {
             not pay extra.
           </p>
 
-          {state.schoolTasks.length > 0 && openTasks.length === 0 ? (
+          {state.schoolTasks.length === 0 ? null : openTasks.length === 0 ? (
             <p className="mt-6 text-sm text-muted-foreground">
               All listed tasks are done. Add another, or switch to a study
               block.
@@ -225,9 +256,9 @@ export default function AppHomePage() {
         <section id="study" className="flux-card px-6 py-8 sm:px-8">
           <h2 className="text-lg font-semibold text-foreground">Study block</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Subject only — no task list required. Tokens come from this
-            session. Switching to Docs or another allowlisted school site does
-            not pause earn.
+            Subject from your Setup/Profile list — no task list required.
+            Tokens come from this session. Switching to Docs or another
+            allowlisted school site does not pause earn.
           </p>
           <div className="mt-5">
             <StudyStartForm formId="study-setup" hideStart />
@@ -256,34 +287,37 @@ export default function AppHomePage() {
         <h2 className="text-lg font-semibold text-foreground">Start</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {mode === "task"
-            ? "Confirm the task and goal, then start this block."
+            ? "Confirm the subject, task, and description, then start this block."
             : "Confirm the study details above, then start this block."}
         </p>
 
-        {mode === "task" ? (
+        {!subjectsReady ? (
+          <div className="mt-5">
+            <MissingSubjectsNote />
+          </div>
+        ) : null}
+
+        {mode === "task" && subjectsReady ? (
           <div className="mt-5 space-y-4">
             <SelectedTaskChip
               title={selectedTask?.title}
               detail={selectedTask ? taskDetail(selectedTask) : undefined}
             />
-            <div className="space-y-2">
-              <Label htmlFor="goal">Goal for this block</Label>
-              <Input
-                id="goal"
-                value={goal}
-                onChange={(event) => setGoal(event.target.value)}
-                placeholder="Finish methodology. No phone until the draft exists."
-                className="focus-field"
-              />
-            </div>
+            <TaskDescriptionField
+              id="focus-task-description"
+              value={description}
+              onChange={setDescription}
+            />
           </div>
         ) : null}
+
+        {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
 
         <div className="mt-5 space-y-4">
           {mode === "task" ? (
             <Button
               className="h-11 w-full rounded-full"
-              disabled={!taskId}
+              disabled={!subjectsReady || !taskId || !description.trim()}
               onClick={begin}
             >
               Start focus
@@ -293,6 +327,7 @@ export default function AppHomePage() {
             <Button
               type="submit"
               form="study-setup"
+              disabled={!subjectsReady}
               className="h-11 w-full rounded-full"
             >
               Start focus
