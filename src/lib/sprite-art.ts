@@ -9,14 +9,12 @@ export const ILLUSTRATED_STAGES = [
   "ethereal",
 ] as const;
 
-/** Painted cutouts for every quiz species. SVG is only the 404 fallback. */
 export const ILLUSTRATED_SPECIES = SPRITE_SPECIES;
 
+/** Image plates are unused. The study buddy is inline SVG. */
 export function spriteArtSrc(
-  species: SpriteSpeciesId | string,
-  stage: CareStage | string,
+  _species?: SpriteSpeciesId | string,
+  _stage?: CareStage | string,
 ): string | null {
-  if (!(ILLUSTRATED_SPECIES as readonly string[]).includes(species)) return null;
-  if (!(ILLUSTRATED_STAGES as readonly string[]).includes(stage)) return null;
-  return `/sprites/${species}/${stage}.webp`;
+  return null;
 }

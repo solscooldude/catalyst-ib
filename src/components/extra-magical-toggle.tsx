@@ -16,7 +16,7 @@ export function ExtraMagicalToggle({
         <p className="text-sm font-medium text-foreground">Extra Magical</p>
         <p className="text-xs text-muted-foreground">
           {unlocked
-            ? "Soft particle shimmer over the painted glow. Ethereal only — off by default."
+            ? "Soft particle shimmer over the SVG glow. Ethereal only — off by default."
             : "Unlocks at Ethereal."}
         </p>
       </div>

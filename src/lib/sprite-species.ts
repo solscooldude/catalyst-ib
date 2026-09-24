@@ -110,16 +110,16 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
   dragon: {
     id: "dragon",
     label: "Dragon",
-    fur: "#86C4A4",
-    furDeep: "#5A9A7E",
-    belly: "#D4F0E4",
-    accent: "#E8D7B0",
+    fur: "#8FB176",
+    furDeep: "#5F7A48",
+    belly: "#F3EBD8",
+    accent: "#C9B48A",
     ink: "#1F2A1E",
     nose: "#3A4638",
     ...ETHEREAL_GLOWS.dragon,
-    egg: "#C8E8D8",
-    eggWash: "#86C4A4",
-    eggMark: "#5A9A7E",
+    egg: "#D5E4C4",
+    eggWash: "#8FB176",
+    eggMark: "#5F7A48",
   },
 };
 

@@ -1,7 +1,7 @@
 import type { CareStage } from "@/lib/stats";
 import type { SpeciesPalette, SpriteSpeciesId } from "@/lib/sprite-species";
 
-/** Overlay glow for illustrated plates. Bodies stay on the WebP. */
+/** Soft stage glow behind the inline SVG critter. */
 export function SpriteFxLayers({
   palette,
   stage,
