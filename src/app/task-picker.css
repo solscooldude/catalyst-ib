@@ -54,6 +54,13 @@
   box-shadow: 0 0 0 3px rgb(94 234 212 / 0.4);
 }
 
+.focus-field-area {
+  height: auto;
+  min-height: 7rem;
+  padding: 0.7rem;
+  resize: vertical;
+}
+
 .picker-empty {
   border-radius: 1rem;
   background: #f4f4f5;

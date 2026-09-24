@@ -115,10 +115,14 @@ export default function FriendsPage() {
       return;
     }
     const friend = state.friends.find((row) => row.code === raceFriend);
-    startSession({
+    const result = startSession({
       taskId: raceTask,
       goal: `Task race vs ${friend?.name ?? raceFriend}`,
     });
+    if (!result.ok) {
+      setNotice(result.reason);
+      return;
+    }
     router.push(ROUTES.session);
   }
 
@@ -310,7 +314,7 @@ export default function FriendsPage() {
       ) : null}
 
       {section === "board" ? (
-        <section id="board" className="flux-card scroll-mt-24 px-6 py-6">
+        <section id="board" className="flux-card px-6 py-6">
           <h2 className="text-lg text-foreground">Friend leaderboard</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Ranked by study minutes, then tasks completed.
