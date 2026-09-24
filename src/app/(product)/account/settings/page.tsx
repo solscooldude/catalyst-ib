@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageFrame } from "@/components/page-frame";
+import { ResetAccountDanger } from "@/components/reset-account";
 import { SpriteRename } from "@/components/sprite-rename";
 import { logOut, useAuth } from "@/lib/auth";
 import { AllowlistSettings } from "@/components/allowlist-settings";
@@ -133,6 +134,8 @@ export default function SettingsPage() {
           Mute soft sounds
         </label>
       </div>
+
+      <ResetAccountDanger />
     </PageFrame>
   );
 }
