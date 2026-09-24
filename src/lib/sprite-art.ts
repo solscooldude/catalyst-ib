@@ -1,5 +1,5 @@
-import type { CareStage } from "./care-stages.ts";
-import { SPRITE_SPECIES, type SpriteSpeciesId } from "./species-glows.ts";
+import type { CareStage } from "./care-stages";
+import { SPRITE_SPECIES, type SpriteSpeciesId } from "./species-glows";
 
 export const ILLUSTRATED_STAGES = [
   "egg",
