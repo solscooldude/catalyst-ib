@@ -229,7 +229,17 @@ export default function SchedulePage() {
                 ? `${formatWindow({ id: "preview", days, start, end, enabled: true })}`
                 : preview.reason}
             </p>
-            {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+            {error ? (
+              <p
+                className={
+                  error.includes("already saved")
+                    ? "text-sm text-muted-foreground"
+                    : "text-sm text-rose-300"
+                }
+              >
+                {error}
+              </p>
+            ) : null}
 
             <Button
               className="h-11 rounded-full px-6"

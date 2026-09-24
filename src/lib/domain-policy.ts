@@ -219,13 +219,13 @@ export function normalizeHost(raw: string) {
     const url = trimmed.includes("://")
       ? new URL(trimmed)
       : new URL(`https://${trimmed}`);
-    return url.hostname.replace(/\.+$/, "");
+    return url.hostname.replace(/\.$/, "");
   } catch {
     return trimmed
       .replace(/^https?:\/\//, "")
       .split("/")[0]
       .replace(/^www\./, "")
-      .replace(/\.+$/, "");
+      .replace(/\.$/, "");
   }
 }
 
@@ -324,11 +324,26 @@ export function normalizePolicyWindow(
   };
 }
 
+function policyWindowKey(window: LockWindowLite) {
+  const start = parseClock(window.start);
+  const end = parseClock(window.end);
+  const days = [...window.days].filter((day) => day >= 0 && day <= 6).sort((a, b) => a - b);
+  return `${days.join(",")}|${start}|${end}`;
+}
+
 export function normalizePolicySchedule(raw?: unknown): LockWindowLite[] {
   if (!Array.isArray(raw)) return [];
-  return raw
-    .map((row) => normalizePolicyWindow(row as LockWindowLite))
-    .filter((row): row is LockWindowLite => Boolean(row));
+  const out: LockWindowLite[] = [];
+  const seen = new Set<string>();
+  for (const row of raw) {
+    const window = normalizePolicyWindow(row as LockWindowLite);
+    if (!window) continue;
+    const key = policyWindowKey(window);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(window);
+  }
+  return out;
 }
 
 export function windowContains(window: LockWindowLite, now: Date) {

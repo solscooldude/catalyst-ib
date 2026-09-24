@@ -558,7 +558,7 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     avatarUrl: snapshot.avatarUrl,
     avatarDataUrl: snapshot.avatarUrl ? null : current.avatarDataUrl,
     tokens: snapshot.tokens,
-    schedule: snapshot.schedule,
+    schedule: normalizeSchedule(snapshot.schedule),
     nemeses: snapshot.nemeses,
     allowlistExtra: snapshot.allowlistExtra,
     unlocks: normalizeUnlocks(snapshot.unlocks, snapshot.nemeses),
