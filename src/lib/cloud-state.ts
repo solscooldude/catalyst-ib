@@ -155,7 +155,7 @@ export function extractCloudSnapshot(
       typeof raw.dailyGoalSetDay === "string" ? raw.dailyGoalSetDay : null,
     dailyGoalClaimedDay:
       typeof raw.dailyGoalClaimedDay === "string" ? raw.dailyGoalClaimedDay : null,
-    friendCode: normalizeFriendCode(String(raw.friendCode ?? "")) || "CAT-WAIT1",
+    friendCode: normalizeFriendCode(String(raw.friendCode ?? "")),
     setupComplete: Boolean(raw.setupComplete),
     introSeen: Boolean(raw.introSeen),
     profile: normalizeProfile(raw.profile as ProfileState | undefined),
