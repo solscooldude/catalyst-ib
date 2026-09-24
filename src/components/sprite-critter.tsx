@@ -1,3 +1,4 @@
+import { CAT_HEART, ETHEREAL_GLOWS } from "@/lib/species-glows";
 import type { SpeciesPalette, SpriteSpeciesId } from "@/lib/sprite-species";
 import type { CareStage } from "@/lib/stats";
 
@@ -93,9 +94,9 @@ function Face({
       <ellipse
         className="spark-pupil"
         cx={60.8 + look}
-        ry="1.85"
         cy="48"
         rx="1.45"
+        ry="1.85"
         fill="#fff"
         fillOpacity="0.95"
       />
@@ -247,12 +248,7 @@ function Tail({ species, palette }: { species: SpriteSpeciesId; palette: Species
     );
   }
   if (species === "axolotl") {
-    return (
-      <path
-        d="M66 86c14 2 20 10 14 18-8 4-16-2-18-8"
-        fill={palette.fur}
-      />
-    );
+    return <path d="M66 86c14 2 20 10 14 18-8 4-16-2-18-8" fill={palette.fur} />;
   }
   if (species === "dragon") {
     return (
@@ -278,16 +274,59 @@ function Tail({ species, palette }: { species: SpriteSpeciesId; palette: Species
         fill={palette.fur}
       />
       <ellipse cx="18" cy="56" rx="6.4" ry="6" fill={palette.belly} />
+      <ellipse cx="14" cy="50" rx="3.4" ry="3.2" fill="#FFF8EE" />
     </g>
   );
 }
 
+function HeartMark({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0 2.2C-1.6-.4-5-.6-6.4 1.5-8.3 4.2-6.6 7.4 0 12.2 6.4 7.4 8.1 4.2 6.2 1.5 4.8-.6 1.4-.4 0 2.2Z"
+      fill={fill}
+    />
+  );
+}
+
+function StarMark({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0-4.2 1.2-1.1 4.4 0 1.2 1.1 0 4.2-1.2 1.1-4.4 0-1.2-1.1Z"
+      fill={fill}
+    />
+  );
+}
+
 function StageGlow({
+  species,
   stage,
   glow,
   glowDeep,
   extraMagical,
 }: {
+  species: SpriteSpeciesId;
   stage: CareStage;
   glow: string;
   glowDeep: string;
@@ -297,6 +336,7 @@ function StageGlow({
   const luminary = stage === "luminary";
   if (!ethereal && !luminary) return null;
   const strong = extraMagical && ethereal;
+  const fx = ETHEREAL_GLOWS[species].fx;
   return (
     <g className="sprite-stage-glow" aria-hidden>
       <ellipse
@@ -307,51 +347,209 @@ function StageGlow({
         fill={glow}
         fillOpacity={strong ? 0.3 : ethereal ? 0.2 : 0.12}
       />
-      <circle
+      <ellipse
         cx="50"
-        cy="48"
-        r={strong ? 38 : ethereal ? 34 : 0}
-        fill="none"
-        stroke={glow}
-        strokeOpacity={strong ? 0.7 : 0.4}
-        strokeWidth={strong ? 1.8 : 1.2}
+        cy="70"
+        rx={strong ? 40 : ethereal ? 34 : 26}
+        ry={strong ? 38 : ethereal ? 32 : 24}
+        fill={glowDeep}
+        fillOpacity={ethereal ? 0.1 : 0.05}
       />
-      <circle
-        cx="50"
-        cy="72"
-        r={strong ? 44 : ethereal ? 40 : 32}
-        fill="none"
-        stroke={glowDeep}
-        strokeOpacity={strong ? 0.62 : ethereal ? 0.45 : 0.28}
-        strokeWidth="1.4"
-      />
-      {ethereal ? (
-        <g className="sprite-ethereal-wisps" fill="none" stroke={glow} strokeLinecap="round">
-          <path d="M14 70c8-18 10-8 18-22" strokeWidth="1.3" opacity="0.75" />
-          <path d="M86 68c-8-16-8-6-18-20" strokeWidth="1.3" opacity="0.75" />
-          <path d="M22 46c6-10 14-4 16-14" strokeWidth="1.1" opacity="0.55" />
-          <path d="M78 44c-6-10-12-2-16-14" strokeWidth="1.1" opacity="0.55" />
-          <circle cx="20" cy="34" r="1.3" fill={glow} stroke="none" />
-          <circle cx="80" cy="30" r="1.1" fill={glow} stroke="none" />
-          <circle cx="50" cy="16" r="1.2" fill={glow} stroke="none" />
-          <circle cx="70" cy="20" r="0.8" fill={glow} stroke="none" />
-          <circle cx="32" cy="22" r="0.8" fill={glow} stroke="none" />
-          {strong ? (
-            <g fill={glow} stroke="none">
-              <circle cx="12" cy="52" r="1.4" />
-              <circle cx="88" cy="50" r="1.3" />
-              <circle cx="28" cy="14" r="1.1" />
-              <circle cx="74" cy="12" r="1.15" />
-              <circle cx="42" cy="8" r="0.9" />
-              <circle cx="58" cy="10" r="0.85" />
-              <circle cx="8" cy="70" r="0.8" />
-              <circle cx="92" cy="72" r="0.8" />
-              <path d="M50 6l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z" />
-              <path d="M18 24l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5Z" />
-              <path d="M82 22l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5Z" />
-            </g>
-          ) : null}
+      {ethereal ? <EtherealFxLayer fx={fx} glow={glow} glowDeep={glowDeep} strong={strong} /> : null}
+    </g>
+  );
+}
+
+function EtherealFxLayer({
+  fx,
+  glow,
+  glowDeep,
+  strong,
+}: {
+  fx: (typeof ETHEREAL_GLOWS)[SpriteSpeciesId]["fx"];
+  glow: string;
+  glowDeep: string;
+  strong: boolean;
+}) {
+  if (fx === "sunset") {
+    return (
+      <g className="sprite-ethereal-wisps" fill="none" strokeLinecap="round">
+        <path d="M12 74c10-22 8-10 22-28" stroke={glowDeep} strokeWidth="2.1" opacity="0.8" />
+        <path d="M18 80c8-16 14-8 20-22" stroke={glow} strokeWidth="1.6" opacity="0.85" />
+        <path d="M88 72c-10-20-6-8-22-26" stroke={glowDeep} strokeWidth="2.1" opacity="0.8" />
+        <path d="M82 78c-8-14-12-6-18-20" stroke={glow} strokeWidth="1.6" opacity="0.85" />
+        <path d="M28 40c6-12 14-4 16-16" stroke={glow} strokeWidth="1.2" opacity="0.6" />
+        <circle cx="22" cy="36" r="1.4" fill={glow} stroke="none" />
+        <circle cx="80" cy="32" r="1.2" fill={glowDeep} stroke="none" />
+        <circle cx="50" cy="14" r="1.3" fill={glow} stroke="none" />
+        {strong ? (
+          <g fill={glowDeep} stroke="none">
+            <circle cx="10" cy="56" r="1.5" />
+            <circle cx="90" cy="54" r="1.3" />
+            <circle cx="36" cy="10" r="1" />
+            <circle cx="64" cy="8" r="0.9" />
+          </g>
+        ) : null}
+      </g>
+    );
+  }
+  if (fx === "bubbles") {
+    return (
+      <g className="sprite-ethereal-wisps" fill="none">
+        <circle cx="16" cy="58" r="5.2" stroke={glow} strokeWidth="1.2" opacity="0.8" />
+        <circle cx="22" cy="40" r="3.4" stroke={glowDeep} strokeWidth="1.1" opacity="0.75" />
+        <circle cx="84" cy="56" r="4.8" stroke={glowDeep} strokeWidth="1.2" opacity="0.8" />
+        <circle cx="78" cy="34" r="3.1" stroke={glow} strokeWidth="1.1" opacity="0.7" />
+        <circle cx="50" cy="16" r="2.6" stroke={glow} strokeWidth="1" opacity="0.65" />
+        <circle cx="34" cy="22" r="2" fill={glow} fillOpacity="0.35" stroke="none" />
+        <circle cx="68" cy="20" r="1.7" fill={glowDeep} fillOpacity="0.4" stroke="none" />
+        {strong ? (
+          <g>
+            <circle cx="8" cy="72" r="3.6" stroke={glow} strokeWidth="1" opacity="0.55" />
+            <circle cx="92" cy="70" r="3.2" stroke={glowDeep} strokeWidth="1" opacity="0.55" />
+            <circle cx="42" cy="8" r="1.8" fill={glow} fillOpacity="0.45" stroke="none" />
+            <circle cx="58" cy="6" r="1.5" fill={glowDeep} fillOpacity="0.4" stroke="none" />
+          </g>
+        ) : null}
+      </g>
+    );
+  }
+  if (fx === "goldgreen") {
+    return (
+      <g className="sprite-ethereal-wisps" fill="none" strokeLinecap="round">
+        <path d="M14 68c8-16 10-6 18-20" stroke={glow} strokeWidth="1.5" opacity="0.8" />
+        <path d="M86 66c-8-14-8-4-18-18" stroke={glowDeep} strokeWidth="1.5" opacity="0.8" />
+        <path d="M24 44c4-10 12-2 12-12" stroke={glowDeep} strokeWidth="1.15" opacity="0.65" />
+        <path d="M76 42c-4-10-10-2-12-12" stroke={glow} strokeWidth="1.15" opacity="0.65" />
+        <ellipse cx="20" cy="36" rx="2.2" ry="3.4" fill={glowDeep} stroke="none" opacity="0.7" />
+        <ellipse cx="80" cy="32" rx="2" ry="3.1" fill={glow} stroke="none" opacity="0.7" />
+        <ellipse cx="50" cy="14" rx="1.6" ry="2.4" fill={glowDeep} stroke="none" opacity="0.6" />
+        {strong ? (
+          <g>
+            <ellipse cx="10" cy="54" rx="1.8" ry="2.8" fill={glow} opacity="0.55" />
+            <ellipse cx="90" cy="52" rx="1.7" ry="2.6" fill={glowDeep} opacity="0.55" />
+            <circle cx="36" cy="10" r="1" fill={glow} />
+            <circle cx="64" cy="8" r="0.9" fill={glowDeep} />
+          </g>
+        ) : null}
+      </g>
+    );
+  }
+  if (fx === "hearts") {
+    return (
+      <g className="sprite-ethereal-wisps">
+        <HeartMark x={16} y={34} scale={0.72} fill={glow} />
+        <HeartMark x={84} y={30} scale={0.62} fill={glowDeep} />
+        <HeartMark x={50} y={8} scale={0.48} fill={CAT_HEART} />
+        <HeartMark x={28} y={18} scale={0.36} fill={glow} />
+        <HeartMark x={72} y={16} scale={0.34} fill={glowDeep} />
+        <circle cx="12" cy="58" r="1.2" fill={glow} />
+        <circle cx="88" cy="56" r="1.1" fill={glowDeep} />
+        {strong ? (
+          <g>
+            <HeartMark x={8} y={68} scale={0.4} fill={CAT_HEART} />
+            <HeartMark x={92} y={66} scale={0.38} fill={glow} />
+            <circle cx="40" cy="6" r="0.9" fill={glow} />
+            <circle cx="60" cy="5" r="0.85" fill={glowDeep} />
+          </g>
+        ) : null}
+      </g>
+    );
+  }
+  if (fx === "rose") {
+    return (
+      <g className="sprite-ethereal-wisps">
+        <ellipse cx="16" cy="52" rx="3.2" ry="4.6" fill={glow} opacity="0.45" />
+        <ellipse cx="84" cy="48" rx="3" ry="4.2" fill={glowDeep} opacity="0.45" />
+        <circle cx="22" cy="34" r="1.6" fill={glow} />
+        <circle cx="78" cy="30" r="1.4" fill={glowDeep} />
+        <circle cx="50" cy="14" r="1.5" fill={glow} />
+        <circle cx="34" cy="18" r="1" fill={glowDeep} />
+        <circle cx="66" cy="16" r="0.95" fill={glow} />
+        <path
+          d="M14 70c8-16 10-6 16-18"
+          fill="none"
+          stroke={glow}
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          opacity="0.65"
+        />
+        <path
+          d="M86 68c-8-14-8-4-16-16"
+          fill="none"
+          stroke={glowDeep}
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          opacity="0.65"
+        />
+        {strong ? (
+          <g>
+            <ellipse cx="8" cy="66" rx="2.4" ry="3.4" fill={glowDeep} opacity="0.4" />
+            <ellipse cx="92" cy="64" rx="2.2" ry="3.2" fill={glow} opacity="0.4" />
+            <circle cx="42" cy="7" r="1.05" fill={glow} />
+            <circle cx="58" cy="6" r="0.95" fill={glowDeep} />
+          </g>
+        ) : null}
+      </g>
+    );
+  }
+  return (
+    <g className="sprite-ethereal-wisps">
+      <StarMark x={18} y={32} scale={1.05} fill={glow} />
+      <StarMark x={82} y={28} scale={0.92} fill={glowDeep} />
+      <StarMark x={50} y={10} scale={0.78} fill={glow} />
+      <circle cx="12" cy="58" r="2.1" fill={glow} opacity="0.7" />
+      <circle cx="88" cy="54" r="1.8" fill={glowDeep} opacity="0.7" />
+      <circle cx="30" cy="16" r="1.2" fill={glow} />
+      <circle cx="70" cy="14" r="1.1" fill={glowDeep} />
+      {strong ? (
+        <g>
+          <StarMark x={8} y={70} scale={0.62} fill={glowDeep} />
+          <StarMark x={92} y={68} scale={0.58} fill={glow} />
+          <StarMark x={38} y={4} scale={0.45} fill={glow} />
+          <StarMark x={62} y={3} scale={0.42} fill={glowDeep} />
         </g>
+      ) : null}
+    </g>
+  );
+}
+
+export function SpeciesEgg({
+  palette,
+  species,
+  hatching,
+}: {
+  palette: SpeciesPalette;
+  species: SpriteSpeciesId;
+  hatching?: boolean;
+}) {
+  return (
+    <g className="spark-body">
+      <ellipse cx="52" cy="86" rx="16" ry="4.5" fill="#0B0B0F" opacity="0.18" />
+      <ellipse cx="50" cy="62" rx="22.5" ry="29.5" fill={palette.egg} />
+      <ellipse cx="50" cy="64" rx="20" ry="26" fill={palette.eggWash} opacity="0.32" />
+      <ellipse cx="42" cy="50" rx="8" ry="6" fill="#FFF8E7" opacity="0.55" />
+      {species === "cat" || species === "bunny" ? (
+        <g transform="translate(50 64)">
+          <HeartMark x={-3.2} y={-4} scale={0.55} fill={palette.eggMark} />
+        </g>
+      ) : species === "fox" ? (
+        <StarMark x={50} y={58} scale={0.7} fill={palette.eggMark} />
+      ) : (
+        <>
+          <circle cx="37" cy="68" r="1.5" fill={palette.eggMark} opacity="0.55" />
+          <circle cx="58" cy="56" r="1.15" fill={palette.eggMark} opacity="0.4" />
+          <circle cx="55" cy="76" r="1.3" fill={palette.eggMark} opacity="0.35" />
+        </>
+      )}
+      {hatching ? (
+        <path
+          d="M50 34c2 7-5 11-2 17 4 8-4 11-1 18"
+          fill="none"
+          stroke="#3F3F46"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
       ) : null}
     </g>
   );
@@ -371,6 +569,7 @@ export function SpriteCritter({
     <g className="sprite-critter">
       {stageGlow ? (
         <StageGlow
+          species={species}
           stage={stage}
           glow={palette.glow}
           glowDeep={palette.glowDeep}
@@ -391,6 +590,11 @@ export function SpriteCritter({
         <ellipse cx="50" cy="49" rx="28.2" ry="26.2" fill={palette.fur} />
         <ellipse cx="50" cy="58" rx="16.4" ry="13" fill={palette.belly} />
         <ellipse cx="38" cy="42" rx="8" ry="5.4" fill="#fff" opacity="0.18" />
+        {species === "cat" ? (
+          <g transform="translate(50 68)">
+            <HeartMark x={-3.4} y={-5} scale={0.52} fill={CAT_HEART} />
+          </g>
+        ) : null}
         {magical ? (
           <path
             d="M50 28l1.1 2.6 2.6 1.1-2.6 1.1L50 35.4 48.9 32.8 46.3 31.7l2.6-1.1Z"
