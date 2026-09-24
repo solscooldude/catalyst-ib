@@ -15,6 +15,7 @@ export const ROUTES = {
   schedule: "/schedule",
   planner: "/planner",
   intro: "/intro",
+  pet: "/pet",
   friends: "/friends",
   sprite: "/sprite",
   quiz: "/quiz",

@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const state = useCatalyst();
   const auth = useAuth();
   const sessionView = pathname === ROUTES.session;
-  const introView = pathname === ROUTES.intro;
+  const introView = pathname === ROUTES.intro || pathname === ROUTES.pet;
   const roomLock =
     pathname === ROUTES.lock && isRoomFocusTheme(state.appearance.focusTheme);
 

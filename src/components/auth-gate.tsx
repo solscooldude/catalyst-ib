@@ -19,6 +19,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
   const store = useCatalyst();
   const accountReady = store.profile.complete && store.schedule.length > 0;
+  const needsPet =
+    store.introSeen && !store.petQuizComplete && !accountReady;
 
   useEffect(() => {
     if (auth.hydrated && !auth.user) {
@@ -39,7 +41,18 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       auth.hydrated &&
       store.hydrated &&
       auth.user &&
+      needsPet &&
+      pathname !== ROUTES.pet
+    ) {
+      router.replace(ROUTES.pet);
+      return;
+    }
+    if (
+      auth.hydrated &&
+      store.hydrated &&
+      auth.user &&
       store.introSeen &&
+      !needsPet &&
       !accountReady &&
       !SETUP_PATHS.has(pathname)
     ) {
@@ -50,6 +63,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     auth.user,
     store.hydrated,
     store.introSeen,
+    store.petQuizComplete,
+    needsPet,
     accountReady,
     pathname,
     router,
@@ -60,7 +75,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     !store.hydrated ||
     !auth.user ||
     (!store.introSeen && pathname !== ROUTES.intro) ||
-    (store.introSeen && !accountReady && !SETUP_PATHS.has(pathname));
+    (needsPet && pathname !== ROUTES.pet) ||
+    (store.introSeen &&
+      !needsPet &&
+      !accountReady &&
+      !SETUP_PATHS.has(pathname));
 
   if (waiting) {
     return (
