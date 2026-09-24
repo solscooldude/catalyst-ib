@@ -72,6 +72,7 @@ export {
   ETHEREAL_SCORE,
   LUMINARY_SCORE,
   mintGlowForStage,
+  signatureGlowForStage,
   normalizeCareStage,
   sparkEvolutionLabel,
   stageFromScore,
