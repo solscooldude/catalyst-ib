@@ -73,6 +73,11 @@ import {
 } from "@/lib/planner";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
 import { sparkEvolutionFromState } from "@/lib/stats";
+import {
+  normalizePendingStreakAward,
+  normalizeStreakAwardsShown,
+  type StreakAward,
+} from "@/lib/care";
 
 export type TaskState = {
   id: TaskId;
@@ -152,6 +157,8 @@ export type CatalystState = {
   schedule: LockWindow[];
   lastLoginDay: string | null;
   streakDays: number;
+  streakAwardsShown: string[];
+  pendingStreakAward: StreakAward | null;
   feedDay: string | null;
   feedCount: number;
   quizDay: string | null;
@@ -219,6 +226,8 @@ export function createDefaultState(): CatalystState {
     schedule: [],
     lastLoginDay: null,
     streakDays: 0,
+    streakAwardsShown: [],
+    pendingStreakAward: null,
     feedDay: null,
     feedCount: 0,
     quizDay: null,
@@ -437,6 +446,15 @@ export function hydrateStore(userId: string | null = null) {
     const parsed = JSON.parse(raw) as Partial<CatalystState> & {
       nemesis?: NemesisId | null;
     };
+    const appearance = mergeAppearance(parsed.appearance, id);
+    const streakAwardsShown = normalizeStreakAwardsShown(
+      parsed.streakAwardsShown,
+      [...appearance.ownedGear, ...appearance.ownedTrails],
+    );
+    const pendingStreakAward = (() => {
+      const pending = normalizePendingStreakAward(parsed.pendingStreakAward);
+      return pending && streakAwardsShown.includes(pending.id) ? null : pending;
+    })();
     state = {
       ...createDefaultState(),
       ...parsed,
@@ -447,13 +465,15 @@ export function hydrateStore(userId: string | null = null) {
           : defaultTasks.map((task) => ({ ...task })),
       unlocks: normalizeUnlocks(parsed.unlocks ?? [], normalizeNemeses(parsed)),
       logs: parsed.logs ?? [],
-      appearance: mergeAppearance(parsed.appearance, id),
+      appearance,
       profile: normalizeProfile(parsed.profile),
       motivation: normalizeMotivation(parsed.motivation),
       schedule: normalizeSchedule(parsed.schedule),
       session: normalizeSession(parsed.session ?? null),
       lastLoginDay: parsed.lastLoginDay ?? null,
       streakDays: parsed.streakDays ?? 0,
+      streakAwardsShown,
+      pendingStreakAward,
       feedDay: parsed.feedDay ?? null,
       feedCount: parsed.feedCount ?? 0,
       quizDay: parsed.quizDay ?? null,
@@ -578,6 +598,24 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     profile: snapshot.profile,
     lastLoginDay: snapshot.lastLoginDay,
     streakDays: snapshot.streakDays,
+    streakAwardsShown: normalizeStreakAwardsShown(
+      [...current.streakAwardsShown, ...snapshot.streakAwardsShown],
+      [
+        ...snapshot.appearance.ownedGear,
+        ...snapshot.appearance.ownedTrails,
+        ...current.appearance.ownedGear,
+        ...current.appearance.ownedTrails,
+      ],
+    ),
+    pendingStreakAward: (() => {
+      const pending =
+        snapshot.pendingStreakAward ?? current.pendingStreakAward;
+      const shown = normalizeStreakAwardsShown(
+        [...current.streakAwardsShown, ...snapshot.streakAwardsShown],
+        [],
+      );
+      return pending && shown.includes(pending.id) ? null : pending;
+    })(),
     demoMode: false,
     hydrated: true,
   }));
