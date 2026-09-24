@@ -15,6 +15,7 @@ import {
   SPARK_GEAR,
   SPARK_TRAILS,
   SPARK_TINTS,
+  shopCatalog,
   type AccentId,
   type AccentShadeId,
   type BackgroundId,
@@ -209,7 +210,11 @@ export default function AppearancePage() {
             <Group
               title="Clothes"
               cue={shopRefreshCue()}
-              items={rotateShopSection(SPARK_GEAR, "clothes", look.ownedGear)}
+              items={rotateShopSection(
+                shopCatalog(SPARK_GEAR),
+                "clothes",
+                look.ownedGear,
+              )}
               owned={(id) => look.ownedGear.includes(id)}
               equipped={(id) => look.gear === id}
               previewing={(id) => preview.gear === id}
@@ -341,9 +346,7 @@ export default function AppearancePage() {
               title="Motion"
               cue={shopRefreshCue()}
               items={rotateShopSection(
-                SPARK_TRAILS.filter(
-                  (item) => item.id !== "week" || look.ownedTrails.includes("week"),
-                ),
+                shopCatalog(SPARK_TRAILS),
                 "trails",
                 look.ownedTrails,
               )}
