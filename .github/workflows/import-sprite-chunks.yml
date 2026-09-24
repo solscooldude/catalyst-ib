@@ -1,0 +1,29 @@
+name: import-sprite-chunks
+on:
+  push:
+    paths:
+      - ".github/workflows/import-sprite-chunks.yml"
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import sprite chunk text files
+        run: |
+          set -euo pipefail
+          mkdir -p public/sprites/chunks
+          curl -fsSL "https://litter.catbox.moe/ckfflg.gz" -o /tmp/sprite-chunks.tar.gz
+          tar -C public/sprites/chunks --strip-components=0 -xzf /tmp/sprite-chunks.tar.gz
+          rm -f public/sprites/chunks/.keep-upload
+          count=$(find public/sprites/chunks -name '*.webp.b64' | wc -l)
+          echo "chunk files: $count"
+          test "$count" -eq 30
+          git config user.name "solscooldude"
+          git config user.email "327976157+solscooldude@users.noreply.github.com"
+          git add public/sprites/chunks/*.webp.b64
+          git rm -f --ignore-unmatch public/sprites/chunks/.keep-upload || true
+          git status
+          git commit -m "Add painted sprite plate chunk files"
+          git push
