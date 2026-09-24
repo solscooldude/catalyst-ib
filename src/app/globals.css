@@ -754,7 +754,11 @@ html[data-bg="aurora"] {
 }
 
 .spark-halo {
-  background: radial-gradient(circle, color-mix(in srgb, var(--spark-lo) 42%, transparent), transparent 68%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--spark-glow, var(--spark-lo)) 42%, transparent),
+    transparent 68%
+  );
   animation: spark-halo 2.8s ease-in-out infinite;
 }
 
