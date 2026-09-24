@@ -49,3 +49,42 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+:root,
+.dark {
+  --background: #0b0b0f;
+  --foreground: #f4f4f5;
+  --card: #121218;
+  --card-foreground: #f4f4f5;
+  --popover: #121218;
+  --popover-foreground: #f4f4f5;
+  --primary: #5eead4;
+  --primary-foreground: #0b0b0f;
+  --secondary: #1a1a22;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1a1a22;
+  --muted-foreground: #a1a1aa;
+  --accent: #1a1a22;
+  --accent-foreground: #f4f4f5;
+  --destructive: #fb7185;
+  --border: rgb(244 244 245 / 8%);
+  --input: rgb(244 244 245 / 10%);
+  --ring: #5eead4;
+  --chart-1: #5eead4;
+  --chart-2: #a1a1aa;
+  --chart-3: #71717a;
+  --chart-4: #3f3f46;
+  --chart-5: #27272a;
+  --radius: 0.9rem;
+  --sidebar: #121218;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #5eead4;
+  --sidebar-primary-foreground: #0b0b0f;
+  --sidebar-accent: #1a1a22;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: rgb(244 244 245 / 8%);
+  --sidebar-ring: #5eead4;
+  --spark-hi: #b8fff3;
+  --spark-mid: #7af0dc;
+  --spark-lo: #5eead4;
+}
