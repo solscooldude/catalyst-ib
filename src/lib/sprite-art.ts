@@ -1,5 +1,5 @@
 import type { CareStage } from "./care-stages.ts";
-import type { SpriteSpeciesId } from "./species-glows.ts";
+import { SPRITE_SPECIES, type SpriteSpeciesId } from "./species-glows.ts";
 
 export const ILLUSTRATED_STAGES = [
   "egg",
@@ -9,14 +9,14 @@ export const ILLUSTRATED_STAGES = [
   "ethereal",
 ] as const;
 
-/** Painted cutouts shipped first for Fox. Other species fall back to SVG. */
-export const ILLUSTRATED_SPECIES = ["fox"] as const;
+/** Painted cutouts for every quiz species. SVG is only the 404 fallback. */
+export const ILLUSTRATED_SPECIES = SPRITE_SPECIES;
 
 export function spriteArtSrc(
   species: SpriteSpeciesId | string,
   stage: CareStage | string,
 ): string | null {
-  if (species !== "fox") return null;
+  if (!(ILLUSTRATED_SPECIES as readonly string[]).includes(species)) return null;
   if (!(ILLUSTRATED_STAGES as readonly string[]).includes(stage)) return null;
-  return `/sprites/fox/${stage}.webp`;
+  return `/sprites/${species}/${stage}.webp`;
 }
