@@ -24,7 +24,7 @@ export function TaskDescriptionField({
     try {
       const text = (await navigator.clipboard.readText()).trim();
       if (!text) {
-        setNote("Clipboard is empty. Copy the assignment text first.");
+        setNote("Clipboard is empty. Copy the assignment first.");
         return;
       }
       onChange(text.slice(0, TASK_DESCRIPTION_MAX));
@@ -62,7 +62,7 @@ export function TaskDescriptionField({
         className="focus-field focus-field-area"
       />
       <p className="text-xs text-muted-foreground">
-        Copy the assignment text from Classroom or ManageBac, then paste here.
+        Copy the assignment in Classroom or ManageBac, then paste it here.
       </p>
       {note ? (
         <p className="text-xs text-amber-700 dark:text-amber-200">{note}</p>
