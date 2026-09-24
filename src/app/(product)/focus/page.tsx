@@ -14,6 +14,7 @@ import { TaskDescriptionField } from "@/components/task-description-field";
 import { SchoolTaskPick } from "@/components/school-task-pick";
 import type { TaskId } from "@/lib/constants";
 import { chosenSubjectOptions, hasChosenSubjects } from "@/lib/ib";
+import { followInPageHref, listenInPageNav } from "@/lib/in-page-nav";
 import { ROUTES } from "@/lib/routes";
 import { groupSchoolTasksBySubject } from "@/lib/school-tasks";
 import { PageFrame } from "@/components/page-frame";
@@ -63,12 +64,9 @@ export default function AppHomePage() {
   }, [state.hydrated, state.session, router]);
 
   useEffect(() => {
-    function sync() {
+    return listenInPageNav(() => {
       setMode(modeFromHash(window.location.hash));
-    }
-    sync();
-    window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
+    });
   }, []);
 
   const diploma = useMemo(
@@ -89,7 +87,7 @@ export default function AppHomePage() {
 
   function go(next: FocusMode) {
     setMode(next);
-    window.history.replaceState(null, "", `${ROUTES.focus}#${next}`);
+    followInPageHref(`${ROUTES.focus}#${next}`);
   }
 
   function pickTask(id: TaskId) {
@@ -245,7 +243,7 @@ export default function AppHomePage() {
             not pay extra.
           </p>
 
-          {state.schoolTasks.length === 0 ? null : openTasks.length === 0 ? (
+          {state.schoolTasks.length > 0 && openTasks.length === 0 ? (
             <p className="mt-6 text-sm text-muted-foreground">
               All listed tasks are done. Add another, or switch to a study
               block.
