@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ExtensionSync } from "@/components/extension-sync";
+import { StreakAwardDialog } from "@/components/streak-award-dialog";
 import { ThemeApplier } from "@/components/theme-applier";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getAuthSnapshot, hydrateAuth, subscribeAuth, useAuth } from "@/lib/auth";
@@ -100,6 +101,10 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
     store.introSeen,
     store.profile,
     store.demoMode,
+    store.streakAwardsShown,
+    store.pendingStreakAward,
+    store.lastLoginDay,
+    store.streakDays,
   ]);
 
   return (
@@ -107,6 +112,7 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
       <ThemeApplier />
       <ExtensionSync>
         <CloudNotice message={notice} />
+        <StreakAwardDialog />
         {children}
       </ExtensionSync>
     </TooltipProvider>
