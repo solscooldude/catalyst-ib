@@ -19,6 +19,8 @@ import {
 import {
   FEED_COST,
   FEED_DAILY_LIMIT,
+  isEggReadyToHatch,
+  nextEggFeeds,
   QUIZ_TOKEN,
   STREAK_REWARD_DAY,
   STREAK_TRAIL,
@@ -84,9 +86,11 @@ import {
 import { todayStudyMs } from "@/lib/stats";
 import {
   FRIEND_CODE_HINT,
-  friendDisplayName,
+  friendUsername,
+  listedFriendProfile,
   lookupFriendDirectory,
   normalizeFriendCode,
+  overlayFriendProfile,
   pushLocalInbox,
   readLocalInbox,
   removeLocalInbox,
@@ -95,6 +99,7 @@ import {
   type FriendRequest,
 } from "@/lib/friends";
 import {
+  displayAvatar,
   normalizeAvatar,
   normalizeAvatarUrl,
   normalizeUsername,
@@ -447,11 +452,8 @@ export function completeSession(tokensEarned?: number) {
     endedAt,
   });
 
-  const justHatched = !getSnapshot().spriteHatched;
   setState((current) => ({
     ...current,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
     tokens: current.tokens + leftover + completionTokens,
     tasks:
       session.kind === "verified" && session.taskId
@@ -477,7 +479,6 @@ export function completeSession(tokensEarned?: number) {
         }
       : null,
   }));
-  if (justHatched) playSfx("hatch");
   return { ok: true as const, timeTokens, completionTokens, totalTokens };
 }
 
@@ -686,15 +687,19 @@ export function feedSpark() {
   if (getSnapshot().tokens < FEED_COST) {
     return { ok: false as const, reason: "Need 1 token to feed." };
   }
-  const justHatched = !getSnapshot().spriteHatched;
+  const snapshot = getSnapshot();
+  const eggFeeds = nextEggFeeds(snapshot.eggFeeds, snapshot.spriteHatched);
+  const justHatched =
+    !snapshot.spriteHatched && isEggReadyToHatch(eggFeeds);
   setState((current) => ({
     ...current,
     tokens: current.tokens - FEED_COST,
     feedDay: today,
     feedCount: used + 1,
     careActions: current.careActions + 1,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
+    eggFeeds,
+    spriteHatched: current.spriteHatched || justHatched,
+    hatchBurstAt: justHatched ? Date.now() : current.hatchBurstAt,
   }));
   if (justHatched) playSfx("hatch");
   return { ok: true as const, remaining: FEED_DAILY_LIMIT - used - 1 };
@@ -712,8 +717,6 @@ export function scoreQuiz(correct: number) {
     quizCorrect: correct,
     tokens: current.tokens + gained,
     careActions: current.careActions + 1,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
   return { ok: true as const, gained };
 }
@@ -1019,7 +1022,7 @@ function profileFromDirectory(code: string, fallbackName?: string): Friend {
   const stub = stubFriendFromCode(code);
   return {
     ...stub,
-    name: friendDisplayName({
+    name: friendUsername({
       name: listed?.name || fallbackName,
       code,
     }),
@@ -1067,7 +1070,7 @@ export function sendFriendRequest(raw: string) {
   const request: FriendRequest = {
     id: `out-${code}-${Date.now()}`,
     code,
-    name: friendDisplayName({ name: listed?.name, code }),
+    name: friendUsername({ name: listed?.name, code }),
     avatarUrl: listed?.avatarUrl ?? null,
     sentAt: Date.now(),
     direction: "out",
@@ -1076,8 +1079,8 @@ export function sendFriendRequest(raw: string) {
     ...request,
     id: `in-${me.friendCode}-${Date.now()}`,
     code: me.friendCode,
-    name: friendDisplayName({ name: me.username, code: me.friendCode }),
-    avatarUrl: me.avatarUrl,
+    name: friendUsername({ name: me.username, code: me.friendCode }),
+    avatarUrl: displayAvatar(me.avatarDataUrl, me.avatarUrl),
     direction: "in",
   });
   setState((current) => ({
@@ -1122,8 +1125,25 @@ export function cancelFriendRequest(raw: string) {
   return { ok: true as const };
 }
 
+export function refreshFriendProfilesFromDirectory() {
+  const me = getSnapshot();
+  const codes = [
+    ...new Set([
+      ...me.friends.map((row) => row.code),
+      ...me.incomingRequests.map((row) => row.code),
+      ...me.outgoingRequests.map((row) => row.code),
+    ]),
+  ];
+  const profiles = codes.flatMap((code) => {
+    const listed = listedFriendProfile(code);
+    return listed ? [listed] : [];
+  });
+  if (profiles.length) applyFriendProfiles(profiles);
+}
+
 export function refreshFriendInbox() {
   const me = getSnapshot();
+  refreshFriendProfilesFromDirectory();
   const delivered = readLocalInbox(me.friendCode).filter(
     (row) =>
       row.code !== me.friendCode &&
@@ -1162,8 +1182,7 @@ export function applyFriendProfiles(
       if (!hit) return friend;
       return {
         ...friend,
-        name: friendDisplayName({ name: hit.name, code: friend.code }),
-        avatarUrl: hit.avatarUrl ?? friend.avatarUrl,
+        ...overlayFriendProfile(friend, hit),
         weeklyStudyMinutes:
           typeof hit.weeklyStudyMinutes === "number"
             ? hit.weeklyStudyMinutes
@@ -1173,20 +1192,12 @@ export function applyFriendProfiles(
     incomingRequests: current.incomingRequests.map((row) => {
       const hit = byCode.get(row.code);
       if (!hit) return row;
-      return {
-        ...row,
-        name: friendDisplayName({ name: hit.name, code: row.code }),
-        avatarUrl: hit.avatarUrl ?? row.avatarUrl,
-      };
+      return overlayFriendProfile(row, hit);
     }),
     outgoingRequests: current.outgoingRequests.map((row) => {
       const hit = byCode.get(row.code);
       if (!hit) return row;
-      return {
-        ...row,
-        name: friendDisplayName({ name: hit.name, code: row.code }),
-        avatarUrl: hit.avatarUrl ?? row.avatarUrl,
-      };
+      return overlayFriendProfile(row, hit);
     }),
   }));
 }
@@ -1471,18 +1482,21 @@ export function saveIdentity(input: {
       avatarDataUrl === undefined ? current.avatarDataUrl : avatarDataUrl,
     avatarUrl: avatarUrl === undefined ? current.avatarUrl : avatarUrl,
   }));
+  if (typeof window !== "undefined") {
+    window.setTimeout(() => {
+      void import("@/lib/friends-client").then((mod) => {
+        void mod.publishIdentityToServer();
+      });
+    }, 200);
+  }
   return { ok: true as const };
 }
 
 export function addCareAction() {
-  const justHatched = !getSnapshot().spriteHatched;
   setState((current) => ({
     ...current,
     careActions: current.careActions + 1,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
-  if (justHatched) playSfx("hatch");
 }
 
 export function addPlannerTodo(title: string) {
