@@ -1,16 +1,30 @@
 import { sessionAccountId } from "@/lib/closet";
+import {
+  friendDisplayName,
+  normalizeFriendCode,
+  normalizeFriendRequests,
+  type FriendRequest,
+} from "@/lib/friends-model";
 import { makeFriendCode } from "@/lib/identity";
 import { ROUTES } from "@/lib/routes";
 
-export type Friend = {
-  code: string;
-  name: string;
-  tokens: number;
-  streakDays: number;
-  studyMinutes: number;
-  weeklyStudyMinutes: number;
-  tasksCompleted: number;
-};
+export type { Friend, FriendRequest } from "@/lib/friends-model";
+export {
+  FRIEND_CODE_HINT,
+  friendDisplayName,
+  friendInitials,
+  formatRequestTime,
+  normalizeFriend,
+  normalizeFriendCode,
+  normalizeFriendRequest,
+  normalizeFriendRequests,
+  normalizeFriends,
+  rankFriends,
+  stubFriendFromCode,
+} from "@/lib/friends-model";
+
+const INBOX_KEY = "catalyst-v1:friend-inbox";
+const DIRECTORY_KEY = "catalyst-v1:friend-directory";
 
 const CLAIMS_KEY = "catalyst-v1:friend-code-claims";
 const PLACEHOLDER_CODES = new Set(["CAT-WAIT1"]);
@@ -18,19 +32,8 @@ const PLACEHOLDER_CODES = new Set(["CAT-WAIT1"]);
 export const FRIEND_TABS = ["races", "manage", "board"] as const;
 export type FriendTab = (typeof FRIEND_TABS)[number];
 
-export const FRIEND_CODE_HINT =
-  "4–12 characters. Letters, numbers, and hyphens. Must start and end with a letter or number.";
-
 export const FRIEND_CODE_COPY =
   "Your assigned Catalyst friend code. Share it so friends can add you.";
-
-export function normalizeFriendCode(raw: string) {
-  const next = raw.trim().toUpperCase().replace(/\s+/g, "");
-  if (next.length < 4 || next.length > 12) return "";
-  if (!/^[A-Z0-9][A-Z0-9-]{2,10}[A-Z0-9]$/.test(next)) return "";
-  if (!/[A-Z]/.test(next)) return "";
-  return next;
-}
 
 function readClaims(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -104,71 +107,82 @@ export function assignUniqueFriendCode(
   return next;
 }
 
-export function stubFriendFromCode(code: string): Friend {
-  let hash = 0;
-  for (const ch of code) hash = (hash * 33 + ch.charCodeAt(0)) >>> 0;
-  return {
-    code,
-    name: `Friend ${code.slice(-4)}`,
-    tokens: 6 + (hash % 48),
-    streakDays: 1 + (hash % 18),
-    studyMinutes: 40 + (hash % 320),
-    weeklyStudyMinutes: 12 + (hash % 240),
-    tasksCompleted: 1 + (hash % 12),
-  };
-}
+export type FriendDirectoryEntry = {
+  code: string;
+  name: string;
+  avatarUrl: string | null;
+  weeklyStudyMinutes: number;
+  tokens: number;
+  streakDays: number;
+};
 
-export function normalizeFriends(raw: unknown): Friend[] {
-  if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const next: Friend[] = [];
-  for (const row of raw) {
-    if (!row || typeof row !== "object") continue;
-    const item = row as Partial<Friend>;
-    const code = normalizeFriendCode(String(item.code ?? ""));
-    if (!code || seen.has(code)) continue;
-    seen.add(code);
-    const stub = stubFriendFromCode(code);
-    const weekly =
-      typeof item.weeklyStudyMinutes === "number" && item.weeklyStudyMinutes >= 0
-        ? Math.round(item.weeklyStudyMinutes)
-        : stub.weeklyStudyMinutes;
-    next.push({
-      code,
-      name:
-        typeof item.name === "string" && item.name.trim()
-          ? item.name.trim().slice(0, 20)
-          : stub.name,
-      tokens:
-        typeof item.tokens === "number" && item.tokens >= 0
-          ? Math.round(item.tokens)
-          : stub.tokens,
-      streakDays:
-        typeof item.streakDays === "number" && item.streakDays >= 1
-          ? Math.round(item.streakDays)
-          : stub.streakDays,
-      studyMinutes:
-        typeof item.studyMinutes === "number" && item.studyMinutes >= 0
-          ? Math.round(item.studyMinutes)
-          : stub.studyMinutes,
-      weeklyStudyMinutes: weekly,
-      tasksCompleted:
-        typeof item.tasksCompleted === "number" && item.tasksCompleted >= 0
-          ? Math.round(item.tasksCompleted)
-          : stub.tasksCompleted,
-    });
+function readJson<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(key) ?? "null") as T;
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
   }
-  return next.slice(0, 24);
 }
 
-export function rankFriends<T extends { weeklyStudyMinutes: number; code?: string }>(
-  rows: T[],
-) {
-  return [...rows].sort(
-    (a, b) =>
-      b.weeklyStudyMinutes - a.weeklyStudyMinutes ||
-      (a.code ?? "").localeCompare(b.code ?? ""),
+export function publishFriendDirectory(entry: FriendDirectoryEntry) {
+  const code = normalizeFriendCode(entry.code);
+  if (!code || typeof window === "undefined") return;
+  const directory = readJson<Record<string, FriendDirectoryEntry>>(DIRECTORY_KEY, {});
+  directory[code] = {
+    code,
+    name: friendDisplayName(entry),
+    avatarUrl: entry.avatarUrl,
+    weeklyStudyMinutes: Math.max(0, Math.round(entry.weeklyStudyMinutes || 0)),
+    tokens: Math.max(0, Math.round(entry.tokens || 0)),
+    streakDays: Math.max(0, Math.round(entry.streakDays || 0)),
+  };
+  window.localStorage.setItem(DIRECTORY_KEY, JSON.stringify(directory));
+}
+
+export function lookupFriendDirectory(code: string): FriendDirectoryEntry | null {
+  const next = normalizeFriendCode(code);
+  if (!next) return null;
+  const directory = readJson<Record<string, FriendDirectoryEntry>>(DIRECTORY_KEY, {});
+  return directory[next] ?? null;
+}
+
+export function pushLocalInbox(targetCode: string, request: FriendRequest) {
+  const code = normalizeFriendCode(targetCode);
+  if (!code || typeof window === "undefined") return;
+  const inbox = readJson<Record<string, FriendRequest[]>>(INBOX_KEY, {});
+  const current = normalizeFriendRequests(inbox[code]);
+  if (current.some((row) => row.code === request.code && row.direction === "in")) {
+    inbox[code] = current;
+  } else {
+    inbox[code] = normalizeFriendRequests([
+      { ...request, direction: "in" },
+      ...current,
+    ]);
+  }
+  window.localStorage.setItem(INBOX_KEY, JSON.stringify(inbox));
+}
+
+export function readLocalInbox(myCode: string): FriendRequest[] {
+  const code = normalizeFriendCode(myCode);
+  if (!code) return [];
+  const inbox = readJson<Record<string, FriendRequest[]>>(INBOX_KEY, {});
+  return normalizeFriendRequests(inbox[code]).map((row) => ({
+    ...row,
+    direction: "in" as const,
+  }));
+}
+
+export function removeLocalInbox(myCode: string, fromCode: string) {
+  const mine = normalizeFriendCode(myCode);
+  const theirs = normalizeFriendCode(fromCode);
+  if (!mine || typeof window === "undefined") return;
+  const inbox = readJson<Record<string, FriendRequest[]>>(INBOX_KEY, {});
+  inbox[mine] = normalizeFriendRequests(inbox[mine]).filter(
+    (row) => row.code !== theirs,
   );
+  window.localStorage.setItem(INBOX_KEY, JSON.stringify(inbox));
 }
 
 export function parseFriendTab(raw: string | null | undefined): FriendTab {

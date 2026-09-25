@@ -6,17 +6,23 @@ import {
 } from "@/lib/care";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
 import { normalizeHostList } from "@/lib/domain-policy";
-import { normalizeFriendCode } from "@/lib/friends";
+import {
+  normalizeFriendCode,
+  normalizeFriendRequests,
+  normalizeFriends,
+  type Friend,
+  type FriendRequest,
+} from "@/lib/friends";
 import { normalizeAvatarUrl, normalizeUsername } from "@/lib/identity";
 import { normalizeProfile, type ProfileState } from "@/lib/ib";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
 import { isNemesisId, type NemesisId } from "@/lib/constants";
 import { normalizeCareStage, type CareStage } from "@/lib/stats";
 import {
-  DEFAULT_STUDY_STYLE,
-  normalizeStudyStyle,
-  type StudyStyleId,
-} from "@/lib/study-style";
+  DEFAULT_SPECIES,
+  normalizeSpriteSpecies,
+  type SpriteSpeciesId,
+} from "@/lib/sprite-species";
 
 export const CLOUD_STATE_VERSION = 1;
 
@@ -46,7 +52,7 @@ export type CloudSnapshot = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   spriteHatched: boolean;
-  studyStyle: StudyStyleId;
+  spriteSpecies: SpriteSpeciesId;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CloudCareStage;
@@ -55,6 +61,10 @@ export type CloudSnapshot = {
   dailyGoalSetDay: string | null;
   dailyGoalClaimedDay: string | null;
   friendCode: string;
+  friends?: Friend[];
+  incomingRequests?: FriendRequest[];
+  outgoingRequests?: FriendRequest[];
+  weeklyStudyMinutes: number;
   setupComplete: boolean;
   introSeen: boolean;
   profile: ProfileState;
@@ -79,7 +89,6 @@ export type CloudSource = {
   spriteRenameCount?: number;
   spriteAsleep?: boolean;
   spriteHatched?: boolean;
-  studyStyle?: string;
   spriteSpecies?: string;
   extraMagical?: boolean;
   petQuizComplete?: boolean;
@@ -89,6 +98,10 @@ export type CloudSource = {
   dailyGoalSetDay?: string | null;
   dailyGoalClaimedDay?: string | null;
   friendCode?: string;
+  friends?: unknown;
+  incomingRequests?: unknown;
+  outgoingRequests?: unknown;
+  weeklyStudyMinutes?: number;
   setupComplete?: boolean;
   introSeen?: boolean;
   profile?: unknown;
@@ -144,7 +157,7 @@ export function extractCloudSnapshot(
     spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
     spriteAsleep: Boolean(raw.spriteAsleep),
     spriteHatched: Boolean(raw.spriteHatched),
-    studyStyle: normalizeStudyStyle(raw.studyStyle ?? raw.spriteSpecies ?? DEFAULT_STUDY_STYLE),
+    spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
     extraMagical: Boolean(raw.extraMagical),
     petQuizComplete: Boolean(raw.petQuizComplete),
     careStage: normalizeCareStage(raw.careStage),
@@ -155,6 +168,22 @@ export function extractCloudSnapshot(
     dailyGoalClaimedDay:
       typeof raw.dailyGoalClaimedDay === "string" ? raw.dailyGoalClaimedDay : null,
     friendCode: normalizeFriendCode(String(raw.friendCode ?? "")),
+    friends:
+      raw.friends === undefined ? undefined : normalizeFriends(raw.friends),
+    incomingRequests:
+      raw.incomingRequests === undefined
+        ? undefined
+        : normalizeFriendRequests(raw.incomingRequests).filter(
+            (row) => row.direction === "in",
+          ),
+    outgoingRequests:
+      raw.outgoingRequests === undefined
+        ? undefined
+        : normalizeFriendRequests(raw.outgoingRequests).map((row) => ({
+            ...row,
+            direction: "out" as const,
+          })),
+    weeklyStudyMinutes: Math.max(0, Math.round(Number(raw.weeklyStudyMinutes ?? 0) || 0)),
     setupComplete: Boolean(raw.setupComplete),
     introSeen: Boolean(raw.introSeen),
     profile: normalizeProfile(raw.profile as ProfileState | undefined),
@@ -210,7 +239,7 @@ export function compactCloudSnapshot(snapshot: CloudSnapshot) {
       ownedBackgrounds: snapshot.appearance.ownedBackgrounds.slice(0, 12),
       ownedSparkTints: snapshot.appearance.ownedSparkTints.slice(0, 12),
       ownedGear: snapshot.appearance.ownedGear.slice(0, 16),
-      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 16),
+      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 8),
       ownedTrails: snapshot.appearance.ownedTrails.slice(0, 8),
       ownedFocusThemes: snapshot.appearance.ownedFocusThemes.slice(0, 8),
     }),
