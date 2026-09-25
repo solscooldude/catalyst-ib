@@ -1,4 +1,5 @@
-use client";
+// Store core — keep this comment so GitHub file writes do not strip the directive.
+"use client";
 
 import { useSyncExternalStore } from "react";
 import {
