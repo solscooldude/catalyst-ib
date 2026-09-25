@@ -2,7 +2,7 @@ import { describePopup } from "./policy.js";
 
 const FALLBACK = "https://catalyst-study.vercel.app";
 const LOCAL_VERSION =
-  globalThis.chrome?.runtime?.getManifest?.()?.version || "0.4.1";
+  globalThis.chrome?.runtime?.getManifest?.()?.version || "0.4.3";
 
 const statusEl = document.getElementById("status");
 const detailEl = document.getElementById("status-detail");

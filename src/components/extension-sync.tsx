@@ -45,6 +45,7 @@ export function ExtensionSync({ children }: { children?: React.ReactNode }) {
     }
 
     window.addEventListener("message", onMessage);
+    publish();
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
@@ -63,7 +64,11 @@ export function ExtensionSync({ children }: { children?: React.ReactNode }) {
       if (document.visibilityState === "visible") publish();
     }
     document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
+    const beat = window.setInterval(publish, 3000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.clearInterval(beat);
+    };
   }, [
     state.hydrated,
     state.schedule,
