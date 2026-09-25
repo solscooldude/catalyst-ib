@@ -34,7 +34,7 @@ export function stubFriendFromCode(code: string): Friend {
   for (const ch of code) hash = (hash * 33 + ch.charCodeAt(0)) >>> 0;
   return {
     code,
-    name: `Friend ${code.slice(-4)}`,
+    name: "",
     avatarUrl: null,
     tokens: 6 + (hash % 48),
     streakDays: 1 + (hash % 18),
@@ -44,9 +44,47 @@ export function stubFriendFromCode(code: string): Friend {
   };
 }
 
-export function friendDisplayName(row: { name?: string; code?: string }) {
+/** True when the stored label is the auto ID (or a leftover "Friend AB12" stub). */
+export function isGeneratedFriendName(name?: string | null, code?: string | null) {
+  const trimmed = String(name ?? "").trim();
+  if (!trimmed) return true;
+  const normalizedCode = String(code ?? "")
+    .trim()
+    .toUpperCase();
+  if (normalizedCode && trimmed.toUpperCase() === normalizedCode) return true;
+  if (/^friend\s+[A-Z0-9]{4}$/i.test(trimmed)) return true;
+  const suffix = normalizedCode.slice(-4);
+  if (suffix && new RegExp(`^friend\\s+${suffix}$`, "i").test(trimmed)) return true;
+  return false;
+}
+
+/** Setup username only — never the assigned friend ID. */
+export function friendUsername(row: { name?: string; code?: string }) {
   const name = String(row.name ?? "").trim();
-  return name || `Friend ${(row.code ?? "").slice(-4) || "????"}`;
+  if (!name || isGeneratedFriendName(name, row.code)) return "";
+  return name.slice(0, 20);
+}
+
+export function friendDisplayName(row: { name?: string; code?: string }) {
+  return friendUsername(row) || "Friend";
+}
+
+export function formatFriendId(code?: string | null) {
+  const next = normalizeFriendCode(String(code ?? "")) || String(code ?? "").trim().toUpperCase();
+  return next ? `ID ${next}` : "";
+}
+
+export function normalizeFriendAvatar(raw?: string | null) {
+  if (!raw || typeof raw !== "string") return null;
+  const next = raw.trim();
+  if (/^https:\/\//i.test(next) && next.length <= 500) return next.slice(0, 500);
+  if (next.startsWith("data:image/") && next.length <= 80_000) return next;
+  return null;
+}
+
+export function shareableFriendAvatar(raw?: string | null) {
+  const next = normalizeFriendAvatar(raw);
+  return next && /^https:\/\//i.test(next) ? next : null;
 }
 
 export function friendInitials(name: string) {
@@ -85,14 +123,8 @@ export function normalizeFriend(raw: unknown): Friend | null {
       : stub.weeklyStudyMinutes;
   return {
     code,
-    name:
-      typeof item.name === "string" && item.name.trim()
-        ? item.name.trim().slice(0, 20)
-        : stub.name,
-    avatarUrl:
-      typeof item.avatarUrl === "string" && /^https:\/\//i.test(item.avatarUrl)
-        ? item.avatarUrl.slice(0, 500)
-        : null,
+    name: friendUsername({ name: item.name, code }),
+    avatarUrl: normalizeFriendAvatar(item.avatarUrl),
     tokens:
       typeof item.tokens === "number" && item.tokens >= 0
         ? Math.round(item.tokens)
@@ -123,11 +155,8 @@ export function normalizeFriendRequest(raw: unknown): FriendRequest | null {
   return {
     id: String(item.id ?? `${direction}-${code}-${Number.isFinite(sentAt) ? sentAt : 0}`),
     code,
-    name: friendDisplayName({ name: item.name, code }),
-    avatarUrl:
-      typeof item.avatarUrl === "string" && /^https:\/\//i.test(item.avatarUrl)
-        ? item.avatarUrl.slice(0, 500)
-        : null,
+    name: friendUsername({ name: item.name, code }),
+    avatarUrl: normalizeFriendAvatar(item.avatarUrl),
     sentAt: Number.isFinite(sentAt) && sentAt > 0 ? sentAt : Date.now(),
     direction,
   };
@@ -167,4 +196,26 @@ export function rankFriends<T extends { weeklyStudyMinutes: number; code?: strin
       b.weeklyStudyMinutes - a.weeklyStudyMinutes ||
       (a.code ?? "").localeCompare(b.code ?? ""),
   );
+}
+
+export function overlayFriendProfile<
+  T extends { code: string; name: string; avatarUrl: string | null },
+>(
+  row: T,
+  profile: { name?: string; avatarUrl?: string | null; weeklyStudyMinutes?: number },
+): T {
+  const name = friendUsername({ name: profile.name, code: row.code }) || row.name;
+  const avatarUrl = normalizeFriendAvatar(profile.avatarUrl) ?? row.avatarUrl;
+  const weekly =
+    typeof profile.weeklyStudyMinutes === "number" && profile.weeklyStudyMinutes >= 0
+      ? Math.round(profile.weeklyStudyMinutes)
+      : undefined;
+  return {
+    ...row,
+    name,
+    avatarUrl,
+    ...("weeklyStudyMinutes" in row && weekly !== undefined
+      ? { weeklyStudyMinutes: weekly }
+      : {}),
+  };
 }
