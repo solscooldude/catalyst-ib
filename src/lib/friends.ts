@@ -1,6 +1,7 @@
 import { sessionAccountId } from "@/lib/closet";
 import {
-  friendDisplayName,
+  friendUsername,
+  normalizeFriendAvatar,
   normalizeFriendCode,
   normalizeFriendRequests,
   type FriendRequest,
@@ -11,15 +12,21 @@ import { ROUTES } from "@/lib/routes";
 export type { Friend, FriendRequest } from "@/lib/friends-model";
 export {
   FRIEND_CODE_HINT,
+  formatFriendId,
   friendDisplayName,
   friendInitials,
+  friendUsername,
   formatRequestTime,
+  isGeneratedFriendName,
   normalizeFriend,
+  normalizeFriendAvatar,
   normalizeFriendCode,
   normalizeFriendRequest,
   normalizeFriendRequests,
   normalizeFriends,
+  overlayFriendProfile,
   rankFriends,
+  shareableFriendAvatar,
   stubFriendFromCode,
 } from "@/lib/friends-model";
 
@@ -33,7 +40,7 @@ export const FRIEND_TABS = ["races", "manage", "board"] as const;
 export type FriendTab = (typeof FRIEND_TABS)[number];
 
 export const FRIEND_CODE_COPY =
-  "Your assigned Catalyst friend code. Share it so friends can add you.";
+  "Your assigned friend ID. Friends add you with this — they still see the username and photo you set during setup.";
 
 function readClaims(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -132,8 +139,8 @@ export function publishFriendDirectory(entry: FriendDirectoryEntry) {
   const directory = readJson<Record<string, FriendDirectoryEntry>>(DIRECTORY_KEY, {});
   directory[code] = {
     code,
-    name: friendDisplayName(entry),
-    avatarUrl: entry.avatarUrl,
+    name: friendUsername(entry),
+    avatarUrl: normalizeFriendAvatar(entry.avatarUrl),
     weeklyStudyMinutes: Math.max(0, Math.round(entry.weeklyStudyMinutes || 0)),
     tokens: Math.max(0, Math.round(entry.tokens || 0)),
     streakDays: Math.max(0, Math.round(entry.streakDays || 0)),
@@ -146,6 +153,29 @@ export function lookupFriendDirectory(code: string): FriendDirectoryEntry | null
   if (!next) return null;
   const directory = readJson<Record<string, FriendDirectoryEntry>>(DIRECTORY_KEY, {});
   return directory[next] ?? null;
+}
+
+export function resolveFriendRow<T extends { code: string; name: string; avatarUrl: string | null }>(
+  row: T,
+): T {
+  const listed = listedFriendProfile(row.code);
+  if (!listed) return { ...row, name: friendUsername(row) };
+  return {
+    ...row,
+    name: friendUsername({ name: listed.name || row.name, code: row.code }),
+    avatarUrl: row.avatarUrl || listed.avatarUrl,
+  };
+}
+
+export function listedFriendProfile(code: string) {
+  const listed = lookupFriendDirectory(code);
+  if (!listed) return null;
+  return {
+    code: listed.code,
+    name: friendUsername(listed),
+    avatarUrl: normalizeFriendAvatar(listed.avatarUrl),
+    weeklyStudyMinutes: listed.weeklyStudyMinutes,
+  };
 }
 
 export function pushLocalInbox(targetCode: string, request: FriendRequest) {
