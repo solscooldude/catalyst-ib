@@ -47,6 +47,7 @@ import {
   type FriendRequest,
 } from "@/lib/friends";
 import {
+  displayAvatar,
   makeFriendCode,
   normalizeAvatar,
   normalizeAvatarUrl,
@@ -85,6 +86,12 @@ import {
   normalizeSpriteSpecies,
   type SpriteSpeciesId,
 } from "@/lib/sprite-species";
+import {
+  DEFAULT_STUDY_STYLE,
+  normalizeStudyStyle,
+  studyStyleResult,
+  type StudyStyleId,
+} from "@/lib/study-style";
 import {
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
@@ -183,6 +190,8 @@ export type CatalystState = {
   dailyGoalClaimedDay: string | null;
   spriteHatched: boolean;
   spriteSpecies: SpriteSpeciesId;
+  studyStyle: StudyStyleId;
+  spriteShapeChangeCount: number;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CareStage;
@@ -251,6 +260,8 @@ export function createDefaultState(): CatalystState {
     dailyGoalClaimedDay: null,
     spriteHatched: false,
     spriteSpecies: DEFAULT_SPECIES,
+    studyStyle: DEFAULT_STUDY_STYLE,
+    spriteShapeChangeCount: 0,
     extraMagical: false,
     petQuizComplete: false,
     careStage: "egg",
@@ -302,7 +313,7 @@ function persist(next: CatalystState) {
   publishFriendDirectory({
     code: next.friendCode,
     name: next.username,
-    avatarUrl: next.avatarUrl,
+    avatarUrl: displayAvatar(next.avatarDataUrl, next.avatarUrl),
     weeklyStudyMinutes: weeklyStudyMinutes(next.logs),
     tokens: next.tokens,
     streakDays: next.streakDays,
@@ -340,11 +351,46 @@ export function setSpriteSpecies(species: SpriteSpeciesId) {
   );
 }
 
-export function completePetQuiz(species: SpriteSpeciesId) {
+export const SHAPE_CHANGE_COST = 15;
+
+export function changeSpriteShape(shape: SpriteSpeciesId) {
+  const current = state;
+  if (current.spriteSpecies === shape) {
+    return { ok: true as const, cost: 0, first: false };
+  }
+  const first = current.spriteShapeChangeCount === 0;
+  const cost = first ? 0 : SHAPE_CHANGE_COST;
+  if (!first && current.tokens < cost) {
+    return { ok: false as const, reason: `Need ${cost} tokens to change shape.` };
+  }
+  setState((next) => ({
+    ...next,
+    spriteSpecies: shape,
+    spriteShapeChangeCount: next.spriteShapeChangeCount + 1,
+    tokens: first ? next.tokens : next.tokens - cost,
+  }));
+  return { ok: true as const, cost, first };
+}
+
+export function completePetQuiz(
+  style: StudyStyleId,
+  opts?: { applyGlow?: boolean; applyShape?: boolean },
+) {
+  const result = studyStyleResult(style);
+  const applyGlow = opts?.applyGlow !== false;
+  const applyShape = opts?.applyShape !== false;
   setState((current) => ({
     ...current,
-    spriteSpecies: species,
+    studyStyle: result.id,
     petQuizComplete: true,
+    spriteSpecies: applyShape ? result.species : current.spriteSpecies,
+    appearance: applyGlow
+      ? normalizeAppearance({
+          ...current.appearance,
+          ownedAuras: [...current.appearance.ownedAuras, result.aura],
+          aura: result.aura,
+        })
+      : current.appearance,
   }));
 }
 
@@ -545,6 +591,13 @@ export function hydrateStore(userId: string | null = null) {
           (parsed.careActions ?? 0) > 0,
       ),
       spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
+      studyStyle: normalizeStudyStyle(
+        (parsed as { studyStyle?: string }).studyStyle ?? parsed.spriteSpecies,
+      ),
+      spriteShapeChangeCount: Math.max(
+        0,
+        Number((parsed as { spriteShapeChangeCount?: number }).spriteShapeChangeCount ?? 0) || 0,
+      ),
       extraMagical: Boolean(parsed.extraMagical),
       petQuizComplete: Boolean(parsed.petQuizComplete),
       careActions:
@@ -646,6 +699,9 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteAsleep: snapshot.spriteAsleep,
     spriteHatched: snapshot.spriteHatched,
     spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
+    studyStyle: snapshot.studyStyle ?? current.studyStyle,
+    spriteShapeChangeCount:
+      snapshot.spriteShapeChangeCount ?? current.spriteShapeChangeCount,
     extraMagical: Boolean(snapshot.extraMagical),
     petQuizComplete: Boolean(snapshot.petQuizComplete),
     careStage: snapshot.careStage,
@@ -791,4 +847,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
