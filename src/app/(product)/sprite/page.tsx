@@ -13,7 +13,12 @@ import {
   type SparkTintId,
   type SparkTrailId,
 } from "@/lib/appearance";
-import { FEED_COST, FEED_DAILY_LIMIT, dayKey } from "@/lib/care";
+import {
+  FEED_COST,
+  FEED_DAILY_LIMIT,
+  dayKey,
+  hatchProgressLabel,
+} from "@/lib/care";
 import {
   formatHours,
   sparkEvolutionFromState,
@@ -162,6 +167,11 @@ export default function SpritePage() {
             if (!ok && reason) setNotice(reason);
           }}
         />
+        {state.careStage === "egg" ? (
+          <p className="mt-4 text-center text-[11px] font-medium tracking-[0.14em] text-zinc-400 uppercase">
+            {hatchProgressLabel(state.eggFeeds)}
+          </p>
+        ) : null}
         <p className="sprite-care-kicker">Care</p>
         <CareStageRail stage={state.careStage} />
         <ExtraMagicalToggle
