@@ -82,7 +82,18 @@ import {
   DAILY_GOAL_REWARD,
 } from "@/lib/daily-goal";
 import { todayStudyMs } from "@/lib/stats";
-import { FRIEND_CODE_HINT, normalizeFriendCode, stubFriendFromCode } from "@/lib/friends";
+import {
+  FRIEND_CODE_HINT,
+  friendDisplayName,
+  lookupFriendDirectory,
+  normalizeFriendCode,
+  pushLocalInbox,
+  readLocalInbox,
+  removeLocalInbox,
+  stubFriendFromCode,
+  type Friend,
+  type FriendRequest,
+} from "@/lib/friends";
 import {
   normalizeAvatar,
   normalizeAvatarUrl,
@@ -1003,24 +1014,221 @@ export function completeIntro() {
   setState((current) => ({ ...current, introSeen: true }));
 }
 
+function profileFromDirectory(code: string, fallbackName?: string): Friend {
+  const listed = lookupFriendDirectory(code);
+  const stub = stubFriendFromCode(code);
+  return {
+    ...stub,
+    name: friendDisplayName({
+      name: listed?.name || fallbackName,
+      code,
+    }),
+    avatarUrl: listed?.avatarUrl ?? null,
+    weeklyStudyMinutes: listed?.weeklyStudyMinutes ?? stub.weeklyStudyMinutes,
+    tokens: listed?.tokens ?? stub.tokens,
+    streakDays: listed?.streakDays ?? stub.streakDays,
+  };
+}
+
+function becomeFriends(current: CatalystState, other: Friend): CatalystState {
+  const incoming = current.incomingRequests.filter((row) => row.code !== other.code);
+  const outgoing = current.outgoingRequests.filter((row) => row.code !== other.code);
+  const friends = current.friends.some((row) => row.code === other.code)
+    ? current.friends.map((row) => (row.code === other.code ? { ...row, ...other } : row))
+    : [...current.friends, other];
+  return { ...current, friends, incomingRequests: incoming, outgoingRequests: outgoing };
+}
+
 export function addFriend(raw: string) {
+  return sendFriendRequest(raw);
+}
+
+export function sendFriendRequest(raw: string) {
   const code = normalizeFriendCode(raw);
   if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
-  if (code === getSnapshot().friendCode) {
+  const me = getSnapshot();
+  if (code === me.friendCode) {
     return { ok: false as const, reason: "That's your own code." };
   }
-  if (getSnapshot().friends.some((row) => row.code === code)) {
-    return { ok: false as const, reason: "Already added." };
+  if (me.friends.some((row) => row.code === code)) {
+    return { ok: false as const, reason: "Already friends." };
   }
-  if (getSnapshot().friends.length >= 24) {
+  if (me.friends.length >= 24) {
     return { ok: false as const, reason: "Friend list is full." };
   }
-  const next = stubFriendFromCode(code);
+  const incoming = me.incomingRequests.find((row) => row.code === code);
+  if (incoming) {
+    return acceptFriendRequest(code);
+  }
+  if (me.outgoingRequests.some((row) => row.code === code)) {
+    return { ok: false as const, reason: "Request already sent." };
+  }
+  const listed = lookupFriendDirectory(code);
+  const request: FriendRequest = {
+    id: `out-${code}-${Date.now()}`,
+    code,
+    name: friendDisplayName({ name: listed?.name, code }),
+    avatarUrl: listed?.avatarUrl ?? null,
+    sentAt: Date.now(),
+    direction: "out",
+  };
+  pushLocalInbox(code, {
+    ...request,
+    id: `in-${me.friendCode}-${Date.now()}`,
+    code: me.friendCode,
+    name: friendDisplayName({ name: me.username, code: me.friendCode }),
+    avatarUrl: me.avatarUrl,
+    direction: "in",
+  });
   setState((current) => ({
     ...current,
-    friends: [...current.friends, next],
+    outgoingRequests: [request, ...current.outgoingRequests],
   }));
-  return { ok: true as const, friend: next };
+  return { ok: true as const, request, pending: true as const };
+}
+
+export function acceptFriendRequest(raw: string) {
+  const code = normalizeFriendCode(raw);
+  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
+  const incoming = getSnapshot().incomingRequests.find((row) => row.code === code);
+  if (!incoming && !getSnapshot().outgoingRequests.some((row) => row.code === code)) {
+    return { ok: false as const, reason: "No request from that code." };
+  }
+  const friend = profileFromDirectory(code, incoming?.name);
+  removeLocalInbox(getSnapshot().friendCode, code);
+  setState((current) => becomeFriends(current, friend));
+  return { ok: true as const, friend };
+}
+
+export function declineFriendRequest(raw: string) {
+  const code = normalizeFriendCode(raw);
+  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
+  removeLocalInbox(getSnapshot().friendCode, code);
+  setState((current) => ({
+    ...current,
+    incomingRequests: current.incomingRequests.filter((row) => row.code !== code),
+  }));
+  return { ok: true as const };
+}
+
+export function cancelFriendRequest(raw: string) {
+  const code = normalizeFriendCode(raw);
+  if (!code) return { ok: false as const, reason: FRIEND_CODE_HINT };
+  removeLocalInbox(code, getSnapshot().friendCode);
+  setState((current) => ({
+    ...current,
+    outgoingRequests: current.outgoingRequests.filter((row) => row.code !== code),
+  }));
+  return { ok: true as const };
+}
+
+export function refreshFriendInbox() {
+  const me = getSnapshot();
+  const delivered = readLocalInbox(me.friendCode).filter(
+    (row) =>
+      row.code !== me.friendCode &&
+      !me.friends.some((friend) => friend.code === row.code),
+  );
+  if (delivered.length === 0) return;
+  setState((current) => {
+    const have = new Set(current.incomingRequests.map((row) => row.code));
+    const extra = delivered.filter((row) => !have.has(row.code));
+    if (extra.length === 0) return current;
+    return { ...current, incomingRequests: [...extra, ...current.incomingRequests] };
+  });
+}
+
+export function applyFriendProfiles(
+  profiles: Array<{
+    code: string;
+    name?: string;
+    avatarUrl?: string | null;
+    weeklyStudyMinutes?: number;
+  }>,
+) {
+  const byCode = new Map(
+    profiles
+      .map((row) => {
+        const code = normalizeFriendCode(row.code);
+        return code ? ([code, row] as const) : null;
+      })
+      .filter((row): row is readonly [string, (typeof profiles)[number]] => Boolean(row)),
+  );
+  if (byCode.size === 0) return;
+  setState((current) => ({
+    ...current,
+    friends: current.friends.map((friend) => {
+      const hit = byCode.get(friend.code);
+      if (!hit) return friend;
+      return {
+        ...friend,
+        name: friendDisplayName({ name: hit.name, code: friend.code }),
+        avatarUrl: hit.avatarUrl ?? friend.avatarUrl,
+        weeklyStudyMinutes:
+          typeof hit.weeklyStudyMinutes === "number"
+            ? hit.weeklyStudyMinutes
+            : friend.weeklyStudyMinutes,
+      };
+    }),
+    incomingRequests: current.incomingRequests.map((row) => {
+      const hit = byCode.get(row.code);
+      if (!hit) return row;
+      return {
+        ...row,
+        name: friendDisplayName({ name: hit.name, code: row.code }),
+        avatarUrl: hit.avatarUrl ?? row.avatarUrl,
+      };
+    }),
+    outgoingRequests: current.outgoingRequests.map((row) => {
+      const hit = byCode.get(row.code);
+      if (!hit) return row;
+      return {
+        ...row,
+        name: friendDisplayName({ name: hit.name, code: row.code }),
+        avatarUrl: hit.avatarUrl ?? row.avatarUrl,
+      };
+    }),
+  }));
+}
+
+function mergeByCode<T extends { code: string }>(local: T[], remote?: T[]) {
+  if (!remote) return local;
+  const byCode = new Map<string, T>();
+  for (const row of local) byCode.set(row.code, row);
+  for (const row of remote) byCode.set(row.code, { ...byCode.get(row.code), ...row });
+  return [...byCode.values()];
+}
+
+export function applyFriendsState(partial: {
+  friends?: Friend[];
+  incomingRequests?: FriendRequest[];
+  outgoingRequests?: FriendRequest[];
+}) {
+  setState((current) => ({
+    ...current,
+    friends: mergeByCode(current.friends, partial.friends),
+    incomingRequests: mergeByCode(
+      current.incomingRequests,
+      partial.incomingRequests,
+    ).filter((row) => row.direction === "in"),
+    outgoingRequests: mergeByCode(
+      current.outgoingRequests,
+      partial.outgoingRequests,
+    ).map((row) => ({ ...row, direction: "out" as const })),
+  }));
+}
+
+export function replaceFriendsState(partial: {
+  friends?: Friend[];
+  incomingRequests?: FriendRequest[];
+  outgoingRequests?: FriendRequest[];
+}) {
+  setState((current) => ({
+    ...current,
+    friends: partial.friends ?? current.friends,
+    incomingRequests: partial.incomingRequests ?? current.incomingRequests,
+    outgoingRequests: partial.outgoingRequests ?? current.outgoingRequests,
+  }));
 }
 
 export function removeFriend(code: string) {
