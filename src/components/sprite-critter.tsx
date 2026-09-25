@@ -25,3 +25,78 @@ type SpriteCritterProps = {
 };
 
 const EYE_INK = "#16120F";
+
+function GlossyEye({
+  cx,
+  cy,
+  look,
+  extraMagical,
+  glow,
+  glowDeep,
+  fillId,
+}: {
+  cx: number;
+  cy: number;
+  look: number;
+  extraMagical: boolean;
+  glow: string;
+  glowDeep: string;
+  fillId: string;
+}) {
+  const x = cx + look;
+  return (
+    <g>
+      {extraMagical ? (
+        <ellipse
+          className="sprite-eye-bloom"
+          cx={x}
+          cy={cy}
+          rx="14.4"
+          ry="15.2"
+          fill={glow}
+          fillOpacity="0.42"
+        />
+      ) : null}
+      <ellipse
+        cx={x}
+        cy={cy}
+        rx={extraMagical ? 9.6 : 9.1}
+        ry={extraMagical ? 11.2 : 10.6}
+        fill={extraMagical ? `url(#${fillId})` : EYE_INK}
+      />
+      <ellipse
+        cx={x}
+        cy={cy + 0.6}
+        rx="3.4"
+        ry="4.2"
+        fill={extraMagical ? glowDeep : "#0B0B0F"}
+        fillOpacity={extraMagical ? 0.5 : 0.48}
+      />
+      <ellipse
+        className="spark-pupil"
+        cx={x - 2.1}
+        cy={cy - 2.8}
+        rx="2.7"
+        ry="3.3"
+        fill="#fff"
+        fillOpacity="0.98"
+      />
+      <ellipse
+        cx={x + 2.4}
+        cy={cy + 1.4}
+        rx="1.05"
+        ry="1.25"
+        fill="#fff"
+        fillOpacity="0.78"
+      />
+      <ellipse
+        cx={x + 0.2}
+        cy={cy + 4.1}
+        rx="2.6"
+        ry="1.2"
+        fill="#fff"
+        fillOpacity="0.16"
+      />
+    </g>
+  );
+}
