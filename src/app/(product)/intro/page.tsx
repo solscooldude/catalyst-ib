@@ -32,7 +32,7 @@ const SLIDES = [
   {
     kicker: "Sprite",
     title: "Sprite",
-    body: "A short quiz matches you to a sprite. It hatches on the first focus block or a snack, then grows when you study.",
+    body: "A short quiz sets your sprite’s starter glow and a study-style title. The drop hatches on the first focus block or a snack, then grows when you study.",
   },
   {
     kicker: "Tokens",
@@ -42,7 +42,7 @@ const SLIDES = [
   {
     kicker: "Account",
     title: "Finish setting up account",
-    body: "Next: a short quiz assigns your sprite, then profile and required lock hours. Default after-school window is 4:30–7:30.",
+    body: "Next: a short quiz sets your glow and study style, then profile and required lock hours. Default after-school window is 4:30–7:30.",
   },
 ] as const;
 
