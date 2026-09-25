@@ -24,6 +24,7 @@ import { signatureGlowForStage, sparkEvolutionFromState, type CareStage } from "
 import {
   normalizeSpriteSpecies,
   spriteBodyPalette,
+  type SpriteSpeciesId,
 } from "@/lib/sprite-species";
 import { SpeciesEgg, SpriteCritter } from "@/components/sprite-critter";
 import { useCatalyst } from "@/lib/store";
@@ -49,6 +50,8 @@ type SparkProps = {
   gear?: SparkGearId;
   aura?: SparkAuraId;
   trail?: SparkTrailId;
+  shape?: SpriteSpeciesId;
+  stage?: CareStage;
   size?: number;
   className?: string;
   pettable?: boolean;
@@ -59,44 +62,6 @@ type SparkProps = {
   snack?: SnackId | null;
   trackEyes?: boolean;
 };
-
-function OpenEyes({
-  wider,
-  look,
-  fill,
-}: {
-  wider?: boolean;
-  look?: "center" | "side";
-  fill: string;
-}) {
-  const rx = wider ? 5.4 : 4.6;
-  const ry = wider ? 6.4 : 5.6;
-  const pupil = look === "side" ? 1.7 : 0;
-  return (
-    <g className="spark-blink">
-      <ellipse cx="38.2" cy="63.6" rx={rx} ry={ry} fill={fill} />
-      <ellipse cx="61.8" cy="63.6" rx={rx} ry={ry} fill={fill} />
-      <ellipse
-        className="spark-pupil"
-        cx={39.6 + pupil}
-        cy="62.1"
-        rx="1.55"
-        ry="1.95"
-        fill="#fff"
-        fillOpacity="0.88"
-      />
-      <ellipse
-        className="spark-pupil"
-        cx={63.2 + pupil}
-        cy="62.1"
-        rx="1.55"
-        ry="1.95"
-        fill="#fff"
-        fillOpacity="0.88"
-      />
-    </g>
-  );
-}
 
 function Heart() {
   return (
@@ -126,54 +91,6 @@ function PetHearts() {
   );
 }
 
-function Eyes({ mood, fill }: { mood: SparkMood; fill: string }) {
-  if (mood === "done") {
-    return (
-      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
-        <path d="M33.5 65.2c2.2-3.2 7.2-3.2 9.4 0" />
-        <path d="M57.1 65.2c2.2-3.2 7.2-3.2 9.4 0" />
-        <path d="M45.6 73.2c1.6 1.8 7.2 1.8 8.8 0" />
-      </g>
-    );
-  }
-  if (mood === "annoyed") {
-    return (
-      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
-        <path d="M33 61.4h11.2" />
-        <path d="M55.8 61.4h11.2" />
-      </g>
-    );
-  }
-  if (mood === "sleepy") {
-    return (
-      <g fill="none" stroke={fill} strokeWidth="2.2" strokeLinecap="round">
-        <path d="M33.4 66.2c2.4 2.2 7.6 2.2 10 0" />
-        <path d="M56.6 66.2c2.4 2.2 7.6 2.2 10 0" />
-      </g>
-    );
-  }
-  if (mood === "eating") {
-    return (
-      <g>
-        <ellipse cx="38.2" cy="66.4" rx="4.2" ry="3.1" fill={fill} />
-        <ellipse cx="61.8" cy="66.4" rx="4.2" ry="3.1" fill={fill} />
-        <ellipse
-          className="spark-chew"
-          cx="50"
-          cy="76.4"
-          rx="6.4"
-          ry="3.4"
-          fill="#0B0B0F"
-        />
-      </g>
-    );
-  }
-  if (mood === "tempted") return <OpenEyes look="side" fill={fill} />;
-  if (mood === "locked" || mood === "earning") {
-    return <OpenEyes wider fill={fill} />;
-  }
-  return <OpenEyes fill={fill} />;
-}
 
 function SparkAuraMark({
   id,
@@ -659,6 +576,8 @@ export function Spark({
   gear,
   aura,
   trail,
+  shape: shapeOverride,
+  stage: stageOverride,
   size = 72,
   className,
   pettable = false,
@@ -810,10 +729,11 @@ export function Spark({
   }, [trackEyes, asleep]);
   const evo = evolve
     ? sparkEvolutionFromState(store)
-    : { scale: 1, glow: 1, stage: "growing" as CareStage };
-  const species = normalizeSpriteSpecies(store.spriteSpecies);
+    : { scale: 1, glow: 1, stage: stageOverride ?? ("growing" as CareStage) };
+  const species = normalizeSpriteSpecies(shapeOverride ?? store.spriteSpecies);
   const bodyPalette = spriteBodyPalette(species, tintId);
-  const stageGlow = evolve && signatureGlowForStage(evo.stage);
+  const stageGlow =
+    (evolve || Boolean(stageOverride)) && signatureGlowForStage(evo.stage);
   const extraMagical = Boolean(store.extraMagical) && evo.stage === "ethereal";
   const glowHex = stageGlow ? bodyPalette.glow : bodyPalette.fur;
   const hatching =
@@ -904,20 +824,13 @@ export function Spark({
                 palette={bodyPalette}
                 mood={shownMood}
                 stage={evo.stage}
-                stageGlow={stageGlow}
+                stageGlow={Boolean(stageGlow)}
                 extraMagical={extraMagical}
                 uid={uid}
               />
               {tintId === "gold" ? (
                 <g className="spark-gold-shine">
-                  <ellipse
-                    cx="40"
-                    cy="40"
-                    rx="11"
-                    ry="7"
-                    fill="#FFFBEB"
-                    opacity="0.55"
-                  />
+                  <ellipse cx="40" cy="40" rx="11" ry="7" fill="#FFFBEB" opacity="0.55" />
                   <circle cx="62" cy="38" r="1.4" fill="#FFFBEB" />
                   <circle cx="34" cy="58" r="1.1" fill="#FFF7D6" />
                 </g>
@@ -925,17 +838,8 @@ export function Spark({
               {tintId === "cosmic" ? (
                 <g className="spark-cosmic-stars" fill="#F8FAFC">
                   <circle className="spark-cosmic-dot" cx="36" cy="40" r="1.1" />
-                  <circle
-                    className="spark-cosmic-dot spark-cosmic-dot-b"
-                    cx="60"
-                    cy="36"
-                    r="0.9"
-                  />
+                  <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="60" cy="36" r="0.9" />
                   <circle className="spark-cosmic-dot" cx="66" cy="54" r="1" />
-                  <path
-                    d="M48 34l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"
-                    fill="#BFDBFE"
-                  />
                 </g>
               ) : null}
               <Gear id={gearId} />
