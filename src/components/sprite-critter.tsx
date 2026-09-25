@@ -12,3 +12,16 @@ type CritterMood =
   | "annoyed"
   | "sleepy"
   | "eating";
+
+type SpriteCritterProps = {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  mood: CritterMood;
+  stage: CareStage;
+  stageGlow: boolean;
+  extraMagical?: boolean;
+  squint?: boolean;
+  uid?: string;
+};
+
+const EYE_INK = "#16120F";
