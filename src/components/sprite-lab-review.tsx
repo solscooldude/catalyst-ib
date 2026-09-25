@@ -92,7 +92,7 @@ const MOVES: { id: LabMove; label: string; ms: number }[] = [
   { id: "poke", label: "Poke", ms: 900 },
   { id: "pet", label: "Pet / happy", ms: 1400 },
   { id: "tickle", label: "Tickle", ms: 980 },
-  { id: "spin", label: "Spin", ms: 1100 },
+  { id: "spin", label: "Spin", ms: 900 },
   { id: "mirror", label: "Mirror", ms: 1100 },
   { id: "sit", label: "Study-buddy sit", ms: 1200 },
   { id: "jiggle", label: "Scrunch", ms: 900 },
