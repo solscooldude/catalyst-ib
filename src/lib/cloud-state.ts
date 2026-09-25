@@ -13,10 +13,10 @@ import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
 import { isNemesisId, type NemesisId } from "@/lib/constants";
 import { normalizeCareStage, type CareStage } from "@/lib/stats";
 import {
-  DEFAULT_SPECIES,
-  normalizeSpriteSpecies,
-  type SpriteSpeciesId,
-} from "@/lib/sprite-species";
+  DEFAULT_STUDY_STYLE,
+  normalizeStudyStyle,
+  type StudyStyleId,
+} from "@/lib/study-style";
 
 export const CLOUD_STATE_VERSION = 1;
 
@@ -46,7 +46,7 @@ export type CloudSnapshot = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   spriteHatched: boolean;
-  spriteSpecies: SpriteSpeciesId;
+  studyStyle: StudyStyleId;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CloudCareStage;
@@ -79,6 +79,7 @@ export type CloudSource = {
   spriteRenameCount?: number;
   spriteAsleep?: boolean;
   spriteHatched?: boolean;
+  studyStyle?: string;
   spriteSpecies?: string;
   extraMagical?: boolean;
   petQuizComplete?: boolean;
@@ -143,7 +144,7 @@ export function extractCloudSnapshot(
     spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
     spriteAsleep: Boolean(raw.spriteAsleep),
     spriteHatched: Boolean(raw.spriteHatched),
-    spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
+    studyStyle: normalizeStudyStyle(raw.studyStyle ?? raw.spriteSpecies ?? DEFAULT_STUDY_STYLE),
     extraMagical: Boolean(raw.extraMagical),
     petQuizComplete: Boolean(raw.petQuizComplete),
     careStage: normalizeCareStage(raw.careStage),
@@ -209,7 +210,7 @@ export function compactCloudSnapshot(snapshot: CloudSnapshot) {
       ownedBackgrounds: snapshot.appearance.ownedBackgrounds.slice(0, 12),
       ownedSparkTints: snapshot.appearance.ownedSparkTints.slice(0, 12),
       ownedGear: snapshot.appearance.ownedGear.slice(0, 16),
-      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 8),
+      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 16),
       ownedTrails: snapshot.appearance.ownedTrails.slice(0, 8),
       ownedFocusThemes: snapshot.appearance.ownedFocusThemes.slice(0, 8),
     }),
