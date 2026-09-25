@@ -40,3 +40,25 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Assembled at vercel-build from public/*/chunks — do not commit binaries.
+/public/sprites/*/*.webp
+/public/focus/*.jpg
+/public/*.zip
+/dist/
+
+# Generated focus plate modules (bootstrap-github.mjs deletes these).
+/src/lib/focus-plates.ts
+/src/lib/focus-plates-cat.ts
+/src/lib/focus-plates-desk.ts
+/src/lib/focus-plates-library.ts
+/src/app/api/plates/
+
+# Local recordings / walkthroughs
+*.mp4
+*.webm
+*.mov
+
+# Legacy split sidecars (full plates live at public/sprites/{species}/{stage}.webp).
+# Keep the directory ignored if someone dumps huge scratch files here; tracked
+# .b64 files are force-added when we need a GitHub-safe text overlay.
