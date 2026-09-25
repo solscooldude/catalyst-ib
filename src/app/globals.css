@@ -564,11 +564,11 @@ html[data-bg="aurora"] {
   0%,
   100% {
     opacity: calc(0.22 * var(--spark-evo-glow, 1));
-    transform: scale(calc(0.9 + 0.06 * var(--spark-evo-glow, 1)));
+    transform: scale(calc(0.98 + 0.03 * var(--spark-evo-glow, 1)));
   }
   50% {
-    opacity: calc(0.62 * var(--spark-evo-glow, 1));
-    transform: scale(calc(1 + 0.08 * var(--spark-evo-glow, 1)));
+    opacity: calc(0.38 * var(--spark-evo-glow, 1));
+    transform: scale(calc(1.04 + 0.05 * var(--spark-evo-glow, 1)));
   }
 }
 
@@ -587,7 +587,7 @@ html[data-bg="aurora"] {
 }
 
 .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 82%;
   animation: spark-squish 5.6s ease-in-out infinite;
 }
@@ -755,35 +755,47 @@ html[data-bg="aurora"] {
 
 .spark-halo {
   background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--spark-glow, var(--spark-lo)) 42%, transparent),
-    color-mix(in srgb, var(--spark-glow-deep, var(--spark-glow, var(--spark-lo))) 18%, transparent) 52%,
-    transparent 68%
+    circle at 50% 54%,
+    color-mix(in srgb, var(--spark-glow, var(--spark-lo)) 26%, transparent) 0%,
+    color-mix(in srgb, var(--spark-glow, var(--spark-lo)) 12%, transparent) 26%,
+    color-mix(in srgb, var(--spark-glow-deep, var(--spark-glow, var(--spark-lo))) 5%, transparent) 52%,
+    transparent 74%
   );
-  animation: spark-halo 2.8s ease-in-out infinite;
+  filter: blur(18px);
+  animation: spark-halo 3.8s ease-in-out infinite;
 }
 
 .spark-has-aura .spark-halo {
-  /* Aura is the body silhouette glow — not a circular orb or ring. */
-  opacity: 0;
-  animation: none;
+  background: radial-gradient(
+    circle at 50% 54%,
+    color-mix(in srgb, var(--spark-aura, var(--spark-glow, #5eead4)) 22%, transparent) 0%,
+    color-mix(in srgb, var(--spark-aura, var(--spark-glow, #5eead4)) 10%, transparent) 30%,
+    color-mix(in srgb, var(--spark-aura, var(--spark-glow, #5eead4)) 4%, transparent) 56%,
+    transparent 76%
+  );
+  filter: blur(20px);
+}
+
+[data-extra-magical="on"] .spark-halo {
+  filter: blur(26px);
+  inset: -68%;
 }
 
 .spark-float:not(.spark-has-aura) .spark-body {
   filter: drop-shadow(
-    0 0 calc(5px * var(--spark-evo-glow, 1))
-      color-mix(in srgb, var(--spark-lo) 48%, transparent)
+    0 0 calc(8px * var(--spark-evo-glow, 1))
+      color-mix(in srgb, var(--spark-lo) 36%, transparent)
   );
 }
 
 .spark-has-aura .spark-body {
   filter: drop-shadow(
-      0 0 calc(8px * var(--spark-evo-glow, 1))
-        color-mix(in srgb, var(--spark-aura, #5eead4) 95%, transparent)
+      0 0 calc(18px * var(--spark-evo-glow, 1))
+        color-mix(in srgb, var(--spark-aura, #5eead4) 42%, transparent)
     )
     drop-shadow(
-      0 0 calc(18px * var(--spark-evo-glow, 1))
-        color-mix(in srgb, var(--spark-aura, #5eead4) 60%, transparent)
+      0 0 calc(36px * var(--spark-evo-glow, 1))
+        color-mix(in srgb, var(--spark-aura, #5eead4) 18%, transparent)
     );
 }
 
