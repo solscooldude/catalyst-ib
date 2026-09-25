@@ -3,8 +3,11 @@ import test from "node:test";
 import {
   decideUrl,
   describePopup,
+  lockForcedOn,
   lockStatus,
+  nextStoredEnabled,
   normalizePolicySchedule,
+  shouldInstallBlockRules,
 } from "./policy.js";
 
 const weekdayAfternoon = new Date("2026-09-23T17:00:00");
@@ -81,6 +84,18 @@ test("lock hours still block even if the popup has not marked policy synced", ()
   assert.equal(decision.action, "block");
 });
 
+test("stored Off cannot disable blocking once lock hours start", () => {
+  const now = weekdayAfternoon.getTime();
+  const offDuringHours = { ...base, extensionEnabled: false, updatedAt: now };
+  assert.equal(decideUrl("https://www.instagram.com/", offDuringHours, now).action, "block");
+  assert.equal(decideUrl("https://www.reddit.com/", offDuringHours, now).action, "block");
+  assert.equal(decideUrl("https://docs.google.com/", offDuringHours, now).action, "allow");
+  const view = describePopup(offDuringHours, now, now);
+  assert.equal(view.status, "on");
+  assert.equal(view.toggleOn, true);
+  assert.equal(view.toggleLocked, true);
+});
+
 test("lock hours force the extension on even if the user left it off", () => {
   const decision = decideUrl(
     "https://www.instagram.com/",
@@ -125,7 +140,10 @@ test("unknown school-like hosts stay open", () => {
 });
 
 test("popup lock status is unknown until policy has updatedAt", () => {
-  assert.equal(lockStatus({ schedule, extensionEnabled: false }), "unknown");
+  assert.equal(
+    lockStatus({ schedule, extensionEnabled: false }, weekdayMorning),
+    "unknown",
+  );
   assert.equal(
     lockStatus({ ...base, updatedAt: weekdayAfternoon.getTime() }, weekdayAfternoon),
     "on",
@@ -141,6 +159,32 @@ test("popup lock status is unknown until policy has updatedAt", () => {
     ),
     "on",
   );
+});
+
+test("lock hours force ON even when updatedAt is missing and storage is Off", () => {
+  const unsyncedOff = { schedule, extensionEnabled: false, nemeses: [] };
+  assert.equal(lockForcedOn(unsyncedOff, weekdayAfternoon), true);
+  assert.equal(lockStatus(unsyncedOff, weekdayAfternoon), "on");
+  assert.equal(nextStoredEnabled(false, unsyncedOff, weekdayAfternoon), true);
+  assert.equal(shouldInstallBlockRules(unsyncedOff, weekdayAfternoon), true);
+  const view = describePopup(unsyncedOff, weekdayAfternoon.getTime());
+  assert.equal(view.toggleOn, true);
+  assert.equal(view.toggleLocked, true);
+});
+
+test("outside lock hours a stored Off is kept and a stored On is kept", () => {
+  assert.equal(nextStoredEnabled(false, base, weekdayMorning), false);
+  assert.equal(nextStoredEnabled(true, base, weekdayMorning), true);
+  assert.equal(nextStoredEnabled(undefined, base, weekdayMorning), true);
+  assert.equal(shouldInstallBlockRules({ ...base, extensionEnabled: false }, weekdayMorning), false);
+  assert.equal(shouldInstallBlockRules({ ...base, extensionEnabled: true }, weekdayMorning), true);
+});
+
+test("unsynced default preference paints the toggle On, not Off", () => {
+  const view = describePopup(null, weekdayMorning.getTime());
+  assert.equal(view.status, "on");
+  assert.equal(view.toggleOn, true);
+  assert.equal(view.toggleLocked, false);
 });
 
 test("popup copy names hours, unlocks, and Catalyst origin", () => {
@@ -169,12 +213,26 @@ test("popup copy names hours, unlocks, and Catalyst origin", () => {
 });
 
 test("popup unsynced state asks the user to open Catalyst but does not lock the toggle", () => {
-  const view = describePopup(null, weekdayMorning.getTime());
+  const view = describePopup({ extensionEnabled: false }, weekdayMorning.getTime());
   assert.equal(view.status, "unknown");
+  assert.equal(view.toggleOn, false);
   assert.equal(view.toggleLocked, false);
   assert.equal(view.hours, "No schedule synced — open Catalyst");
   assert.equal(view.sync, "Not synced — open Catalyst");
   assert.equal(view.openHref, "https://catalyst-study.vercel.app");
+});
+
+test("stored Off cannot keep the popup Off during lock hours", () => {
+  const now = weekdayAfternoon.getTime();
+  const view = describePopup(
+    { ...base, extensionEnabled: false, updatedAt: now },
+    now,
+    now,
+  );
+  assert.equal(view.status, "on");
+  assert.equal(view.toggleOn, true);
+  assert.equal(view.toggleLocked, true);
+  assert.match(view.statusDetail, /Lock hours require/);
 });
 
 test("outside lock hours the popup toggle follows the user preference", () => {

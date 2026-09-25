@@ -343,9 +343,26 @@ export function lockIsOn(policy, now = new Date()) {
   return lockForcedOn(policy, now) || lockPreferredOn(policy);
 }
 
+/**
+ * What chrome.storage.local.extensionEnabled must become.
+ * Lock hours / a live study block always persist true so a leftover Off
+ * cannot survive into the window or skip declarativeNetRequest install.
+ * Outside those windows the user's last toggle is kept as-is.
+ */
+export function nextStoredEnabled(storedEnabled, policy, now = new Date()) {
+  if (lockForcedOn(policy, now)) return true;
+  if (storedEnabled === undefined) return true;
+  return storedEnabled !== false;
+}
+
+export function shouldInstallBlockRules(policy, now = new Date()) {
+  return lockIsOn(policy, now);
+}
+
 export function lockStatus(policy, now = new Date()) {
+  if (lockIsOn(policy, now)) return "on";
   if (!policyIsSynced(policy)) return "unknown";
-  return lockIsOn(policy, now) ? "on" : "off";
+  return "off";
 }
 
 export function activeUnlockRows(unlockedUntil = {}, now = Date.now()) {
@@ -396,7 +413,7 @@ export function describePopup(policy, now = Date.now(), receivedAt = null) {
     status,
     statusLabel: status === "on" ? "ON" : status === "off" ? "OFF" : "Unknown",
     statusDetail,
-    toggleOn: status === "on",
+    toggleOn: lockIsOn(policy, clock),
     toggleLocked: forced,
     toggleHint,
     preferredOn: preferred,

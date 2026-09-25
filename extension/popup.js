@@ -2,7 +2,7 @@ import { describePopup } from "./policy.js";
 
 const FALLBACK = "https://catalyst-study.vercel.app";
 const LOCAL_VERSION =
-  globalThis.chrome?.runtime?.getManifest?.()?.version || "0.4.3";
+  globalThis.chrome?.runtime?.getManifest?.()?.version || "0.4.5";
 
 const statusEl = document.getElementById("status");
 const detailEl = document.getElementById("status-detail");
@@ -90,14 +90,31 @@ async function readStored() {
   return { policy: null, receivedAt: null };
 }
 
-async function refresh() {
+async function refreshFromStorage() {
   const { policy, receivedAt } = await readStored();
   const view = describePopup(policy, Date.now(), receivedAt);
   paint(view);
   void checkUpdate(view.openHref);
+}
+
+async function refresh() {
   if (globalThis.chrome?.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: "REFRESH_BADGE" });
+    chrome.runtime.sendMessage({ type: "GET_LOCK_STATE" }, (res) => {
+      if (chrome.runtime.lastError || !res?.ok) {
+        void refreshFromStorage();
+        return;
+      }
+      if (res.view) paint(res.view);
+      else if (res.policy) {
+        paint(describePopup(res.policy, Date.now()));
+      } else {
+        void refreshFromStorage();
+      }
+      void checkUpdate(res.view?.openHref || res.policy?.appOrigin);
+    });
+    return;
   }
+  await refreshFromStorage();
 }
 
 async function setEnabled(next) {
@@ -106,7 +123,8 @@ async function setEnabled(next) {
     return;
   }
   if (globalThis.chrome?.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: "SET_ENABLED", enabled: next }, () => {
+    chrome.runtime.sendMessage({ type: "SET_ENABLED", enabled: next }, (res) => {
+      if (res?.view) paint(res.view);
       void refresh();
     });
     return;

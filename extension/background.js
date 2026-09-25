@@ -1,10 +1,12 @@
 import {
   BLOCK_APPS,
   decideUrl,
+  describePopup,
   isAppCovered,
   lockForcedOn,
-  lockIsOn,
-  lockStatus,
+  nextStoredEnabled,
+  normalizePolicySchedule,
+  shouldInstallBlockRules,
 } from "./policy.js";
 
 const RECENT = new Map();
@@ -22,12 +24,39 @@ function defaultPolicy() {
   };
 }
 
-async function readPolicy() {
-  const stored = await chrome.storage.local.get(["policy", "extensionEnabled"]);
-  return {
-    ...(stored.policy || defaultPolicy()),
-    extensionEnabled: stored.extensionEnabled !== false,
+function hydratePolicy(stored, now = new Date()) {
+  const raw = stored?.policy && typeof stored.policy === "object"
+    ? stored.policy
+    : defaultPolicy();
+  const policy = {
+    ...raw,
+    schedule: normalizePolicySchedule(raw.schedule),
+    nemeses: Array.isArray(raw.nemeses) ? raw.nemeses : [],
+    allowlistExtra: Array.isArray(raw.allowlistExtra) ? raw.allowlistExtra : [],
+    unlockedUntil:
+      raw.unlockedUntil && typeof raw.unlockedUntil === "object"
+        ? raw.unlockedUntil
+        : {},
+    appOrigin: raw.appOrigin || "https://catalyst-study.vercel.app",
   };
+  policy.extensionEnabled = nextStoredEnabled(
+    stored?.extensionEnabled,
+    policy,
+    now,
+  );
+  return policy;
+}
+
+async function readStored() {
+  return chrome.storage.local.get([
+    "policy",
+    "extensionEnabled",
+    "policyReceivedAt",
+  ]);
+}
+
+async function readPolicy(now = new Date()) {
+  return hydratePolicy(await readStored(), now);
 }
 
 function recentlyHandled(key) {
@@ -41,23 +70,29 @@ function clearRecent() {
   RECENT.clear();
 }
 
-async function refreshBadge() {
-  const policy = await readPolicy();
-  const status = lockStatus(policy);
-  const text = status === "on" ? "ON" : status === "off" ? "OFF" : "?";
+async function refreshBadge(policy) {
+  const current = policy || (await readPolicy());
+  const view = describePopup(current, Date.now());
+  const text =
+    view.status === "on" ? "ON" : view.status === "off" ? "OFF" : "?";
   const title =
-    status === "on"
+    view.status === "on"
       ? "Catalyst Lock · ON"
-      : status === "off"
+      : view.status === "off"
         ? "Catalyst Lock · OFF"
         : "Catalyst Lock · not synced";
   await chrome.action.setBadgeText({ text });
   await chrome.action.setBadgeBackgroundColor({
-    color: status === "on" ? "#5EEAD4" : status === "off" ? "#3F3F46" : "#52525B",
+    color:
+      view.status === "on"
+        ? "#5EEAD4"
+        : view.status === "off"
+          ? "#3F3F46"
+          : "#52525B",
   });
   if (chrome.action.setBadgeTextColor) {
     await chrome.action.setBadgeTextColor({
-      color: status === "on" ? "#042F2E" : "#F4F4F5",
+      color: view.status === "on" ? "#042F2E" : "#F4F4F5",
     });
   }
   await chrome.action.setTitle({ title });
@@ -88,36 +123,75 @@ function lockedUrl(policy, decision, url) {
   return locked.toString();
 }
 
-async function enforce(tabId, url) {
+/**
+ * Persist enabled=true during a lock window, then install or drop DNR rules.
+ * Every trigger (alarm, startup, policy sync, tab navigation) must run this
+ * so a leftover Off cannot skip redirects.
+ */
+async function applyLockState({ scanTabs = true } = {}) {
+  const now = new Date();
+  const stored = await readStored();
+  const policy = hydratePolicy(stored, now);
+  if (stored.extensionEnabled !== policy.extensionEnabled) {
+    await chrome.storage.local.set({
+      extensionEnabled: policy.extensionEnabled,
+    });
+  }
+  try {
+    await refreshBadge(policy);
+  } catch {
+    /* badge APIs are best-effort */
+  }
+  try {
+    await syncDeclarativeRules(policy);
+  } catch {
+    /* tab redirects still run below */
+  }
+  if (scanTabs) {
+    try {
+      await enforceAllTabs(policy);
+    } catch {
+      /* individual tab updates are best-effort */
+    }
+  }
+  return policy;
+}
+
+async function enforce(tabId, url, policy) {
   if (!url || isExtensionPage(url)) return;
-  const policy = await readPolicy();
-  const decision = decideUrl(url, policy, Date.now());
+  const current = policy || (await applyLockState({ scanTabs: false }));
+  const decision = decideUrl(url, current, Date.now());
   if (decision.action !== "block") return;
   const key = `${tabId}:${url}`;
   if (recentlyHandled(key)) return;
   try {
-    await chrome.tabs.update(tabId, { url: lockedUrl(policy, decision, url) });
+    await chrome.tabs.update(tabId, { url: lockedUrl(current, decision, url) });
   } catch {
     RECENT.delete(key);
   }
 }
 
-async function enforceAllTabs() {
+async function enforceAllTabs(policy) {
   clearRecent();
+  const current = policy || (await applyLockState({ scanTabs: false }));
   const tabs = await chrome.tabs.query({});
   await Promise.all(
     tabs.map((tab) =>
-      tab.id && tab.url ? enforce(tab.id, tab.url) : Promise.resolve(),
+      tab.id && tab.url ? enforce(tab.id, tab.url, current) : Promise.resolve(),
     ),
   );
 }
 
-async function syncDeclarativeRules() {
+async function applyThenEnforce(tabId, url) {
+  const policy = await applyLockState({ scanTabs: false });
+  await enforce(tabId, url, policy);
+}
+
+async function syncDeclarativeRules(policy) {
   if (!chrome.declarativeNetRequest?.updateDynamicRules) return;
-  const policy = await readPolicy();
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
   const removeRuleIds = existing.map((rule) => rule.id);
-  if (!lockIsOn(policy)) {
+  if (!shouldInstallBlockRules(policy)) {
     if (removeRuleIds.length) {
       await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds });
     }
@@ -139,7 +213,7 @@ async function syncDeclarativeRules() {
         action: {
           type: "redirect",
           redirect: {
-            extensionPath: `/locked.html?app=${encodeURIComponent(app.name)}&id=${app.id}&tier=${app.tier}&host=${encodeURIComponent(host)}&next=${encodeURIComponent(unlocksHref(policy))}`,
+            url: lockedUrl(policy, { name: app.name, appId: app.id, tier: app.tier }, `https://${host}/`),
           },
         },
         condition: {
@@ -155,24 +229,6 @@ async function syncDeclarativeRules() {
   });
 }
 
-async function clearStoredOffDuringLock() {
-  const stored = await chrome.storage.local.get(["policy", "extensionEnabled"]);
-  const policy = {
-    ...(stored.policy || defaultPolicy()),
-    extensionEnabled: stored.extensionEnabled !== false,
-  };
-  if (lockForcedOn(policy) && stored.extensionEnabled === false) {
-    await chrome.storage.local.set({ extensionEnabled: true });
-  }
-}
-
-async function reevaluate(scanTabs = true) {
-  await clearStoredOffDuringLock();
-  await refreshBadge();
-  await syncDeclarativeRules();
-  if (scanTabs) await enforceAllTabs();
-}
-
 function ensureAlarm() {
   chrome.alarms.create(ALARM, { periodInMinutes: 1 });
 }
@@ -180,40 +236,75 @@ function ensureAlarm() {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "SET_POLICY" && message.policy) {
     chrome.storage.local.get(["extensionEnabled"], (stored) => {
-      const policy = { ...message.policy };
-      delete policy.extensionEnabled;
-      const writes = { policy, policyReceivedAt: Date.now() };
-      if (lockForcedOn(policy) || stored.extensionEnabled === undefined) {
-        writes.extensionEnabled = true;
+      const incoming = { ...message.policy };
+      delete incoming.extensionEnabled;
+      incoming.schedule = normalizePolicySchedule(incoming.schedule);
+      if (typeof incoming.updatedAt !== "number") {
+        incoming.updatedAt = Date.now();
       }
-      chrome.storage.local.set(writes, () => {
-        void reevaluate(true);
-        sendResponse({ ok: true, forcedOn: lockForcedOn(policy) });
-      });
+      const enabled = nextStoredEnabled(
+        stored.extensionEnabled,
+        incoming,
+        new Date(),
+      );
+      chrome.storage.local.set(
+        {
+          policy: incoming,
+          policyReceivedAt: Date.now(),
+          extensionEnabled: enabled,
+        },
+        () => {
+          void applyLockState({ scanTabs: true }).then((policy) => {
+            sendResponse({
+              ok: true,
+              forcedOn: lockForcedOn(policy),
+              enabled: policy.extensionEnabled,
+            });
+          });
+        },
+      );
     });
     return true;
   }
   if (message?.type === "SET_ENABLED") {
     chrome.storage.local.get(["policy", "extensionEnabled"], (stored) => {
-      const policy = {
-        ...(stored.policy || defaultPolicy()),
-        extensionEnabled: stored.extensionEnabled !== false,
-      };
+      const policy = hydratePolicy(stored);
       if (lockForcedOn(policy)) {
-        void reevaluate(true);
-        sendResponse({ ok: true, enabled: true, forced: true });
+        chrome.storage.local.set({ extensionEnabled: true }, () => {
+          void applyLockState({ scanTabs: true }).then((next) => {
+            sendResponse({
+              ok: true,
+              enabled: true,
+              forced: true,
+              view: describePopup(next, Date.now(), stored.policyReceivedAt),
+            });
+          });
+        });
         return;
       }
       const enabled = message.enabled !== false;
       chrome.storage.local.set({ extensionEnabled: enabled }, () => {
-        void reevaluate(true);
-        sendResponse({ ok: true, enabled, forced: false });
+        void applyLockState({ scanTabs: true }).then((next) => {
+          sendResponse({
+            ok: true,
+            enabled,
+            forced: false,
+            view: describePopup(next, Date.now(), stored.policyReceivedAt),
+          });
+        });
       });
     });
     return true;
   }
-  if (message?.type === "GET_POLICY") {
-    readPolicy().then((policy) => sendResponse({ ok: true, policy }));
+  if (message?.type === "GET_POLICY" || message?.type === "GET_LOCK_STATE") {
+    void applyLockState({ scanTabs: false }).then(async (policy) => {
+      const stored = await readStored();
+      sendResponse({
+        ok: true,
+        policy,
+        view: describePopup(policy, Date.now(), stored.policyReceivedAt),
+      });
+    });
     return true;
   }
   if (message?.type === "GET_VERSION") {
@@ -224,7 +315,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return false;
   }
   if (message?.type === "REFRESH_BADGE") {
-    reevaluate(false).then(() => sendResponse({ ok: true }));
+    applyLockState({ scanTabs: false }).then(async (policy) => {
+      const stored = await readStored();
+      sendResponse({
+        ok: true,
+        policy,
+        view: describePopup(policy, Date.now(), stored.policyReceivedAt),
+      });
+    });
     return true;
   }
   return false;
@@ -232,47 +330,51 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 chrome.runtime.onInstalled.addListener(() => {
   ensureAlarm();
-  chrome.storage.local.get("extensionEnabled", (stored) => {
-    if (stored.extensionEnabled === undefined) {
-      chrome.storage.local.set({ extensionEnabled: true }, () => {
-        void reevaluate(true);
-      });
-      return;
-    }
-    void reevaluate(true);
-  });
+  void applyLockState({ scanTabs: true });
 });
 chrome.runtime.onStartup.addListener(() => {
   ensureAlarm();
-  void reevaluate(true);
+  void applyLockState({ scanTabs: true });
 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name !== ALARM) return;
-  void reevaluate(true);
+  void applyLockState({ scanTabs: true });
 });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && (changes.policy || changes.extensionEnabled)) {
-    void reevaluate(true);
+  if (area !== "local") return;
+  if (changes.policy || changes.extensionEnabled) {
+    void applyLockState({ scanTabs: true });
   }
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const url = changeInfo.url || tab.url;
   if (changeInfo.status === "loading" || changeInfo.url) {
-    void enforce(tabId, url);
+    void applyThenEnforce(tabId, url);
   }
 });
 
 chrome.tabs.onActivated.addListener((active) => {
   chrome.tabs.get(active.tabId, (tab) => {
-    if (tab?.url) void enforce(tab.id, tab.url);
+    if (tab?.url) void applyThenEnforce(tab.id, tab.url);
   });
+});
+
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  if (details.frameId !== 0) return;
+  void applyThenEnforce(details.tabId, details.url);
 });
 
 chrome.webNavigation.onCommitted.addListener((details) => {
   if (details.frameId !== 0) return;
-  void enforce(details.tabId, details.url);
+  void applyThenEnforce(details.tabId, details.url);
 });
 
 ensureAlarm();
-void reevaluate(true);
+void applyLockState({ scanTabs: true });
+
+globalThis.catalystLockDebug = {
+  applyLockState,
+  hydratePolicy,
+  nextStoredEnabled,
+};
