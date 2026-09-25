@@ -1252,3 +1252,67 @@ function EggCracks({
     </g>
   );
 }
+
+export function SpeciesEgg({
+  palette,
+  species,
+  hatching,
+  crack = 0,
+  uid = "egg",
+}: {
+  palette: SpeciesPalette;
+  species: SpriteSpeciesId;
+  hatching?: boolean;
+  crack?: EggCrackLevel;
+  uid?: string;
+}) {
+  const tabby = species === "cat" ? catEggColors(palette) : null;
+  const shell = tabby?.shell ?? palette.egg;
+  const wash = tabby?.wash ?? palette.eggWash;
+  const tip = tabby?.tip ?? palette.eggWash;
+  return (
+    <g className="spark-body">
+      <defs>
+        <clipPath id={`${uid}-egg-clip`}>
+          <path d={EGG_PATH} />
+        </clipPath>
+        <linearGradient id={`${uid}-egg-shell`} x1="32%" y1="12%" x2="78%" y2="92%">
+          <stop offset="0%" stopColor={tip} />
+          <stop offset="38%" stopColor={shell} />
+          <stop offset="100%" stopColor={shell} />
+        </linearGradient>
+        <radialGradient id={`${uid}-egg-shade`} cx="38%" cy="28%" r="72%">
+          <stop offset="0%" stopColor={wash} stopOpacity="0.55" />
+          <stop offset="55%" stopColor={shell} stopOpacity="0" />
+          <stop offset="100%" stopColor="#2A211C" stopOpacity="0.18" />
+        </radialGradient>
+        <radialGradient id={`${uid}-egg-sheen`} cx="30%" cy="22%" r="42%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`${uid}-fox-tip`} x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stopColor="#FFF6E4" />
+          <stop offset="100%" stopColor="#FFF6E4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(50 78) scale(1.38) translate(-50 -78)">
+      <ellipse cx="50" cy="95" rx="20" ry="5.2" fill="#0B0B0F" opacity="0.2" />
+      <path d={EGG_PATH} fill={`url(#${uid}-egg-shell)`} />
+      <g clipPath={`url(#${uid}-egg-clip)`}>
+        <path d={EGG_PATH} fill={`url(#${uid}-egg-shade)`} />
+        <EggMarks species={species} palette={palette} uid={uid} />
+        <ellipse cx="39" cy="46" rx="9.2" ry="7.2" fill={`url(#${uid}-egg-sheen)`} />
+        <ellipse cx="60" cy="78" rx="7" ry="4.2" fill="#fff" opacity="0.1" />
+        <EggCracks crack={crack} hatching={Boolean(hatching)} />
+      </g>
+      <path
+        d={EGG_PATH}
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.22"
+        strokeWidth="1.05"
+      />
+      </g>
+    </g>
+  );
+}
