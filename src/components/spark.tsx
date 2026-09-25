@@ -5,14 +5,12 @@ import { useEffect, useId, useRef, useState, type Ref } from "react";
 import "@/app/sprite-motion.css";
 import {
   getSparkAura,
-  getSparkTint,
   type SparkAuraId,
   type SparkGearId,
   type SparkTintId,
   type SparkTrailId,
 } from "@/lib/appearance";
 import { SparkParticleRing, SubjectFlourish } from "@/components/spark-flourishes";
-import { SPARK_BODY_PATH } from "@/lib/spark-silhouette";
 import {
   SPARK_FLAVOR_INK,
   sparkFlavorFromContext,
@@ -22,7 +20,12 @@ import {
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
 import { type SnackId, type SparkAct } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
-import { sparkEvolutionFromState, type CareStage } from "@/lib/stats";
+import { signatureGlowForStage, sparkEvolutionFromState, type CareStage } from "@/lib/stats";
+import {
+  normalizeSpriteSpecies,
+  spriteBodyPalette,
+} from "@/lib/sprite-species";
+import { SpeciesEgg, SpriteCritter } from "@/components/sprite-critter";
 import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -184,20 +187,24 @@ function SparkAuraMark({
   return (
     <g aria-hidden className="spark-aura-body">
       {spec.glowB ? (
-        <path
-          d={SPARK_BODY_PATH}
+        <ellipse
+          cx="50"
+          cy="68"
+          rx="36"
+          ry="40"
           fill={spec.glowB}
-          fillOpacity="0.55"
+          fillOpacity="0.5"
           filter={`url(#${blurId})`}
-          transform="translate(50 62) scale(1.22) translate(-50 -62)"
         />
       ) : null}
-      <path
-        d={SPARK_BODY_PATH}
+      <ellipse
+        cx="50"
+        cy="68"
+        rx="32"
+        ry="36"
         fill={spec.glow}
-        fillOpacity="0.7"
+        fillOpacity="0.62"
         filter={`url(#${blurId})`}
-        transform="translate(50 62) scale(1.18) translate(-50 -62)"
       />
     </g>
   );
@@ -382,7 +389,12 @@ function Gear({ id }: { id: SparkGearId }) {
       <g>
         <path d="M22 20 50 10l28 10-28 10Z" fill="#18181B" />
         <path d="M38 22h24l-1.6 8H39.6Z" fill="#27272A" />
-        <path d="M50 12c8 4 14 10 16 16" fill="none" stroke="#FBBF24" strokeWidth="1.4" />
+        <path
+          d="M50 12c8 4 14 10 16 16"
+          fill="none"
+          stroke="#FBBF24"
+          strokeWidth="1.4"
+        />
         <circle cx="67" cy="29" r="2.1" fill="#FBBF24" />
       </g>
     );
@@ -392,23 +404,45 @@ function Gear({ id }: { id: SparkGearId }) {
       <g>
         <ellipse cx="42" cy="80" rx="22" ry="9" fill="#5EEAD4" fillOpacity="0.28" />
         <ellipse cx="60" cy="78" rx="18" ry="8" fill="#A78BFA" fillOpacity="0.26" />
-        <path d="M28 78c8 10 36 10 44 0" fill="none" stroke="#5EEAD4" strokeOpacity="0.45" strokeWidth="1.2" />
+        <path
+          d="M28 78c8 10 36 10 44 0"
+          fill="none"
+          stroke="#5EEAD4"
+          strokeOpacity="0.45"
+          strokeWidth="1.2"
+        />
       </g>
     );
   }
   if (id === "streak-hood") {
     return (
       <g>
-        <path d="M26 34C32 10 42 4 50 4c9 0 19 6 25 28-9 8-40 9-49 2Z" fill="#18181B" />
-        <path d="M24 32c10 8 42 8 54 0-2 10-14 16-27 16S26 42 24 32Z" fill="#27272A" />
-        <path d="M30 28c7-8 33-8 40 0" fill="none" stroke="#3F3F46" strokeWidth="1.4" />
+        <path
+          d="M26 34C32 10 42 4 50 4c9 0 19 6 25 28-9 8-40 9-49 2Z"
+          fill="#18181B"
+        />
+        <path
+          d="M24 32c10 8 42 8 54 0-2 10-14 16-27 16S26 42 24 32Z"
+          fill="#27272A"
+        />
+        <path
+          d="M30 28c7-8 33-8 40 0"
+          fill="none"
+          stroke="#3F3F46"
+          strokeWidth="1.4"
+        />
       </g>
     );
   }
   if (id === "streak-crown") {
     return (
       <g>
-        <path d="M24 28 32 12l10 12 8-16 8 16 10-12 8 16H24Z" fill="#E8C547" stroke="#A16207" strokeWidth="1.1" />
+        <path
+          d="M24 28 32 12l10 12 8-16 8 16 10-12 8 16H24Z"
+          fill="#E8C547"
+          stroke="#A16207"
+          strokeWidth="1.1"
+        />
         <circle cx="32" cy="14" r="2" fill="#FFF7D6" />
         <circle cx="50" cy="8" r="2.2" fill="#FFFBEB" />
         <circle cx="68" cy="14" r="2" fill="#FFF7D6" />
@@ -426,9 +460,19 @@ function Gear({ id }: { id: SparkGearId }) {
   if (id === "cap-gold") {
     return (
       <g>
-        <path d="M22 20 50 10l28 10-28 10Z" fill="#1C1917" stroke="#E4C56A" strokeWidth="1.3" />
+        <path
+          d="M22 20 50 10l28 10-28 10Z"
+          fill="#1C1917"
+          stroke="#E4C56A"
+          strokeWidth="1.3"
+        />
         <path d="M38 22h24l-1.6 8H39.6Z" fill="#292524" stroke="#E4C56A" strokeWidth="0.7" />
-        <path d="M50 12c8 4 14 10 16 16" fill="none" stroke="#F5D76A" strokeWidth="1.6" />
+        <path
+          d="M50 12c8 4 14 10 16 16"
+          fill="none"
+          stroke="#F5D76A"
+          strokeWidth="1.6"
+        />
         <circle cx="67" cy="29" r="2.3" fill="#F5D76A" />
       </g>
     );
@@ -443,7 +487,13 @@ function Gear({ id }: { id: SparkGearId }) {
   if (id === "phones") {
     return (
       <g>
-        <path d="M22 48c0-20 12-30 28-30s28 10 28 30" fill="none" stroke="#18181B" strokeWidth="3.6" strokeLinecap="round" />
+        <path
+          d="M22 48c0-20 12-30 28-30s28 10 28 30"
+          fill="none"
+          stroke="#18181B"
+          strokeWidth="3.6"
+          strokeLinecap="round"
+        />
         <rect x="16" y="46" width="12" height="22" rx="6" fill="#18181B" />
         <rect x="18.5" y="50" width="7" height="14" rx="3.5" fill="#3F3F46" />
         <rect x="72" y="46" width="12" height="22" rx="6" fill="#18181B" />
@@ -456,8 +506,20 @@ function Gear({ id }: { id: SparkGearId }) {
       <g>
         <circle cx="50" cy="77.2" r="3.4" fill="#312E81" stroke="#A78BFA" strokeWidth="1.1" />
         <circle cx="50" cy="77.2" r="1.35" fill="#C4B5FD" />
-        <path d="M46.4 76.4 38 74.2" fill="none" stroke="#4338CA" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M53.6 76.4 62 74.2" fill="none" stroke="#4338CA" strokeWidth="1.4" strokeLinecap="round" />
+        <path
+          d="M46.4 76.4 38 74.2"
+          fill="none"
+          stroke="#4338CA"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M53.6 76.4 62 74.2"
+          fill="none"
+          stroke="#4338CA"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
       </g>
     );
   }
@@ -465,16 +527,36 @@ function Gear({ id }: { id: SparkGearId }) {
     return (
       <g transform="translate(39 13) rotate(-16)">
         <ellipse cx="0" cy="7.2" rx="5.2" ry="2.4" fill="#F59E0B" opacity="0.55" />
-        <path d="M-3.6 7.4C-4.6 1.2-2.4-14 0-22.5C2.4-14 4.6 1.2 3.6 7.4Z" fill="#FDE68A" stroke="#D97706" strokeWidth="0.85" />
-        <path d="M-1.8-16C.6-12 2.2-9 .2-5M-2.2-8C.8-4 2.6-1 .4 3M-2.4 0C.6 3.2 2.4 5.2.2 7" fill="none" stroke="#F59E0B" strokeWidth="1.05" strokeLinecap="round" />
-        <path d="M-1.1-20.4 1.2-16.8" fill="none" stroke="#FFFBEB" strokeWidth="0.9" strokeLinecap="round" />
+        <path
+          d="M-3.6 7.4C-4.6 1.2-2.4-14 0-22.5C2.4-14 4.6 1.2 3.6 7.4Z"
+          fill="#FDE68A"
+          stroke="#D97706"
+          strokeWidth="0.85"
+        />
+        <path
+          d="M-1.8-16C.6-12 2.2-9 .2-5M-2.2-8C.8-4 2.6-1 .4 3M-2.4 0C.6 3.2 2.4 5.2.2 7"
+          fill="none"
+          stroke="#F59E0B"
+          strokeWidth="1.05"
+          strokeLinecap="round"
+        />
+        <path
+          d="M-1.1-20.4 1.2-16.8"
+          fill="none"
+          stroke="#FFFBEB"
+          strokeWidth="0.9"
+          strokeLinecap="round"
+        />
       </g>
     );
   }
   if (id === "bowtie") {
     return (
       <g>
-        <path d="M36 80c-7-5-9 3-2 7 5 2 9 1 14-1 5 2 9 3 14 1 7-4 5-12-2-7-5 2-9 2-14 1-5 1-9 1-14-1Z" fill="#9A3412" />
+        <path
+          d="M36 80c-7-5-9 3-2 7 5 2 9 1 14-1 5 2 9 3 14 1 7-4 5-12-2-7-5 2-9 2-14 1-5 1-9 1-14-1Z"
+          fill="#9A3412"
+        />
         <rect x="46.6" y="78.2" width="6.8" height="6.4" rx="1.3" fill="#7C2D12" />
       </g>
     );
@@ -482,16 +564,32 @@ function Gear({ id }: { id: SparkGearId }) {
   if (id === "beanie") {
     return (
       <g>
-        <path d="M29 30C34 12 43 6 50 6c8 0 17 5 23 22-10 5-34 6-44 2Z" fill="#334155" />
-        <path d="M27 28c8 5 38 6 48 0-2 7-12 10-24 10S29 35 27 28Z" fill="#1E293B" />
+        <path
+          d="M29 30C34 12 43 6 50 6c8 0 17 5 23 22-10 5-34 6-44 2Z"
+          fill="#334155"
+        />
+        <path
+          d="M27 28c8 5 38 6 48 0-2 7-12 10-24 10S29 35 27 28Z"
+          fill="#1E293B"
+        />
         <circle cx="50" cy="7.4" r="3.3" fill="#F8FAFC" />
-        <path d="M34 24c8 3 24 3 32 0" fill="none" stroke="#475569" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
+        <path
+          d="M34 24c8 3 24 3 32 0"
+          fill="none"
+          stroke="#475569"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
       </g>
     );
   }
   if (id === "star") {
     return (
-      <path d="M32 18l2.2 6.4H41l-5.4 4 2.1 6.4L32 30.8 26.3 34.8l2.1-6.4-5.4-4h6.8Z" fill="#E8C547" />
+      <path
+        d="M32 18l2.2 6.4H41l-5.4 4 2.1 6.4L32 30.8 26.3 34.8l2.1-6.4-5.4-4h6.8Z"
+        fill="#E8C547"
+      />
     );
   }
   return null;
@@ -501,11 +599,41 @@ function GearFront({ id }: { id: SparkGearId }) {
   if (id !== "hearts") return null;
   return (
     <g>
-      <path d="M35.6 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z" fill="#DB2777" stroke="#9D174D" strokeWidth="1.25" />
-      <path d="M64.4 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z" fill="#DB2777" stroke="#9D174D" strokeWidth="1.25" />
-      <path d="M43 65.2h14" fill="none" stroke="#9D174D" strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M27.2 51.2c2.6-3 6.8-2.6 7.8.8" fill="none" stroke="#F9A8D4" strokeWidth="1.8" strokeLinecap="round" opacity="0.85" />
-      <path d="M56 51.2c2.6-3 6.8-2.6 7.8.8" fill="none" stroke="#F9A8D4" strokeWidth="1.8" strokeLinecap="round" opacity="0.85" />
+      <path
+        d="M35.6 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z"
+        fill="#DB2777"
+        stroke="#9D174D"
+        strokeWidth="1.25"
+      />
+      <path
+        d="M64.4 46.4c-5.2-7.8-16.4-8.6-21.6-.8-6.8 9.6-.4 20.8 21.6 36.6 22-15.8 28.4-27 21.6-36.6-5.2-7.8-16.4-7-21.6.8Z"
+        fill="#DB2777"
+        stroke="#9D174D"
+        strokeWidth="1.25"
+      />
+      <path
+        d="M43 65.2h14"
+        fill="none"
+        stroke="#9D174D"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M27.2 51.2c2.6-3 6.8-2.6 7.8.8"
+        fill="none"
+        stroke="#F9A8D4"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        opacity="0.85"
+      />
+      <path
+        d="M56 51.2c2.6-3 6.8-2.6 7.8.8"
+        fill="none"
+        stroke="#F9A8D4"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        opacity="0.85"
+      />
     </g>
   );
 }
@@ -544,15 +672,12 @@ export function Spark({
   const wrapRef = useRef<HTMLDivElement | HTMLButtonElement | null>(null);
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
-  const bodyId = `spark-body-${uid}`;
-  const specId = `spark-spec-${uid}`;
   const auraBlurId = `spark-aura-blur-${uid}`;
   const store = useCatalyst();
   const tintId = tint ?? store.appearance.sparkTint;
   const gearId = gear ?? store.appearance.gear;
   const auraId = aura ?? store.appearance.aura;
   const trailId = trail ?? store.appearance.trail;
-  const palette = getSparkTint(tintId);
   const resolved =
     flavor ??
     sparkFlavorFromContext({
@@ -671,8 +796,14 @@ export function Spark({
       const box = el.getBoundingClientRect();
       const nx = (event.clientX - (box.left + box.width / 2)) / (box.width / 2);
       const ny = (event.clientY - (box.top + box.height * 0.48)) / (box.height / 2);
-      el.style.setProperty("--eye-x", `${Math.max(-3.2, Math.min(3.2, nx * 3.1))}px`);
-      el.style.setProperty("--eye-y", `${Math.max(-2.4, Math.min(2.4, ny * 2.2))}px`);
+      el.style.setProperty(
+        "--eye-x",
+        `${Math.max(-3.2, Math.min(3.2, nx * 3.1))}px`,
+      );
+      el.style.setProperty(
+        "--eye-y",
+        `${Math.max(-2.4, Math.min(2.4, ny * 2.2))}px`,
+      );
     }
     window.addEventListener("pointermove", look, { passive: true });
     return () => window.removeEventListener("pointermove", look);
@@ -680,7 +811,11 @@ export function Spark({
   const evo = evolve
     ? sparkEvolutionFromState(store)
     : { scale: 1, glow: 1, stage: "growing" as CareStage };
-  const ethereal = evo.stage === "ethereal";
+  const species = normalizeSpriteSpecies(store.spriteSpecies);
+  const bodyPalette = spriteBodyPalette(species, tintId);
+  const stageGlow = evolve && signatureGlowForStage(evo.stage);
+  const extraMagical = Boolean(store.extraMagical) && evo.stage === "ethereal";
+  const glowHex = stageGlow ? bodyPalette.glow : bodyPalette.fur;
   const hatching =
     Boolean(store.hatchBurstAt) &&
     Date.now() - (store.hatchBurstAt ?? 0) < 1600;
@@ -710,9 +845,14 @@ export function Spark({
   const frameStyle = {
     width: drawn,
     height: drawn,
-    color: palette.lo,
-    ["--spark-evo-glow" as string]: String(ethereal ? evo.glow * 1.2 : evo.glow),
+    color: glowHex,
+    ["--spark-evo-glow" as string]: String(extraMagical ? evo.glow * 1.48 : evo.glow),
     ["--spark-aura" as string]: getSparkAura(auraId).glow,
+    ["--spark-hi" as string]: bodyPalette.belly,
+    ["--spark-mid" as string]: bodyPalette.fur,
+    ["--spark-lo" as string]: bodyPalette.furDeep,
+    ["--spark-glow" as string]: glowHex,
+    ["--spark-glow-deep" as string]: bodyPalette.glowDeep,
   };
 
   const body = (
@@ -724,107 +864,136 @@ export function Spark({
           {say}
         </span>
       ) : null}
-      <svg viewBox="-22 -18 144 150" width={drawn} height={drawn} className="relative z-10 overflow-visible">
-        <defs>
-          <radialGradient id={glowId} cx="50%" cy="58%" r="48%">
-            <stop offset="0%" stopColor={palette.lo} stopOpacity={ethereal ? 0.88 : evo.stage === "luminary" ? 0.7 : 0.55} />
-            <stop offset="100%" stopColor={palette.lo} stopOpacity="0" />
-          </radialGradient>
-          {tintId === "gold" ? (
-            <linearGradient id={bodyId} x1="8%" y1="4%" x2="92%" y2="98%">
-              <stop offset="0%" stopColor="#FFF8DC" />
-              <stop offset="18%" stopColor="#F6D365" />
-              <stop offset="38%" stopColor="#C9A227" />
-              <stop offset="58%" stopColor="#F0C14A" />
-              <stop offset="78%" stopColor="#B8860B" />
-              <stop offset="100%" stopColor="#7A5C10" />
-            </linearGradient>
-          ) : palette.kind === "gradient" ? (
-            <linearGradient id={bodyId} x1="16%" y1="6%" x2="88%" y2="94%">
-              <stop offset="0%" stopColor={palette.hi} />
-              <stop offset="48%" stopColor={palette.mid} />
-              <stop offset="100%" stopColor={palette.lo} />
-            </linearGradient>
-          ) : (
-            <radialGradient id={bodyId} cx="38%" cy="32%" r="72%">
-              <stop offset="0%" stopColor={palette.hi} />
-              <stop offset="42%" stopColor={palette.mid} />
-              <stop offset="100%" stopColor={palette.lo} />
+      <div className={cn("spark-body spark-svg-critter", hatching && "spark-hatch")}>
+        <svg
+          viewBox="-22 -18 144 150"
+          width={drawn}
+          height={drawn}
+          className="relative z-10 overflow-visible"
+        >
+          <defs>
+            <radialGradient id={glowId} cx="50%" cy="58%" r="48%">
+              <stop
+                offset="0%"
+                stopColor={glowHex}
+                stopOpacity={stageGlow ? (extraMagical ? 0.72 : 0.42) : 0.18}
+              />
+              <stop offset="100%" stopColor={glowHex} stopOpacity="0" />
             </radialGradient>
-          )}
-          <radialGradient id={specId} cx="35%" cy="30%" r="22%">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-          </radialGradient>
-          <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
-            <feGaussianBlur stdDeviation="5.4" />
-          </filter>
-        </defs>
-        <ellipse cx="50" cy="72" rx={ethereal ? 34 : 28} ry={ethereal ? 30 : 24} fill={`url(#${glowId})`} />
-        {showEgg || hatching ? (
-          <g className={cn("spark-body", hatching && "spark-hatch")}>
-            <ellipse cx="52" cy="86" rx="16" ry="4.5" fill="#0B0B0F" opacity="0.18" />
-            <ellipse cx="50" cy="62" rx="22.5" ry="29.5" fill="#F3E2BF" />
-            <ellipse cx="50" cy="64" rx="20" ry="26" fill="#E8C98A" opacity="0.35" />
-            <ellipse cx="42" cy="50" rx="8" ry="6" fill="#FFF8E7" opacity="0.7" />
-            <circle cx="37" cy="68" r="1.5" fill="#C4A46A" opacity="0.55" />
-            <circle cx="58" cy="56" r="1.15" fill="#C4A46A" opacity="0.4" />
-            <circle cx="55" cy="76" r="1.3" fill="#C4A46A" opacity="0.35" />
-            {hatching ? (
-              <path d="M50 34c2 7-5 11-2 17 4 8-4 11-1 18" fill="none" stroke="#3F3F46" strokeWidth="1.7" strokeLinecap="round" />
-            ) : null}
-          </g>
-        ) : (
-          <g className="spark-body">
-            <SparkAuraMark id={auraId} blurId={auraBlurId} />
-            <GearBack id={gearId} />
-            <path d={SPARK_BODY_PATH} fill={`url(#${bodyId})`} />
-            {tintId === "gold" ? (
-              <g className="spark-gold-shine">
-                <ellipse cx="38" cy="44" rx="13" ry="9" fill="#FFFBEB" opacity="0.7" />
-                <path d="M26 54c10-14 28-16 38-7" fill="none" stroke="#FFF8D0" strokeWidth="2.6" strokeLinecap="round" opacity="0.85" />
-                <path d="M34 68c8-6 18-7 26-2" fill="none" stroke="#FFE27A" strokeWidth="1.4" strokeLinecap="round" opacity="0.55" />
-                <circle cx="62" cy="40" r="1.7" fill="#FFFBEB" />
-                <circle cx="70" cy="56" r="1.25" fill="#FDE68A" />
-                <circle cx="34" cy="70" r="1.35" fill="#FFF7D6" />
-                <circle cx="48" cy="36" r="1.1" fill="#FFFBEB" />
-              </g>
-            ) : null}
-            {tintId === "cosmic" ? (
-              <g className="spark-cosmic-stars" fill="#F8FAFC">
-                <circle className="spark-cosmic-dot" cx="36" cy="46" r="1.15" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="58" cy="40" r="0.9" />
-                <circle className="spark-cosmic-dot" cx="68" cy="58" r="1.05" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="42" cy="72" r="0.8" />
-                <circle className="spark-cosmic-dot" cx="54" cy="64" r="1.2" />
-                <circle className="spark-cosmic-dot spark-cosmic-dot-b" cx="30" cy="60" r="0.7" />
-                <path d="M48 38l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z" fill="#BFDBFE" />
-                <path d="M63 48l.45 1.2 1.2.45-1.2.45-.45 1.2-.45-1.2-1.2-.45 1.2-.45Z" fill="#DBEAFE" />
-              </g>
-            ) : null}
-            <ellipse cx="40" cy="48" rx="11" ry="8" fill={`url(#${specId})`} />
-            <Gear id={gearId} />
-            <g className={canGlance ? "spark-glance" : undefined}>
-              <Eyes mood={shownMood} fill="#0B0B0F" />
+            <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
+              <feGaussianBlur stdDeviation="5.4" />
+            </filter>
+          </defs>
+
+          <ellipse cx="50" cy="78" rx="26" ry="16" fill={`url(#${glowId})`} />
+
+          {showEgg || hatching ? (
+            <g>
+              <SpeciesEgg
+                palette={bodyPalette}
+                species={species}
+                hatching={hatching}
+              />
             </g>
-            <GearFront id={gearId} />
-          </g>
-        )}
+          ) : (
+            <g>
+              <SparkAuraMark id={auraId} blurId={auraBlurId} />
+              <GearBack id={gearId} />
+              <SpriteCritter
+                species={species}
+                palette={bodyPalette}
+                mood={shownMood}
+                stage={evo.stage}
+                stageGlow={stageGlow}
+                extraMagical={extraMagical}
+                uid={uid}
+              />
+              {tintId === "gold" ? (
+                <g className="spark-gold-shine">
+                  <ellipse
+                    cx="40"
+                    cy="40"
+                    rx="11"
+                    ry="7"
+                    fill="#FFFBEB"
+                    opacity="0.55"
+                  />
+                  <circle cx="62" cy="38" r="1.4" fill="#FFFBEB" />
+                  <circle cx="34" cy="58" r="1.1" fill="#FFF7D6" />
+                </g>
+              ) : null}
+              {tintId === "cosmic" ? (
+                <g className="spark-cosmic-stars" fill="#F8FAFC">
+                  <circle className="spark-cosmic-dot" cx="36" cy="40" r="1.1" />
+                  <circle
+                    className="spark-cosmic-dot spark-cosmic-dot-b"
+                    cx="60"
+                    cy="36"
+                    r="0.9"
+                  />
+                  <circle className="spark-cosmic-dot" cx="66" cy="54" r="1" />
+                  <path
+                    d="M48 34l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7Z"
+                    fill="#BFDBFE"
+                  />
+                </g>
+              ) : null}
+              <Gear id={gearId} />
+              <GearFront id={gearId} />
+            </g>
+          )}
+        </svg>
+        {extraMagical ? (
+          <span className="sprite-magical-dust" aria-hidden>
+            {Array.from({ length: 10 }, (_, index) => (
+              <span
+                key={index}
+                className={`sprite-magical-mote mote-${index}`}
+              />
+            ))}
+          </span>
+        ) : null}
+      </div>
+      <svg
+        viewBox="-22 -18 144 150"
+        width={drawn}
+        height={drawn}
+        className="pointer-events-none absolute inset-0 z-20 overflow-visible"
+        aria-hidden
+      >
         {(petted || act === "boop") && mood !== "eating" ? <PetHearts /> : null}
+
         {act === "sleep" || mood === "sleepy" ? (
           <g className="spark-zzz" fill="#A1A1AA" fontSize="11" fontWeight="700">
-            <text className="spark-z spark-z-a" x="74" y="22">z</text>
-            <text className="spark-z spark-z-b" x="84" y="12">z</text>
-            <text className="spark-z spark-z-c" x="92" y="4">z</text>
+            <text className="spark-z spark-z-a" x="74" y="22">
+              z
+            </text>
+            <text className="spark-z spark-z-b" x="84" y="12">
+              z
+            </text>
+            <text className="spark-z spark-z-c" x="92" y="4">
+              z
+            </text>
           </g>
         ) : null}
+
         {mood === "eating" ? (
-          <g className="spark-crumbs" fill={snack === "berry" ? "#C084FC" : snack === "mint" ? "#5EEAD4" : "#F5D0A9"}>
+          <g
+            className="spark-crumbs"
+            fill={
+              snack === "berry"
+                ? "#C084FC"
+                : snack === "mint"
+                  ? "#5EEAD4"
+                  : "#F5D0A9"
+            }
+          >
             <circle className="spark-crumb-bit spark-crumb-a" cx="28" cy="84" r="2.1" />
             <circle className="spark-crumb-bit spark-crumb-b" cx="70" cy="88" r="1.6" />
             <circle className="spark-crumb-bit spark-crumb-c" cx="50" cy="94" r="1.3" />
           </g>
         ) : null}
+
         {orbit && mood !== "tempted" && mood !== "sleepy" && act !== "sleep" ? (
           <g className="spark-particles" fill={SPARK_FLAVOR_INK[resolved]}>
             <SparkParticleRing radius={40} twist={22} />
@@ -857,7 +1026,12 @@ export function Spark({
   }
 
   return (
-    <div ref={wrapRef as Ref<HTMLDivElement>} aria-hidden className={frameClass} style={frameStyle}>
+    <div
+      ref={wrapRef as Ref<HTMLDivElement>}
+      aria-hidden
+      className={frameClass}
+      style={frameStyle}
+    >
       {body}
     </div>
   );
