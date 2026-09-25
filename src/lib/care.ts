@@ -97,3 +97,15 @@ export {
   quizItemCaption,
   type QuizItem,
 } from "@/lib/quiz-bank";
+export {
+  EGG_FEEDS_TO_HATCH,
+  clampEggFeeds,
+  eggCrackLevel,
+  hatchProgressLabel,
+  isEggReadyToHatch,
+  nextEggFeeds,
+  normalizeEggFeeds,
+  resolveSpriteHatched,
+  wasLegacyHatched,
+  type EggCrackLevel,
+} from "./egg-hatch.ts";

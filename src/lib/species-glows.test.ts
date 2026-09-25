@@ -5,7 +5,7 @@ import {
   ETHEREAL_GLOWS,
   SPRITE_SPECIES,
 } from "./species-glows.ts";
-import { normalizeSpriteSpecies } from "./sprite-species.ts";
+import { SPECIES_PALETTES, normalizeSpriteSpecies } from "./sprite-species.ts";
 
 describe("signature Ethereal glows", () => {
   it("gives each animal a unique glow; mint only on Dragon", () => {
@@ -23,6 +23,25 @@ describe("signature Ethereal glows", () => {
       assert.notEqual(ETHEREAL_GLOWS[id].glow, BRAND_MINT);
       assert.notEqual(ETHEREAL_GLOWS[id].glowDeep, BRAND_MINT);
     }
+  });
+
+  it("keeps the cat a tuxedo with magenta glow", () => {
+    assert.equal(SPECIES_PALETTES.cat.fur, "#1C1C1E");
+    assert.equal(SPECIES_PALETTES.cat.belly, "#FFF8F4");
+    assert.equal(SPECIES_PALETTES.cat.mark, "#FFF8F4");
+    assert.equal(SPECIES_PALETTES.cat.nose, "#F4A8B8");
+    assert.equal(SPECIES_PALETTES.cat.egg, "#1C1C1E");
+    assert.equal(SPECIES_PALETTES.cat.eggMark, "#FFF8F4");
+    assert.equal(ETHEREAL_GLOWS.cat.glow, "#E879F9");
+    assert.equal(ETHEREAL_GLOWS.cat.glowDeep, "#A78BFA");
+  });
+
+  it("keeps the deer a warm caramel with cream spots", () => {
+    assert.equal(SPECIES_PALETTES.deer.fur, "#B8773F");
+    assert.equal(SPECIES_PALETTES.deer.furDeep, "#8A4A24");
+    assert.equal(SPECIES_PALETTES.deer.belly, "#FFF6E8");
+    assert.equal(SPECIES_PALETTES.deer.mark, "#FFF8EE");
+    assert.equal(SPECIES_PALETTES.deer.egg, "#C8894E");
   });
 
   it("keeps animals and maps drop-shape leftovers onto them", () => {

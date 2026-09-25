@@ -1,3 +1,5 @@
+import { EGG_FEEDS_TO_HATCH } from "./egg-hatch.ts";
+
 export const CARE_STAGES = [
   "egg",
   "hatchling",
@@ -22,17 +24,17 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "egg",
     label: "Egg",
-    how: "Closed egg. First real focus or snack hatches it into Hatchling.",
+    how: `Closed egg. ${EGG_FEEDS_TO_HATCH} snacks hatch it into Hatchling — a small crack, then a bigger one, then the hatch.`,
   },
   {
     stage: "hatchling",
     label: "Hatchling",
-    how: "Just out. Tiny chibi body, almost no glow.",
+    how: "Just out. Tiny drop body, almost no glow.",
   },
   {
     stage: "growing",
     label: "Growing",
-    how: "Full little-critter shape. Study hours, streak, and snacks.",
+    how: "Full drop shape. Study hours, streak, and snacks.",
   },
   {
     stage: "luminary",
