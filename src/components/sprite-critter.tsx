@@ -1316,3 +1316,181 @@ export function SpeciesEgg({
     </g>
   );
 }
+
+export function SpriteFxLayers({
+  species,
+  palette,
+  stage,
+  stageGlow,
+  extraMagical = false,
+  uid = "sprite-fx",
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  stage: CareStage;
+  stageGlow: boolean;
+  extraMagical?: boolean;
+  uid?: string;
+}) {
+  const magical = extraMagical && stage === "ethereal";
+  return (
+    <g className="sprite-fx-layers" aria-hidden>
+      <PaintDefs uid={uid} palette={palette} />
+      {stageGlow ? (
+        <StageGlow
+          species={species}
+          stage={stage}
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          extraMagical={magical}
+          uid={uid}
+        />
+      ) : null}
+      {magical ? (
+        <MagicalHalo
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          bloomId={`${uid}-halo`}
+        />
+      ) : null}
+    </g>
+  );
+}
+
+export function SpriteCritter({
+  species,
+  palette,
+  mood,
+  stage,
+  stageGlow,
+  extraMagical = false,
+  squint = false,
+  uid = "sprite",
+}: SpriteCritterProps) {
+  const hatchling = stage === "hatchling";
+  const magical = extraMagical && stage === "ethereal";
+  const stageScale =
+    stage === "hatchling" ? 0.86 : stage === "luminary" ? 1.04 : stage === "ethereal" ? 1.06 : 1;
+  const blush = species === "cat" ? "#F472B6" : species === "fox" ? "#F97316" : palette.accent;
+  return (
+    <g className="sprite-critter">
+      <PaintDefs uid={uid} palette={palette} />
+      {stageGlow ? (
+        <StageGlow
+          species={species}
+          stage={stage}
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          extraMagical={magical}
+          uid={uid}
+        />
+      ) : null}
+      {magical ? (
+        <MagicalHalo
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          bloomId={`${uid}-halo`}
+        />
+      ) : null}
+      <ellipse
+        cx="50"
+        cy="110"
+        rx="20"
+        ry="5.2"
+        fill="#0B0B0F"
+        opacity="0.26"
+        filter={`url(#${uid}-sit)`}
+      />
+      <g
+        transform={
+          hatchling || stageScale !== 1
+            ? `translate(50 110) scale(${stageScale}) translate(-50 -110)`
+            : undefined
+        }
+      >
+        <Tail species={species} palette={palette} />
+        {species === "dragon" ? (
+          <DragonWings palette={palette} stage={stage} />
+        ) : null}
+        <SpeciesExtras species={species} palette={palette} stage={stage} />
+        <ellipse cx="50" cy="93.6" rx="14.4" ry="10.6" fill={palette.furDeep} />
+        <ellipse cx="50" cy="92.4" rx="13.4" ry="9.7" fill={palette.fur} />
+        {species === "cat" ? null : (
+          <ellipse cx="50" cy="92.4" rx="13.4" ry="9.7" fill={`url(#${uid}-body)`} />
+        )}
+        <ellipse
+          cx="50"
+          cy={species === "cat" ? 93.4 : 94.2}
+          rx={species === "cat" ? 9.6 : 8.2}
+          ry={species === "cat" ? 7.4 : 6.2}
+          fill={palette.belly}
+        />
+        {species === "deer" ? (
+          <DeerHooves />
+        ) : (
+          <>
+            <ellipse
+              cx="42.2"
+              cy="102.2"
+              rx="4.8"
+              ry="2.8"
+              fill={species === "cat" ? (palette.mark ?? palette.belly) : palette.furDeep}
+            />
+            <ellipse
+              cx="57.8"
+              cy="102.2"
+              rx="4.8"
+              ry="2.8"
+              fill={species === "cat" ? (palette.mark ?? palette.belly) : palette.furDeep}
+            />
+          </>
+        )}
+        <ellipse cx="50" cy="47.2" rx="31.6" ry="29.2" fill={palette.furDeep} />
+        <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={palette.fur} />
+        {species === "cat" ? null : (
+          <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={`url(#${uid}-head)`} />
+        )}
+        <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={`url(#${uid}-rim)`} />
+        <Ears species={species} palette={palette} />
+        {species === "dragon" ? (
+          <DragonSpikes palette={palette} stage={stage} />
+        ) : null}
+        {species === "cat" ? (
+          <path
+            d="M50 51.2C45.4 52.2 40.2 57.2 38.6 63.2C37.2 69.2 41.4 73.8 50 74.6C58.6 73.8 62.8 69.2 61.4 63.2C59.8 57.2 54.6 52.2 50 51.2Z"
+            fill={palette.mark ?? palette.belly}
+          />
+        ) : (
+          <ellipse cx="50" cy="56.6" rx="15.2" ry="12.2" fill={palette.belly} opacity="0.92" />
+        )}
+        <ellipse cx="36.6" cy="36.4" rx="9.6" ry="6.4" fill="#fff" opacity={species === "cat" ? 0.16 : 0.28} />
+        <ellipse cx="33.2" cy="60.8" rx="6.2" ry="3.6" fill={blush} opacity="0.34" />
+        <ellipse cx="66.8" cy="60.8" rx="6.2" ry="3.6" fill={blush} opacity="0.34" />
+        {magical ? (
+          <path
+            d="M50 23.6l1.25 2.9 2.9 1.25-2.9 1.25L50 31.9 48.75 29 45.85 27.75l2.9-1.25Z"
+            fill={palette.glow}
+          />
+        ) : null}
+        <Face
+          mood={mood}
+          ink={palette.ink}
+          species={species}
+          palette={palette}
+          glow={palette.glow}
+          glowDeep={palette.glowDeep}
+          extraMagical={magical}
+          squint={squint}
+          uid={uid}
+        />
+        {magical ? (
+          <MagicalAccents
+            species={species}
+            glow={palette.glow}
+            glowDeep={palette.glowDeep}
+          />
+        ) : null}
+      </g>
+    </g>
+  );
+}
