@@ -100,3 +100,40 @@ function GlossyEye({
     </g>
   );
 }
+
+const MOUTH_Y: Record<SpriteSpeciesId, number> = {
+  fox: 64.6,
+  bunny: 63.1,
+  deer: 64.8,
+  cat: 66.5,
+  axolotl: 63.4,
+  dragon: 64.9,
+};
+
+function catMouthPath(y: number, half: number, dip: number) {
+  const left = 50 - half;
+  const right = 50 + half;
+  const pull = half * 0.44;
+  return `M${left} ${y}C${left + pull} ${y + dip} ${50 - pull} ${y + dip} 50 ${y}C${50 + pull} ${y + dip} ${right - pull} ${y + dip} ${right} ${y}`;
+}
+
+function CatMouth({
+  ink,
+  species,
+  wide = false,
+}: {
+  ink: string;
+  species: SpriteSpeciesId;
+  wide?: boolean;
+}) {
+  return (
+    <path
+      d={catMouthPath(MOUTH_Y[species], wide ? 8.8 : 7.45, wide ? 3.45 : 2.85)}
+      fill="none"
+      stroke={ink}
+      strokeWidth={wide ? 1.9 : 1.72}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
