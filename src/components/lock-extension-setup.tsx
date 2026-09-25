@@ -27,7 +27,7 @@ const STEPS = [
   "Turn on Developer mode (top right).",
   "Click Load unpacked. Select the extension folder — the one that contains manifest.json. Never select the .zip. Never select Downloads itself.",
   "Come back to this Catalyst tab so lock hours and unlocks can sync. Refresh if it still says not connected.",
-  "Click the Catalyst Lock toolbar icon for ON / OFF. After an update, open chrome://extensions and press Reload on Catalyst Lock.",
+  `Click the Catalyst Lock toolbar icon for ON / OFF. After downloading ${EXTENSION_VERSION}, open chrome://extensions and press Reload on Catalyst Lock so Chrome drops the old Off-stuck build.`,
 ] as const;
 
 function downloadHref(href: string, filename: string) {
@@ -64,7 +64,10 @@ export function LockExtensionSetup() {
         Chrome will not install this from the site. Download the zip, unzip it
         so you have a folder named <span className="font-mono">extension</span>,
         then Load unpacked and pick that folder — never the .zip. After every
-        new zip, open chrome://extensions and press Reload on Catalyst Lock.
+        new zip, Chrome keeps the old code until you open chrome://extensions
+        and press Reload on Catalyst Lock. If the toolbar still says Off during
+        lock hours, you are on an older zip — download {EXTENSION_VERSION} and
+        Reload.
       </p>
 
       {connected ? (
