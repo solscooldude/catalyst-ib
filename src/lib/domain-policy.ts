@@ -225,13 +225,13 @@ export function normalizeHost(raw: string) {
     const url = trimmed.includes("://")
       ? new URL(trimmed)
       : new URL(`https://${trimmed}`);
-    return url.hostname.replace(/\.+$/, "");
+    return url.hostname.replace(/\.$/, "");
   } catch {
     return trimmed
       .replace(/^https?:\/\//, "")
       .split("/")[0]
       .replace(/^www\./, "")
-      .replace(/\.+$/, "");
+      .replace(/\.$/, "");
   }
 }
 
