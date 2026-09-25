@@ -76,8 +76,21 @@ async function pullCloudPolicy() {
 window.addEventListener("message", (event) => {
   if (event.source !== window || event.origin !== window.location.origin) return;
   const data = event.data;
-  if (!data || data.type !== POLICY_MESSAGE || !data.policy) return;
-  sendPolicy(data.policy);
+  if (!data || typeof data !== "object") return;
+  if (data.type === POLICY_MESSAGE && data.policy) {
+    sendPolicy(data.policy);
+    return;
+  }
+  if (data.type === "CATALYST_LOCK_SET_ENABLED") {
+    try {
+      chrome.runtime.sendMessage({
+        type: "SET_ENABLED",
+        enabled: data.enabled !== false,
+      });
+    } catch {
+      /* worker waking */
+    }
+  }
 });
 
 document.addEventListener("visibilitychange", () => {
