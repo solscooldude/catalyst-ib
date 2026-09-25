@@ -1,3 +1,4 @@
+import type { EggCrackLevel } from "@/lib/care";
 import { CAT_HEART, ETHEREAL_GLOWS } from "@/lib/species-glows";
 import type { SpeciesPalette, SpriteSpeciesId } from "@/lib/sprite-species";
 import type { CareStage } from "@/lib/stats";
@@ -19,6 +20,7 @@ type SpriteCritterProps = {
   stage: CareStage;
   stageGlow: boolean;
   extraMagical?: boolean;
+  squint?: boolean;
   uid?: string;
 };
 
@@ -46,12 +48,13 @@ function GlossyEye({
     <g>
       {extraMagical ? (
         <ellipse
+          className="sprite-eye-bloom"
           cx={x}
           cy={cy}
-          rx="12.2"
-          ry="13.2"
+          rx="14.4"
+          ry="15.2"
           fill={glow}
-          fillOpacity="0.38"
+          fillOpacity="0.42"
         />
       ) : null}
       <ellipse
@@ -98,6 +101,43 @@ function GlossyEye({
   );
 }
 
+const MOUTH_Y: Record<SpriteSpeciesId, number> = {
+  fox: 64.6,
+  bunny: 63.1,
+  deer: 64.8,
+  cat: 66.5,
+  axolotl: 63.4,
+  dragon: 64.9,
+};
+
+function catMouthPath(y: number, half: number, dip: number) {
+  const left = 50 - half;
+  const right = 50 + half;
+  const pull = half * 0.44;
+  return `M${left} ${y}C${left + pull} ${y + dip} ${50 - pull} ${y + dip} 50 ${y}C${50 + pull} ${y + dip} ${right - pull} ${y + dip} ${right} ${y}`;
+}
+
+function CatMouth({
+  ink,
+  species,
+  wide = false,
+}: {
+  ink: string;
+  species: SpriteSpeciesId;
+  wide?: boolean;
+}) {
+  return (
+    <path
+      d={catMouthPath(MOUTH_Y[species], wide ? 8.8 : 7.45, wide ? 3.45 : 2.85)}
+      fill="none"
+      stroke={ink}
+      strokeWidth={wide ? 1.9 : 1.72}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
+
 function SpeciesNose({
   species,
   palette,
@@ -118,18 +158,7 @@ function SpeciesNose({
     );
   }
   if (species === "bunny") {
-    return (
-      <g>
-        <ellipse cx="50" cy="59.2" rx="1.55" ry="1.25" fill={palette.nose} />
-        <path
-          d="M50 60.3v3.1M50 62.2c-2.1 1.4-3.6 1.2-4.4.4M50 62.2c2.1 1.4 3.6 1.2 4.4.4"
-          fill="none"
-          stroke={palette.ink}
-          strokeWidth="1.05"
-          strokeLinecap="round"
-        />
-      </g>
-    );
+    return <ellipse cx="50" cy="59.2" rx="1.55" ry="1.25" fill={palette.nose} />;
   }
   if (species === "deer") {
     return (
@@ -144,19 +173,12 @@ function SpeciesNose({
     return (
       <g>
         <path d="M50 58.4 47.7 61.1h4.6Z" fill={palette.nose} />
-        <path
-          d="M50 61.1c-2.4 1.7-4.2 1.5-5.2.3M50 61.1c2.4 1.7 4.2 1.5 5.2.3"
-          fill="none"
-          stroke={palette.ink}
-          strokeWidth="1.05"
-          strokeLinecap="round"
-        />
         <g
           fill="none"
-          stroke={palette.ink}
+          stroke="#3F3F46"
           strokeWidth="0.85"
           strokeLinecap="round"
-          opacity="0.55"
+          opacity="0.62"
         >
           <path d="M34 59.6c-5.2.4-8.4 2.2-10.2 4" />
           <path d="M34.6 62.2c-5 .8-8.2 2.8-9.6 4.8" />
@@ -171,13 +193,6 @@ function SpeciesNose({
       <g>
         <circle cx="47.6" cy="59.6" r="0.7" fill={palette.nose} />
         <circle cx="52.4" cy="59.6" r="0.7" fill={palette.nose} />
-        <path
-          d="M44.8 63.4c1.8 2.6 8.6 2.6 10.4 0"
-          fill="none"
-          stroke={palette.ink}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-        />
       </g>
     );
   }
@@ -199,6 +214,7 @@ function Face({
   glow,
   glowDeep,
   extraMagical,
+  squint = false,
   uid,
 }: {
   mood: CritterMood;
@@ -208,64 +224,100 @@ function Face({
   glow: string;
   glowDeep: string;
   extraMagical: boolean;
+  squint?: boolean;
   uid: string;
 }) {
   const look = mood === "tempted" ? 2.2 : 0;
-  if (mood === "done") {
-    return (
-      <g fill="none" stroke={ink} strokeWidth="1.9" strokeLinecap="round">
-        <path d="M35 47.6c2.6-3.6 8.2-3.6 10.8 0" />
-        <path d="M54.2 47.6c2.6-3.6 8.2-3.6 10.8 0" />
-        <path d="M45.6 60.6c1.6 1.8 7.2 1.8 8.8 0" />
-      </g>
-    );
-  }
-  if (mood === "annoyed") {
-    return (
-      <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
-        <path d="M34 47h12" />
-        <path d="M54 47h12" />
-      </g>
-    );
-  }
-  if (mood === "sleepy") {
-    return (
-      <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
-        <path d="M34 50c2.8 2.4 8.8 2.4 11.6 0" />
-        <path d="M54.4 50c2.8 2.4 8.8 2.4 11.6 0" />
-      </g>
-    );
-  }
-  if (mood === "eating") {
-    return (
-      <g>
-        <ellipse cx="39.8" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
-        <ellipse cx="60.2" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
-        <ellipse className="spark-chew" cx="50" cy="61.6" rx="5.6" ry="3" fill="#0B0B0F" />
-      </g>
-    );
-  }
+  const happy = mood === "done";
+  const showCatMouth =
+    mood === "idle" ||
+    mood === "locked" ||
+    mood === "earning" ||
+    mood === "tempted" ||
+    mood === "done";
+
   return (
     <g>
-      <GlossyEye
-        cx={38.8}
-        cy={47.6}
-        look={look}
-        extraMagical={extraMagical}
-        glow={glow}
-        glowDeep={glowDeep}
-        fillId={`${uid}-eye`}
-      />
-      <GlossyEye
-        cx={61.2}
-        cy={47.6}
-        look={look}
-        extraMagical={extraMagical}
-        glow={glow}
-        glowDeep={glowDeep}
-        fillId={`${uid}-eye`}
-      />
+      {mood === "done" ? (
+        <g fill="none" stroke={ink} strokeWidth="1.9" strokeLinecap="round">
+          <path d="M35 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+          <path d="M54.2 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+        </g>
+      ) : null}
+      {mood === "annoyed" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 47h12" />
+          <path d="M54 47h12" />
+        </g>
+      ) : null}
+      {mood === "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 50c2.8 2.4 8.8 2.4 11.6 0" />
+          <path d="M54.4 50c2.8 2.4 8.8 2.4 11.6 0" />
+        </g>
+      ) : null}
+      {squint && mood !== "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+          <path d="M54.4 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+        </g>
+      ) : null}
+      {mood === "eating" ? (
+        <g>
+          <ellipse cx="39.8" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+          <ellipse cx="60.2" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+        </g>
+      ) : null}
+      {!squint &&
+      (mood === "idle" ||
+        mood === "locked" ||
+        mood === "earning" ||
+        mood === "tempted") ? (
+        <>
+          <GlossyEye
+            cx={38.8}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+          <GlossyEye
+            cx={61.2}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+        </>
+      ) : null}
+      {happy ? (
+        <>
+          <ellipse cx="34.6" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+          <ellipse cx="65.4" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+        </>
+      ) : null}
       <SpeciesNose species={species} palette={palette} />
+      {showCatMouth ? (
+        <CatMouth
+          ink={species === "cat" ? "#2A211C" : ink}
+          species={species}
+          wide={happy}
+        />
+      ) : null}
+      {mood === "eating" ? (
+        <ellipse
+          className="spark-chew"
+          cx="50"
+          cy={MOUTH_Y[species] + 2.2}
+          rx="4.4"
+          ry="2.2"
+          fill="#0B0B0F"
+        />
+      ) : null}
     </g>
   );
 }
@@ -363,8 +415,8 @@ function SpeciesExtras({
   if (species === "dragon") {
     return (
       <g>
-        <path d="M29 16c-1.4-8.4 6.6-12.6 10.2-5.2 1.6 3.4.2 8.4-2.8 10.6Z" fill={palette.accent} />
-        <path d="M71 16c1.4-8.4-6.6-12.6-10.2-5.2-1.6 3.4-.2 8.4 2.8 10.6Z" fill={palette.accent} />
+        <path d="M28 14c-1.6-9.2 7.4-13.8 11.2-5.6 1.6 3.6.2 9-3 11.4Z" fill={palette.accent} />
+        <path d="M72 14c1.6-9.2-7.4-13.8-11.2-5.6-1.6 3.6-.2 9 3 11.4Z" fill={palette.accent} />
         <path d="M20 74c-11.2-3.2-15.6 8.4-7.2 15.2 9.6 3.6 15.6-2.2 17.4-8Z" fill={palette.furDeep} opacity="0.92" />
         <path d="M80 74c11.2-3.2 15.6 8.4 7.2 15.2-9.6 3.6-15.6-2.2-17.4-8Z" fill={palette.furDeep} opacity="0.92" />
       </g>
@@ -378,37 +430,86 @@ function Ears({ species, palette }: { species: SpriteSpeciesId; palette: Species
   if (species === "cat") {
     return (
       <g>
-        <path d="M27 34c-2.4-16 16.8-20 20.4-6.4-6.4 1.8-13.6 4.4-20.4 6.4Z" fill={palette.fur} />
-        <path d="M73 34c2.4-16-16.8-20-20.4-6.4 6.4 1.8 13.6 4.4 20.4 6.4Z" fill={palette.fur} />
-        <path d="M30.4 30.4c-1-10 9.6-12.4 12.2-4.2-4.2 1.2-8.6 2.8-12.2 4.2Z" fill={palette.accent} opacity="0.7" />
-        <path d="M69.6 30.4c1-10-9.6-12.4-12.2-4.2 4.2 1.2 8.6 2.8 12.2 4.2Z" fill={palette.accent} opacity="0.7" />
+        <CatEar palette={palette} />
+        <g transform="translate(100 0) scale(-1 1)">
+          <CatEar palette={palette} />
+        </g>
       </g>
     );
   }
   if (species === "deer") {
     return (
       <g>
-        <path d="M29 30c-2-13.6 14.8-17.2 18-5.6-5.8 1.6-12.2 3.6-18 5.6Z" fill={palette.fur} />
-        <path d="M71 30c2-13.6-14.8-17.2-18-5.6 5.8 1.6 12.2 3.6 18 5.6Z" fill={palette.fur} />
-        <path d="M32 27.4c-.8-8 8.2-10 10.4-3.4-3.6 1-7.4 2.2-10.4 3.4Z" fill={palette.belly} />
-        <path d="M68 27.4c.8-8-8.2-10-10.4-3.4 3.6 1 7.4 2.2 10.4 3.4Z" fill={palette.belly} />
+        <path d="M28 31c-2.4-16.8 16.4-21.2 20-8.2-6.2 1.8-13.2 4.2-20 8.2Z" fill={palette.fur} />
+        <path d="M72 31c2.4-16.8-16.4-21.2-20-8.2 6.2 1.8 13.2 4.2 20 8.2Z" fill={palette.fur} />
+        <path d="M31.4 27.6c-1-10.4 9.6-13 12.2-4.6-4 1.2-8.4 2.8-12.2 4.6Z" fill={palette.belly} />
+        <path d="M68.6 27.6c1-10.4-9.6-13-12.2-4.6 4 1.2 8.4 2.8 12.2 4.6Z" fill={palette.belly} />
       </g>
     );
   }
   if (species === "dragon") {
     return (
       <g>
-        <path d="M29 28c-1.6-12 12.8-15.2 16-5-5.2 1.4-11 3.2-16 5Z" fill={palette.fur} />
-        <path d="M71 28c1.6-12-12.8-15.2-16-5 5.2 1.4 11 3.2 16 5Z" fill={palette.fur} />
+        <path d="M28 29c-1.8-14 14.4-17.6 18-6.2-5.8 1.6-12.2 3.6-18 6.2Z" fill={palette.fur} />
+        <path d="M72 29c1.8-14-14.4-17.6-18-6.2 5.8 1.6 12.2 3.6 18 6.2Z" fill={palette.fur} />
       </g>
     );
   }
   return (
     <g>
-      <path d="M28 32C18 8 40 4 46 22c-6.2 2.2-12.6 6-18 10Z" fill={palette.fur} />
-      <path d="M72 32C82 8 60 4 54 22c6.2 2.2 12.6 6 18 10Z" fill={palette.fur} />
-      <path d="M31 28C25 14 40 12 43.6 22c-4.2 1.6-8.6 4-12.6 6Z" fill={palette.belly} />
-      <path d="M69 28C75 14 60 12 56.4 22c4.2 1.6 8.6 4 12.6 6Z" fill={palette.belly} />
+      <FoxEar palette={palette} />
+      <g transform="translate(100 0) scale(-1 1)">
+        <FoxEar palette={palette} />
+      </g>
+    </g>
+  );
+}
+
+function CatEar({ palette }: { palette: SpeciesPalette }) {
+  return (
+    <g>
+      <path
+        d="M24.8 31.4C21.2 17.6 22.4 7.2 27.6 4.4C29.6 3.3 34 3.4 35.8 6C39.2 14.2 40 23.6 40.4 31.4Z"
+        fill="#8B8B94"
+      />
+      <path
+        d="M26 31C22.8 18.2 24 8.4 28.6 5.8C30.4 4.8 34 4.9 35.4 7.2C38.4 14.8 39.2 23.4 39.6 31Z"
+        fill={palette.fur}
+      />
+      <path
+        d="M30.8 29.4C29.4 19.6 29.6 11.6 31.8 8C32.6 6.8 34.8 6.8 35.6 8.2C37.2 14 37.8 22.2 38 29.4Z"
+        fill="#F4B4C8"
+      />
+    </g>
+  );
+}
+
+function FoxEar({ palette }: { palette: SpeciesPalette }) {
+  return (
+    <g>
+      <path
+        d="M25.8 30.8C22.2 20.6 23.2 12 27.2 7.2C28.6 5.5 32.4 5.4 33.8 7.4C36.8 13.6 37.8 22.4 38.4 30.8Z"
+        fill={palette.fur}
+      />
+      <path
+        d="M26.6 11.2C25.6 8.2 27.6 5.8 30.4 5.7C33.2 5.8 34.8 8.4 34.2 11.2C32.4 9.4 28.6 9.4 26.6 11.2Z"
+        fill={palette.furDeep}
+      />
+      <path
+        d="M30.4 27.4C28.8 20.4 28.8 14.4 30.6 10.6C31.4 9 33.4 8.9 34.2 10.6C35.6 15.2 36.2 21.6 36.6 27.4Z"
+        fill={palette.belly}
+      />
+    </g>
+  );
+}
+
+function DeerHooves() {
+  return (
+    <g>
+      <ellipse cx="42.2" cy="102.2" rx="4.8" ry="2.8" fill="#3F3F46" />
+      <ellipse cx="41.3" cy="101.35" rx="2.55" ry="1.15" fill="#A1A1AA" opacity="0.38" />
+      <ellipse cx="57.8" cy="102.2" rx="4.8" ry="2.8" fill="#3F3F46" />
+      <ellipse cx="56.9" cy="101.35" rx="2.55" ry="1.15" fill="#A1A1AA" opacity="0.38" />
     </g>
   );
 }
@@ -419,13 +520,29 @@ function Tail({ species, palette }: { species: SpriteSpeciesId; palette: Species
   }
   if (species === "cat") {
     return (
-      <path
-        d="M66 90c16 3 23-9 17.4-20"
-        fill="none"
-        stroke={palette.fur}
-        strokeWidth="5.4"
-        strokeLinecap="round"
-      />
+      <g>
+        <path
+          d="M66 90c16 3 23-9 17.4-20"
+          fill="none"
+          stroke="#8B8B94"
+          strokeWidth="6.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M66 90c16 3 23-9 17.4-20"
+          fill="none"
+          stroke={palette.fur}
+          strokeWidth="5.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M81.6 71.4c1.4-1.2 2.8-0.6 2.2 1.1"
+          fill="none"
+          stroke={palette.mark ?? palette.belly}
+          strokeWidth="5.2"
+          strokeLinecap="round"
+        />
+      </g>
     );
   }
   if (species === "axolotl") {
@@ -511,28 +628,7 @@ function MagicalHalo({
 }) {
   return (
     <g className="sprite-magical-halo" aria-hidden>
-      <ellipse cx="50" cy="50" rx="48" ry="50" fill={`url(#${bloomId})`} />
-      <ellipse
-        cx="50"
-        cy="42"
-        rx="36.5"
-        ry="38.5"
-        fill="none"
-        stroke={glow}
-        strokeWidth="1.2"
-        strokeDasharray="1.5 3.8"
-        opacity="0.62"
-      />
-      <ellipse
-        cx="50"
-        cy="42"
-        rx="32.4"
-        ry="34.2"
-        fill="none"
-        stroke={glowDeep}
-        strokeWidth="0.55"
-        opacity="0.38"
-      />
+      <ellipse cx="50" cy="50" rx="54" ry="56" fill={`url(#${bloomId})`} />
       <path
         d="M50 1.6 52 6.2 56.6 8.2 52 10.2 50 14.8 48 10.2 43.4 8.2 48 6.2Z"
         fill={glow}
@@ -580,8 +676,18 @@ function PaintDefs({
         <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.1" />
         <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
       </radialGradient>
+      <radialGradient id={`${uid}-stage`} cx="50%" cy="48%" r="50%">
+        <stop offset="0%" stopColor={palette.glow} stopOpacity="0.32" />
+        <stop offset="28%" stopColor={palette.glow} stopOpacity="0.16" />
+        <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.06" />
+        <stop offset="82%" stopColor={palette.glow} stopOpacity="0.02" />
+        <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
+      </radialGradient>
       <filter id={`${uid}-sit`} x="-30%" y="-40%" width="160%" height="180%">
         <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id={`${uid}-glow-soft`} x="-75%" y="-75%" width="250%" height="250%">
+        <feGaussianBlur stdDeviation="10.4" />
       </filter>
     </defs>
   );
@@ -593,12 +699,14 @@ function StageGlow({
   glow,
   glowDeep,
   extraMagical,
+  uid,
 }: {
   species: SpriteSpeciesId;
   stage: CareStage;
   glow: string;
   glowDeep: string;
   extraMagical: boolean;
+  uid: string;
 }) {
   const ethereal = stage === "ethereal";
   const luminary = stage === "luminary";
@@ -609,19 +717,21 @@ function StageGlow({
     <g className="sprite-stage-glow" aria-hidden>
       <ellipse
         cx="50"
-        cy="72"
-        rx={strong ? 54 : ethereal ? 42 : 34}
-        ry={strong ? 52 : ethereal ? 40 : 32}
-        fill={glow}
-        fillOpacity={strong ? 0.4 : ethereal ? 0.2 : 0.12}
+        cy="62"
+        rx={strong ? 72 : ethereal ? 64 : 50}
+        ry={strong ? 70 : ethereal ? 62 : 48}
+        fill={`url(#${uid}-stage)`}
+        filter={`url(#${uid}-glow-soft)`}
+        opacity={strong ? 0.92 : ethereal ? 0.8 : 0.58}
       />
       <ellipse
         cx="50"
-        cy="70"
-        rx={strong ? 44 : ethereal ? 34 : 26}
-        ry={strong ? 42 : ethereal ? 32 : 24}
+        cy="66"
+        rx={strong ? 42 : ethereal ? 36 : 26}
+        ry={strong ? 40 : ethereal ? 34 : 24}
         fill={glowDeep}
-        fillOpacity={strong ? 0.18 : ethereal ? 0.1 : 0.05}
+        fillOpacity={strong ? 0.08 : 0.04}
+        filter={`url(#${uid}-glow-soft)`}
       />
       {ethereal ? <EtherealFxLayer fx={fx} glow={glow} glowDeep={glowDeep} strong={strong} /> : null}
     </g>
@@ -747,39 +857,326 @@ function EtherealFxLayer({
   );
 }
 
+const EGG_PATH =
+  "M50 28c14.8 0 23.2 17.2 23.2 34.6C73.2 82.4 63 92.4 50 92.4S26.8 82.4 26.8 62.6C26.8 45.2 35.2 28 50 28Z";
+
+function hexRgb(hex: string) {
+  const raw = hex.replace("#", "");
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((part) => part + part)
+          .join("")
+      : raw;
+  return {
+    r: parseInt(full.slice(0, 2), 16) || 0,
+    g: parseInt(full.slice(2, 4), 16) || 0,
+    b: parseInt(full.slice(4, 6), 16) || 0,
+  };
+}
+
+function isGingerFur(hex: string) {
+  const { r, g, b } = hexRgb(hex);
+  return r > 140 && r > g && r > b + 16 && g > 70 && b < 150;
+}
+
+function catEggColors(palette: SpeciesPalette) {
+  if (isGingerFur(palette.fur)) {
+    return {
+      shell: "#E4A25A",
+      wash: "#F0C48A",
+      stripe: palette.furDeep,
+      tip: "#FFF1D6",
+    };
+  }
+  return {
+    shell: palette.egg,
+    wash: palette.eggWash,
+    stripe: palette.eggMark,
+    tip: palette.eggWash,
+  };
+}
+
+function FlameSpeckle({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0-5.6C2.2-2.2 3.2.4 2 2.8 1.1 4.6-1.1 4.6-2 2.8-3.2.4-2.2-2.2 0-5.6Z"
+      fill={fill}
+    />
+  );
+}
+
+function CloverSpot({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} fill={fill}>
+      <circle cx="-1.35" cy="-0.15" r="1.35" />
+      <circle cx="1.35" cy="-0.15" r="1.35" />
+      <circle cx="0" cy="1.45" r="1.35" />
+      <path d="M0 1.1v2.4" stroke={fill} strokeWidth="0.55" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function EggMarks({
+  species,
+  palette,
+  uid,
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  uid: string;
+}) {
+  if (species === "fox") {
+    return (
+      <g>
+        <ellipse cx="50" cy="36" rx="17.5" ry="13" fill={`url(#${uid}-fox-tip)`} />
+        <FlameSpeckle x={35} y={56} scale={1.15} fill={palette.eggMark} />
+        <FlameSpeckle x={63} y={52} scale={0.95} fill={palette.eggMark} />
+        <FlameSpeckle x={44} y={70} scale={0.88} fill={palette.eggMark} />
+        <FlameSpeckle x={58} y={76} scale={0.72} fill={palette.eggMark} />
+        <FlameSpeckle x={37} y={80} scale={0.62} fill={palette.eggMark} />
+        <FlameSpeckle x={51} y={58} scale={0.55} fill={palette.eggMark} />
+      </g>
+    );
+  }
+  if (species === "bunny") {
+    return (
+      <g opacity="0.78">
+        <CloverSpot x={36} y={54} scale={1.15} fill={palette.eggMark} />
+        <CloverSpot x={61} y={48} scale={0.95} fill={palette.eggMark} />
+        <CloverSpot x={54} y={70} scale={1.05} fill={palette.eggMark} />
+        <CloverSpot x={39} y={78} scale={0.82} fill={palette.eggMark} />
+        <CloverSpot x={48} y={58} scale={0.7} fill={palette.eggMark} />
+      </g>
+    );
+  }
+  if (species === "deer") {
+    return (
+      <g fill={palette.eggMark}>
+        <ellipse cx="37" cy="52" rx="3.1" ry="2.4" />
+        <ellipse cx="58" cy="48" rx="2.5" ry="1.95" />
+        <ellipse cx="46" cy="66" rx="3.3" ry="2.55" />
+        <ellipse cx="62" cy="68" rx="2.3" ry="1.8" />
+        <ellipse cx="35" cy="74" rx="2.2" ry="1.7" />
+        <ellipse cx="52" cy="80" rx="2.7" ry="2.05" />
+        <ellipse cx="43" cy="46" rx="1.85" ry="1.4" />
+        <ellipse cx="56" cy="58" rx="1.7" ry="1.3" />
+      </g>
+    );
+  }
+  if (species === "cat") {
+    const tuxedo = catEggColors(palette);
+    return (
+      <g>
+        <path
+          d="M50 58C42 60 37 68 38.4 76C40 84 45.6 88.6 50 89C54.4 88.6 60 84 61.6 76C63 68 58 60 50 58Z"
+          fill={tuxedo.stripe}
+          opacity="0.92"
+        />
+        <ellipse cx="36" cy="50" rx="2.1" ry="1.6" fill={tuxedo.stripe} />
+        <ellipse cx="62" cy="54" rx="1.7" ry="1.3" fill={tuxedo.stripe} />
+        <ellipse cx="44" cy="46" rx="1.4" ry="1.1" fill={tuxedo.stripe} />
+        <ellipse cx="56" cy="70" rx="1.5" ry="1.15" fill={tuxedo.shell} opacity="0.35" />
+      </g>
+    );
+  }
+  if (species === "axolotl") {
+    return (
+      <g fill="none" stroke={palette.eggMark} strokeLinecap="round">
+        <path
+          d="M28.5 48c-5.4-2.4-8.6 2.6-5.6 7.2 3.8 3 8.6.8 9.6-3.4"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M28.8 61c-5.8-1.4-8.6 4-4.8 8.2 4 2.6 8.8.4 9.8-3.2"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M31 74c-5-.6-7.6 4.2-3.8 7.8 3.6 2.1 7.8.1 8.8-3"
+          strokeWidth="2.4"
+          opacity="0.74"
+        />
+        <path
+          d="M71.5 48c5.4-2.4 8.6 2.6 5.6 7.2-3.8 3-8.6.8-9.6-3.4"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M71.2 61c5.8-1.4 8.6 4 4.8 8.2-4 2.6-8.8.4-9.8-3.2"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M69 74c5-.6 7.6 4.2 3.8 7.8-3.6 2.1-7.8.1-8.8-3"
+          strokeWidth="2.4"
+          opacity="0.74"
+        />
+        <path
+          d="M36 47c5.4 3.4 8.6-2.2 15 1.2 6.4 3.4 8.6-1.2 15.2 2.2"
+          strokeWidth="1.7"
+          opacity="0.5"
+        />
+        <path
+          d="M34 63c6.4 2.8 9.6-1.8 16 1.4 6.4 3 9.6-1.2 16.2 1.8"
+          strokeWidth="1.7"
+          opacity="0.42"
+        />
+      </g>
+    );
+  }
+  return (
+    <g fill={palette.eggWash} stroke={palette.eggMark} strokeWidth="0.85" opacity="0.9">
+      {[
+        [34, 50],
+        [46, 48],
+        [58, 50],
+        [70, 52],
+        [30, 61],
+        [42, 59],
+        [54, 59],
+        [66, 61],
+        [34, 71],
+        [46, 69],
+        [58, 69],
+        [70, 71],
+        [38, 81],
+        [50, 79],
+        [62, 81],
+      ].map(([x, y]) => (
+        <path
+          key={`${x}-${y}`}
+          d={`M${x - 5.2} ${y}a5.2 4.1 0 0 1 10.4 0`}
+        />
+      ))}
+    </g>
+  );
+}
+
+function EggCracks({
+  crack,
+  hatching,
+}: {
+  crack: EggCrackLevel;
+  hatching: boolean;
+}) {
+  if (crack < 1 && !hatching) return null;
+  const strong = crack >= 2 || hatching;
+  return (
+    <g
+      fill="none"
+      stroke="#3F3A38"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      opacity={hatching ? 0.82 : 0.7}
+    >
+      <path
+        d={strong ? "M50 33c2.2 7.2-4.8 11.2-1.6 18.4 4.2 8.6-4.6 12-1.2 20.6" : "M50 36c1.6 5.4-3.2 8.2-1.2 13.4"}
+        strokeWidth={strong ? 1.85 : 1.45}
+      />
+      {strong ? (
+        <>
+          <path d="M48.6 48.5 43 52.2" strokeWidth="1.35" />
+          <path d="M51.4 56.8 57.2 60.4" strokeWidth="1.35" />
+          <path d="M49.2 68.4 44.4 73.6" strokeWidth="1.25" />
+        </>
+      ) : (
+        <path d="M49.4 44.6 46.2 47.2" strokeWidth="1.15" />
+      )}
+      {hatching ? (
+        <>
+          <path d="M47.6 40.2 41.8 36.4" strokeWidth="1.3" />
+          <path d="M52.6 62.2 59.4 66" strokeWidth="1.3" />
+          <path d="M50.4 78.8 54.8 86.2" strokeWidth="1.2" />
+        </>
+      ) : null}
+    </g>
+  );
+}
+
 export function SpeciesEgg({
   palette,
   species,
   hatching,
+  crack = 0,
+  uid = "egg",
 }: {
   palette: SpeciesPalette;
   species: SpriteSpeciesId;
   hatching?: boolean;
+  crack?: EggCrackLevel;
+  uid?: string;
 }) {
+  const tabby = species === "cat" ? catEggColors(palette) : null;
+  const shell = tabby?.shell ?? palette.egg;
+  const wash = tabby?.wash ?? palette.eggWash;
+  const tip = tabby?.tip ?? palette.eggWash;
   return (
     <g className="spark-body">
-      <ellipse cx="50" cy="94" rx="20" ry="5.4" fill="#0B0B0F" opacity="0.2" />
-      <ellipse cx="50" cy="62" rx="22.5" ry="29.5" fill={palette.egg} />
-      <ellipse cx="50" cy="64" rx="20" ry="26" fill={palette.eggWash} opacity="0.32" />
-      <ellipse cx="42" cy="50" rx="8" ry="6" fill="#FFF8E7" opacity="0.55" />
-      {species === "fox" ? (
-        <StarMark x={50} y={58} scale={0.7} fill={palette.eggMark} />
-      ) : (
-        <>
-          <circle cx="37" cy="68" r="1.5" fill={palette.eggMark} opacity="0.55" />
-          <circle cx="58" cy="56" r="1.15" fill={palette.eggMark} opacity="0.4" />
-          <circle cx="55" cy="76" r="1.3" fill={palette.eggMark} opacity="0.35" />
-        </>
-      )}
-      {hatching ? (
-        <path
-          d="M50 34c2 7-5 11-2 17 4 8-4 11-1 18"
-          fill="none"
-          stroke="#3F3F46"
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-      ) : null}
+      <defs>
+        <clipPath id={`${uid}-egg-clip`}>
+          <path d={EGG_PATH} />
+        </clipPath>
+        <linearGradient id={`${uid}-egg-shell`} x1="32%" y1="12%" x2="78%" y2="92%">
+          <stop offset="0%" stopColor={tip} />
+          <stop offset="38%" stopColor={shell} />
+          <stop offset="100%" stopColor={shell} />
+        </linearGradient>
+        <radialGradient id={`${uid}-egg-shade`} cx="38%" cy="28%" r="72%">
+          <stop offset="0%" stopColor={wash} stopOpacity="0.55" />
+          <stop offset="55%" stopColor={shell} stopOpacity="0" />
+          <stop offset="100%" stopColor="#2A211C" stopOpacity="0.18" />
+        </radialGradient>
+        <radialGradient id={`${uid}-egg-sheen`} cx="30%" cy="22%" r="42%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`${uid}-fox-tip`} x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stopColor="#FFF6E4" />
+          <stop offset="100%" stopColor="#FFF6E4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(50 78) scale(1.38) translate(-50 -78)">
+      <ellipse cx="50" cy="95" rx="20" ry="5.2" fill="#0B0B0F" opacity="0.2" />
+      <path d={EGG_PATH} fill={`url(#${uid}-egg-shell)`} />
+      <g clipPath={`url(#${uid}-egg-clip)`}>
+        <path d={EGG_PATH} fill={`url(#${uid}-egg-shade)`} />
+        <EggMarks species={species} palette={palette} uid={uid} />
+        <ellipse cx="39" cy="46" rx="9.2" ry="7.2" fill={`url(#${uid}-egg-sheen)`} />
+        <ellipse cx="60" cy="78" rx="7" ry="4.2" fill="#fff" opacity="0.1" />
+        <EggCracks crack={crack} hatching={Boolean(hatching)} />
+      </g>
+      <path
+        d={EGG_PATH}
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.22"
+        strokeWidth="1.05"
+      />
+      </g>
     </g>
   );
 }
@@ -810,6 +1207,7 @@ export function SpriteFxLayers({
           glow={palette.glow}
           glowDeep={palette.glowDeep}
           extraMagical={magical}
+          uid={uid}
         />
       ) : null}
       {magical ? (
@@ -830,6 +1228,7 @@ export function SpriteCritter({
   stage,
   stageGlow,
   extraMagical = false,
+  squint = false,
   uid = "sprite",
 }: SpriteCritterProps) {
   const hatchling = stage === "hatchling";
@@ -847,6 +1246,7 @@ export function SpriteCritter({
           glow={palette.glow}
           glowDeep={palette.glowDeep}
           extraMagical={magical}
+          uid={uid}
         />
       ) : null}
       {magical ? (
@@ -876,17 +1276,52 @@ export function SpriteCritter({
         <SpeciesExtras species={species} palette={palette} stage={stage} />
         <ellipse cx="50" cy="93.6" rx="14.4" ry="10.6" fill={palette.furDeep} />
         <ellipse cx="50" cy="92.4" rx="13.4" ry="9.7" fill={palette.fur} />
-        <ellipse cx="50" cy="92.4" rx="13.4" ry="9.7" fill={`url(#${uid}-body)`} />
-        <ellipse cx="50" cy="94.2" rx="8.2" ry="6.2" fill={palette.belly} />
-        <ellipse cx="42.2" cy="102.2" rx="4.8" ry="2.8" fill={palette.furDeep} />
-        <ellipse cx="57.8" cy="102.2" rx="4.8" ry="2.8" fill={palette.furDeep} />
-        <Ears species={species} palette={palette} />
+        {species === "cat" ? null : (
+          <ellipse cx="50" cy="92.4" rx="13.4" ry="9.7" fill={`url(#${uid}-body)`} />
+        )}
+        <ellipse
+          cx="50"
+          cy={species === "cat" ? 93.4 : 94.2}
+          rx={species === "cat" ? 9.6 : 8.2}
+          ry={species === "cat" ? 7.4 : 6.2}
+          fill={palette.belly}
+        />
+        {species === "deer" ? (
+          <DeerHooves />
+        ) : (
+          <>
+            <ellipse
+              cx="42.2"
+              cy="102.2"
+              rx="4.8"
+              ry="2.8"
+              fill={species === "cat" ? (palette.mark ?? palette.belly) : palette.furDeep}
+            />
+            <ellipse
+              cx="57.8"
+              cy="102.2"
+              rx="4.8"
+              ry="2.8"
+              fill={species === "cat" ? (palette.mark ?? palette.belly) : palette.furDeep}
+            />
+          </>
+        )}
         <ellipse cx="50" cy="47.2" rx="31.6" ry="29.2" fill={palette.furDeep} />
         <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={palette.fur} />
-        <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={`url(#${uid}-head)`} />
+        {species === "cat" ? null : (
+          <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={`url(#${uid}-head)`} />
+        )}
         <ellipse cx="50" cy="46" rx="30.2" ry="28" fill={`url(#${uid}-rim)`} />
-        <ellipse cx="50" cy="56.6" rx="15.2" ry="12.2" fill={palette.belly} opacity="0.92" />
-        <ellipse cx="36.6" cy="36.4" rx="9.6" ry="6.4" fill="#fff" opacity="0.28" />
+        <Ears species={species} palette={palette} />
+        {species === "cat" ? (
+          <path
+            d="M50 51.2C45.4 52.2 40.2 57.2 38.6 63.2C37.2 69.2 41.4 73.8 50 74.6C58.6 73.8 62.8 69.2 61.4 63.2C59.8 57.2 54.6 52.2 50 51.2Z"
+            fill={palette.mark ?? palette.belly}
+          />
+        ) : (
+          <ellipse cx="50" cy="56.6" rx="15.2" ry="12.2" fill={palette.belly} opacity="0.92" />
+        )}
+        <ellipse cx="36.6" cy="36.4" rx="9.6" ry="6.4" fill="#fff" opacity={species === "cat" ? 0.16 : 0.28} />
         <ellipse cx="33.2" cy="60.8" rx="6.2" ry="3.6" fill={blush} opacity="0.34" />
         <ellipse cx="66.8" cy="60.8" rx="6.2" ry="3.6" fill={blush} opacity="0.34" />
         {magical ? (
@@ -903,9 +1338,75 @@ export function SpriteCritter({
           glow={palette.glow}
           glowDeep={palette.glowDeep}
           extraMagical={magical}
+          squint={squint}
           uid={uid}
         />
+        {magical ? (
+          <MagicalAccents
+            species={species}
+            glow={palette.glow}
+            glowDeep={palette.glowDeep}
+          />
+        ) : null}
       </g>
+    </g>
+  );
+}
+
+function MagicalAccents({
+  species,
+  glow,
+  glowDeep,
+}: {
+  species: SpriteSpeciesId;
+  glow: string;
+  glowDeep: string;
+}) {
+  return (
+    <g className="sprite-accent-glow" aria-hidden>
+      {species === "fox" ? (
+        <>
+          <circle cx="30.4" cy="6.4" r="2.6" fill={glow} />
+          <circle cx="69.6" cy="6.4" r="2.6" fill={glowDeep} />
+          <circle cx="13.4" cy="50.4" r="3.1" fill={glow} />
+        </>
+      ) : null}
+      {species === "bunny" ? (
+        <>
+          <circle cx="31" cy="8" r="2.4" fill={glow} />
+          <circle cx="69" cy="8" r="2.4" fill={glowDeep} />
+        </>
+      ) : null}
+      {species === "deer" ? (
+        <>
+          <circle cx="31" cy="0" r="2.8" fill={glow} />
+          <circle cx="69" cy="0" r="2.8" fill={glowDeep} />
+          <circle cx="28" cy="5" r="1.6" fill={glow} />
+          <circle cx="72" cy="5" r="1.6" fill={glowDeep} />
+        </>
+      ) : null}
+      {species === "cat" ? (
+        <>
+          <circle cx="31.6" cy="5.6" r="2.4" fill={glow} />
+          <circle cx="68.4" cy="5.6" r="2.4" fill={glowDeep} />
+          <circle cx="83" cy="70" r="2.4" fill={glow} />
+        </>
+      ) : null}
+      {species === "axolotl" ? (
+        <>
+          <circle cx="14.4" cy="35.6" r="2.4" fill={glow} />
+          <circle cx="85.6" cy="35.6" r="2.4" fill={glowDeep} />
+          <circle cx="16" cy="48" r="2" fill={glow} />
+          <circle cx="84" cy="48" r="2" fill={glowDeep} />
+        </>
+      ) : null}
+      {species === "dragon" ? (
+        <>
+          <circle cx="32.6" cy="10.4" r="2.4" fill={glow} />
+          <circle cx="67.4" cy="10.4" r="2.4" fill={glowDeep} />
+          <circle cx="88" cy="70" r="2.6" fill={glow} />
+        </>
+      ) : null}
     </g>
   );
 }
