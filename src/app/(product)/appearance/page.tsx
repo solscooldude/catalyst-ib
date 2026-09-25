@@ -415,3 +415,408 @@ export default function AppearancePage() {
     </PageFrame>
   );
 }
+
+function ShopRealmCard({
+  title,
+  copy,
+  icon: Icon,
+  selected,
+  tabs,
+  tab,
+  onOpen,
+  onPick,
+}: {
+  title: string;
+  copy: string;
+  icon: typeof Sparkles;
+  selected: boolean;
+  tabs: readonly { id: ShopTab; label: string }[];
+  tab: ShopTab;
+  onOpen: () => void;
+  onPick: (next: ShopTab) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[1.75rem] px-6 py-6 sm:px-7",
+        selected
+          ? "bg-primary text-primary-foreground shadow-[0_16px_40px_-24px_rgb(94_234_212/0.9)] ring-2 ring-primary"
+          : "bg-card ring-2 ring-border",
+      )}
+    >
+      <button type="button" onClick={onOpen} className="w-full text-left">
+        <span
+          className={cn(
+            "inline-flex size-11 items-center justify-center rounded-2xl",
+            selected ? "bg-black/10" : "bg-primary/15 text-primary",
+          )}
+        >
+          <Icon className="size-5" />
+        </span>
+        <p className="mt-4 text-3xl font-semibold tracking-tight">{title}</p>
+        <p
+          className={cn(
+            "mt-2 text-sm",
+            selected ? "text-primary-foreground/80" : "text-zinc-500",
+          )}
+        >
+          {copy}
+        </p>
+      </button>
+      <label className="mt-5 block">
+        <span
+          className={cn(
+            "mb-2 inline-flex items-center gap-1 text-sm font-semibold",
+            selected ? "text-primary-foreground" : "text-foreground",
+          )}
+        >
+          {title}
+          <ChevronDown className="size-4" />
+        </span>
+        <span className="relative block">
+          <select
+            className={cn(
+              nativeSelectClass,
+              "h-14 appearance-none pr-10 text-base",
+              selected &&
+                "border-primary-foreground/40 bg-white text-zinc-900",
+            )}
+            value={tab}
+            aria-label={`${title} section`}
+            onChange={(event) => onPick(event.target.value as ShopTab)}
+          >
+            {tabs.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-zinc-500"
+            aria-hidden
+          />
+        </span>
+      </label>
+    </div>
+  );
+}
+
+function AccentGroup({
+  items,
+  owned,
+  equipped,
+  shade,
+  onAct,
+  onShade,
+}: {
+  items: readonly (typeof ACCENTS)[number][];
+  owned: (id: AccentId) => boolean;
+  equipped: (id: AccentId) => boolean;
+  shade: AccentShadeId;
+  onAct: (id: AccentId, owned: boolean) => void;
+  onShade: (id: AccentId, shade: AccentShadeId) => void;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm text-muted-foreground">Accent colour</h3>
+      <p className="mt-1 text-xs text-zinc-500">
+        Buy the colour once. Then pick Pastel, Normal, or Deep.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const has = owned(item.id);
+          const on = equipped(item.id);
+          return (
+            <ShopCard
+              key={item.id}
+              name={item.name}
+              blurb={item.blurb}
+              cost={item.cost}
+              owned={has}
+              equipped={on}
+              extra={
+                has ? (
+                  <label className="block">
+                    <span className="sr-only">Shade for {item.name}</span>
+                    <select
+                      className={cn(nativeSelectClass, "h-8 min-w-[7.25rem] text-xs")}
+                      value={shade}
+                      onChange={(event) =>
+                        onShade(item.id, event.target.value as AccentShadeId)
+                      }
+                    >
+                      {ACCENT_SHADE_OPTIONS.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null
+              }
+              onClick={() => onAct(item.id, has)}
+            >
+              <span className="flex size-8 overflow-hidden rounded-full ring-1 ring-zinc-200/80">
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.pastel.hex }}
+                />
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.normal.hex }}
+                />
+                <span
+                  className="h-full flex-1"
+                  style={{ background: item.shades.deep.hex }}
+                />
+              </span>
+            </ShopCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function RoomGroup({
+  items,
+  owned,
+  equipped,
+  shade,
+  onAct,
+  onShade,
+}: {
+  items: readonly (typeof BACKGROUNDS)[number][];
+  owned: (id: BackgroundId) => boolean;
+  equipped: (id: BackgroundId) => boolean;
+  shade: AccentShadeId;
+  onAct: (id: BackgroundId, owned: boolean) => void;
+  onShade: (id: BackgroundId, shade: AccentShadeId) => void;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm text-muted-foreground">Room colour</h3>
+      <p className="mt-1 text-xs text-zinc-500">
+        Buy the hue once. Then pick Pastel, Normal, or Deep. Void and star dots stay as they are.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const has = owned(item.id);
+          const on = equipped(item.id);
+          const wash = item.kind === "wash" ? item.shades : null;
+          return (
+            <ShopCard
+              key={item.id}
+              name={item.name}
+              blurb={item.blurb}
+              cost={item.cost}
+              owned={has}
+              equipped={on}
+              extra={
+                has && wash ? (
+                  <label className="block">
+                    <span className="sr-only">Shade for {item.name}</span>
+                    <select
+                      className={cn(nativeSelectClass, "h-8 min-w-[7.25rem] text-xs")}
+                      value={shade}
+                      onChange={(event) =>
+                        onShade(item.id, event.target.value as AccentShadeId)
+                      }
+                    >
+                      {ACCENT_SHADE_OPTIONS.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null
+              }
+              onClick={() => onAct(item.id, has)}
+            >
+              {wash ? (
+                <span className="flex size-8 overflow-hidden rounded-full ring-1 ring-zinc-200/80">
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.pastel.swatch }}
+                  />
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.normal.swatch }}
+                  />
+                  <span
+                    className="h-full flex-1"
+                    style={{ background: wash.deep.swatch }}
+                  />
+                </span>
+              ) : (
+                <BgSwatch id={item.id} />
+              )}
+            </ShopCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Group<
+  T extends { id: string; name: string; cost: number; blurb?: string },
+>({
+  title,
+  cue,
+  items,
+  owned,
+  equipped,
+  previewing,
+  onAct,
+  onTry,
+  swatch,
+  equipLabel = "Wear",
+}: {
+  title: string;
+  cue?: string;
+  items: readonly T[];
+  owned: (id: T["id"]) => boolean;
+  equipped: (id: T["id"]) => boolean;
+  previewing?: (id: T["id"]) => boolean;
+  onAct: (id: T["id"], owned: boolean) => void;
+  onTry?: (id: T["id"]) => void;
+  swatch: (item: T) => ReactNode;
+  equipLabel?: string;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm text-muted-foreground">{title}</h3>
+      {cue ? <p className="mt-1 text-xs text-zinc-500">{cue}</p> : null}
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {items.map((item) => {
+          const has = owned(item.id);
+          const on = equipped(item.id);
+          return (
+            <ShopCard
+              key={item.id}
+              name={item.name}
+              blurb={item.blurb}
+              cost={item.cost}
+              owned={has}
+              equipped={on}
+              previewing={previewing?.(item.id) ?? false}
+              equipLabel={equipLabel}
+              onClick={() => onAct(item.id, has)}
+              onTry={onTry ? () => onTry(item.id) : undefined}
+            >
+              {swatch(item)}
+            </ShopCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function BgSwatch({ id }: { id: string }) {
+  return (
+    <span
+      className={cn(
+        "size-8 rounded-full ring-1 ring-white/15",
+        id === "void" && "bg-[#0B0B0F]",
+        id === "stars" &&
+          "bg-[#07080d] shadow-[inset_1px_1px_0_#fff8,inset_-8px_-10px_0_-6px_#fff5]",
+      )}
+    />
+  );
+}
+
+function SceneSwatch({ id }: { id: string }) {
+  return (
+    <span
+      className={cn(
+        "size-8 rounded-full ring-1 ring-white/15",
+        id === "nightsky" && "bg-[#0b1224]",
+        id === "sea" && "bg-[#0a3a70]",
+        id === "math" && "bg-[#1a1a22]",
+      )}
+    />
+  );
+}
+
+function ShopCard({
+  name,
+  blurb,
+  cost,
+  owned,
+  equipped,
+  previewing = false,
+  equipLabel = "Wear",
+  extra,
+  onClick,
+  onTry,
+  children,
+}: {
+  name: string;
+  blurb?: string;
+  cost: number;
+  owned: boolean;
+  equipped: boolean;
+  previewing?: boolean;
+  equipLabel?: string;
+  extra?: ReactNode;
+  onClick: () => void;
+  onTry?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-4 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900",
+        equipped
+          ? "ring-1 ring-primary/45"
+          : previewing
+            ? "ring-1 ring-primary/25"
+            : "",
+      )}
+    >
+      <div className="flex size-16 items-center justify-center overflow-visible">
+        {children}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm text-foreground">{name}</p>
+        {blurb ? <p className="mt-0.5 text-xs text-zinc-500">{blurb}</p> : null}
+      </div>
+      <div className="flex flex-col items-end gap-1.5">
+        {extra}
+        {!owned && onTry ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 rounded-full"
+            onClick={onTry}
+          >
+            Try
+          </Button>
+        ) : null}
+        <Button
+          size="sm"
+          variant={equipped ? "outline" : "default"}
+          className="h-9 rounded-full"
+          disabled={equipped}
+          onClick={onClick}
+        >
+          {equipped ? (
+            "On"
+          ) : owned ? (
+            equipLabel
+          ) : cost === 0 ? (
+            "Take"
+          ) : (
+            <BuyLabel cost={cost} />
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
