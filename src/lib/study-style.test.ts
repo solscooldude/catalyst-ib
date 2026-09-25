@@ -22,6 +22,20 @@ describe("study style", () => {
     ]);
   });
 
+  it("pairs each style to a unique species", () => {
+    const species = STUDY_STYLES.map((id) => STUDY_STYLE_RESULTS[id].species);
+    assert.equal(new Set(species).size, STUDY_STYLES.length);
+    assert.deepEqual(species, [
+      "fox",
+      "bunny",
+      "deer",
+      "cat",
+      "axolotl",
+      "dragon",
+    ]);
+    assert.equal(STUDY_STYLE_RESULTS["night-owl"].species, "fox");
+  });
+
   it("migrates legacy animal ids to study styles", () => {
     assert.equal(normalizeStudyStyle("fox"), "night-owl");
     assert.equal(normalizeStudyStyle("bunny"), "social-sprint");
@@ -32,7 +46,13 @@ describe("study style", () => {
     assert.equal(normalizeStudyStyle("unknown"), DEFAULT_STUDY_STYLE);
   });
 
-  it("keeps titles free of animal names", () => {
+  it("uses everyday study titles", () => {
+    assert.equal(STUDY_STYLE_RESULTS["night-owl"].title, "Night owl sprinter");
+    assert.equal(STUDY_STYLE_RESULTS["social-sprint"].title, "Social sprinter");
+    assert.equal(STUDY_STYLE_RESULTS["steady-marathon"].title, "Steady marathoner");
+    assert.equal(STUDY_STYLE_RESULTS["deep-dive"].title, "Deep-dive explorer");
+    assert.equal(STUDY_STYLE_RESULTS["calm-plan"].title, "Calm planner");
+    assert.equal(STUDY_STYLE_RESULTS["bold-challenge"].title, "Bold challenger");
     for (const id of STUDY_STYLES) {
       const card = studyStyleResult(id);
       assert.match(card.title, /\S/);

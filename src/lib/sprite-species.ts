@@ -1,11 +1,10 @@
-import { getSparkTint, type SparkTintId } from "@/lib/spark-tints";
+import { getSparkTint, type SparkTintId } from "./spark-tints.ts";
 import {
-  BRAND_MINT,
   CAT_HEART,
   ETHEREAL_GLOWS,
   SPRITE_SPECIES,
   type SpriteSpeciesId,
-} from "@/lib/species-glows";
+} from "./species-glows.ts";
 
 export {
   BRAND_MINT,
@@ -14,7 +13,7 @@ export {
   SPRITE_SPECIES,
   type EtherealFx,
   type SpriteSpeciesId,
-} from "@/lib/species-glows";
+} from "./species-glows.ts";
 
 export const DEFAULT_SPECIES: SpriteSpeciesId = "fox";
 
@@ -58,7 +57,7 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     belly: "#FFFCF8",
     accent: "#F4B4C8",
     ink: "#2A211C",
-    nose: "#E8A0B0",
+    nose: "#F4A8B8",
     ...ETHEREAL_GLOWS.bunny,
     egg: "#FFF8F2",
     eggWash: "#F8D5DE",
@@ -72,7 +71,7 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     belly: "#FFF6E8",
     accent: "#7A5530",
     ink: "#2A211C",
-    nose: "#3A2A20",
+    nose: "#2A1C16",
     ...ETHEREAL_GLOWS.deer,
     egg: "#E8D2A8",
     eggWash: "#C4A06A",
@@ -85,13 +84,13 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
     fur: "#1C1C1E",
     furDeep: "#0B0B0F",
     belly: "#2A2A2E",
-    accent: CAT_HEART,
+    accent: "#F4B4C8",
     ink: "#F8FAFC",
-    nose: CAT_HEART,
+    nose: "#F4A8B8",
     ...ETHEREAL_GLOWS.cat,
     egg: "#2A2A30",
     eggWash: "#18181C",
-    eggMark: CAT_HEART,
+    eggMark: "#A1A1AA",
   },
   axolotl: {
     id: "axolotl",
@@ -123,12 +122,23 @@ export const SPECIES_PALETTES: Record<SpriteSpeciesId, SpeciesPalette> = {
   },
 };
 
+const SHAPE_TO_ANIMAL: Record<string, SpriteSpeciesId> = {
+  "twin-peak": "dragon",
+  teardrop: "bunny",
+  mochi: "fox",
+  cloud: "deer",
+  wisp: "axolotl",
+  bean: "cat",
+  star: "fox",
+};
+
 export function normalizeSpriteSpecies(
   raw: string | undefined | null,
 ): SpriteSpeciesId {
   if (raw && (SPRITE_SPECIES as readonly string[]).includes(raw)) {
     return raw as SpriteSpeciesId;
   }
+  if (raw && SHAPE_TO_ANIMAL[raw]) return SHAPE_TO_ANIMAL[raw];
   return DEFAULT_SPECIES;
 }
 

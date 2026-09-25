@@ -1,20 +1,18 @@
-export const PET_SPECIES = [
-  "fox",
-  "bunny",
-  "deer",
-  "cat",
-  "axolotl",
-  "dragon",
-] as const;
+import {
+  STUDY_STYLE_RESULTS,
+  STUDY_STYLES,
+  type StudyStyleId,
+} from "./study-style.ts";
 
-export type PetSpeciesId = (typeof PET_SPECIES)[number];
+export const PET_SPECIES = STUDY_STYLES;
+export type PetSpeciesId = StudyStyleId;
 
 export const PET_QUIZ_LETTERS = ["A", "B", "C", "D"] as const;
 
 export type PetQuizOption = {
   letter: (typeof PET_QUIZ_LETTERS)[number];
   text: string;
-  species: PetSpeciesId;
+  style: StudyStyleId;
 };
 
 export type PetQuizQuestion = {
@@ -25,335 +23,199 @@ export type PetQuizQuestion = {
 
 export const PET_QUIZ: PetQuizQuestion[] = [
   {
-    id: "deadline",
-    prompt: "A big deadline is a week away. What’s your usual move?",
+    id: "nine-pm",
+    prompt: "It's 9pm and you've got a test tomorrow. What are you actually doing?",
     options: [
       {
         letter: "A",
-        text: "Sketch a plan, cut corners that don’t matter, save energy for the hard parts",
-        species: "fox",
+        text: "Making a last-minute plan so the hard bits get the time left",
+        style: "night-owl",
       },
       {
         letter: "B",
-        text: "Text someone to work on it together so it feels less heavy",
-        species: "bunny",
+        text: "Texting someone to cram together so it feels less doomed",
+        style: "social-sprint",
       },
       {
         letter: "C",
-        text: "Block time on your calendar and chip away a bit each day",
-        species: "deer",
+        text: "Skimming the notes I already made this week, then sleeping",
+        style: "steady-marathon",
       },
       {
         letter: "D",
-        text: "Put your phone away and disappear until it’s done",
-        species: "cat",
+        text: "Phone in another room. I'm disappearing until I get it",
+        style: "deep-dive",
       },
     ],
   },
   {
-    id: "where",
-    prompt: "Where do you actually get work done?",
+    id: "study-together",
+    prompt: "Your friend asks to study together. Your honest first thought?",
     options: [
       {
         letter: "A",
-        text: "Somewhere soft and low-stakes — bed, couch, quiet corner",
-        species: "axolotl",
+        text: "Only if we actually race the worksheet and not just talk",
+        style: "bold-challenge",
       },
       {
         letter: "B",
-        text: "Wherever the energy is — loud playlist, big desk, full send",
-        species: "dragon",
+        text: "Please. I was hoping someone would ask",
+        style: "social-sprint",
       },
       {
         letter: "C",
-        text: "It changes; you follow whatever feels productive that day",
-        species: "fox",
+        text: "Fine if we sit quietly and do our own stuff",
+        style: "calm-plan",
       },
       {
         letter: "D",
-        text: "A shared space — library, café, call with a friend on mute",
-        species: "bunny",
+        text: "I'd rather do it alone. I can help them after",
+        style: "deep-dive",
       },
     ],
   },
   {
-    id: "feedback",
-    prompt: "When someone gives you feedback, what lands best?",
+    id: "laptop-open",
+    prompt: "You open your laptop to start homework. What happens in the next 10 minutes?",
     options: [
       {
         letter: "A",
-        text: "Calm, specific, “here’s what to fix next”",
-        species: "deer",
+        text: "I rearrange tabs, pick a playlist, then actually start",
+        style: "night-owl",
       },
       {
         letter: "B",
-        text: "Short and straight — no sugarcoating",
-        species: "cat",
+        text: "I message someone \"are you doing this too\"",
+        style: "social-sprint",
       },
       {
         letter: "C",
-        text: "Kind first, then the note — you shut down if it’s harsh",
-        species: "axolotl",
+        text: "I open the doc and just start the first easy part",
+        style: "steady-marathon",
       },
       {
         letter: "D",
-        text: "Something that lights a competitive spark",
-        species: "dragon",
+        text: "I stare for a second, then I'm 40 minutes in without noticing",
+        style: "deep-dive",
       },
     ],
   },
   {
-    id: "midblock",
-    prompt: "Halfway through a long study block you usually…",
+    id: "huge-project",
+    prompt: "A teacher dumps a huge project on Friday. You…",
     options: [
       {
         letter: "A",
-        text: "Change approach if you’re stuck (new notes style, new order)",
-        species: "fox",
+        text: "Treat it like a dare and try to knock out a chunk tonight",
+        style: "bold-challenge",
       },
       {
         letter: "B",
-        text: "Keep the same rhythm; rushing makes it worse",
-        species: "deer",
+        text: "Write the due date down and split it across the week",
+        style: "calm-plan",
       },
       {
         letter: "C",
-        text: "Take a short break, snack/water, then ease back in",
-        species: "bunny",
+        text: "Do 20 minutes now so Monday isn't a wall",
+        style: "steady-marathon",
       },
       {
         letter: "D",
-        text: "Slip into deep focus and only notice the time later",
-        species: "axolotl",
+        text: "Ignore it until the night I actually have energy for it",
+        style: "night-owl",
       },
     ],
   },
   {
-    id: "space",
-    prompt: "Your space says what about you?",
+    id: "stuck",
+    prompt: "You're stuck on a question and the answer isn't coming. What do you actually do?",
     options: [
       {
         letter: "A",
-        text: "Intentional — a few things you like, nothing random",
-        species: "cat",
+        text: "Skip it, change the order, come back when my brain unsticks",
+        style: "night-owl",
       },
       {
         letter: "B",
-        text: "Expressive — colour, posters, a bit of beautiful mess",
-        species: "dragon",
+        text: "Do the next three easy ones so I don't lose the day",
+        style: "steady-marathon",
       },
       {
         letter: "C",
-        text: "Practical — everything you need within reach",
-        species: "fox",
+        text: "Close the laptop, snack, come back when I'm less fried",
+        style: "calm-plan",
       },
       {
         letter: "D",
-        text: "Calm — clean surfaces, easy on the eyes",
-        species: "deer",
+        text: "Refuse to lose. I stay until it clicks",
+        style: "bold-challenge",
       },
     ],
   },
   {
-    id: "others",
-    prompt: "Studying with other people…",
+    id: "sunday-night",
+    prompt: "It's Sunday night. How does the week look from here?",
     options: [
       {
         letter: "A",
-        text: "Helps — you like the company even if you’re on different subjects",
-        species: "bunny",
+        text: "I'll figure Monday out when Monday starts",
+        style: "night-owl",
       },
       {
         letter: "B",
-        text: "Is fine if nobody’s chatting at you — parallel quiet",
-        species: "cat",
+        text: "Better if I've already got a call or library plan with someone",
+        style: "social-sprint",
       },
       {
         letter: "C",
-        text: "Is better as a friendly push (“who finishes the set first?”)",
-        species: "dragon",
+        text: "Fine if the assignments are already on a list",
+        style: "steady-marathon",
       },
       {
         letter: "D",
-        text: "Is something you do when a friend’s stressed and needs company",
-        species: "axolotl",
+        text: "I already moved the heavy stuff off Monday morning",
+        style: "calm-plan",
       },
     ],
   },
   {
-    id: "hard-weeks",
-    prompt: "Which sounds most like how you get through hard weeks?",
-    options: [
-      { letter: "A", text: "“There’s a smarter way through this.”", species: "fox" },
-      { letter: "B", text: "“I don’t have to do it alone.”", species: "bunny" },
-      {
-        letter: "C",
-        text: "“Showing up a little every day is enough.”",
-        species: "deer",
-      },
-      {
-        letter: "D",
-        text: "“Protect my focus. Everything else can wait.”",
-        species: "cat",
-      },
-    ],
-  },
-  {
-    id: "sunday",
-    prompt: "It’s Sunday night. How do you feel about the week ahead?",
+    id: "free-period",
+    prompt: "You've got a free period. What are you actually doing with it?",
     options: [
       {
         letter: "A",
-        text: "Already rearranging tasks so Monday isn’t brutal",
-        species: "fox",
+        text: "Turn it into a timed sprint so it counts",
+        style: "bold-challenge",
       },
       {
         letter: "B",
-        text: "A bit nervous, but better if you’ve got plans with people",
-        species: "bunny",
-      },
-      { letter: "C", text: "Fine if the week is mapped out", species: "deer" },
-      {
-        letter: "D",
-        text: "Prefer not to think about it until you have to",
-        species: "cat",
-      },
-    ],
-  },
-  {
-    id: "procrastinate",
-    prompt: "When you procrastinate, it’s usually because…",
-    options: [
-      {
-        letter: "A",
-        text: "You’re waiting for the “right” mood or method",
-        species: "fox",
-      },
-      { letter: "B", text: "The task feels lonely and heavy", species: "bunny" },
-      {
-        letter: "C",
-        text: "You underestimated how long the early steps take",
-        species: "deer",
-      },
-      {
-        letter: "D",
-        text: "You’re protecting your energy / overstimulated",
-        species: "axolotl",
-      },
-    ],
-  },
-  {
-    id: "praise",
-    prompt: "A teacher praises the class. You…",
-    options: [
-      {
-        letter: "A",
-        text: "Feel quietly proud and file it away",
-        species: "deer",
-      },
-      {
-        letter: "B",
-        text: "Want the next challenge immediately",
-        species: "dragon",
+        text: "Sit with whoever's around and half-work, half-talk",
+        style: "social-sprint",
       },
       {
         letter: "C",
-        text: "Feel warm if it was a group win you shared",
-        species: "bunny",
+        text: "Use it for the boring admin so tonight stays lighter",
+        style: "calm-plan",
       },
       {
         letter: "D",
-        text: "Shrug — praise doesn’t move you much either way",
-        species: "cat",
-      },
-    ],
-  },
-  {
-    id: "phone",
-    prompt: "Your phone buzzes mid-focus. You…",
-    options: [
-      {
-        letter: "A",
-        text: "Check if it’s useful, then adapt",
-        species: "fox",
-      },
-      {
-        letter: "B",
-        text: "Feel pulled to reply so nobody’s left hanging",
-        species: "bunny",
-      },
-      {
-        letter: "C",
-        text: "Finish your block first; messages can wait",
-        species: "deer",
-      },
-      {
-        letter: "D",
-        text: "Get annoyed; interruptions break the spell",
-        species: "cat",
-      },
-    ],
-  },
-  {
-    id: "recovery",
-    prompt: "After a rough day, recovery looks like…",
-    options: [
-      {
-        letter: "A",
-        text: "Soft reset — shower, snack, low lights",
-        species: "axolotl",
-      },
-      {
-        letter: "B",
-        text: "Doing something intense so the day doesn’t “win”",
-        species: "dragon",
-      },
-      {
-        letter: "C",
-        text: "Talking it out with someone you trust",
-        species: "bunny",
-      },
-      {
-        letter: "D",
-        text: "Alone time with a comfort show / game",
-        species: "cat",
-      },
-    ],
-  },
-  {
-    id: "elective",
-    prompt: "You’re picking an elective. You lean toward…",
-    options: [
-      {
-        letter: "A",
-        text: "Whatever opens the most doors later",
-        species: "fox",
-      },
-      { letter: "B", text: "What your friends are also taking", species: "bunny" },
-      {
-        letter: "C",
-        text: "What you can sustain without burning out",
-        species: "deer",
-      },
-      {
-        letter: "D",
-        text: "What you’re oddly obsessed with, even if it’s extra",
-        species: "dragon",
+        text: "Find a quiet corner and actually finish one thing",
+        style: "deep-dive",
       },
     ],
   },
 ];
 
-export type PetQuizScores = Record<PetSpeciesId, number>;
+export type PetQuizScores = Record<StudyStyleId, number>;
 
 export function emptyPetScores(): PetQuizScores {
   return {
-    fox: 0,
-    bunny: 0,
-    deer: 0,
-    cat: 0,
-    axolotl: 0,
-    dragon: 0,
+    "night-owl": 0,
+    "social-sprint": 0,
+    "steady-marathon": 0,
+    "deep-dive": 0,
+    "calm-plan": 0,
+    "bold-challenge": 0,
   };
 }
 
@@ -365,65 +227,40 @@ export function scorePetAnswer(
   const question = PET_QUIZ[questionIndex];
   const option = question?.options[optionIndex];
   if (!option) return scores;
-  return { ...scores, [option.species]: scores[option.species] + 1 };
+  return { ...scores, [option.style]: scores[option.style] + 1 };
 }
 
-export function leadingSpecies(scores: PetQuizScores): PetSpeciesId[] {
-  const max = Math.max(...PET_SPECIES.map((id) => scores[id]));
-  return PET_SPECIES.filter((id) => scores[id] === max && max > 0);
+export function leadingStyles(scores: PetQuizScores): StudyStyleId[] {
+  const max = Math.max(...STUDY_STYLES.map((id) => scores[id]));
+  return STUDY_STYLES.filter((id) => scores[id] === max && max > 0);
 }
 
 export function petQuizOutcome(scores: PetQuizScores): {
-  kind: "winner" | "tie" | "axolotl-dragon";
-  species: PetSpeciesId[];
+  kind: "winner" | "tie" | "drain-tie";
+  styles: StudyStyleId[];
 } {
-  const leaders = leadingSpecies(scores);
+  const leaders = leadingStyles(scores);
   if (leaders.length <= 1) {
-    return { kind: "winner", species: leaders[0] ? [leaders[0]] : ["fox"] };
+    return {
+      kind: "winner",
+      styles: leaders[0] ? [leaders[0]] : ["bold-challenge"],
+    };
   }
   const pair = new Set(leaders);
-  if (pair.size === 2 && pair.has("axolotl") && pair.has("dragon")) {
-    return { kind: "axolotl-dragon", species: ["axolotl", "dragon"] };
+  if (pair.size === 2 && pair.has("calm-plan") && pair.has("bold-challenge")) {
+    return { kind: "drain-tie", styles: ["calm-plan", "bold-challenge"] };
   }
-  return { kind: "tie", species: leaders.slice(0, 2) };
+  return { kind: "tie", styles: leaders.slice(0, 2) };
 }
 
-export const SPECIES_REVEAL: Record<
-  PetSpeciesId,
-  { label: string; line: string }
-> = {
-  fox: {
-    label: "Fox",
-    line: "You find the smarter path. Plans flex. Energy goes where it counts.",
-  },
-  bunny: {
-    label: "Bunny",
-    line: "Hard work feels lighter with people. You pull others in and keep going.",
-  },
-  deer: {
-    label: "Deer",
-    line: "You show up a little every day. Calm structure beats a scramble.",
-  },
-  cat: {
-    label: "Cat",
-    line: "Focus is the point. You protect the block and let the rest wait.",
-  },
-  axolotl: {
-    label: "Axolotl",
-    line: "You recover soft, then sink deep. Kindness first, then the work.",
-  },
-  dragon: {
-    label: "Dragon",
-    line: "You want the spark. Intensity, a challenge, and a reason to push.",
-  },
-};
-
-export const AXOLOTL_DRAGON_TIE = {
-  prompt: "When you’re drained, soft recover or push with intensity?",
+export const DRAIN_TIE = {
+  prompt: "When you're drained, recover soft or push through?",
   options: [
-    { species: "axolotl" as const, label: "Soft recover" },
-    { species: "dragon" as const, label: "Push with intensity" },
+    { style: "calm-plan" as const, label: "Recover soft" },
+    { style: "bold-challenge" as const, label: "Push through" },
   ],
 };
 
 export const GENERIC_TIE_PROMPT = "Which feels more you?";
+
+export { STUDY_STYLE_RESULTS };
