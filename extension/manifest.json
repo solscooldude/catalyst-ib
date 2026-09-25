@@ -1,9 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Catalyst Lock",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Block distracting sites when Catalyst Lock is on. Lock hours and study blocks keep it on. School tools stay open.",
-  "permissions": ["tabs", "storage", "webNavigation"],
+  "permissions": [
+    "tabs",
+    "storage",
+    "webNavigation",
+    "alarms",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js",
@@ -25,5 +32,11 @@
   "action": {
     "default_title": "Catalyst Lock",
     "default_popup": "popup.html"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["locked.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

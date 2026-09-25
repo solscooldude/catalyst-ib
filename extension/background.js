@@ -1,6 +1,15 @@
-import { decideUrl, lockForcedOn, lockStatus } from "./policy.js";
+import {
+  BLOCK_APPS,
+  decideUrl,
+  isAppCovered,
+  lockForcedOn,
+  lockIsOn,
+  lockStatus,
+} from "./policy.js";
 
-const CHECKED = new Set();
+const RECENT = new Map();
+const RECENT_MS = 1500;
+const ALARM = "catalyst-lock-tick";
 
 function defaultPolicy() {
   return {
@@ -19,6 +28,17 @@ async function readPolicy() {
     ...(stored.policy || defaultPolicy()),
     extensionEnabled: stored.extensionEnabled !== false,
   };
+}
+
+function recentlyHandled(key) {
+  const exp = RECENT.get(key);
+  if (exp && exp > Date.now()) return true;
+  RECENT.set(key, Date.now() + RECENT_MS);
+  return false;
+}
+
+function clearRecent() {
+  RECENT.clear();
 }
 
 async function refreshBadge() {
@@ -47,30 +67,100 @@ function isExtensionPage(url) {
   return Boolean(url && url.startsWith(chrome.runtime.getURL("")));
 }
 
-async function enforce(tabId, url) {
-  if (!url || isExtensionPage(url)) return;
-  const key = `${tabId}:${url}`;
-  if (CHECKED.has(key)) return;
-  const policy = await readPolicy();
-  const decision = decideUrl(url, policy, Date.now());
-  if (decision.action !== "block") return;
-  CHECKED.add(key);
+function lockedUrl(policy, decision, url) {
   const locked = new URL(chrome.runtime.getURL("locked.html"));
   locked.searchParams.set("app", decision.name);
   locked.searchParams.set("id", decision.appId);
   locked.searchParams.set("tier", decision.tier);
-  locked.searchParams.set("host", new URL(url).hostname);
+  try {
+    locked.searchParams.set("host", new URL(url).hostname);
+  } catch {
+    locked.searchParams.set("host", decision.appId);
+  }
   locked.searchParams.set(
     "next",
     policy.appOrigin
       ? `${policy.appOrigin.replace(/\/$/, "")}/unlocks`
       : "https://catalyst-study.vercel.app/unlocks",
   );
+  return locked.toString();
+}
+
+async function enforce(tabId, url) {
+  if (!url || isExtensionPage(url)) return;
+  const policy = await readPolicy();
+  const decision = decideUrl(url, policy, Date.now());
+  if (decision.action !== "block") return;
+  const key = `${tabId}:${url}`;
+  if (recentlyHandled(key)) return;
   try {
-    await chrome.tabs.update(tabId, { url: locked.toString() });
+    await chrome.tabs.update(tabId, { url: lockedUrl(policy, decision, url) });
   } catch {
-    CHECKED.delete(key);
+    RECENT.delete(key);
   }
+}
+
+async function enforceAllTabs() {
+  clearRecent();
+  const tabs = await chrome.tabs.query({});
+  await Promise.all(
+    tabs.map((tab) =>
+      tab.id && tab.url ? enforce(tab.id, tab.url) : Promise.resolve(),
+    ),
+  );
+}
+
+async function syncDeclarativeRules() {
+  if (!chrome.declarativeNetRequest?.updateDynamicRules) return;
+  const policy = await readPolicy();
+  const existing = await chrome.declarativeNetRequest.getDynamicRules();
+  const removeRuleIds = existing.map((rule) => rule.id);
+  if (!lockIsOn(policy)) {
+    if (removeRuleIds.length) {
+      await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds });
+    }
+    return;
+  }
+  const now = Date.now();
+  const addRules = [];
+  let id = 1;
+  for (const app of BLOCK_APPS) {
+    if (
+      isAppCovered(app.id, policy.unlockedUntil || {}, policy.nemeses || [], now)
+    ) {
+      continue;
+    }
+    for (const host of app.hosts) {
+      addRules.push({
+        id: id++,
+        priority: 1,
+        action: {
+          type: "redirect",
+          redirect: {
+            extensionPath: `/locked.html?app=${encodeURIComponent(app.name)}&id=${app.id}&tier=${app.tier}&host=${encodeURIComponent(host)}`,
+          },
+        },
+        condition: {
+          urlFilter: `||${host}^`,
+          resourceTypes: ["main_frame"],
+        },
+      });
+    }
+  }
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds,
+    addRules,
+  });
+}
+
+async function reevaluate(scanTabs = true) {
+  await refreshBadge();
+  await syncDeclarativeRules();
+  if (scanTabs) await enforceAllTabs();
+}
+
+function ensureAlarm() {
+  chrome.alarms.create(ALARM, { periodInMinutes: 1 });
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -78,13 +168,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     chrome.storage.local.get(["extensionEnabled"], (stored) => {
       const policy = { ...message.policy };
       delete policy.extensionEnabled;
-      chrome.storage.local.set(
-        { policy, policyReceivedAt: Date.now() },
-        () => {
-          void refreshBadge();
-          sendResponse({ ok: true, forcedOn: lockForcedOn(policy) });
-        },
-      );
+      chrome.storage.local.set({ policy, policyReceivedAt: Date.now() }, () => {
+        void reevaluate(true);
+        sendResponse({ ok: true, forcedOn: lockForcedOn(policy) });
+      });
       if (stored.extensionEnabled === undefined) {
         chrome.storage.local.set({ extensionEnabled: true });
       }
@@ -98,13 +185,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         extensionEnabled: stored.extensionEnabled !== false,
       };
       if (lockForcedOn(policy)) {
-        void refreshBadge();
+        void reevaluate(true);
         sendResponse({ ok: true, enabled: true, forced: true });
         return;
       }
       const enabled = message.enabled !== false;
       chrome.storage.local.set({ extensionEnabled: enabled }, () => {
-        void refreshBadge();
+        void reevaluate(true);
         sendResponse({ ok: true, enabled, forced: false });
       });
     });
@@ -114,33 +201,45 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     readPolicy().then((policy) => sendResponse({ ok: true, policy }));
     return true;
   }
+  if (message?.type === "GET_VERSION") {
+    sendResponse({
+      ok: true,
+      version: chrome.runtime.getManifest().version,
+    });
+    return false;
+  }
   if (message?.type === "REFRESH_BADGE") {
-    refreshBadge().then(() => sendResponse({ ok: true }));
+    reevaluate(false).then(() => sendResponse({ ok: true }));
     return true;
   }
   return false;
 });
 
 chrome.runtime.onInstalled.addListener(() => {
+  ensureAlarm();
   chrome.storage.local.get("extensionEnabled", (stored) => {
     if (stored.extensionEnabled === undefined) {
       chrome.storage.local.set({ extensionEnabled: true }, () => {
-        void refreshBadge();
+        void reevaluate(true);
       });
       return;
     }
-    void refreshBadge();
+    void reevaluate(true);
   });
 });
 chrome.runtime.onStartup.addListener(() => {
-  void refreshBadge();
+  ensureAlarm();
+  void reevaluate(true);
+});
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== ALARM) return;
+  void reevaluate(true);
 });
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && (changes.policy || changes.extensionEnabled)) {
-    void refreshBadge();
+    void reevaluate(true);
   }
 });
-void refreshBadge();
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const url = changeInfo.url || tab.url;
@@ -149,7 +248,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
+chrome.tabs.onActivated.addListener((active) => {
+  chrome.tabs.get(active.tabId, (tab) => {
+    if (tab?.url) void enforce(tab.id, tab.url);
+  });
+});
+
 chrome.webNavigation.onCommitted.addListener((details) => {
   if (details.frameId !== 0) return;
   void enforce(details.tabId, details.url);
 });
+
+ensureAlarm();
+void reevaluate(true);

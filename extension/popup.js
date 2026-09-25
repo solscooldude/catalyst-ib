@@ -1,6 +1,8 @@
 import { describePopup } from "./policy.js";
 
 const FALLBACK = "https://catalyst-study.vercel.app";
+const LOCAL_VERSION =
+  globalThis.chrome?.runtime?.getManifest?.()?.version || "0.4.0";
 
 const statusEl = document.getElementById("status");
 const detailEl = document.getElementById("status-detail");
@@ -10,6 +12,8 @@ const hoursEl = document.getElementById("hours");
 const syncEl = document.getElementById("sync");
 const unlocksEl = document.getElementById("unlocks");
 const openEl = document.getElementById("open");
+const versionEl = document.getElementById("version");
+const updateEl = document.getElementById("update");
 
 let latestView = null;
 
@@ -88,7 +92,9 @@ async function readStored() {
 
 async function refresh() {
   const { policy, receivedAt } = await readStored();
-  paint(describePopup(policy, Date.now(), receivedAt));
+  const view = describePopup(policy, Date.now(), receivedAt);
+  paint(view);
+  void checkUpdate(view.openHref);
   if (globalThis.chrome?.runtime?.sendMessage) {
     chrome.runtime.sendMessage({ type: "REFRESH_BADGE" });
   }
@@ -99,13 +105,39 @@ async function setEnabled(next) {
     void refresh();
     return;
   }
+  if (globalThis.chrome?.runtime?.sendMessage) {
+    chrome.runtime.sendMessage({ type: "SET_ENABLED", enabled: next }, () => {
+      void refresh();
+    });
+    return;
+  }
   if (globalThis.chrome?.storage?.local) {
     await chrome.storage.local.set({ extensionEnabled: next });
   }
-  if (globalThis.chrome?.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: "SET_ENABLED", enabled: next });
-  }
   void refresh();
+}
+
+async function checkUpdate(origin) {
+  if (versionEl) versionEl.textContent = `Catalyst Lock v${LOCAL_VERSION}`;
+  const base = String(origin || FALLBACK).replace(/\/$/, "");
+  try {
+    const res = await fetch(`${base}/extension-version.json`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const latest = String(data.version || "").trim();
+    if (!latest || latest === LOCAL_VERSION) {
+      if (updateEl) updateEl.hidden = true;
+      return;
+    }
+    if (updateEl) {
+      updateEl.hidden = false;
+      updateEl.textContent = `Update available · ${latest} (you have ${LOCAL_VERSION}). Download a new zip from Catalyst Setup, then open chrome://extensions and press Reload on Catalyst Lock.`;
+    }
+  } catch {
+    /* stay quiet offline */
+  }
 }
 
 toggleEl.addEventListener("click", () => {
