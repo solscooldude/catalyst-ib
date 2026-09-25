@@ -54,11 +54,20 @@ export async function PUT(request: Request) {
     extractCloudSnapshot((body.snapshot ?? {}) as CloudSnapshot),
   );
   const client = await clerkClient();
+  if (snapshot.friendCode) {
+    try {
+      await client.users.updateUser(userId, { externalId: snapshot.friendCode });
+    } catch {
+      // Code already claimed as another account's external id.
+    }
+  }
   await client.users.updateUserMetadata(userId, {
     privateMetadata: { catalyst: snapshot },
     publicMetadata: {
       username: snapshot.username,
       friendCode: snapshot.friendCode,
+      avatarUrl: snapshot.avatarUrl,
+      weeklyStudyMinutes: snapshot.weeklyStudyMinutes,
     },
   });
   return Response.json({ ok: true, snapshot, empty: isCloudEmpty(snapshot) });

@@ -10,9 +10,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { RequestCountBadge } from "@/components/friend-identity";
 import { friendTabHref, parseFriendTab } from "@/lib/friends";
 import { listenInPageNav, onSamePathNavClick } from "@/lib/in-page-nav";
 import { ROUTES } from "@/lib/routes";
+import { useCatalyst } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const GROUPS = [
@@ -119,11 +121,13 @@ function MenuLinks({
   pathname,
   hash,
   search,
+  incomingCount,
   onPick,
 }: {
   pathname: string;
   hash: string;
   search: string;
+  incomingCount: number;
   onPick?: () => void;
 }) {
   const [open, setOpen] = useState<string | null>(
@@ -146,7 +150,12 @@ function MenuLinks({
               aria-expanded={expanded}
               onClick={() => setOpen(expanded ? null : group.id)}
             >
-              {group.label}
+              <span className="inline-flex items-center">
+                {group.label}
+                {group.id === "friends" ? (
+                  <RequestCountBadge count={incomingCount} />
+                ) : null}
+              </span>
               <ChevronDown
                 className={cn(
                   "size-4 transition-transform",
@@ -172,6 +181,9 @@ function MenuLinks({
                     )}
                   >
                     {item.label}
+                    {item.label === "Friends" ? (
+                      <RequestCountBadge count={incomingCount} />
+                    ) : null}
                   </Link>
                 ))}
               </div>
@@ -185,6 +197,7 @@ function MenuLinks({
 
 export function TopNav() {
   const pathname = usePathname();
+  const incomingCount = useCatalyst().incomingRequests.length;
   const [open, setOpen] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
   const [hash, setHash] = useState("");
@@ -257,7 +270,12 @@ export function TopNav() {
                   }
                 }}
               >
-                {group.label}
+                <span className="inline-flex items-center">
+                  {group.label}
+                  {group.id === "friends" ? (
+                    <RequestCountBadge count={incomingCount} />
+                  ) : null}
+                </span>
                 <ChevronDown
                   className={cn(
                     "size-4 transition-transform",
@@ -291,12 +309,15 @@ export function TopNav() {
                             : "text-zinc-500 hover:bg-primary/10 hover:text-foreground",
                         )}
                       >
-                        {item.label}
-                      </Link>
-                    ))}
+                          {item.label}
+                          {item.label === "Friends" ? (
+                            <RequestCountBadge count={incomingCount} />
+                          ) : null}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
             </div>
           );
         })}
@@ -325,6 +346,7 @@ export function TopNav() {
                 pathname={pathname}
                 hash={hash}
                 search={search}
+                incomingCount={incomingCount}
                 onPick={() => setSheet(false)}
               />
             </div>

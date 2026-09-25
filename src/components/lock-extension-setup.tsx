@@ -15,6 +15,7 @@ import {
   CHROME_WEB_STORE_URL,
   EXTENSION_UNZIP_ZIP_HREF,
   EXTENSION_UNZIP_ZIP_NAME,
+  EXTENSION_VERSION,
   EXTENSION_ZIP_HREF,
   EXTENSION_ZIP_NAME,
 } from "@/lib/lock-extension";
@@ -59,9 +60,11 @@ export function LockExtensionSetup() {
     <section>
       <h2 className="text-base text-foreground">Chrome lock extension</h2>
       <p className="mt-2 text-sm text-muted-foreground">
+        Current version <span className="font-mono">{EXTENSION_VERSION}</span>.
         Chrome will not install this from the site. Download the zip, unzip it
         so you have a folder named <span className="font-mono">extension</span>,
-        then Load unpacked and pick that folder — never the .zip.
+        then Load unpacked and pick that folder — never the .zip. After every
+        new zip, open chrome://extensions and press Reload on Catalyst Lock.
       </p>
 
       {connected ? (

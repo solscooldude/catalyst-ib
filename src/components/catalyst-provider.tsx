@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { getAuthSnapshot, hydrateAuth, subscribeAuth, useAuth } from "@/lib/auth";
 import { isClerkConfigured } from "@/lib/clerk-config";
 import { loadCloudState, saveCloudState } from "@/lib/cloud-sync";
+import { syncFriendsFromServer } from "@/lib/friends-client";
 import {
   claimDailyLogin,
   getSnapshot,
@@ -69,6 +70,7 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
       if (imageUrl && !current.avatarUrl && !current.avatarDataUrl) {
         saveIdentity({ avatarUrl: imageUrl });
       }
+      void syncFriendsFromServer();
     });
     return () => {
       cancelled = true;
@@ -96,8 +98,9 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
     store.avatarUrl,
     store.appearance,
     store.spriteName,
-    store.studyStyle,
+    store.spriteSpecies,
     store.petQuizComplete,
+    store.extraMagical,
     store.dailyGoalMinutes,
     store.setupComplete,
     store.introSeen,
@@ -107,6 +110,10 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
     store.pendingStreakAward,
     store.lastLoginDay,
     store.streakDays,
+    store.friendCode,
+    store.friends,
+    store.incomingRequests,
+    store.outgoingRequests,
   ]);
 
   return (
