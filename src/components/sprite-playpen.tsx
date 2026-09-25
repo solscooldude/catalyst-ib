@@ -16,12 +16,16 @@ import {
   WAVE_FLIP_MS,
   WAVE_NEAR,
   hitZone,
+  isScrunchZone,
   isTickleSwipe,
   type SnackId,
   type SparkAct,
   type SparkZone,
 } from "@/lib/spark-play";
 import { catchSparkToken } from "@/lib/spark-gift";
+import { useCatalyst } from "@/lib/store";
+import type { CareStage } from "@/lib/care-stages";
+import type { SpriteSpeciesId } from "@/lib/sprite-species";
 import { playSfx } from "@/lib/sfx";
 import { createSparkScrunch } from "@/lib/spark-scrunch";
 import { cn } from "@/lib/utils";
@@ -50,6 +54,11 @@ type SpritePlaypenProps = {
   gear?: SparkGearId;
   aura?: SparkAuraId;
   trail?: SparkTrailId;
+  extraMagical?: boolean;
+  shape?: SpriteSpeciesId;
+  stage?: CareStage;
+  eggFeeds?: number;
+  size?: number;
 };
 
 export function SpritePlaypen({
@@ -68,7 +77,16 @@ export function SpritePlaypen({
   gear,
   aura,
   trail,
+  extraMagical: extraMagicalOverride,
+  shape,
+  stage,
+  eggFeeds,
+  size = 228,
 }: SpritePlaypenProps) {
+  const store = useCatalyst();
+  const extraMagical =
+    extraMagicalOverride ??
+    (store.extraMagical && store.careStage === "ethereal");
   const sparkRef = useRef<HTMLDivElement>(null);
   const snackRef = useRef<HTMLButtonElement>(null);
   const spark = useRef({ x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0 });
@@ -97,6 +115,12 @@ export function SpritePlaypen({
   const [eaten, setEaten] = useState(false);
   const eatenRef = useRef(false);
   const snackScale = useRef(1);
+  const [crumbs, setCrumbs] = useState<
+    { id: number; x: number; y: number }[]
+  >([]);
+  const lastCrumb = useRef(0);
+  const extraMagicalRef = useRef(extraMagical);
+  extraMagicalRef.current = extraMagical;
   const [snackId, setSnackId] = useState<SnackId>("cookie");
   const [act, setAct] = useState<SparkAct>(asleep ? "sleep" : null);
   const [star, setStar] = useState<{ id: number; left: number } | null>(null);
@@ -113,6 +137,22 @@ export function SpritePlaypen({
     function tick() {
       snackScale.current +=
         ((eatenRef.current ? 0.08 : 1) - snackScale.current) * 0.18;
+      if (
+        extraMagicalRef.current &&
+        hold.current?.kind === "spark" &&
+        hold.current.dragged
+      ) {
+        const now = performance.now();
+        if (now - lastCrumb.current > 80) {
+          lastCrumb.current = now;
+          const { x, y } = spark.current;
+          const id = now;
+          setCrumbs((current) => [...current.slice(-5), { id, x, y }]);
+          window.setTimeout(() => {
+            setCrumbs((current) => current.filter((crumb) => crumb.id !== id));
+          }, 420);
+        }
+      }
       step(spark.current, hold.current?.kind === "spark", sparkRef.current, 1);
       step(
         snack.current,
@@ -202,7 +242,7 @@ export function SpritePlaypen({
       if (prev && sign !== prev) flips += 1;
       prev = sign;
     }
-    if (flips >= 2) {
+    if (flips >= 1) {
       waveCool.current = now;
       wave.current = [];
       play("wave", 720);
@@ -217,10 +257,6 @@ export function SpritePlaypen({
     event.currentTarget.setPointerCapture(event.pointerId);
     const zone = kind === "spark" ? zoneFromEvent(event) : "body";
     scrunch.current.attach(sparkRef.current);
-    if (kind === "spark" && zone === "peak" && !asleepRef.current && mood !== "sleepy") {
-      const box = sparkRef.current?.getBoundingClientRect();
-      scrunch.current.press(event.clientY, box?.height ?? 200);
-    }
     hold.current = {
       kind,
       pointerId: event.pointerId,
@@ -260,11 +296,19 @@ export function SpritePlaypen({
     if (!active.dragged && Math.hypot(dx, dy) > TAP_SLOP) {
       active.dragged = true;
       window.clearTimeout(holdTimer.current);
-      if (active.kind === "spark" && active.zone === "peak") {
-        scrunch.current.move(event.clientY);
+      if (
+        active.kind === "spark" &&
+        isScrunchZone(active.zone) &&
+        dy > 8 &&
+        !asleepRef.current &&
+        mood !== "sleepy"
+      ) {
+        const box = sparkRef.current?.getBoundingClientRect();
+        scrunch.current.press(active.originY, box?.height ?? 200);
+        setAct("scrunch");
       }
     }
-    if (active.kind === "spark" && active.zone === "peak") {
+    if (active.kind === "spark" && scrunch.current.active()) {
       scrunch.current.move(event.clientY);
       return;
     }
@@ -308,8 +352,9 @@ export function SpritePlaypen({
       return;
     }
     if (!active.dragged) {
-      if (active.kind === "spark" && active.zone === "peak") {
+      if (active.kind === "spark" && scrunch.current.active()) {
         scrunch.current.release();
+        setAct((current) => (current === "scrunch" ? null : current));
       }
       if (active.kind === "spark") {
         if (asleepRef.current || mood === "sleepy") {
@@ -333,8 +378,11 @@ export function SpritePlaypen({
       }
       return;
     }
-    if (active.kind === "spark" && active.zone === "peak") {
+    if (active.kind === "spark" && scrunch.current.active()) {
       scrunch.current.release();
+      window.setTimeout(() => {
+        setAct((current) => (current === "scrunch" ? null : current));
+      }, 280);
     }
     if (active.kind === "snack") {
       if (over(sparkRef, snackRef) && canFeed && onFeed()) {
@@ -398,14 +446,9 @@ export function SpritePlaypen({
       }}
     >
       <div className="sprite-room" aria-hidden>
-        <div className="sprite-room-shelf">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="sprite-room-art" />
-        <div className="sprite-room-lamp" />
-        <div className="sprite-room-rug" />
+        <div className="sprite-room-wash" />
+        <div className="sprite-room-floor" />
+        <div className="sprite-room-shadow" />
       </div>
       <div
         ref={sparkRef}
@@ -420,7 +463,7 @@ export function SpritePlaypen({
       >
         <Spark
           mood={act === "sleep" ? "sleepy" : mood}
-          size={268}
+          size={size}
           petPulse={petPulse}
           act={act}
           snack={snackId}
@@ -428,23 +471,38 @@ export function SpritePlaypen({
           gear={gear}
           aura={aura}
           trail={trail}
+          extraMagical={extraMagical || undefined}
+          shape={shape}
+          stage={stage}
+          eggFeeds={eggFeeds}
+          evolve={!stage}
           trackEyes
           className="pointer-events-none"
         />
       </div>
+      {crumbs.map((crumb) => (
+        <span
+          key={crumb.id}
+          className="sprite-drag-crumb"
+          style={{
+            ["--crumb-x" as string]: `${crumb.x}px`,
+            ["--crumb-y" as string]: `${crumb.y}px`,
+          }}
+        />
+      ))}
       {star ? (
         <button
           type="button"
           aria-label="Catch a token"
           className="sprite-catch-star"
-          style={{ left: `${star.left}%`, top: "12%" }}
+          style={{ left: `${star.left}%`, top: "10%" }}
           onClick={grabStar}
         >
           <SparkleMark size={22} />
         </button>
       ) : null}
       {canFeed ? (
-        <>
+        <div className="sprite-snack-tray">
           <div className="sprite-snack-row">
             {SNACKS.map((item) => (
               <button
@@ -479,7 +537,7 @@ export function SpritePlaypen({
           >
             <SnackArt id={snackId} />
           </button>
-        </>
+        </div>
       ) : null}
     </div>
   );
@@ -540,7 +598,7 @@ function apply(
 }
 
 function SnackArt({ id, small }: { id: SnackId; small?: boolean }) {
-  const size = small ? 36 : 58;
+  const size = small ? 28 : 40;
   if (id === "berry") {
     return (
       <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden>
