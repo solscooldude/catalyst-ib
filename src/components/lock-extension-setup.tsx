@@ -67,7 +67,8 @@ export function LockExtensionSetup() {
         new zip, Chrome keeps the old code until you open chrome://extensions
         and press Reload on Catalyst Lock. If the toolbar still says Off during
         lock hours, you are on an older zip — download {EXTENSION_VERSION} and
-        Reload.
+        Reload. Lock hours always force the toolbar On and install block
+        rules, even if you left it Off last night.
       </p>
 
       {connected ? (
