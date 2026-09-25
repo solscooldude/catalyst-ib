@@ -78,10 +78,11 @@ import {
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
 import { sparkEvolutionFromState, type CareStage } from "@/lib/stats";
 import {
-  DEFAULT_SPECIES,
-  normalizeSpriteSpecies,
-  type SpriteSpeciesId,
-} from "@/lib/sprite-species";
+  DEFAULT_STUDY_STYLE,
+  normalizeStudyStyle,
+  studyStyleResult,
+  type StudyStyleId,
+} from "@/lib/study-style";
 import {
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
@@ -179,7 +180,7 @@ export type CatalystState = {
   dailyGoalSetDay: string | null;
   dailyGoalClaimedDay: string | null;
   spriteHatched: boolean;
-  spriteSpecies: SpriteSpeciesId;
+  studyStyle: StudyStyleId;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CareStage;
@@ -245,7 +246,7 @@ export function createDefaultState(): CatalystState {
     dailyGoalSetDay: null,
     dailyGoalClaimedDay: null,
     spriteHatched: false,
-    spriteSpecies: DEFAULT_SPECIES,
+    studyStyle: DEFAULT_STUDY_STYLE,
     extraMagical: false,
     petQuizComplete: false,
     careStage: "egg",
@@ -317,19 +318,23 @@ export function setExtraMagical(on: boolean) {
   );
 }
 
-export function setSpriteSpecies(species: SpriteSpeciesId) {
-  setState((current) =>
-    current.spriteSpecies === species
-      ? current
-      : { ...current, spriteSpecies: species },
-  );
-}
-
-export function completePetQuiz(species: SpriteSpeciesId) {
+export function completePetQuiz(
+  style: StudyStyleId,
+  opts?: { applyGlow?: boolean },
+) {
+  const result = studyStyleResult(style);
+  const applyGlow = opts?.applyGlow !== false;
   setState((current) => ({
     ...current,
-    spriteSpecies: species,
+    studyStyle: result.id,
     petQuizComplete: true,
+    appearance: applyGlow
+      ? normalizeAppearance({
+          ...current.appearance,
+          ownedAuras: [...current.appearance.ownedAuras, result.aura],
+          aura: result.aura,
+        })
+      : current.appearance,
   }));
 }
 
@@ -529,7 +534,10 @@ export function hydrateStore(userId: string | null = null) {
           (parsed.logs?.length ?? 0) > 0 ||
           (parsed.careActions ?? 0) > 0,
       ),
-      spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
+      studyStyle: normalizeStudyStyle(
+        (parsed as { studyStyle?: string; spriteSpecies?: string }).studyStyle ??
+          (parsed as { spriteSpecies?: string }).spriteSpecies,
+      ),
       extraMagical: Boolean(parsed.extraMagical),
       petQuizComplete: Boolean(parsed.petQuizComplete),
       careActions:
@@ -624,7 +632,7 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteRenameCount: snapshot.spriteRenameCount,
     spriteAsleep: snapshot.spriteAsleep,
     spriteHatched: snapshot.spriteHatched,
-    spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
+    studyStyle: snapshot.studyStyle ?? current.studyStyle,
     extraMagical: Boolean(snapshot.extraMagical),
     petQuizComplete: Boolean(snapshot.petQuizComplete),
     careStage: snapshot.careStage,
@@ -760,4 +768,3 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
-
