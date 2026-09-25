@@ -1,7 +1,9 @@
 import { normalizeAppearance, type AppearanceState } from "@/lib/appearance";
 import {
+  normalizeEggFeeds,
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
+  resolveSpriteHatched,
   type StreakAward,
 } from "@/lib/care";
 import { clampDailyGoalMinutes } from "@/lib/daily-goal";
@@ -57,6 +59,7 @@ export type CloudSnapshot = {
   spriteRenameCount: number;
   spriteAsleep: boolean;
   spriteHatched: boolean;
+  eggFeeds: number;
   spriteSpecies: SpriteSpeciesId;
   studyStyle: StudyStyleId;
   spriteShapeChangeCount: number;
@@ -96,6 +99,9 @@ export type CloudSource = {
   spriteRenameCount?: number;
   spriteAsleep?: boolean;
   spriteHatched?: boolean;
+  eggFeeds?: number;
+  feedCount?: number;
+  feedDay?: string | null;
   spriteSpecies?: string;
   studyStyle?: string;
   spriteShapeChangeCount?: number;
@@ -165,7 +171,8 @@ export function extractCloudSnapshot(
     spriteName: String(raw.spriteName ?? "Sprite").slice(0, 24) || "Sprite",
     spriteRenameCount: Math.max(0, Number(raw.spriteRenameCount ?? 0) || 0),
     spriteAsleep: Boolean(raw.spriteAsleep),
-    spriteHatched: Boolean(raw.spriteHatched),
+    spriteHatched: resolveSpriteHatched(raw),
+    eggFeeds: normalizeEggFeeds(raw),
     spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
     studyStyle: normalizeStudyStyle(
       raw.studyStyle ?? raw.spriteSpecies ?? DEFAULT_STUDY_STYLE,
