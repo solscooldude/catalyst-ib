@@ -100,3 +100,224 @@ function GlossyEye({
     </g>
   );
 }
+
+const MOUTH_Y: Record<SpriteSpeciesId, number> = {
+  fox: 64.6,
+  bunny: 63.1,
+  deer: 64.8,
+  cat: 66.5,
+  axolotl: 63.4,
+  dragon: 64.9,
+};
+
+function catMouthPath(y: number, half: number, dip: number) {
+  const left = 50 - half;
+  const right = 50 + half;
+  const pull = half * 0.44;
+  return `M${left} ${y}C${left + pull} ${y + dip} ${50 - pull} ${y + dip} 50 ${y}C${50 + pull} ${y + dip} ${right - pull} ${y + dip} ${right} ${y}`;
+}
+
+function CatMouth({
+  ink,
+  species,
+  wide = false,
+}: {
+  ink: string;
+  species: SpriteSpeciesId;
+  wide?: boolean;
+}) {
+  return (
+    <path
+      d={catMouthPath(MOUTH_Y[species], wide ? 8.8 : 7.45, wide ? 3.45 : 2.85)}
+      fill="none"
+      stroke={ink}
+      strokeWidth={wide ? 1.9 : 1.72}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
+
+function SpeciesNose({
+  species,
+  palette,
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+}) {
+  if (species === "fox") {
+    return (
+      <g>
+        <ellipse cx="50" cy="61.4" rx="8.4" ry="5.6" fill={palette.belly} />
+        <path
+          d="M50 57.6c-2.1 0-3.4 1.7-2.4 3.2.6.9 1.6 1.4 2.4 1.4s1.8-.5 2.4-1.4c1-1.5-.3-3.2-2.4-3.2Z"
+          fill={palette.nose}
+        />
+        <ellipse cx="49.2" cy="58.8" rx="0.7" ry="0.45" fill="#fff" opacity="0.35" />
+      </g>
+    );
+  }
+  if (species === "bunny") {
+    return <ellipse cx="50" cy="59.2" rx="1.55" ry="1.25" fill={palette.nose} />;
+  }
+  if (species === "deer") {
+    return (
+      <g>
+        <ellipse cx="50" cy="61.8" rx="7.6" ry="5.2" fill={palette.belly} />
+        <ellipse cx="50" cy="60.2" rx="2.55" ry="2.15" fill={palette.nose} />
+        <ellipse cx="49.1" cy="59.3" rx="0.85" ry="0.55" fill="#fff" opacity="0.45" />
+      </g>
+    );
+  }
+  if (species === "cat") {
+    return (
+      <g>
+        <path d="M50 58.4 47.7 61.1h4.6Z" fill={palette.nose} />
+        <g
+          fill="none"
+          stroke="#3F3F46"
+          strokeWidth="0.85"
+          strokeLinecap="round"
+          opacity="0.62"
+        >
+          <path d="M34 59.6c-5.2.4-8.4 2.2-10.2 4" />
+          <path d="M34.6 62.2c-5 .8-8.2 2.8-9.6 4.8" />
+          <path d="M66 59.6c5.2.4 8.4 2.2 10.2 4" />
+          <path d="M65.4 62.2c5 .8 8.2 2.8 9.6 4.8" />
+        </g>
+      </g>
+    );
+  }
+  if (species === "axolotl") {
+    return (
+      <g>
+        <circle cx="47.6" cy="59.6" r="0.7" fill={palette.nose} />
+        <circle cx="52.4" cy="59.6" r="0.7" fill={palette.nose} />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <ellipse cx="50" cy="61.8" rx="8.2" ry="4.8" fill={palette.furDeep} />
+      <ellipse cx="50" cy="61.2" rx="7.2" ry="4.1" fill={palette.fur} />
+      <circle cx="47.8" cy="60.4" r="0.7" fill={palette.nose} />
+      <circle cx="52.2" cy="60.4" r="0.7" fill={palette.nose} />
+    </g>
+  );
+}
+
+function Face({
+  mood,
+  ink,
+  species,
+  palette,
+  glow,
+  glowDeep,
+  extraMagical,
+  squint = false,
+  uid,
+}: {
+  mood: CritterMood;
+  ink: string;
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  glow: string;
+  glowDeep: string;
+  extraMagical: boolean;
+  squint?: boolean;
+  uid: string;
+}) {
+  const look = mood === "tempted" ? 2.2 : 0;
+  const happy = mood === "done";
+  const showCatMouth =
+    mood === "idle" ||
+    mood === "locked" ||
+    mood === "earning" ||
+    mood === "tempted" ||
+    mood === "done";
+
+  return (
+    <g>
+      {mood === "done" ? (
+        <g fill="none" stroke={ink} strokeWidth="1.9" strokeLinecap="round">
+          <path d="M35 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+          <path d="M54.2 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+        </g>
+      ) : null}
+      {mood === "annoyed" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 47h12" />
+          <path d="M54 47h12" />
+        </g>
+      ) : null}
+      {mood === "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 50c2.8 2.4 8.8 2.4 11.6 0" />
+          <path d="M54.4 50c2.8 2.4 8.8 2.4 11.6 0" />
+        </g>
+      ) : null}
+      {squint && mood !== "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+          <path d="M54.4 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+        </g>
+      ) : null}
+      {mood === "eating" ? (
+        <g>
+          <ellipse cx="39.8" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+          <ellipse cx="60.2" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+        </g>
+      ) : null}
+      {!squint &&
+      (mood === "idle" ||
+        mood === "locked" ||
+        mood === "earning" ||
+        mood === "tempted") ? (
+        <>
+          <GlossyEye
+            cx={38.8}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+          <GlossyEye
+            cx={61.2}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+        </>
+      ) : null}
+      {happy ? (
+        <>
+          <ellipse cx="34.6" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+          <ellipse cx="65.4" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+        </>
+      ) : null}
+      <SpeciesNose species={species} palette={palette} />
+      {showCatMouth ? (
+        <CatMouth
+          ink={species === "cat" ? "#2A211C" : ink}
+          species={species}
+          wide={happy}
+        />
+      ) : null}
+      {mood === "eating" ? (
+        <ellipse
+          className="spark-chew"
+          cx="50"
+          cy={MOUTH_Y[species] + 2.2}
+          rx="4.4"
+          ry="2.2"
+          fill="#0B0B0F"
+        />
+      ) : null}
+    </g>
+  );
+}
