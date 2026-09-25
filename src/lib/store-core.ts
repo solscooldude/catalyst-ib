@@ -1,4 +1,4 @@
-"use client";
+use client";
 
 import { useSyncExternalStore } from "react";
 import {
@@ -93,8 +93,11 @@ import {
   type StudyStyleId,
 } from "@/lib/study-style";
 import {
+  EGG_FEEDS_TO_HATCH,
+  normalizeEggFeeds,
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
+  resolveSpriteHatched,
   type StreakAward,
 } from "@/lib/care";
 
@@ -180,6 +183,7 @@ export type CatalystState = {
   pendingStreakAward: StreakAward | null;
   feedDay: string | null;
   feedCount: number;
+  eggFeeds: number;
   quizDay: string | null;
   quizCorrect: number;
   spriteName: string;
@@ -250,6 +254,7 @@ export function createDefaultState(): CatalystState {
     pendingStreakAward: null,
     feedDay: null,
     feedCount: 0,
+    eggFeeds: 0,
     quizDay: null,
     quizCorrect: 0,
     spriteName: "Sprite",
@@ -570,6 +575,7 @@ export function hydrateStore(userId: string | null = null) {
       pendingStreakAward,
       feedDay: parsed.feedDay ?? null,
       feedCount: parsed.feedCount ?? 0,
+      eggFeeds: normalizeEggFeeds(parsed),
       quizDay: parsed.quizDay ?? null,
       quizCorrect: parsed.quizCorrect ?? 0,
       spriteName: pickPersistedSpriteName(
@@ -585,11 +591,7 @@ export function hydrateStore(userId: string | null = null) {
         typeof parsed.dailyGoalClaimedDay === "string"
           ? parsed.dailyGoalClaimedDay
           : null,
-      spriteHatched: Boolean(
-        parsed.spriteHatched ||
-          (parsed.logs?.length ?? 0) > 0 ||
-          (parsed.careActions ?? 0) > 0,
-      ),
+      spriteHatched: resolveSpriteHatched(parsed),
       spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
       studyStyle: normalizeStudyStyle(
         (parsed as { studyStyle?: string }).studyStyle ?? parsed.spriteSpecies,
@@ -697,7 +699,12 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteName: snapshot.spriteName,
     spriteRenameCount: snapshot.spriteRenameCount,
     spriteAsleep: snapshot.spriteAsleep,
-    spriteHatched: snapshot.spriteHatched,
+    spriteHatched: Boolean(snapshot.spriteHatched || current.spriteHatched),
+    eggFeeds: Math.max(
+      snapshot.eggFeeds ?? 0,
+      current.eggFeeds ?? 0,
+      snapshot.spriteHatched || current.spriteHatched ? EGG_FEEDS_TO_HATCH : 0,
+    ),
     spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
     studyStyle: snapshot.studyStyle ?? current.studyStyle,
     spriteShapeChangeCount:
