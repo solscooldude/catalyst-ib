@@ -752,3 +752,124 @@ function StarMark({
     />
   );
 }
+
+function MagicalHalo({
+  glow,
+  glowDeep,
+  bloomId,
+}: {
+  glow: string;
+  glowDeep: string;
+  bloomId: string;
+}) {
+  return (
+    <g className="sprite-magical-halo" aria-hidden>
+      <ellipse cx="50" cy="50" rx="54" ry="56" fill={`url(#${bloomId})`} />
+      <path
+        d="M50 1.6 52 6.2 56.6 8.2 52 10.2 50 14.8 48 10.2 43.4 8.2 48 6.2Z"
+        fill={glow}
+      />
+      <circle cx="50" cy="8.2" r="1.05" fill="#FFFBEB" fillOpacity="0.85" />
+      <circle cx="16" cy="24" r="1.15" fill={glow} />
+      <circle cx="84" cy="22" r="1.05" fill={glowDeep} />
+      <circle cx="24" cy="10" r="0.8" fill={glow} />
+      <circle cx="76" cy="8" r="0.75" fill={glowDeep} />
+      <circle cx="10" cy="48" r="0.9" fill={glow} />
+      <circle cx="90" cy="46" r="0.85" fill={glowDeep} />
+    </g>
+  );
+}
+
+function PaintDefs({
+  uid,
+  palette,
+}: {
+  uid: string;
+  palette: SpeciesPalette;
+}) {
+  return (
+    <defs>
+      <radialGradient id={`${uid}-head`} cx="34%" cy="26%" r="74%">
+        <stop offset="0%" stopColor={palette.belly} stopOpacity="0.5" />
+        <stop offset="42%" stopColor={palette.fur} stopOpacity="0" />
+        <stop offset="100%" stopColor={palette.furDeep} stopOpacity="0.42" />
+      </radialGradient>
+      <radialGradient id={`${uid}-body`} cx="40%" cy="26%" r="78%">
+        <stop offset="0%" stopColor={palette.belly} stopOpacity="0.32" />
+        <stop offset="100%" stopColor={palette.furDeep} stopOpacity="0.34" />
+      </radialGradient>
+      <radialGradient id={`${uid}-rim`} cx="22%" cy="18%" r="46%">
+        <stop offset="0%" stopColor="#fff" stopOpacity="0.42" />
+        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${uid}-eye`} cx="38%" cy="32%" r="70%">
+        <stop offset="0%" stopColor="#FFF7D6" stopOpacity="0.95" />
+        <stop offset="28%" stopColor={palette.glow} />
+        <stop offset="100%" stopColor={palette.glowDeep} />
+      </radialGradient>
+      <radialGradient id={`${uid}-halo`} cx="50%" cy="46%" r="50%">
+        <stop offset="0%" stopColor={palette.glow} stopOpacity="0.28" />
+        <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.1" />
+        <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${uid}-stage`} cx="50%" cy="48%" r="50%">
+        <stop offset="0%" stopColor={palette.glow} stopOpacity="0.32" />
+        <stop offset="28%" stopColor={palette.glow} stopOpacity="0.16" />
+        <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.06" />
+        <stop offset="82%" stopColor={palette.glow} stopOpacity="0.02" />
+        <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
+      </radialGradient>
+      <filter id={`${uid}-sit`} x="-30%" y="-40%" width="160%" height="180%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id={`${uid}-glow-soft`} x="-75%" y="-75%" width="250%" height="250%">
+        <feGaussianBlur stdDeviation="10.4" />
+      </filter>
+    </defs>
+  );
+}
+
+function StageGlow({
+  species,
+  stage,
+  glow,
+  glowDeep,
+  extraMagical,
+  uid,
+}: {
+  species: SpriteSpeciesId;
+  stage: CareStage;
+  glow: string;
+  glowDeep: string;
+  extraMagical: boolean;
+  uid: string;
+}) {
+  const ethereal = stage === "ethereal";
+  const luminary = stage === "luminary";
+  if (!ethereal && !luminary) return null;
+  const strong = extraMagical && ethereal;
+  const fx = ETHEREAL_GLOWS[species].fx;
+  return (
+    <g className="sprite-stage-glow" aria-hidden>
+      <ellipse
+        cx="50"
+        cy="62"
+        rx={strong ? 72 : ethereal ? 64 : 50}
+        ry={strong ? 70 : ethereal ? 62 : 48}
+        fill={`url(#${uid}-stage)`}
+        filter={`url(#${uid}-glow-soft)`}
+        opacity={strong ? 0.92 : ethereal ? 0.8 : 0.58}
+      />
+      <ellipse
+        cx="50"
+        cy="66"
+        rx={strong ? 42 : ethereal ? 36 : 26}
+        ry={strong ? 40 : ethereal ? 34 : 24}
+        fill={glowDeep}
+        fillOpacity={strong ? 0.08 : 0.04}
+        filter={`url(#${uid}-glow-soft)`}
+      />
+      {ethereal ? <EtherealFxLayer fx={fx} glow={glow} glowDeep={glowDeep} strong={strong} /> : null}
+    </g>
+  );
+}
