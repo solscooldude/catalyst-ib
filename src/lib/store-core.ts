@@ -40,8 +40,11 @@ import { clampDailyGoalMinutes, DEFAULT_DAILY_GOAL_MINUTES } from "@/lib/daily-g
 import { normalizeHostList } from "@/lib/domain-policy";
 import {
   assignUniqueFriendCode,
+  normalizeFriendRequests,
   normalizeFriends,
+  publishFriendDirectory,
   type Friend,
+  type FriendRequest,
 } from "@/lib/friends";
 import {
   makeFriendCode,
@@ -76,13 +79,12 @@ import {
   type PlannerTodo,
 } from "@/lib/planner";
 import { normalizeSchedule, type LockWindow } from "@/lib/schedule";
-import { sparkEvolutionFromState, type CareStage } from "@/lib/stats";
+import { sparkEvolutionFromState, weeklyStudyMinutes, type CareStage } from "@/lib/stats";
 import {
-  DEFAULT_STUDY_STYLE,
-  normalizeStudyStyle,
-  studyStyleResult,
-  type StudyStyleId,
-} from "@/lib/study-style";
+  DEFAULT_SPECIES,
+  normalizeSpriteSpecies,
+  type SpriteSpeciesId,
+} from "@/lib/sprite-species";
 import {
   normalizePendingStreakAward,
   normalizeStreakAwardsShown,
@@ -180,7 +182,7 @@ export type CatalystState = {
   dailyGoalSetDay: string | null;
   dailyGoalClaimedDay: string | null;
   spriteHatched: boolean;
-  studyStyle: StudyStyleId;
+  spriteSpecies: SpriteSpeciesId;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CareStage;
@@ -194,6 +196,8 @@ export type CatalystState = {
   friendCode: string;
   allowlistExtra: string[];
   friends: Friend[];
+  incomingRequests: FriendRequest[];
+  outgoingRequests: FriendRequest[];
   plannerTodos: PlannerTodo[];
   plannerEvents: PlannerEvent[];
 };
@@ -246,7 +250,7 @@ export function createDefaultState(): CatalystState {
     dailyGoalSetDay: null,
     dailyGoalClaimedDay: null,
     spriteHatched: false,
-    studyStyle: DEFAULT_STUDY_STYLE,
+    spriteSpecies: DEFAULT_SPECIES,
     extraMagical: false,
     petQuizComplete: false,
     careStage: "egg",
@@ -260,6 +264,8 @@ export function createDefaultState(): CatalystState {
     friendCode: makeFriendCode(),
     allowlistExtra: [],
     friends: [],
+    incomingRequests: [],
+    outgoingRequests: [],
     plannerTodos: [],
     plannerEvents: [],
   };
@@ -293,6 +299,14 @@ function persist(next: CatalystState) {
   window.localStorage.setItem(accountStorageKey(userId), JSON.stringify(rest));
   writeCloset(userId, next.appearance);
   writeDeviceFocusStage(next.appearance.focusTheme);
+  publishFriendDirectory({
+    code: next.friendCode,
+    name: next.username,
+    avatarUrl: next.avatarUrl,
+    weeklyStudyMinutes: weeklyStudyMinutes(next.logs),
+    tokens: next.tokens,
+    streakDays: next.streakDays,
+  });
 }
 
 function withGrowth(next: CatalystState): CatalystState {
@@ -318,23 +332,19 @@ export function setExtraMagical(on: boolean) {
   );
 }
 
-export function completePetQuiz(
-  style: StudyStyleId,
-  opts?: { applyGlow?: boolean },
-) {
-  const result = studyStyleResult(style);
-  const applyGlow = opts?.applyGlow !== false;
+export function setSpriteSpecies(species: SpriteSpeciesId) {
+  setState((current) =>
+    current.spriteSpecies === species
+      ? current
+      : { ...current, spriteSpecies: species },
+  );
+}
+
+export function completePetQuiz(species: SpriteSpeciesId) {
   setState((current) => ({
     ...current,
-    studyStyle: result.id,
+    spriteSpecies: species,
     petQuizComplete: true,
-    appearance: applyGlow
-      ? normalizeAppearance({
-          ...current.appearance,
-          ownedAuras: [...current.appearance.ownedAuras, result.aura],
-          aura: result.aura,
-        })
-      : current.appearance,
   }));
 }
 
@@ -534,10 +544,7 @@ export function hydrateStore(userId: string | null = null) {
           (parsed.logs?.length ?? 0) > 0 ||
           (parsed.careActions ?? 0) > 0,
       ),
-      studyStyle: normalizeStudyStyle(
-        (parsed as { studyStyle?: string; spriteSpecies?: string }).studyStyle ??
-          (parsed as { spriteSpecies?: string }).spriteSpecies,
-      ),
+      spriteSpecies: normalizeSpriteSpecies(parsed.spriteSpecies),
       extraMagical: Boolean(parsed.extraMagical),
       petQuizComplete: Boolean(parsed.petQuizComplete),
       careActions:
@@ -553,6 +560,12 @@ export function hydrateStore(userId: string | null = null) {
       friendCode: assignUniqueFriendCode(String(parsed.friendCode ?? ""), id),
       allowlistExtra: normalizeHostList(parsed.allowlistExtra),
       friends: normalizeFriends(parsed.friends),
+      incomingRequests: normalizeFriendRequests(
+        (parsed as { incomingRequests?: unknown }).incomingRequests,
+      ).filter((row) => row.direction === "in"),
+      outgoingRequests: normalizeFriendRequests(
+        (parsed as { outgoingRequests?: unknown }).outgoingRequests,
+      ).map((row) => ({ ...row, direction: "out" as const })),
       schoolTasks: normalizeSchoolTasks(parsed.schoolTasks),
       schoolProvider: normalizeSchoolProvider(parsed.schoolProvider),
       manageBacIcsUrl:
@@ -632,7 +645,7 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     spriteRenameCount: snapshot.spriteRenameCount,
     spriteAsleep: snapshot.spriteAsleep,
     spriteHatched: snapshot.spriteHatched,
-    studyStyle: snapshot.studyStyle ?? current.studyStyle,
+    spriteSpecies: snapshot.spriteSpecies ?? current.spriteSpecies,
     extraMagical: Boolean(snapshot.extraMagical),
     petQuizComplete: Boolean(snapshot.petQuizComplete),
     careStage: snapshot.careStage,
@@ -643,6 +656,9 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
     friendCode: assignUniqueFriendCode(
       snapshot.friendCode || current.friendCode,
     ),
+    friends: snapshot.friends ?? current.friends,
+    incomingRequests: snapshot.incomingRequests ?? current.incomingRequests,
+    outgoingRequests: snapshot.outgoingRequests ?? current.outgoingRequests,
     setupComplete: snapshot.setupComplete,
     introSeen: snapshot.introSeen,
     profile: snapshot.profile,
@@ -672,7 +688,14 @@ export function applyCloudSnapshot(snapshot: CloudSnapshot) {
 }
 
 export function exportCloudSnapshot(now = Date.now()) {
-  return extractCloudSnapshot(getSnapshot(), now);
+  const current = getSnapshot();
+  return extractCloudSnapshot(
+    {
+      ...current,
+      weeklyStudyMinutes: weeklyStudyMinutes(current.logs),
+    },
+    now,
+  );
 }
 
 export function readLegacyLocalSnapshots(): CloudSnapshot[] {
@@ -768,3 +791,4 @@ export function isAppUnlocked(
   const tierId = item.tier === 2 ? "tier2" : "tier3";
   return isUnlockActive(unlocks, appId, now) || isUnlockActive(unlocks, tierId, now);
 }
+
