@@ -76,8 +76,15 @@
   width: 100%;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 1.4rem;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  padding: 2.8rem 1.25rem 6rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card, #121218) 36%, #0b0b0f) 0%,
+    color-mix(in srgb, var(--card, #121218) 82%, #141418) 100%
+  );
 }
 
 .sprite-room {
@@ -86,57 +93,50 @@
   inset: 0;
 }
 
-.sprite-room-shelf {
+.sprite-room-wash {
   position: absolute;
-  top: 14%;
-  left: 8%;
-  display: flex;
-  width: 42%;
-  justify-content: space-between;
-  border-bottom: 2px solid rgb(255 255 255 / 0.06);
-  padding-bottom: 0.35rem;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--background, #0b0b0f) 70%, transparent) 0%,
+    transparent 46%,
+    color-mix(in srgb, var(--card, #121218) 55%, transparent) 100%
+  );
 }
 
-.sprite-room-shelf span {
-  display: block;
-  height: 1.6rem;
-  width: 22%;
-  border-radius: 0.2rem;
-  background: rgb(255 255 255 / 0.05);
+.sprite-room-floor {
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  bottom: 22%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.07),
+    transparent
+  );
 }
 
-.sprite-room-art {
+.sprite-room-shadow {
   position: absolute;
-  top: 16%;
-  right: 18%;
-  width: 2.1rem;
-  height: 1.6rem;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  background: rgb(255 255 255 / 0.03);
-}
-
-.sprite-room-lamp {
-  position: absolute;
-  top: 18%;
-  right: 8%;
-  width: 1.15rem;
-  height: 1.7rem;
-  border-radius: 0.2rem 0.2rem 0.7rem 0.7rem;
-  background: rgb(94 234 212 / 0.12);
-  box-shadow: 0 0 24px 8px rgb(94 234 212 / 0.08);
-}
-
-.sprite-room-rug {
-  position: absolute;
-  bottom: 12%;
+  bottom: 16%;
   left: 50%;
-  width: 11rem;
-  height: 3.2rem;
+  width: min(13rem, 58%);
+  height: 2.4rem;
   border-radius: 999px;
-  background: radial-gradient(ellipse at 50% 50%, #5eead4 0%, #2dd4bf 38%, #134e4a 100%);
-  opacity: 0.88;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgb(0 0 0 / 0.5) 0%,
+    rgb(0 0 0 / 0.2) 46%,
+    transparent 76%
+  );
   transform: translateX(-50%);
-  filter: blur(0.2px);
+}
+
+.sprite-room-demo-pen {
+  min-height: 22rem;
+  padding-bottom: 4.8rem;
 }
 
 .sprite-care-kicker {
@@ -207,7 +207,132 @@
 }
 
 .sprite-ethereal-wisps {
+  filter: blur(2.6px);
+  opacity: 0.52;
   animation: sprite-ethereal-drift 3.4s ease-in-out infinite;
+}
+
+.spark-ethereal .spark-svg-critter::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -6%;
+  z-index: 3;
+  background: linear-gradient(
+    118deg,
+    transparent 34%,
+    color-mix(in srgb, var(--spark-glow, #fde68a) 42%, #fff) 49%,
+    transparent 64%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transform: translateX(-48%);
+  animation: sprite-fur-shimmer 5.6s ease-in-out infinite;
+}
+
+@keyframes sprite-fur-shimmer {
+  0%,
+  58%,
+  100% {
+    opacity: 0;
+    transform: translateX(-48%);
+  }
+  70% {
+    opacity: 0.62;
+    transform: translateX(6%);
+  }
+  84% {
+    opacity: 0;
+    transform: translateX(52%);
+  }
+}
+
+.sprite-ethereal-sparkles {
+  pointer-events: none;
+  position: absolute;
+  inset: -8%;
+  z-index: 3;
+}
+
+.sprite-ethereal-sparkle {
+  position: absolute;
+  width: 4.5%;
+  height: 4.5%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff 0%,
+    color-mix(in srgb, var(--spark-glow, #fde68a) 70%, transparent) 46%,
+    transparent 74%
+  );
+  mix-blend-mode: screen;
+  animation: sprite-sparkle-rise 3.8s ease-in-out infinite;
+}
+
+.sprite-ethereal-sparkle.sparkle-0 { left: 22%; top: 58%; animation-delay: 0s; }
+.sprite-ethereal-sparkle.sparkle-1 { left: 68%; top: 52%; width: 3.6%; height: 3.6%; animation-delay: 0.7s; }
+.sprite-ethereal-sparkle.sparkle-2 { left: 44%; top: 70%; width: 3.2%; height: 3.2%; animation-delay: 1.4s; }
+.sprite-ethereal-sparkle.sparkle-3 { left: 16%; top: 38%; width: 3.8%; height: 3.8%; animation-delay: 2.1s; }
+.sprite-ethereal-sparkle.sparkle-4 { left: 74%; top: 34%; width: 3.4%; height: 3.4%; animation-delay: 2.8s; }
+
+@keyframes sprite-sparkle-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.55);
+  }
+  28% {
+    opacity: 0.86;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.05);
+  }
+}
+
+.sprite-accent-glow circle,
+.sprite-eye-bloom {
+  filter: blur(1.15px);
+  animation: sprite-accent-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes sprite-accent-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.sprite-drag-crumb {
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: -0.68rem 0 0 -0.68rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--spark-glow, #fde68a) 70%, #fff) 0%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+  animation: sprite-drag-crumb 0.42s ease-out forwards;
+}
+
+@keyframes sprite-drag-crumb {
+  from {
+    opacity: 0.7;
+    transform: translate(var(--crumb-x, 0px), var(--crumb-y, 0px)) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--crumb-x, 0px), var(--crumb-y, 0px)) scale(0.35);
+  }
 }
 
 .sprite-extra-magical {
@@ -272,7 +397,7 @@
 .sprite-spark-stage .spark-body,
 .focus-spark-stage .spark-body,
 .spark-scrunch-host .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 86%;
   backface-visibility: hidden;
 }
@@ -282,7 +407,7 @@
   z-index: 10;
   width: 100%;
   height: 100%;
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 88%;
 }
 
@@ -347,16 +472,28 @@
   animation: none;
 }
 
-.sprite-snack {
+.sprite-snack-tray {
   position: absolute;
-  bottom: 4.4rem;
-  left: 50%;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.45rem 0.5rem;
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--card, #18181b) 72%, rgb(11 11 15 / 0.55));
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.sprite-snack {
+  position: relative;
   z-index: 3;
   display: grid;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 2.55rem;
+  height: 2.55rem;
   place-items: center;
-  margin-left: -1.8rem;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -434,7 +571,7 @@
 
 .spark-petted .spark-body,
 .spark-boop .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 80%;
   animation: spark-pet-punch 0.78s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
@@ -458,7 +595,7 @@
 }
 
 .spark-poke .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 80%;
   animation: spark-poke-punch 0.86s cubic-bezier(0.2, 0.72, 0.28, 1);
 }
@@ -482,7 +619,7 @@
 }
 
 .spark-spin .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 62%;
   animation: spark-spin-twirl 0.98s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -510,31 +647,33 @@
 }
 
 .spark-tickle .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 78%;
   animation: spark-tickle-giggle 0.92s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
 
 @keyframes spark-wave-pose {
-  0%,
+  0% {
+    transform: scaleX(1) rotate(0deg) translate(0, 0);
+  }
+  28% {
+    transform: scaleX(-1) rotate(-6deg) translate(6px, -2px);
+  }
+  58% {
+    transform: scaleX(-1) rotate(4deg) translate(-2px, -4px);
+  }
+  82% {
+    transform: scaleX(1) rotate(-3deg) translate(2px, 0);
+  }
   100% {
-    transform: rotate(0deg) translate(0, 0);
-  }
-  24% {
-    transform: rotate(-9deg) translate(4px, -3px);
-  }
-  52% {
-    transform: rotate(8deg) translate(-3px, -5px);
-  }
-  76% {
-    transform: rotate(-4deg) translate(2px, -1px);
+    transform: scaleX(1) rotate(0deg) translate(0, 0);
   }
 }
 
 .spark-wave .spark-body {
-  transform-box: fill-box;
-  transform-origin: 50% 82%;
-  animation: spark-wave-pose 0.96s cubic-bezier(0.22, 0.7, 0.32, 1);
+  transform-box: border-box;
+  transform-origin: 50% 62%;
+  animation: spark-wave-pose 1.05s cubic-bezier(0.22, 0.7, 0.32, 1);
 }
 
 .spark-sit {
@@ -604,9 +743,41 @@
 }
 
 .spark-hatch {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 80%;
   animation: spark-hatch-crack 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes spark-egg-wobble {
+  0%,
+  100% {
+    transform: rotate(-2.1deg) translateX(-0.5px);
+  }
+  50% {
+    transform: rotate(2.3deg) translateX(0.6px);
+  }
+}
+
+@keyframes spark-egg-wobble-strong {
+  0%,
+  100% {
+    transform: rotate(-5.2deg) translateX(-1.2px);
+  }
+  50% {
+    transform: rotate(5.6deg) translateX(1.3px);
+  }
+}
+
+.spark-egg-wobble,
+.spark-egg-wobble-strong {
+  transform-box: border-box;
+  transform-origin: 50% 82%;
+  animation: spark-egg-wobble 2.7s ease-in-out infinite;
+}
+
+.spark-egg-wobble-strong {
+  animation-name: spark-egg-wobble-strong;
+  animation-duration: 1.35s;
 }
 
 @keyframes spark-celebrate {
@@ -693,8 +864,38 @@
   animation: spark-celebrate 0.9s ease-in-out;
 }
 
+.spark-sleeping.spark-float {
+  animation: spark-sleep-breathe 3.4s ease-in-out infinite;
+}
+
+.spark-sleeping .spark-body {
+  transform-box: border-box;
+  transform-origin: 50% 88%;
+  animation: spark-sleep-tuck 3.4s ease-in-out infinite;
+}
+
+@keyframes spark-sleep-breathe {
+  0%,
+  100% {
+    transform: translateY(3px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes spark-sleep-tuck {
+  0%,
+  100% {
+    transform: scale3d(1.03, 0.94, 1) rotate(-2deg);
+  }
+  50% {
+    transform: scale3d(1.05, 0.9, 1) rotate(2deg);
+  }
+}
+
 .spark-highfive .spark-body {
-  transform-box: fill-box;
+  transform-box: border-box;
   transform-origin: 50% 80%;
   animation: spark-highfive-lean 0.7s ease-in-out;
 }
@@ -721,22 +922,17 @@
 }
 
 .sprite-snack-row {
-  position: absolute;
-  bottom: 0.7rem;
-  left: 50%;
-  z-index: 3;
   display: flex;
-  gap: 0.55rem;
-  transform: translateX(-50%);
+  gap: 0.28rem;
 }
 
 .sprite-snack-pick {
   display: grid;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 1.9rem;
+  height: 1.9rem;
   place-items: center;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.86);
+  background: rgb(255 255 255 / 0.88);
   box-shadow: 0 0 0 1px rgb(24 24 27 / 0.06);
 }
 
@@ -875,6 +1071,81 @@
   box-shadow: 0 0 10px rgb(251 191 36 / 0.35);
 }
 
+@media (max-width: 640px) {
+  .sprite-playpen {
+    min-height: 21rem;
+    padding: 2rem 0.85rem 5.8rem;
+  }
+
+  .sprite-snack-tray {
+    right: 50%;
+    bottom: 0.55rem;
+    flex-direction: row;
+    transform: translateX(50%);
+  }
+
+  .sprite-room-floor {
+    bottom: 30%;
+  }
+
+  .sprite-room-shadow {
+    bottom: 24%;
+  }
+}
+
+@keyframes sprite-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.sprite-stage-glow,
+.spark-aura-body {
+  transform-box: fill-box;
+  transform-origin: 50% 62%;
+  animation: sprite-glow-breathe 3.8s ease-in-out infinite;
+}
+
+@keyframes spark-blink-once {
+  0%,
+  18% {
+    transform: scaleY(1);
+  }
+  40%,
+  58% {
+    transform: scaleY(0.12);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+.spark-force-blink .spark-blink {
+  animation: spark-blink-once 0.46s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.sprite-lab-reduced .spark-float,
+.sprite-lab-reduced .spark-blink,
+.sprite-lab-reduced .spark-glance,
+.sprite-lab-reduced .spark-flourish,
+.sprite-lab-reduced .spark-body,
+.sprite-lab-reduced .sprite-ethereal-sparkle,
+.sprite-lab-reduced .sprite-magical-mote,
+.sprite-lab-reduced .sprite-stage-glow,
+.sprite-lab-reduced .spark-aura-body,
+.sprite-lab-reduced .spark-ethereal .spark-svg-critter::after,
+.sprite-lab-reduced .sprite-ethereal-wisps,
+.sprite-lab-reduced .sprite-accent-glow circle,
+.sprite-lab-reduced .sprite-eye-bloom,
+.sprite-lab-reduced .spark-egg-wobble,
+.sprite-lab-reduced .spark-egg-wobble-strong {
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spark-eating .spark-body,
   .spark-chew,
@@ -884,13 +1155,24 @@
   .spark-spin .spark-body,
   .spark-tickle .spark-body,
   .spark-wave .spark-body,
+  .sprite-ethereal-sparkle,
+  .sprite-accent-glow circle,
+  .sprite-eye-bloom,
+  .spark-ethereal .spark-svg-critter::after,
+  .sprite-drag-crumb,
   .sprite-magical-mote,
   .spark-sit,
   .spark-gold-shine,
   .spark-cosmic-dot,
   .spark-celebrate,
   .spark-z,
+  .spark-sleeping.spark-float,
+  .spark-sleeping .spark-body,
   .spark-hatch,
+  .spark-egg-wobble,
+  .spark-egg-wobble-strong,
+  .sprite-stage-glow,
+  .spark-aura-body,
   .sprite-catch-star,
   .avoid-sprite.is-entering,
   .avoid-sprite.is-hit {
