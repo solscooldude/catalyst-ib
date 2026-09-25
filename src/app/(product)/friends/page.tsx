@@ -10,16 +10,21 @@ import { PageFrame } from "@/components/page-frame";
 import {
   FRIEND_CODE_COPY,
   FRIEND_CODE_HINT,
+  formatFriendId,
   formatRequestTime,
+  friendDisplayName,
   friendTabFromLocation,
   friendTabHref,
+  normalizeFriendCode,
   rankFriends,
+  resolveFriendRow,
   type FriendTab,
 } from "@/lib/friends";
 import {
   acceptIncoming,
   cancelOutgoing,
   declineIncoming,
+  lookupFriendProfile,
   requestFriend,
   syncFriendsFromServer,
 } from "@/lib/friends-client";
@@ -49,9 +54,16 @@ export default function FriendsPage() {
   );
   const [raceFriend, setRaceFriend] = useState("");
   const [raceTask, setRaceTask] = useState("");
+  const [lookup, setLookup] = useState<{
+    code: string;
+    name: string;
+    avatarUrl: string | null;
+  } | null>(null);
+  const [lookupBusy, setLookupBusy] = useState(false);
   const focusTasks = openSchoolTasks(state.schoolTasks);
-  const incoming = state.incomingRequests;
-  const outgoing = state.outgoingRequests;
+  const incoming = state.incomingRequests.map(resolveFriendRow);
+  const outgoing = state.outgoingRequests.map(resolveFriendRow);
+  const friends = state.friends.map(resolveFriendRow);
 
   useEffect(() => listenInPageNav(() => setSection(friendTabFromLocation())), []);
 
@@ -61,21 +73,52 @@ export default function FriendsPage() {
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const next = normalizeFriendCode(code);
+    if (!next) {
+      setLookup(null);
+      setLookupBusy(false);
+      return;
+    }
+    let cancelled = false;
+    setLookupBusy(true);
+    const timer = window.setTimeout(() => {
+      void lookupFriendProfile(next).then((profile) => {
+        if (cancelled) return;
+        setLookupBusy(false);
+        setLookup(
+          profile
+            ? {
+                code: profile.code,
+                name: friendDisplayName(profile),
+                avatarUrl: profile.avatarUrl ?? null,
+              }
+            : null,
+        );
+      });
+    }, 280);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [code]);
+
   const youWeekly = weeklyStudyMinutes(state.logs);
   const youAvatar = displayAvatar(state.avatarDataUrl, state.avatarUrl);
+  const youName = state.username || "You";
   const board = useMemo(() => {
     const you = {
       code: state.friendCode,
-      name: state.username || "You",
+      name: youName,
       avatarUrl: youAvatar,
       weeklyStudyMinutes: youWeekly,
       you: true,
     };
     return rankFriends([
       you,
-      ...state.friends.map((row) => ({ ...row, you: false })),
+      ...friends.map((row) => ({ ...row, you: false })),
     ]);
-  }, [state.friendCode, state.friends, state.username, youAvatar, youWeekly]);
+  }, [state.friendCode, friends, youName, youAvatar, youWeekly]);
 
   async function copy() {
     try {
@@ -97,10 +140,11 @@ export default function FriendsPage() {
       return;
     }
     setCode("");
+    setLookup(null);
     setNotice(
       result.becameFriends
-        ? `You and ${result.name} are now friends.`
-        : `Request sent to ${result.name}.`,
+        ? `You and ${friendDisplayName({ name: result.name, code })} are now friends.`
+        : `Request sent to ${friendDisplayName({ name: result.name, code })}.`,
     );
   }
 
@@ -109,10 +153,10 @@ export default function FriendsPage() {
       setNotice("Pick a friend and a task.");
       return;
     }
-    const friend = state.friends.find((row) => row.code === raceFriend);
+    const friend = friends.find((row) => row.code === raceFriend);
     const result = startSession({
       taskId: raceTask,
-      goal: `Task race vs ${friend?.name ?? raceFriend}`,
+      goal: `Task race vs ${friendDisplayName(friend ?? { code: raceFriend })}`,
     });
     if (!result.ok) {
       setNotice(result.reason);
@@ -134,9 +178,10 @@ export default function FriendsPage() {
         </p>
         <h1 className="mt-3 text-4xl text-foreground sm:text-5xl">Friends</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Race the same task. Send a request with their assigned code. The
-          leaderboard ranks study time this week — Monday to Sunday, your local
-          time. Minigames live on My Sprite.
+          Race the same task. Add someone with the assigned ID Catalyst gave
+          them — you will see their username and photo. The leaderboard ranks
+          study time this week — Monday to Sunday, your local time. Minigames
+          live on My Sprite.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           {TABS.map(([id, label]) => (
@@ -166,7 +211,7 @@ export default function FriendsPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Same task. First to end the focus block wins.
           </p>
-          {state.friends.length === 0 ? (
+          {friends.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
               Add a friend first, then come back to race.
             </p>
@@ -176,23 +221,32 @@ export default function FriendsPage() {
             </p>
           ) : (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="race-friend">Friend</Label>
-                <select
-                  id="race-friend"
-                  value={raceFriend}
-                  onChange={(event) => setRaceFriend(event.target.value)}
-                  className="h-11 w-full rounded-xl border border-input bg-transparent px-3 text-sm"
-                >
-                  <option value="">Choose</option>
-                  {state.friends.map((friend) => (
-                    <option key={friend.code} value={friend.code}>
-                      {friend.name}
-                    </option>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Friend</Label>
+                <ul className="grid gap-2 sm:grid-cols-2">
+                  {friends.map((friend) => (
+                    <li key={friend.code}>
+                      <button
+                        type="button"
+                        onClick={() => setRaceFriend(friend.code)}
+                        className={cn(
+                          "flex w-full rounded-2xl px-4 py-3 text-left ring-1",
+                          raceFriend === friend.code
+                            ? "bg-primary/15 ring-primary/40"
+                            : "bg-zinc-50 ring-transparent dark:bg-zinc-900",
+                        )}
+                      >
+                        <FriendIdentity
+                          name={friend.name}
+                          code={friend.code}
+                          avatarUrl={friend.avatarUrl}
+                        />
+                      </button>
+                    </li>
                   ))}
-                </select>
+                </ul>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="race-task">Task</Label>
                 <select
                   id="race-task"
@@ -208,26 +262,12 @@ export default function FriendsPage() {
                   ))}
                 </select>
               </div>
-              {raceFriend ? (
-                <div className="sm:col-span-2">
-                  {state.friends
-                    .filter((friend) => friend.code === raceFriend)
-                    .map((friend) => (
-                      <FriendIdentity
-                        key={friend.code}
-                        name={friend.name}
-                        code={friend.code}
-                        avatarUrl={friend.avatarUrl}
-                      />
-                    ))}
-                </div>
-              ) : null}
             </div>
           )}
           <Button
             type="button"
             className="mt-5 h-11 rounded-full px-6"
-            disabled={state.friends.length === 0 || focusTasks.length === 0}
+            disabled={friends.length === 0 || focusTasks.length === 0}
             onClick={beginRace}
           >
             Start task race
@@ -238,15 +278,15 @@ export default function FriendsPage() {
       {section === "manage" ? (
         <section id="manage" className="space-y-6">
           <div className="flux-card px-6 py-6">
-            <h2 className="text-lg text-foreground">Your friend code</h2>
+            <h2 className="text-lg text-foreground">Your friend ID</h2>
             <p className="mt-2 text-sm text-muted-foreground">{FRIEND_CODE_COPY}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <p
-                className="font-mono text-xl tracking-wide text-foreground"
-                aria-label="Your friend code"
-              >
-                {state.friendCode || "Assigning…"}
-              </p>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <FriendIdentity
+                name={youName}
+                code={state.friendCode}
+                avatarUrl={youAvatar}
+                you
+              />
               <Button
                 type="button"
                 variant="outline"
@@ -254,7 +294,7 @@ export default function FriendsPage() {
                 onClick={() => void copy()}
                 disabled={!state.friendCode}
               >
-                {copied ? "Copied" : "Copy"}
+                {copied ? "Copied" : "Copy ID"}
               </Button>
             </div>
           </div>
@@ -297,7 +337,7 @@ export default function FriendsPage() {
                           void acceptIncoming(row.code).then((result) => {
                             setNotice(
                               result.ok
-                                ? `You and ${row.name} are now friends.`
+                                ? `You and ${friendDisplayName(row)} are now friends.`
                                 : result.reason,
                             );
                           });
@@ -312,7 +352,7 @@ export default function FriendsPage() {
                         disabled={busy}
                         onClick={() => {
                           void declineIncoming(row.code).then(() => {
-                            setNotice(`Declined ${row.name}.`);
+                            setNotice(`Declined ${friendDisplayName(row)}.`);
                           });
                         }}
                       >
@@ -351,7 +391,7 @@ export default function FriendsPage() {
                       disabled={busy}
                       onClick={() => {
                         void cancelOutgoing(row.code).then(() => {
-                          setNotice(`Cancelled request to ${row.name}.`);
+                          setNotice(`Cancelled request to ${friendDisplayName(row)}.`);
                         });
                       }}
                     >
@@ -366,19 +406,36 @@ export default function FriendsPage() {
           <form className="flux-card px-6 py-6" onSubmit={(event) => void submitFriend(event)}>
             <h2 className="text-lg text-foreground">Add a friend</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Enter the code Catalyst assigned them. They will get a request
-              they can accept. {FRIEND_CODE_HINT}
+              Enter the assigned ID they can copy from Friends. After they
+              accept, you see the username and photo they set during setup.{" "}
+              {FRIEND_CODE_HINT}
             </p>
             <div className="mt-4 space-y-2">
-              <Label htmlFor="friend-code">Their code</Label>
+              <Label htmlFor="friend-code">Their assigned ID</Label>
               <Input
                 id="friend-code"
                 value={code}
                 onChange={(event) => setCode(event.target.value.toUpperCase())}
-                placeholder="friend-code"
+                placeholder="CAT-XXXXXX"
                 className="h-11 rounded-xl"
               />
             </div>
+            {lookup ? (
+              <div className="mt-4 rounded-2xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
+                <FriendIdentity
+                  name={lookup.name}
+                  code={lookup.code}
+                  avatarUrl={lookup.avatarUrl}
+                  extra="Account found"
+                />
+              </div>
+            ) : lookupBusy ? (
+              <p className="mt-3 text-sm text-muted-foreground">Looking up account…</p>
+            ) : normalizeFriendCode(code) ? (
+              <p className="mt-3 text-sm text-muted-foreground">
+                No account found for {formatFriendId(code)} yet.
+              </p>
+            ) : null}
             <Button
               type="submit"
               className="mt-4 h-11 rounded-full px-6"
@@ -389,13 +446,13 @@ export default function FriendsPage() {
           </form>
           <div className="flux-card px-6 py-6">
             <h2 className="text-lg text-foreground">Your friends</h2>
-            {state.friends.length === 0 ? (
+            {friends.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">
                 No friends yet. Send a request to start a race.
               </p>
             ) : (
               <ul className="mt-4 space-y-2">
-                {state.friends.map((friend) => (
+                {friends.map((friend) => (
                   <li
                     key={friend.code}
                     className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900"
@@ -412,7 +469,7 @@ export default function FriendsPage() {
                       className="h-9 rounded-full px-4"
                       onClick={() => {
                         removeFriend(friend.code);
-                        setNotice(`Removed ${friend.name}.`);
+                        setNotice(`Removed ${friendDisplayName(friend)}.`);
                       }}
                     >
                       Remove
