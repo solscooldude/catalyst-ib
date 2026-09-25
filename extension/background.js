@@ -67,6 +67,13 @@ function isExtensionPage(url) {
   return Boolean(url && url.startsWith(chrome.runtime.getURL("")));
 }
 
+function unlocksHref(policy) {
+  const origin = String(policy?.appOrigin || "https://catalyst-study.vercel.app")
+    .trim()
+    .replace(/\/$/, "");
+  return `${origin || "https://catalyst-study.vercel.app"}/unlocks`;
+}
+
 function lockedUrl(policy, decision, url) {
   const locked = new URL(chrome.runtime.getURL("locked.html"));
   locked.searchParams.set("app", decision.name);
@@ -77,12 +84,7 @@ function lockedUrl(policy, decision, url) {
   } catch {
     locked.searchParams.set("host", decision.appId);
   }
-  locked.searchParams.set(
-    "next",
-    policy.appOrigin
-      ? `${policy.appOrigin.replace(/\/$/, "")}/unlocks`
-      : "https://catalyst-study.vercel.app/unlocks",
-  );
+  locked.searchParams.set("next", unlocksHref(policy));
   return locked.toString();
 }
 
@@ -137,7 +139,7 @@ async function syncDeclarativeRules() {
         action: {
           type: "redirect",
           redirect: {
-            extensionPath: `/locked.html?app=${encodeURIComponent(app.name)}&id=${app.id}&tier=${app.tier}&host=${encodeURIComponent(host)}`,
+            extensionPath: `/locked.html?app=${encodeURIComponent(app.name)}&id=${app.id}&tier=${app.tier}&host=${encodeURIComponent(host)}&next=${encodeURIComponent(unlocksHref(policy))}`,
           },
         },
         condition: {
@@ -153,7 +155,19 @@ async function syncDeclarativeRules() {
   });
 }
 
+async function clearStoredOffDuringLock() {
+  const stored = await chrome.storage.local.get(["policy", "extensionEnabled"]);
+  const policy = {
+    ...(stored.policy || defaultPolicy()),
+    extensionEnabled: stored.extensionEnabled !== false,
+  };
+  if (lockForcedOn(policy) && stored.extensionEnabled === false) {
+    await chrome.storage.local.set({ extensionEnabled: true });
+  }
+}
+
 async function reevaluate(scanTabs = true) {
+  await clearStoredOffDuringLock();
   await refreshBadge();
   await syncDeclarativeRules();
   if (scanTabs) await enforceAllTabs();
@@ -168,13 +182,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     chrome.storage.local.get(["extensionEnabled"], (stored) => {
       const policy = { ...message.policy };
       delete policy.extensionEnabled;
-      chrome.storage.local.set({ policy, policyReceivedAt: Date.now() }, () => {
+      const writes = { policy, policyReceivedAt: Date.now() };
+      if (lockForcedOn(policy) || stored.extensionEnabled === undefined) {
+        writes.extensionEnabled = true;
+      }
+      chrome.storage.local.set(writes, () => {
         void reevaluate(true);
         sendResponse({ ok: true, forcedOn: lockForcedOn(policy) });
       });
-      if (stored.extensionEnabled === undefined) {
-        chrome.storage.local.set({ extensionEnabled: true });
-      }
     });
     return true;
   }
