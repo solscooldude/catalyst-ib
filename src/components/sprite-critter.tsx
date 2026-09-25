@@ -992,3 +992,327 @@ function EtherealFxLayer({
     </g>
   );
 }
+
+const EGG_PATH =
+  "M50 28c14.8 0 23.2 17.2 23.2 34.6C73.2 82.4 63 92.4 50 92.4S26.8 82.4 26.8 62.6C26.8 45.2 35.2 28 50 28Z";
+
+function hexRgb(hex: string) {
+  const raw = hex.replace("#", "");
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((part) => part + part)
+          .join("")
+      : raw;
+  return {
+    r: parseInt(full.slice(0, 2), 16) || 0,
+    g: parseInt(full.slice(2, 4), 16) || 0,
+    b: parseInt(full.slice(4, 6), 16) || 0,
+  };
+}
+
+function isGingerFur(hex: string) {
+  const { r, g, b } = hexRgb(hex);
+  return r > 140 && r > g && r > b + 16 && g > 70 && b < 150;
+}
+
+function catEggColors(palette: SpeciesPalette) {
+  if (isGingerFur(palette.fur)) {
+    return {
+      shell: "#E4A25A",
+      wash: "#F0C48A",
+      stripe: palette.furDeep,
+      tip: "#FFF1D6",
+    };
+  }
+  return {
+    shell: palette.egg,
+    wash: palette.eggWash,
+    stripe: palette.eggMark,
+    tip: palette.eggWash,
+  };
+}
+
+function FlameSpeckle({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0-5.6C2.2-2.2 3.2.4 2 2.8 1.1 4.6-1.1 4.6-2 2.8-3.2.4-2.2-2.2 0-5.6Z"
+      fill={fill}
+    />
+  );
+}
+
+function CloverSpot({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} fill={fill}>
+      <circle cx="-1.35" cy="-0.15" r="1.35" />
+      <circle cx="1.35" cy="-0.15" r="1.35" />
+      <circle cx="0" cy="1.45" r="1.35" />
+      <path d="M0 1.1v2.4" stroke={fill} strokeWidth="0.55" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function EggMarks({
+  species,
+  palette,
+  uid,
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  uid: string;
+}) {
+  if (species === "fox") {
+    return (
+      <g>
+        <ellipse cx="50" cy="36" rx="17.5" ry="13" fill={`url(#${uid}-fox-tip)`} />
+        <FlameSpeckle x={35} y={56} scale={1.15} fill={palette.eggMark} />
+        <FlameSpeckle x={63} y={52} scale={0.95} fill={palette.eggMark} />
+        <FlameSpeckle x={44} y={70} scale={0.88} fill={palette.eggMark} />
+        <FlameSpeckle x={58} y={76} scale={0.72} fill={palette.eggMark} />
+        <FlameSpeckle x={37} y={80} scale={0.62} fill={palette.eggMark} />
+        <FlameSpeckle x={51} y={58} scale={0.55} fill={palette.eggMark} />
+      </g>
+    );
+  }
+  if (species === "bunny") {
+    return (
+      <g opacity="0.78">
+        <CloverSpot x={36} y={54} scale={1.15} fill={palette.eggMark} />
+        <CloverSpot x={61} y={48} scale={0.95} fill={palette.eggMark} />
+        <CloverSpot x={54} y={70} scale={1.05} fill={palette.eggMark} />
+        <CloverSpot x={39} y={78} scale={0.82} fill={palette.eggMark} />
+        <CloverSpot x={48} y={58} scale={0.7} fill={palette.eggMark} />
+      </g>
+    );
+  }
+  if (species === "deer") {
+    return (
+      <g fill={palette.eggMark}>
+        <ellipse cx="37" cy="52" rx="3.1" ry="2.4" />
+        <ellipse cx="58" cy="48" rx="2.5" ry="1.95" />
+        <ellipse cx="46" cy="66" rx="3.3" ry="2.55" />
+        <ellipse cx="62" cy="68" rx="2.3" ry="1.8" />
+        <ellipse cx="35" cy="74" rx="2.2" ry="1.7" />
+        <ellipse cx="52" cy="80" rx="2.7" ry="2.05" />
+        <ellipse cx="43" cy="46" rx="1.85" ry="1.4" />
+        <ellipse cx="56" cy="58" rx="1.7" ry="1.3" />
+      </g>
+    );
+  }
+  if (species === "cat") {
+    const tuxedo = catEggColors(palette);
+    return (
+      <g>
+        <path
+          d="M50 58C42 60 37 68 38.4 76C40 84 45.6 88.6 50 89C54.4 88.6 60 84 61.6 76C63 68 58 60 50 58Z"
+          fill={tuxedo.stripe}
+          opacity="0.92"
+        />
+        <ellipse cx="36" cy="50" rx="2.1" ry="1.6" fill={tuxedo.stripe} />
+        <ellipse cx="62" cy="54" rx="1.7" ry="1.3" fill={tuxedo.stripe} />
+        <ellipse cx="44" cy="46" rx="1.4" ry="1.1" fill={tuxedo.stripe} />
+        <ellipse cx="56" cy="70" rx="1.5" ry="1.15" fill={tuxedo.shell} opacity="0.35" />
+      </g>
+    );
+  }
+  if (species === "axolotl") {
+    return (
+      <g fill="none" stroke={palette.eggMark} strokeLinecap="round">
+        <path
+          d="M28.5 48c-5.4-2.4-8.6 2.6-5.6 7.2 3.8 3 8.6.8 9.6-3.4"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M28.8 61c-5.8-1.4-8.6 4-4.8 8.2 4 2.6 8.8.4 9.8-3.2"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M31 74c-5-.6-7.6 4.2-3.8 7.8 3.6 2.1 7.8.1 8.8-3"
+          strokeWidth="2.4"
+          opacity="0.74"
+        />
+        <path
+          d="M71.5 48c5.4-2.4 8.6 2.6 5.6 7.2-3.8 3-8.6.8-9.6-3.4"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M71.2 61c5.8-1.4 8.6 4 4.8 8.2-4 2.6-8.8.4-9.8-3.2"
+          strokeWidth="2.6"
+          opacity="0.82"
+        />
+        <path
+          d="M69 74c5-.6 7.6 4.2 3.8 7.8-3.6 2.1-7.8.1-8.8-3"
+          strokeWidth="2.4"
+          opacity="0.74"
+        />
+        <path
+          d="M36 47c5.4 3.4 8.6-2.2 15 1.2 6.4 3.4 8.6-1.2 15.2 2.2"
+          strokeWidth="1.7"
+          opacity="0.5"
+        />
+        <path
+          d="M34 63c6.4 2.8 9.6-1.8 16 1.4 6.4 3 9.6-1.2 16.2 1.8"
+          strokeWidth="1.7"
+          opacity="0.42"
+        />
+      </g>
+    );
+  }
+  return (
+    <g fill={palette.eggWash} stroke={palette.eggMark} strokeWidth="0.85" opacity="0.9">
+      {[
+        [34, 50],
+        [46, 48],
+        [58, 50],
+        [70, 52],
+        [30, 61],
+        [42, 59],
+        [54, 59],
+        [66, 61],
+        [34, 71],
+        [46, 69],
+        [58, 69],
+        [70, 71],
+        [38, 81],
+        [50, 79],
+        [62, 81],
+      ].map(([x, y]) => (
+        <path
+          key={`${x}-${y}`}
+          d={`M${x - 5.2} ${y}a5.2 4.1 0 0 1 10.4 0`}
+        />
+      ))}
+    </g>
+  );
+}
+
+function EggCracks({
+  crack,
+  hatching,
+}: {
+  crack: EggCrackLevel;
+  hatching: boolean;
+}) {
+  if (crack < 1 && !hatching) return null;
+  const strong = crack >= 2 || hatching;
+  return (
+    <g
+      fill="none"
+      stroke="#3F3A38"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      opacity={hatching ? 0.82 : 0.7}
+    >
+      <path
+        d={strong ? "M50 33c2.2 7.2-4.8 11.2-1.6 18.4 4.2 8.6-4.6 12-1.2 20.6" : "M50 36c1.6 5.4-3.2 8.2-1.2 13.4"}
+        strokeWidth={strong ? 1.85 : 1.45}
+      />
+      {strong ? (
+        <>
+          <path d="M48.6 48.5 43 52.2" strokeWidth="1.35" />
+          <path d="M51.4 56.8 57.2 60.4" strokeWidth="1.35" />
+          <path d="M49.2 68.4 44.4 73.6" strokeWidth="1.25" />
+        </>
+      ) : (
+        <path d="M49.4 44.6 46.2 47.2" strokeWidth="1.15" />
+      )}
+      {hatching ? (
+        <>
+          <path d="M47.6 40.2 41.8 36.4" strokeWidth="1.3" />
+          <path d="M52.6 62.2 59.4 66" strokeWidth="1.3" />
+          <path d="M50.4 78.8 54.8 86.2" strokeWidth="1.2" />
+        </>
+      ) : null}
+    </g>
+  );
+}
+
+export function SpeciesEgg({
+  palette,
+  species,
+  hatching,
+  crack = 0,
+  uid = "egg",
+}: {
+  palette: SpeciesPalette;
+  species: SpriteSpeciesId;
+  hatching?: boolean;
+  crack?: EggCrackLevel;
+  uid?: string;
+}) {
+  const tabby = species === "cat" ? catEggColors(palette) : null;
+  const shell = tabby?.shell ?? palette.egg;
+  const wash = tabby?.wash ?? palette.eggWash;
+  const tip = tabby?.tip ?? palette.eggWash;
+  return (
+    <g className="spark-body">
+      <defs>
+        <clipPath id={`${uid}-egg-clip`}>
+          <path d={EGG_PATH} />
+        </clipPath>
+        <linearGradient id={`${uid}-egg-shell`} x1="32%" y1="12%" x2="78%" y2="92%">
+          <stop offset="0%" stopColor={tip} />
+          <stop offset="38%" stopColor={shell} />
+          <stop offset="100%" stopColor={shell} />
+        </linearGradient>
+        <radialGradient id={`${uid}-egg-shade`} cx="38%" cy="28%" r="72%">
+          <stop offset="0%" stopColor={wash} stopOpacity="0.55" />
+          <stop offset="55%" stopColor={shell} stopOpacity="0" />
+          <stop offset="100%" stopColor="#2A211C" stopOpacity="0.18" />
+        </radialGradient>
+        <radialGradient id={`${uid}-egg-sheen`} cx="30%" cy="22%" r="42%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`${uid}-fox-tip`} x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stopColor="#FFF6E4" />
+          <stop offset="100%" stopColor="#FFF6E4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(50 78) scale(1.38) translate(-50 -78)">
+      <ellipse cx="50" cy="95" rx="20" ry="5.2" fill="#0B0B0F" opacity="0.2" />
+      <path d={EGG_PATH} fill={`url(#${uid}-egg-shell)`} />
+      <g clipPath={`url(#${uid}-egg-clip)`}>
+        <path d={EGG_PATH} fill={`url(#${uid}-egg-shade)`} />
+        <EggMarks species={species} palette={palette} uid={uid} />
+        <ellipse cx="39" cy="46" rx="9.2" ry="7.2" fill={`url(#${uid}-egg-sheen)`} />
+        <ellipse cx="60" cy="78" rx="7" ry="4.2" fill="#fff" opacity="0.1" />
+        <EggCracks crack={crack} hatching={Boolean(hatching)} />
+      </g>
+      <path
+        d={EGG_PATH}
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.22"
+        strokeWidth="1.05"
+      />
+      </g>
+    </g>
+  );
+}
