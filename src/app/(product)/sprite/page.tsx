@@ -32,6 +32,8 @@ import { PageFrame } from "@/components/page-frame";
 import { SpriteRename } from "@/components/sprite-rename";
 import { setSpriteAsleep } from "@/lib/store-core";
 import { equipAppearance, feedSpark, useCatalyst } from "@/lib/store";
+import { SPECIES_PALETTES } from "@/lib/sprite-species";
+import { studyStyleResult } from "@/lib/study-style";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
@@ -189,6 +191,22 @@ export default function SpritePage() {
       </section>
 
       <AvoidFall onNotice={setNotice} onLiveChange={setMinigameLive} />
+
+      <section className="flux-card px-6 py-6">
+        <h2 className="text-lg text-foreground">Study vibe</h2>
+        <p className="mt-2 text-sm font-medium text-foreground">
+          {studyStyleResult(state.studyStyle).title}
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {SPECIES_PALETTES[state.spriteSpecies].label} ·{" "}
+          {studyStyleResult(state.studyStyle).glowName} glow
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {studyStyleResult(state.studyStyle).line} Retake the quiz from Account
+          settings if you want a different title — it will ask before changing
+          the animal.
+        </p>
+      </section>
 
       <EquipRow
         title="Sprite colour"
