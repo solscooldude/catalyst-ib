@@ -6,6 +6,12 @@ import {
   isCloudEmpty,
   type CloudSnapshot,
 } from "@/lib/cloud-state";
+import {
+  fanOutPublicProfile,
+  peerCodesFromSnapshot,
+  profileFromUser,
+  selfProfileFromSnapshot,
+} from "@/lib/friend-server";
 
 export const runtime = "nodejs";
 
@@ -53,6 +59,10 @@ export async function PUT(request: Request) {
   const snapshot = compactCloudSnapshot(
     extractCloudSnapshot((body.snapshot ?? {}) as CloudSnapshot),
   );
+  const previous = await readSnapshot(userId);
+  const identityChanged =
+    previous?.username !== snapshot.username ||
+    previous?.avatarUrl !== snapshot.avatarUrl;
   const client = await clerkClient();
   if (snapshot.friendCode) {
     try {
@@ -70,5 +80,17 @@ export async function PUT(request: Request) {
       weeklyStudyMinutes: snapshot.weeklyStudyMinutes,
     },
   });
+  if (identityChanged) {
+    const meUser = await client.users.getUser(userId);
+    const profile =
+      profileFromUser(meUser) ?? selfProfileFromSnapshot(snapshot, meUser.imageUrl);
+    if (profile.code) {
+      await fanOutPublicProfile(
+        profile.code,
+        profile,
+        peerCodesFromSnapshot(snapshot),
+      );
+    }
+  }
   return Response.json({ ok: true, snapshot, empty: isCloudEmpty(snapshot) });
 }

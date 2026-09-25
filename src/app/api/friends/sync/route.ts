@@ -9,7 +9,7 @@ import {
   type PublicFriendProfile,
   patchUserCatalyst,
 } from "@/lib/friend-server";
-import { friendDisplayName } from "@/lib/friends";
+import { friendUsername } from "@/lib/friends";
 
 export const runtime = "nodejs";
 
@@ -66,7 +66,7 @@ export async function GET() {
         if (!hit) return row;
         return {
           ...row,
-          name: friendDisplayName({ name: hit.name, code: row.code }),
+          name: friendUsername({ name: hit.name, code: row.code }),
           avatarUrl: hit.avatarUrl,
         };
       },
@@ -77,7 +77,7 @@ export async function GET() {
         if (!hit) return row;
         return {
           ...row,
-          name: friendDisplayName({ name: hit.name, code: row.code }),
+          name: friendUsername({ name: hit.name, code: row.code }),
           avatarUrl: hit.avatarUrl,
         };
       },
