@@ -1,4 +1,4 @@
-export const EXTENSION_VERSION = "0.4.2";
+export const EXTENSION_VERSION = "0.4.3";
 export const EXTENSION_VERSION_HREF = "/extension-version.json";
 
 export const EXTENSION_ZIP_HREF = "/catalyst-lock-extension.zip";
