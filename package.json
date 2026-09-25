@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 43127",
     "build": "next build",
-    "vercel-build": "node scripts/bootstrap-github.mjs && next build",
+    "vercel-build": "node scripts/bootstrap-github.mjs && node scripts/pack-extension.mjs && next build",
     "start": "next start --port 43127",
     "lint": "eslint",
     "test:policy": "node --test extension/policy.test.mjs",
