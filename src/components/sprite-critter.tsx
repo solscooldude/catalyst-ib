@@ -572,3 +572,259 @@ function DragonSpike({
     </g>
   );
 }
+
+function DragonSpikes({
+  palette,
+  stage,
+}: {
+  palette: SpeciesPalette;
+  stage: CareStage;
+}) {
+  const grown = stage === "luminary" || stage === "ethereal";
+  const glow = stage === "ethereal" ? palette.glow : undefined;
+  const plates = grown
+    ? [
+        [50, 17.6, 3.15, 0],
+        [54.4, 27.2, 2.75, 16],
+        [59.8, 40.4, 2.55, 22],
+        [65.2, 55.2, 2.35, 26],
+        [70.6, 68.6, 2.15, 30],
+        [76.4, 76.8, 1.95, 18],
+        [82.2, 73.4, 1.7, -8],
+        [87.2, 68.2, 1.45, -18],
+      ]
+    : [
+        [50, 18.4, 2.75, 0],
+        [54.6, 28.6, 2.4, 16],
+        [60.4, 43.2, 2.2, 22],
+        [66.2, 58.4, 2.05, 26],
+        [72.4, 72.2, 1.85, 24],
+        [79.2, 77.2, 1.65, 8],
+        [85.2, 71.4, 1.4, -16],
+      ];
+  return (
+    <g className="dragon-spikes">
+      {plates.map(([x, y, r, rot]) => (
+        <DragonSpike
+          key={`${x}-${y}`}
+          x={x}
+          y={y}
+          r={r}
+          rot={rot}
+          fill={palette.furDeep}
+          sheen={palette.accent}
+          glow={glow}
+        />
+      ))}
+    </g>
+  );
+}
+
+function FoxEar({ palette }: { palette: SpeciesPalette }) {
+  return (
+    <g>
+      <path
+        d="M25.8 30.8C22.2 20.6 23.2 12 27.2 7.2C28.6 5.5 32.4 5.4 33.8 7.4C36.8 13.6 37.8 22.4 38.4 30.8Z"
+        fill={palette.fur}
+      />
+      <path
+        d="M26.6 11.2C25.6 8.2 27.6 5.8 30.4 5.7C33.2 5.8 34.8 8.4 34.2 11.2C32.4 9.4 28.6 9.4 26.6 11.2Z"
+        fill={palette.furDeep}
+      />
+      <path
+        d="M30.4 27.4C28.8 20.4 28.8 14.4 30.6 10.6C31.4 9 33.4 8.9 34.2 10.6C35.6 15.2 36.2 21.6 36.6 27.4Z"
+        fill={palette.belly}
+      />
+    </g>
+  );
+}
+
+function DeerHooves() {
+  return (
+    <g>
+      <ellipse cx="42.2" cy="102.2" rx="4.8" ry="2.8" fill="#3F3F46" />
+      <ellipse cx="41.3" cy="101.35" rx="2.55" ry="1.15" fill="#A1A1AA" opacity="0.38" />
+      <ellipse cx="57.8" cy="102.2" rx="4.8" ry="2.8" fill="#3F3F46" />
+      <ellipse cx="56.9" cy="101.35" rx="2.55" ry="1.15" fill="#A1A1AA" opacity="0.38" />
+    </g>
+  );
+}
+
+function Tail({ species, palette }: { species: SpriteSpeciesId; palette: SpeciesPalette }) {
+  if (species === "bunny") {
+    return <ellipse cx="67.4" cy="92.2" rx="6.4" ry="5.6" fill={palette.belly} />;
+  }
+  if (species === "cat") {
+    return (
+      <g>
+        <path
+          d="M66 90c16 3 23-9 17.4-20"
+          fill="none"
+          stroke="#8B8B94"
+          strokeWidth="6.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M66 90c16 3 23-9 17.4-20"
+          fill="none"
+          stroke={palette.fur}
+          strokeWidth="5.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M81.6 71.4c1.4-1.2 2.8-0.6 2.2 1.1"
+          fill="none"
+          stroke={palette.mark ?? palette.belly}
+          strokeWidth="5.2"
+          strokeLinecap="round"
+        />
+      </g>
+    );
+  }
+  if (species === "axolotl") {
+    return <path d="M66 88c14.4 2.4 20.4 10.4 14 18.4-8.2 3.8-16.2-2.2-18.4-8.4Z" fill={palette.fur} />;
+  }
+  if (species === "dragon") {
+    return (
+      <g>
+        <path
+          d="M66 90c18 4.2 24.4-8 20.2-18.4"
+          fill="none"
+          stroke={palette.fur}
+          strokeWidth="4.8"
+          strokeLinecap="round"
+        />
+        <path d="M84 67.4c4.6 1.2 8.8 3.4 8.2 5.6-2.2 2.8-7.8 4.8-10.6 3.2Z" fill={palette.accent} />
+      </g>
+    );
+  }
+  if (species === "deer") {
+    return <ellipse cx="66.8" cy="90.4" rx="5.2" ry="6" fill={palette.belly} />;
+  }
+  return (
+    <g>
+      <path
+        d="M26 88c-16.4-6.4-20.8-25.2-8-35.2 8.2-6.4 16.4 4.2 16.2 14.4 6.2-4.2 14.4 2.2 12.2 12.4-2.2 10.4-12.4 14.6-20.4 8.4Z"
+        fill={palette.fur}
+      />
+      <ellipse cx="16.8" cy="56.4" rx="6.6" ry="6.2" fill={palette.belly} />
+      <ellipse cx="13.2" cy="50.6" rx="3.2" ry="3" fill="#FFF8EE" />
+    </g>
+  );
+}
+
+function HeartMark({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0 2.2C-1.6-.4-5-.6-6.4 1.5-8.3 4.2-6.6 7.4 0 12.2 6.4 7.4 8.1 4.2 6.2 1.5 4.8-.6 1.4-.4 0 2.2Z"
+      fill={fill}
+    />
+  );
+}
+
+function StarMark({
+  x,
+  y,
+  scale = 1,
+  fill,
+}: {
+  x: number;
+  y: number;
+  scale?: number;
+  fill: string;
+}) {
+  return (
+    <path
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      d="M0-4.2 1.2-1.1 4.4 0 1.2 1.1 0 4.2-1.2 1.1-4.4 0-1.2-1.1Z"
+      fill={fill}
+    />
+  );
+}
+
+function MagicalHalo({
+  glow,
+  glowDeep,
+  bloomId,
+}: {
+  glow: string;
+  glowDeep: string;
+  bloomId: string;
+}) {
+  return (
+    <g className="sprite-magical-halo" aria-hidden>
+      <ellipse cx="50" cy="50" rx="54" ry="56" fill={`url(#${bloomId})`} />
+      <path
+        d="M50 1.6 52 6.2 56.6 8.2 52 10.2 50 14.8 48 10.2 43.4 8.2 48 6.2Z"
+        fill={glow}
+      />
+      <circle cx="50" cy="8.2" r="1.05" fill="#FFFBEB" fillOpacity="0.85" />
+      <circle cx="16" cy="24" r="1.15" fill={glow} />
+      <circle cx="84" cy="22" r="1.05" fill={glowDeep} />
+      <circle cx="24" cy="10" r="0.8" fill={glow} />
+      <circle cx="76" cy="8" r="0.75" fill={glowDeep} />
+      <circle cx="10" cy="48" r="0.9" fill={glow} />
+      <circle cx="90" cy="46" r="0.85" fill={glowDeep} />
+    </g>
+  );
+}
+
+function PaintDefs({
+  uid,
+  palette,
+}: {
+  uid: string;
+  palette: SpeciesPalette;
+}) {
+  return (
+    <defs>
+      <radialGradient id={`${uid}-head`} cx="34%" cy="26%" r="74%">
+        <stop offset="0%" stopColor={palette.belly} stopOpacity="0.5" />
+        <stop offset="42%" stopColor={palette.fur} stopOpacity="0" />
+        <stop offset="100%" stopColor={palette.furDeep} stopOpacity="0.42" />
+      </radialGradient>
+      <radialGradient id={`${uid}-body`} cx="40%" cy="26%" r="78%">
+        <stop offset="0%" stopColor={palette.belly} stopOpacity="0.32" />
+        <stop offset="100%" stopColor={palette.furDeep} stopOpacity="0.34" />
+      </radialGradient>
+      <radialGradient id={`${uid}-rim`} cx="22%" cy="18%" r="46%">
+        <stop offset="0%" stopColor="#fff" stopOpacity="0.42" />
+        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${uid}-eye`} cx="38%" cy="32%" r="70%">
+        <stop offset="0%" stopColor="#FFF7D6" stopOpacity="0.95" />
+        <stop offset="28%" stopColor={palette.glow} />
+        <stop offset="100%" stopColor={palette.glowDeep} />
+      </radialGradient>
+      <radialGradient id={`${uid}-halo`} cx="50%" cy="46%" r="50%">
+        <stop offset="0%" stopColor={palette.glow} stopOpacity="0.28" />
+        <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.1" />
+        <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`${uid}-stage`} cx="50%" cy="48%" r="50%">
+        <stop offset="0%" stopColor={palette.glow} stopOpacity="0.32" />
+        <stop offset="28%" stopColor={palette.glow} stopOpacity="0.16" />
+        <stop offset="58%" stopColor={palette.glowDeep} stopOpacity="0.06" />
+        <stop offset="82%" stopColor={palette.glow} stopOpacity="0.02" />
+        <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
+      </radialGradient>
+      <filter id={`${uid}-sit`} x="-30%" y="-40%" width="160%" height="180%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id={`${uid}-glow-soft`} x="-75%" y="-75%" width="250%" height="250%">
+        <feGaussianBlur stdDeviation="10.4" />
+      </filter>
+    </defs>
+  );
+}
