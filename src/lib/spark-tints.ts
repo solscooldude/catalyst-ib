@@ -1,14 +1,14 @@
 export const SPARK_TINTS = [
   {
     id: "mint",
-    name: "Mint sprite",
+    name: "Natural",
     cost: 0,
     collection: "starter" as const,
     kind: "solid" as const,
-    blurb: "The original drop. Brand mint.",
-    hi: "#B8FFF3",
-    mid: "#7AF0DC",
-    lo: "#5EEAD4",
+    blurb: "Natural species fur. Mint glow is Dragon and brand only.",
+    hi: "#FFF4E5",
+    mid: "#E07A2F",
+    lo: "#B45316",
   },
   {
     id: "rose",

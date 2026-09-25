@@ -13,8 +13,6 @@ import { isClerkConfigured } from "@/lib/clerk-config";
 import { saveCloudState } from "@/lib/cloud-sync";
 import { setSoundMuted, useCatalyst } from "@/lib/store";
 import { useRouter } from "next/navigation";
-import { ROUTES } from "@/lib/routes";
-import { studyStyleResult } from "@/lib/study-style";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -118,25 +116,6 @@ export default function SettingsPage() {
 
       <div className="flux-card px-6 py-8">
         <SpriteRename />
-      </div>
-
-      <div className="flux-card space-y-3 px-6 py-8">
-        <h2 className="text-lg text-foreground">Study vibe</h2>
-        <p className="text-sm text-foreground">
-          {studyStyleResult(store.studyStyle).title}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {studyStyleResult(store.studyStyle).line} Retaking always updates this
-          title. Glow only changes if you confirm on the result screen.
-        </p>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11 rounded-full px-6"
-          onClick={() => router.push(`${ROUTES.pet}?retake=1`)}
-        >
-          Retake vibe quiz
-        </Button>
       </div>
 
       <div className="flux-card px-6 py-8">
