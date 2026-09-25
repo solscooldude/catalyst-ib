@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ChevronDown, Monitor, Sparkles } from "lucide-react";
+import { ExtraMagicalToggle } from "@/components/extra-magical-toggle";
 import { BuyLabel, TokenAmount } from "@/components/mint-chip";
 import { Spark } from "@/components/spark";
 import { Button } from "@/components/ui/button";
@@ -167,6 +168,12 @@ export default function AppearancePage() {
           {trying ? (
             <p className="mt-2 text-xs text-zinc-500">Preview</p>
           ) : null}
+          <div className="mx-auto mt-1 w-full max-w-[18rem] text-left">
+            <ExtraMagicalToggle
+              on={state.extraMagical}
+              unlocked={state.careStage === "ethereal"}
+            />
+          </div>
         </div>
       </div>
 
@@ -301,8 +308,9 @@ export default function AppearancePage() {
             <div>
               <h2 className="text-2xl text-foreground">Aura · Body glow</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Colour of the soft glow around the drop. Quiz starters plus
-                shop glows. One at a time. Not a prop, trail, or ring.
+                Colour of the soft glow around the sprite body. Mint, pink,
+                gold, lavender, aurora. One at a time. Not a prop, trail, or
+                ring.
               </p>
             </div>
             <Group
