@@ -12,6 +12,9 @@ import { LockExtensionSetup } from "@/components/lock-extension-setup";
 import { isClerkConfigured } from "@/lib/clerk-config";
 import { saveCloudState } from "@/lib/cloud-sync";
 import { setSoundMuted, useCatalyst } from "@/lib/store";
+import { ROUTES } from "@/lib/routes";
+import { SPECIES_PALETTES } from "@/lib/sprite-species";
+import { studyStyleResult } from "@/lib/study-style";
 import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
@@ -116,6 +119,30 @@ export default function SettingsPage() {
 
       <div className="flux-card px-6 py-8">
         <SpriteRename />
+      </div>
+
+      <div className="flux-card px-6 py-8">
+        <h2 className="text-lg text-foreground">Study vibe</h2>
+        <p className="mt-2 text-sm font-medium text-foreground">
+          {studyStyleResult(store.studyStyle).title}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {SPECIES_PALETTES[store.spriteSpecies].label} ·{" "}
+          {studyStyleResult(store.studyStyle).glowName} glow
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {studyStyleResult(store.studyStyle).line} Retaking always updates this
+          title. The animal and glow only change if you confirm on the result
+          screen.
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-4 h-11 rounded-full px-6"
+          onClick={() => router.push(`${ROUTES.pet}?retake=1`)}
+        >
+          Retake study quiz
+        </Button>
       </div>
 
       <div className="flux-card px-6 py-8">
