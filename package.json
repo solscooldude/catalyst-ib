@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test:policy": "node --test extension/policy.test.mjs",
     "test:schedule": "node --experimental-strip-types --test src/lib/schedule.test.ts",
-    "test:stats": "node --experimental-strip-types --test src/lib/stats.test.ts src/lib/study-style.test.ts",
+    "test:friends": "node --experimental-strip-types --test src/lib/friends.test.ts",
+    "test:stats": "node --experimental-strip-types --test src/lib/stats.test.ts src/lib/species-glows.test.ts src/lib/sprite-art.test.ts",
     "test:pet-quiz": "node --experimental-strip-types --test src/lib/pet-quiz.test.ts",
     "pack:extension": "node scripts/pack-extension.mjs"
   },

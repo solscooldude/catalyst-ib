@@ -1,10 +1,17 @@
 import { execSync } from "node:child_process";
-import { mkdirSync, existsSync, copyFileSync } from "node:fs";
+import { mkdirSync, existsSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
 const publicDir = join(root, "public");
 mkdirSync(publicDir, { recursive: true });
+const manifest = JSON.parse(
+  readFileSync(join(root, "extension/manifest.json"), "utf8"),
+);
+writeFileSync(
+  join(publicDir, "extension-version.json"),
+  `${JSON.stringify({ version: manifest.version, name: manifest.name }, null, 2)}\n`,
+);
 const publicZip = join(publicDir, "catalyst-lock-extension.zip");
 const namedZip = join(publicDir, "unzip-then-select-the-extension-folder.zip");
 execSync(`zip -r "${publicZip}" extension -x "*.test.mjs" -x "*.DS_Store"`, {
