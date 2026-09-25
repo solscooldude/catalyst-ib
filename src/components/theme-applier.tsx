@@ -2,11 +2,13 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { getAccentShade, getBackgroundShade } from "@/lib/appearance";
+import {
+  getAccentShade,
+  getBackgroundShade,
+  getSparkTint,
+} from "@/lib/appearance";
 import { ROUTES } from "@/lib/routes";
 import { applyUiTheme, restoreStoredUiTheme, useUiTheme } from "@/lib/ui-theme";
-import { spriteBodyPalette } from "@/lib/sprite-species";
-import { signatureGlowForStage } from "@/lib/stats";
 import { useCatalyst } from "@/lib/store";
 
 const ROOM_VARS = [
@@ -24,7 +26,7 @@ function clearRoomVars(root: HTMLElement) {
 
 export function ThemeApplier() {
   const pathname = usePathname();
-  const { appearance, hydrated, spriteSpecies, careStage, extraMagical } = useCatalyst();
+  const { appearance, hydrated } = useCatalyst();
   const uiTheme = useUiTheme();
   const introLock = pathname === ROUTES.intro;
 
@@ -75,15 +77,12 @@ export function ThemeApplier() {
         clearRoomVars(root);
       }
     }
-    const body = spriteBodyPalette(spriteSpecies, appearance.sparkTint);
-    const glow = signatureGlowForStage(careStage) ? body.glow : body.fur;
-    root.style.setProperty("--spark-hi", body.belly);
-    root.style.setProperty("--spark-mid", body.fur);
-    root.style.setProperty("--spark-lo", body.furDeep);
-    root.style.setProperty("--spark-glow", glow);
-    root.style.setProperty("--spark-glow-deep", body.glowDeep);
-    root.dataset.extraMagical = extraMagical && careStage === "ethereal" ? "on" : "off";
-  }, [hydrated, appearance, uiTheme, spriteSpecies, careStage, extraMagical]);
+    const tint = getSparkTint(appearance.sparkTint);
+    root.style.setProperty("--spark-hi", tint.hi);
+    root.style.setProperty("--spark-mid", tint.mid);
+    root.style.setProperty("--spark-lo", tint.lo);
+    delete root.dataset.extraMagical;
+  }, [hydrated, appearance, uiTheme]);
 
   return null;
 }

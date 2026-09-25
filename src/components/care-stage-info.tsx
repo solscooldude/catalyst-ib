@@ -34,10 +34,8 @@ export function CareStageInfo() {
         <p className="mt-3 text-xs text-muted-foreground">
           Egg → Hatchling → Growing → Luminary → Ethereal. Study time, streak,
           and care (snacks, quiz, catch) move it up. Ethereal unlocks after
-          Luminary at care score 64. Ethereal uses that species’ signature
-          glow — Fox amber, Bunny pearl, Deer gold-green, Cat magenta,
-          Axolotl rose, Dragon mint-teal. Bodies stay natural. Extra Magical
-          is optional on Ethereal (glowing eyes, bloom, sparkles, halo).
+          Luminary at care score 64 and brightens the drop’s glow. Pick a
+          starter glow in the vibe quiz; change it later in the shop.
         </p>
       </PopoverContent>
     </Popover>

@@ -27,12 +27,12 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "hatchling",
     label: "Hatchling",
-    how: "Just out. Tiny chibi body, almost no glow.",
+    how: "Just out. Tiny drop, dim glow.",
   },
   {
     stage: "growing",
     label: "Growing",
-    how: "Full little-critter shape. Study hours, streak, and snacks.",
+    how: "Full drop shape. Study hours, streak, and snacks.",
   },
   {
     stage: "luminary",
@@ -42,7 +42,7 @@ export const CARE_STAGE_GUIDE: {
   {
     stage: "ethereal",
     label: "Ethereal",
-    how: "Final form after Luminary. Signature glow, still a natural body. Extra Magical is optional: glowing eyes, stronger aura, more sparkles, faint halo.",
+    how: "Final form after Luminary. Same drop body, stronger glow and aura.",
   },
 ];
 
@@ -73,7 +73,7 @@ export function sparkEvolutionLabel(stage: CareStage) {
   return CARE_STAGE_GUIDE.find((row) => row.stage === stage)?.label ?? "Egg";
 }
 
-/** Luminary/Ethereal use the species signature glow — not a shared mint wash. */
+/** Luminary/Ethereal brighten the drop’s equipped glow. */
 export function signatureGlowForStage(stage: CareStage) {
   return stage === "luminary" || stage === "ethereal";
 }
