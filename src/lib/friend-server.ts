@@ -6,11 +6,13 @@ import {
   type CloudSource,
 } from "@/lib/cloud-state";
 import {
-  friendDisplayName,
+  friendUsername,
   normalizeFriend,
   normalizeFriendCode,
   normalizeFriendRequests,
   normalizeFriends,
+  overlayFriendProfile,
+  shareableFriendAvatar,
   stubFriendFromCode,
   type Friend,
   type FriendRequest,
@@ -64,14 +66,14 @@ export function profileFromUser(user: ClerkUser): PublicFriendProfile | null {
   if (!code) return null;
   const name =
     normalizeUsername(publicMeta.username || snap.username) ||
-    friendDisplayName({ name: "", code });
+    friendUsername({ name: user.username ?? "", code });
   return {
     code,
     name,
     avatarUrl:
-      normalizeAvatarUrl(publicMeta.avatarUrl) ||
+      shareableFriendAvatar(publicMeta.avatarUrl) ||
       normalizeAvatarUrl(user.imageUrl) ||
-      snap.avatarUrl,
+      shareableFriendAvatar(snap.avatarUrl),
     weeklyStudyMinutes: Math.max(
       0,
       Math.round(
@@ -219,12 +221,64 @@ export function selfProfileFromSnapshot(
   const code = snapshot.friendCode;
   return {
     code,
-    name:
-      normalizeUsername(snapshot.username) ||
-      friendDisplayName({ name: "", code }),
-    avatarUrl: snapshot.avatarUrl || normalizeAvatarUrl(imageUrl),
+    name: normalizeUsername(snapshot.username) || friendUsername({ name: "", code }),
+    avatarUrl:
+      shareableFriendAvatar(snapshot.avatarUrl) || normalizeAvatarUrl(imageUrl),
     weeklyStudyMinutes: snapshot.weeklyStudyMinutes,
     tokens: snapshot.tokens,
     streakDays: snapshot.streakDays,
   };
+}
+
+export function overlayProfileOnSnapshot(
+  snapshot: CloudSnapshot,
+  code: string,
+  profile: Pick<PublicFriendProfile, "name" | "avatarUrl" | "weeklyStudyMinutes">,
+) {
+  const next = normalizeFriendCode(code);
+  if (!next) return snapshot;
+  const patch = {
+    name: profile.name,
+    avatarUrl: profile.avatarUrl,
+    weeklyStudyMinutes: profile.weeklyStudyMinutes,
+  };
+  return {
+    ...snapshot,
+    friends: (snapshot.friends ?? []).map((row) =>
+      row.code === next ? overlayFriendProfile(row, patch) : row,
+    ),
+    incomingRequests: (snapshot.incomingRequests ?? []).map((row) =>
+      row.code === next ? overlayFriendProfile(row, patch) : row,
+    ),
+    outgoingRequests: (snapshot.outgoingRequests ?? []).map((row) =>
+      row.code === next ? overlayFriendProfile(row, patch) : row,
+    ),
+  };
+}
+
+export async function fanOutPublicProfile(
+  myCode: string,
+  profile: PublicFriendProfile,
+  peerCodes: string[],
+) {
+  const mine = normalizeFriendCode(myCode);
+  if (!mine) return;
+  const unique = [
+    ...new Set(peerCodes.map((code) => normalizeFriendCode(code)).filter(Boolean)),
+  ].filter((code) => code !== mine);
+  for (const code of unique) {
+    const user = await findUserByFriendCode(code);
+    if (!user) continue;
+    await patchUserCatalyst(user.id, (snap) =>
+      overlayProfileOnSnapshot(snap, mine, profile),
+    );
+  }
+}
+
+export function peerCodesFromSnapshot(snapshot: CloudSnapshot) {
+  return [
+    ...(snapshot.friends ?? []).map((row) => row.code),
+    ...(snapshot.incomingRequests ?? []).map((row) => row.code),
+    ...(snapshot.outgoingRequests ?? []).map((row) => row.code),
+  ];
 }
