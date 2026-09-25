@@ -205,3 +205,337 @@ function SpeciesNose({
     </g>
   );
 }
+
+function Face({
+  mood,
+  ink,
+  species,
+  palette,
+  glow,
+  glowDeep,
+  extraMagical,
+  squint = false,
+  uid,
+}: {
+  mood: CritterMood;
+  ink: string;
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  glow: string;
+  glowDeep: string;
+  extraMagical: boolean;
+  squint?: boolean;
+  uid: string;
+}) {
+  const look = mood === "tempted" ? 2.2 : 0;
+  const happy = mood === "done";
+  const showCatMouth =
+    mood === "idle" ||
+    mood === "locked" ||
+    mood === "earning" ||
+    mood === "tempted" ||
+    mood === "done";
+
+  return (
+    <g>
+      {mood === "done" ? (
+        <g fill="none" stroke={ink} strokeWidth="1.9" strokeLinecap="round">
+          <path d="M35 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+          <path d="M54.2 47.6c2.6-3.6 8.2-3.6 10.8 0" />
+        </g>
+      ) : null}
+      {mood === "annoyed" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 47h12" />
+          <path d="M54 47h12" />
+        </g>
+      ) : null}
+      {mood === "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 50c2.8 2.4 8.8 2.4 11.6 0" />
+          <path d="M54.4 50c2.8 2.4 8.8 2.4 11.6 0" />
+        </g>
+      ) : null}
+      {squint && mood !== "sleepy" ? (
+        <g fill="none" stroke={ink} strokeWidth="2" strokeLinecap="round">
+          <path d="M34 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+          <path d="M54.4 48.2c2.8 2.8 8.6 2.8 11.4 0" />
+        </g>
+      ) : null}
+      {mood === "eating" ? (
+        <g>
+          <ellipse cx="39.8" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+          <ellipse cx="60.2" cy="48.8" rx="4.2" ry="3.1" fill={EYE_INK} />
+        </g>
+      ) : null}
+      {!squint &&
+      (mood === "idle" ||
+        mood === "locked" ||
+        mood === "earning" ||
+        mood === "tempted") ? (
+        <>
+          <GlossyEye
+            cx={38.8}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+          <GlossyEye
+            cx={61.2}
+            cy={47.6}
+            look={look}
+            extraMagical={extraMagical}
+            glow={glow}
+            glowDeep={glowDeep}
+            fillId={`${uid}-eye`}
+          />
+        </>
+      ) : null}
+      {happy ? (
+        <>
+          <ellipse cx="34.6" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+          <ellipse cx="65.4" cy="57.8" rx="3.1" ry="1.7" fill="#F4A8B8" opacity="0.42" />
+        </>
+      ) : null}
+      <SpeciesNose species={species} palette={palette} />
+      {showCatMouth ? (
+        <CatMouth
+          ink={species === "cat" ? "#2A211C" : ink}
+          species={species}
+          wide={happy}
+        />
+      ) : null}
+      {mood === "eating" ? (
+        <ellipse
+          className="spark-chew"
+          cx="50"
+          cy={MOUTH_Y[species] + 2.2}
+          rx="4.4"
+          ry="2.2"
+          fill="#0B0B0F"
+        />
+      ) : null}
+    </g>
+  );
+}
+
+function SpeciesExtras({
+  species,
+  palette,
+  stage,
+}: {
+  species: SpriteSpeciesId;
+  palette: SpeciesPalette;
+  stage: CareStage;
+}) {
+  if (species === "bunny") {
+    return (
+      <g>
+        <path
+          d="M31 22c-3.6-16 8.4-26 13.2-12 2.6 7.6 1.4 18.4-1.6 24.8-2.6 1.2-6.8-1.6-11.6-12.8Z"
+          fill={palette.fur}
+        />
+        <path
+          d="M35.4 20c-1.6-10 5.2-16.4 8.2-8.4 1.6 4.6.6 12.2-1.4 16.8-2.2.4-5.2-1.8-6.8-8.4Z"
+          fill={palette.accent}
+        />
+        <path
+          d="M69 22c3.6-16-8.4-26-13.2-12-2.6 7.6-1.4 18.4 1.6 24.8 2.6 1.2 6.8-1.6 11.6-12.8Z"
+          fill={palette.fur}
+        />
+        <path
+          d="M64.6 20c1.6-10-5.2-16.4-8.2-8.4-1.6 4.6-.6 12.2 1.4 16.8 2.2.4 5.2-1.8 6.8-8.4Z"
+          fill={palette.accent}
+        />
+      </g>
+    );
+  }
+  if (species === "deer") {
+    const grown = stage === "luminary" || stage === "ethereal";
+    const sprout = stage === "hatchling";
+    return (
+      <g>
+        {sprout ? (
+          <>
+            <path d="M38 18v-5" fill="none" stroke={palette.accent} strokeWidth="1.6" strokeLinecap="round" />
+            <path d="M62 18v-5" fill="none" stroke={palette.accent} strokeWidth="1.6" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            <path
+              d={grown ? "M37 14 31-1c4.2 2 8.4 9 10.4 16" : "M38 16 34 4c4 2 7 8 8 14"}
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth={grown ? 2 : 1.7}
+              strokeLinecap="round"
+            />
+            <path
+              d={grown ? "M63 14 69-1c-4.2 2-8.4 9-10.4 16" : "M62 16 66 4c-4 2-7 8-8 14"}
+              fill="none"
+              stroke={palette.accent}
+              strokeWidth={grown ? 2 : 1.7}
+              strokeLinecap="round"
+            />
+            {grown ? (
+              <>
+                <path d="M34 6l-6-5" fill="none" stroke={palette.accent} strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M66 6l6-5" fill="none" stroke={palette.accent} strokeWidth="1.5" strokeLinecap="round" />
+              </>
+            ) : null}
+            {stage === "ethereal" ? (
+              <>
+                <circle cx="31" cy="0" r="1.3" fill={palette.glow} />
+                <circle cx="69" cy="0" r="1.3" fill={palette.glowDeep} />
+              </>
+            ) : null}
+          </>
+        )}
+        <ellipse cx="44" cy="86" rx="2" ry="1.45" fill={palette.mark ?? palette.belly} />
+        <ellipse cx="56" cy="87.6" rx="1.7" ry="1.25" fill={palette.mark ?? palette.belly} />
+        <ellipse cx="40.4" cy="91.2" rx="1.4" ry="1.05" fill={palette.mark ?? palette.belly} />
+        <ellipse cx="59.6" cy="90.6" rx="1.3" ry="0.95" fill={palette.mark ?? palette.belly} />
+      </g>
+    );
+  }
+  if (species === "axolotl") {
+    return (
+      <g>
+        <path d="M22 42c-9.6-1.6-14 8.4-7.6 13.6 4.2 3.4 10.2 1.4 12.4-4.2Z" fill={palette.accent} />
+        <path d="M21 34c-8.6-7.6-3.4-15.6 4.2-11.4 4.8 2.2 7.6 7.6 5.4 13.4Z" fill={palette.accent} />
+        <path d="M24 52c-8.2 2-10.8 11.2-4.2 14.4 4.6 2.2 9.6-1 11.2-6.2Z" fill={palette.furDeep} />
+        <path d="M78 42c9.6-1.6 14 8.4 7.6 13.6-4.2 3.4-10.2 1.4-12.4-4.2Z" fill={palette.accent} />
+        <path d="M79 34c8.6-7.6 3.4-15.6-4.2-11.4-4.8 2.2-7.6 7.6-5.4 13.4Z" fill={palette.accent} />
+        <path d="M76 52c8.2 2 10.8 11.2 4.2 14.4-4.6 2.2-9.6-1-11.2-6.2Z" fill={palette.furDeep} />
+      </g>
+    );
+  }
+  if (species === "dragon") {
+    return (
+      <g>
+        <path d="M28 14c-1.6-9.2 7.4-13.8 11.2-5.6 1.6 3.6.2 9-3 11.4Z" fill={palette.accent} />
+        <path d="M72 14c1.6-9.2-7.4-13.8-11.2-5.6-1.6 3.6-.2 9 3 11.4Z" fill={palette.accent} />
+      </g>
+    );
+  }
+  return null;
+}
+
+function Ears({ species, palette }: { species: SpriteSpeciesId; palette: SpeciesPalette }) {
+  if (species === "bunny" || species === "axolotl") return null;
+  if (species === "cat") {
+    return (
+      <g>
+        <CatEar palette={palette} />
+        <g transform="translate(100 0) scale(-1 1)">
+          <CatEar palette={palette} />
+        </g>
+      </g>
+    );
+  }
+  if (species === "deer") {
+    return (
+      <g>
+        <path d="M28 31c-2.4-16.8 16.4-21.2 20-8.2-6.2 1.8-13.2 4.2-20 8.2Z" fill={palette.fur} />
+        <path d="M72 31c2.4-16.8-16.4-21.2-20-8.2 6.2 1.8 13.2 4.2 20 8.2Z" fill={palette.fur} />
+        <path d="M31.4 27.6c-1-10.4 9.6-13 12.2-4.6-4 1.2-8.4 2.8-12.2 4.6Z" fill={palette.belly} />
+        <path d="M68.6 27.6c1-10.4-9.6-13-12.2-4.6 4 1.2 8.4 2.8 12.2 4.6Z" fill={palette.belly} />
+      </g>
+    );
+  }
+  if (species === "dragon") {
+    return (
+      <g>
+        <path d="M28 29c-1.8-14 14.4-17.6 18-6.2-5.8 1.6-12.2 3.6-18 6.2Z" fill={palette.fur} />
+        <path d="M72 29c1.8-14-14.4-17.6-18-6.2 5.8 1.6 12.2 3.6 18 6.2Z" fill={palette.fur} />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <FoxEar palette={palette} />
+      <g transform="translate(100 0) scale(-1 1)">
+        <FoxEar palette={palette} />
+      </g>
+    </g>
+  );
+}
+
+function CatEar({ palette }: { palette: SpeciesPalette }) {
+  return (
+    <g transform="translate(-2.4 6.4) translate(33.2 31.2) scale(0.68) translate(-33.2 -31.2)">
+      <path
+        d="M24.8 31.4C21.2 17.6 22.4 7.2 27.6 4.4C29.6 3.3 34 3.4 35.8 6C39.2 14.2 40 23.6 40.4 31.4Z"
+        fill="#8B8B94"
+      />
+      <path
+        d="M26 31C22.8 18.2 24 8.4 28.6 5.8C30.4 4.8 34 4.9 35.4 7.2C38.4 14.8 39.2 23.4 39.6 31Z"
+        fill={palette.fur}
+      />
+      <path
+        d="M30.8 29.4C29.4 19.6 29.6 11.6 31.8 8C32.6 6.8 34.8 6.8 35.6 8.2C37.2 14 37.8 22.2 38 29.4Z"
+        fill="#F4B4C8"
+      />
+    </g>
+  );
+}
+
+function DragonWing({
+  palette,
+  side,
+}: {
+  palette: SpeciesPalette;
+  side: "left" | "right";
+}) {
+  const flip = side === "right" ? "translate(100 0) scale(-1 1)" : undefined;
+  return (
+    <g transform={flip}>
+      <path
+        d="M34.8 69.2C20.4 60.6 8.2 61.4 4.6 71.2C2.8 80.8 10.4 90.6 22.6 88.2C28.4 86.8 31.6 80.4 34.2 74.6C34.8 73.2 35.2 71.2 34.8 69.2Z"
+        fill={palette.furDeep}
+      />
+      <path
+        d="M33.8 70C22.2 62.8 11.6 64 8.6 72C7.4 80 13.6 87.2 23.2 85.4C28 84.2 30.8 78.8 33.2 74C33.6 72.8 34 71.2 33.8 70Z"
+        fill={palette.fur}
+      />
+      <path
+        d="M33.6 70.2C23.2 64.4 14.6 67.2 10.4 75.4"
+        fill="none"
+        stroke={palette.furDeep}
+        strokeWidth="1.55"
+        strokeLinecap="round"
+      />
+      <path
+        d="M32.8 73.6C24.8 70.4 18.4 74.6 16.2 80.8"
+        fill="none"
+        stroke={palette.furDeep}
+        strokeWidth="1.15"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <ellipse cx="33.8" cy="71.6" rx="6.2" ry="5.1" fill={palette.fur} />
+      <ellipse cx="33.2" cy="71" rx="3.6" ry="2.8" fill={palette.furDeep} opacity="0.3" />
+    </g>
+  );
+}
+
+function DragonWings({
+  palette,
+  stage,
+}: {
+  palette: SpeciesPalette;
+  stage: CareStage;
+}) {
+  const grown = stage === "luminary" || stage === "ethereal";
+  return (
+    <g
+      className="dragon-wings"
+      transform={grown ? "translate(50 72) scale(1.08) translate(-50 -72)" : undefined}
+    >
+      <DragonWing palette={palette} side="left" />
+      <DragonWing palette={palette} side="right" />
+    </g>
+  );
+}
