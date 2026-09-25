@@ -1,13 +1,16 @@
 "use client";
 
 import { lookupFriendDirectory } from "@/lib/friends";
+import { weeklyStudyMinutes } from "@/lib/stats";
 import {
   acceptFriendRequest,
   applyFriendProfiles,
   applyFriendsState,
   cancelFriendRequest,
   declineFriendRequest,
+  getSnapshot,
   refreshFriendInbox,
+  refreshFriendProfilesFromDirectory,
   replaceFriendsState,
   sendFriendRequest,
 } from "@/lib/store";
@@ -136,11 +139,62 @@ export async function cancelOutgoing(raw: string) {
 
 export async function syncFriendsFromServer() {
   refreshFriendInbox();
+  refreshFriendProfilesFromDirectory();
   try {
     const res = await fetch("/api/friends/sync", { cache: "no-store" });
     if (!res.ok) return;
     applyLists((await res.json()) as Lists, false);
   } catch {
     /* stay on local lists */
+  }
+}
+
+export async function lookupFriendProfile(raw: string) {
+  try {
+    const res = await fetch(
+      `/api/friends/lookup?code=${encodeURIComponent(raw)}`,
+      { cache: "no-store" },
+    );
+    if (!res.ok) {
+      const listed = lookupFriendDirectory(raw);
+      return listed
+        ? {
+            code: listed.code,
+            name: listed.name,
+            avatarUrl: listed.avatarUrl,
+          }
+        : null;
+    }
+    const data = (await res.json()) as {
+      profile?: { code: string; name?: string; avatarUrl?: string | null };
+    };
+    return data.profile ?? null;
+  } catch {
+    return lookupFriendDirectory(raw);
+  }
+}
+
+export async function publishIdentityToServer() {
+  const snap = getSnapshot();
+  try {
+    const res = await fetch("/api/account/identity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: snap.username,
+        avatarUrl: snap.avatarUrl,
+        avatarDataUrl: snap.avatarDataUrl,
+        weeklyStudyMinutes: weeklyStudyMinutes(snap.logs),
+        peerCodes: [
+          ...snap.friends.map((row) => row.code),
+          ...snap.incomingRequests.map((row) => row.code),
+          ...snap.outgoingRequests.map((row) => row.code),
+        ],
+      }),
+    });
+    if (!res.ok) return;
+    applyLists((await res.json()) as Lists, false);
+  } catch {
+    /* local identity already saved */
   }
 }
