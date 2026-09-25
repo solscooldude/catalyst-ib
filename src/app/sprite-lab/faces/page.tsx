@@ -1,3 +1,4 @@
+// Sprite lab page — keep this comment so GitHub file writes do not strip the directive.
 "use client";
 
 import { Spark } from "@/components/spark";
@@ -150,8 +151,8 @@ export default function SpriteFacesPage() {
           Cat ears
         </h2>
         <p className="mt-2 text-sm text-zinc-400">
-          Pointed ears stay on top of the head at every expression, with a
-          pink inner and a light rim.
+          Smaller pointed ears sit lower and a little wider, with a pink inner
+          and a light rim. They still clear a beanie, headphones, and the cap.
         </p>
         <div
           id="cat-ears-close"
@@ -185,6 +186,91 @@ export default function SpriteFacesPage() {
               </figcaption>
             </figure>
           ))}
+        </div>
+        <div
+          id="cat-hats"
+          className="mt-6 grid grid-cols-3 gap-4"
+        >
+          {(
+            [
+              ["beanie", "Beanie"],
+              ["phones", "Headphones"],
+              ["cap", "Cap"],
+            ] as const
+          ).map(([gear, label]) => (
+            <figure
+              key={gear}
+              className="rounded-[1.5rem] border border-white/10 bg-[#18181B] px-2 pt-8 pb-3"
+            >
+              <div className="flex justify-center">
+                <Spark
+                  mood="idle"
+                  shape="cat"
+                  gear={gear}
+                  aura="none"
+                  trail="none"
+                  evolve={false}
+                  stage="growing"
+                  size={200}
+                />
+              </div>
+              <figcaption className="mt-1 text-center text-sm font-medium">
+                {label}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <h2 className="mt-12 text-2xl font-semibold tracking-tight">
+          Dragon wings + spikes
+        </h2>
+        <p className="mt-2 text-sm text-zinc-400">
+          Wings root at the shoulders. Soft dorsal plates run from the crown
+          down the back to the tail.
+        </p>
+        <div
+          id="dragon-wings-close"
+          className="mt-6 grid gap-4 sm:grid-cols-2"
+        >
+          <figure
+            id="dragon-growing-close"
+            className="rounded-[1.5rem] border border-white/10 bg-[#18181B] px-2 pt-8 pb-3"
+          >
+            <div className="flex justify-center">
+              <Spark
+                mood="idle"
+                shape="dragon"
+                aura="none"
+                trail="none"
+                evolve={false}
+                stage="growing"
+                size={260}
+              />
+            </div>
+            <figcaption className="mt-1 text-center text-sm font-medium">
+              Dragon · Growing
+            </figcaption>
+          </figure>
+          <figure
+            id="dragon-ethereal-close"
+            className="rounded-[1.5rem] border border-white/10 bg-[#18181B] px-2 pt-8 pb-3"
+          >
+            <div className="flex justify-center">
+              <Spark
+                mood="idle"
+                shape="dragon"
+                aura="mint"
+                trail="none"
+                evolve={false}
+                stage="ethereal"
+                extraMagical
+                size={260}
+              />
+            </div>
+            <figcaption className="mt-1 text-center text-sm font-medium">
+              Dragon · Ethereal
+            </figcaption>
+          </figure>
         </div>
 
         <h2 className="mt-12 text-2xl font-semibold tracking-tight">
