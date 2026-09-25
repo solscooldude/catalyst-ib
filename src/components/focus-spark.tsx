@@ -6,6 +6,7 @@ import { Spark, type SparkMood } from "@/components/spark";
 import {
   DOUBLE_TAP_MS,
   hitZone,
+  isScrunchZone,
   isTickleSwipe,
   type SparkAct,
   type SparkZone,
@@ -114,9 +115,6 @@ export function FocusSpark({
     zone.current = box
       ? hitZone(event.clientX - box.left, event.clientY - box.top, box.width, box.height)
       : "body";
-    if (zone.current === "peak" && act !== "sleep") {
-      scrunch.current.press(event.clientY, box?.height ?? 200);
-    }
     window.clearTimeout(holdTimer.current);
     holdTimer.current = window.setTimeout(() => {
       if (!moved.current) {
@@ -132,10 +130,23 @@ export function FocusSpark({
     if (Math.hypot(dx, dy) > 8) {
       moved.current = true;
       window.clearTimeout(holdTimer.current);
+      if (
+        isScrunchZone(zone.current) &&
+        dy > 8 &&
+        act !== "sleep" &&
+        !scrunch.current.active()
+      ) {
+        scrunch.current.press(origin.current.y, boxHeight());
+        setAct("scrunch");
+      }
     }
-    if (zone.current === "peak") {
+    if (scrunch.current.active()) {
       scrunch.current.move(event.clientY);
     }
+  }
+
+  function boxHeight() {
+    return stageRef.current?.getBoundingClientRect().height ?? 200;
   }
 
   function up(event?: React.PointerEvent<HTMLDivElement>) {
@@ -153,8 +164,11 @@ export function FocusSpark({
       play("tickle", 720);
       return;
     }
-    if (zone.current === "peak") {
+    if (scrunch.current.active()) {
       scrunch.current.release();
+      window.setTimeout(() => {
+        setAct((current) => (current === "scrunch" ? null : current));
+      }, 280);
       if (moved.current) return;
     }
     if (!moved.current) {
