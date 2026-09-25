@@ -602,26 +602,38 @@
 
 @keyframes spark-spin-twirl {
   0% {
-    transform: rotate(0deg) scaleX(1);
+    transform: rotate(0deg);
   }
-  22% {
-    transform: rotate(90deg) scaleX(0.28);
+  12% {
+    transform: rotate(-16deg);
   }
-  48% {
-    transform: rotate(180deg) scaleX(1);
-  }
-  72% {
-    transform: rotate(270deg) scaleX(0.28);
+  78% {
+    transform: rotate(368deg);
   }
   100% {
-    transform: rotate(360deg) scaleX(1);
+    transform: rotate(360deg);
   }
 }
 
 .spark-spin .spark-body {
   transform-box: border-box;
-  transform-origin: 50% 62%;
-  animation: spark-spin-twirl 0.98s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-origin: 50% 58%;
+  animation: spark-spin-twirl 0.82s cubic-bezier(0.45, 0.06, 0.18, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes spark-spin-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-8deg);
+  }
+  62% {
+    transform: rotate(7deg);
+  }
 }
 
 @keyframes spark-tickle-giggle {
@@ -1146,13 +1158,16 @@
   animation: none !important;
 }
 
+.sprite-lab-reduced .spark-spin .spark-body {
+  animation: spark-spin-wiggle 0.7s cubic-bezier(0.22, 0.7, 0.32, 1) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spark-eating .spark-body,
   .spark-chew,
   .spark-crumb-bit,
   .spark-boop .spark-blink,
   .spark-poke .spark-body,
-  .spark-spin .spark-body,
   .spark-tickle .spark-body,
   .spark-wave .spark-body,
   .sprite-ethereal-sparkle,
@@ -1177,5 +1192,9 @@
   .avoid-sprite.is-entering,
   .avoid-sprite.is-hit {
     animation: none;
+  }
+
+  .spark-spin .spark-body {
+    animation: spark-spin-wiggle 0.7s cubic-bezier(0.22, 0.7, 0.32, 1);
   }
 }
