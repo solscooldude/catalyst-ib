@@ -20,6 +20,7 @@ import {
 import { TASK_SUBJECT, type SubjectId, type TaskId } from "@/lib/constants";
 import { type SnackId, type SparkAct } from "@/lib/spark-play";
 import { displaySpriteName } from "@/lib/sprite-name";
+import { eggCrackLevel, type EggCrackLevel } from "@/lib/care";
 import { signatureGlowForStage, sparkEvolutionFromState, type CareStage } from "@/lib/stats";
 import {
   normalizeSpriteSpecies,
@@ -58,9 +59,12 @@ type SparkProps = {
   petPulse?: number;
   flourish?: "loop" | "now";
   evolve?: boolean;
+  eggFeeds?: number;
   act?: SparkAct;
   snack?: SnackId | null;
   trackEyes?: boolean;
+  extraMagical?: boolean;
+  hatching?: boolean;
 };
 
 function Heart() {
@@ -95,32 +99,43 @@ function PetHearts() {
 function SparkAuraMark({
   id,
   blurId,
+  washId,
+  bloomId,
 }: {
   id: SparkAuraId;
   blurId: string;
+  washId: string;
+  bloomId: string;
 }) {
   if (id === "none") return null;
   const spec = getSparkAura(id);
   return (
     <g aria-hidden className="spark-aura-body">
+      <ellipse
+        cx="50"
+        cy="58"
+        rx="62"
+        ry="66"
+        fill={`url(#${washId})`}
+        filter={`url(#${blurId})`}
+      />
       {spec.glowB ? (
         <ellipse
           cx="50"
-          cy="68"
-          rx="36"
-          ry="40"
+          cy="56"
+          rx="52"
+          ry="56"
           fill={spec.glowB}
-          fillOpacity="0.5"
+          fillOpacity="0.12"
           filter={`url(#${blurId})`}
         />
       ) : null}
       <ellipse
         cx="50"
-        cy="68"
-        rx="32"
-        ry="36"
-        fill={spec.glow}
-        fillOpacity="0.62"
+        cy="60"
+        rx="40"
+        ry="44"
+        fill={`url(#${bloomId})`}
         filter={`url(#${blurId})`}
       />
     </g>
@@ -584,14 +599,19 @@ export function Spark({
   petPulse = 0,
   flourish = "loop",
   evolve = true,
+  eggFeeds: eggFeedsOverride,
   act = null,
   snack = null,
   trackEyes = false,
+  extraMagical: extraMagicalOverride,
+  hatching: hatchingOverride,
 }: SparkProps) {
   const wrapRef = useRef<HTMLDivElement | HTMLButtonElement | null>(null);
   const uid = useId().replace(/:/g, "");
   const glowId = `spark-glow-${uid}`;
   const auraBlurId = `spark-aura-blur-${uid}`;
+  const auraWashId = `spark-aura-wash-${uid}`;
+  const auraBloomId = `spark-aura-bloom-${uid}`;
   const store = useCatalyst();
   const tintId = tint ?? store.appearance.sparkTint;
   const gearId = gear ?? store.appearance.gear;
@@ -734,12 +754,18 @@ export function Spark({
   const bodyPalette = spriteBodyPalette(species, tintId);
   const stageGlow =
     (evolve || Boolean(stageOverride)) && signatureGlowForStage(evo.stage);
-  const extraMagical = Boolean(store.extraMagical) && evo.stage === "ethereal";
+  const extraMagical =
+    Boolean(extraMagicalOverride ?? store.extraMagical) &&
+    evo.stage === "ethereal";
   const glowHex = stageGlow ? bodyPalette.glow : bodyPalette.fur;
   const hatching =
-    Boolean(store.hatchBurstAt) &&
-    Date.now() - (store.hatchBurstAt ?? 0) < 1600;
-  const showEgg = evolve && evo.stage === "egg";
+    Boolean(hatchingOverride) ||
+    (evolve &&
+      Boolean(store.hatchBurstAt) &&
+      Date.now() - (store.hatchBurstAt ?? 0) < 1600);
+  const showEgg = evo.stage === "egg";
+  const eggFeeds = eggFeedsOverride ?? (evolve ? store.eggFeeds ?? 0 : 0);
+  const crack: EggCrackLevel = hatching ? 2 : eggCrackLevel(eggFeeds);
   const drawn = size * evo.scale;
   const frameClass = cn(
     "spark-float relative isolate z-20 overflow-visible",
@@ -760,6 +786,8 @@ export function Spark({
     flourish === "now" && "spark-idle-pop",
     trackEyes && "spark-track-eyes",
     auraId !== "none" && "spark-has-aura",
+    evo.stage === "ethereal" && "spark-ethereal",
+    extraMagical && "spark-extra-magical",
     className,
   );
   const frameStyle = {
@@ -777,14 +805,20 @@ export function Spark({
 
   const body = (
     <>
-      <span className="spark-halo absolute inset-[-28%] rounded-full" />
+      <span className="spark-halo absolute inset-[-58%] rounded-full" />
       {showEgg ? null : <Trail id={trailId} />}
       {say && canPet ? (
         <span className="spark-say" aria-live="polite">
           {say}
         </span>
       ) : null}
-      <div className={cn("spark-body spark-svg-critter", hatching && "spark-hatch")}>
+      <div
+        className={cn(
+          "spark-body spark-svg-critter",
+          hatching && "spark-hatch",
+          showEgg && !hatching && (crack >= 2 ? "spark-egg-wobble-strong" : "spark-egg-wobble"),
+        )}
+      >
         <svg
           viewBox="-22 -18 144 150"
           width={drawn}
@@ -796,12 +830,52 @@ export function Spark({
               <stop
                 offset="0%"
                 stopColor={glowHex}
-                stopOpacity={stageGlow ? (extraMagical ? 0.72 : 0.42) : 0.18}
+                stopOpacity={stageGlow ? (extraMagical ? 0.42 : 0.28) : 0.12}
               />
+              <stop offset="55%" stopColor={glowHex} stopOpacity="0.06" />
               <stop offset="100%" stopColor={glowHex} stopOpacity="0" />
             </radialGradient>
-            <filter id={auraBlurId} x="-55%" y="-55%" width="210%" height="210%">
-              <feGaussianBlur stdDeviation="5.4" />
+            <radialGradient id={auraWashId} cx="50%" cy="52%" r="50%">
+              <stop
+                offset="0%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0.2"
+              />
+              <stop
+                offset="34%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0.1"
+              />
+              <stop
+                offset="64%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0.035"
+              />
+              <stop
+                offset="100%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0"
+              />
+            </radialGradient>
+            <radialGradient id={auraBloomId} cx="50%" cy="48%" r="50%">
+              <stop
+                offset="0%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0.3"
+              />
+              <stop
+                offset="42%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0.1"
+              />
+              <stop
+                offset="100%"
+                stopColor={getSparkAura(auraId).glow}
+                stopOpacity="0"
+              />
+            </radialGradient>
+            <filter id={auraBlurId} x="-90%" y="-90%" width="280%" height="280%">
+              <feGaussianBlur stdDeviation="12.4" />
             </filter>
           </defs>
 
@@ -813,11 +887,18 @@ export function Spark({
                 palette={bodyPalette}
                 species={species}
                 hatching={hatching}
+                crack={crack}
+                uid={`${uid}-egg`}
               />
             </g>
           ) : (
             <g>
-              <SparkAuraMark id={auraId} blurId={auraBlurId} />
+              <SparkAuraMark
+                id={auraId}
+                blurId={auraBlurId}
+                washId={auraWashId}
+                bloomId={auraBloomId}
+              />
               <GearBack id={gearId} />
               <SpriteCritter
                 species={species}
@@ -826,6 +907,7 @@ export function Spark({
                 stage={evo.stage}
                 stageGlow={Boolean(stageGlow)}
                 extraMagical={extraMagical}
+                squint={act === "scrunch"}
                 uid={uid}
               />
               {tintId === "gold" ? (
@@ -847,9 +929,19 @@ export function Spark({
             </g>
           )}
         </svg>
+        {evo.stage === "ethereal" && !extraMagical ? (
+          <span className="sprite-ethereal-sparkles" aria-hidden>
+            {Array.from({ length: 5 }, (_, index) => (
+              <span
+                key={index}
+                className={`sprite-ethereal-sparkle sparkle-${index}`}
+              />
+            ))}
+          </span>
+        ) : null}
         {extraMagical ? (
           <span className="sprite-magical-dust" aria-hidden>
-            {Array.from({ length: 10 }, (_, index) => (
+            {Array.from({ length: 8 }, (_, index) => (
               <span
                 key={index}
                 className={`sprite-magical-mote mote-${index}`}
