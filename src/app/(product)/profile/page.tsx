@@ -27,14 +27,9 @@ import {
   saveIdentity,
   saveMotivation,
   saveProfile,
-  setSpriteSpecies,
   useCatalyst,
 } from "@/lib/store";
-import {
-  SPECIES_PALETTES,
-  SPRITE_SPECIES,
-  type SpriteSpeciesId,
-} from "@/lib/sprite-species";
+import { studyStyleResult } from "@/lib/study-style";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -264,18 +259,13 @@ export default function ProfilePage() {
         }}
       />
       <div className="space-y-2">
-        <Label htmlFor="sprite-species">Sprite species</Label>
-        <AppSelect
-          id="sprite-species"
-          value={state.spriteSpecies}
-          onChange={(next) => setSpriteSpecies(next as SpriteSpeciesId)}
-          options={SPRITE_SPECIES.map((id) => ({
-            value: id,
-            label: SPECIES_PALETTES[id].label,
-          }))}
-        />
+        <p className="text-sm font-medium text-foreground">Study style</p>
+        <p className="text-base text-foreground">
+          {studyStyleResult(state.studyStyle).title}
+        </p>
         <p className="text-xs text-muted-foreground">
-          My Sprite draws this species as a soft SVG critter.
+          {studyStyleResult(state.studyStyle).line} Retake the vibe quiz in
+          Account settings.
         </p>
       </div>
       <div className="space-y-2">
