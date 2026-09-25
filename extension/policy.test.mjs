@@ -159,10 +159,10 @@ test("popup copy names hours, unlocks, and Catalyst origin", () => {
   assert.match(view.sync, /Catalyst tab synced/);
 });
 
-test("popup unsynced state asks the user to open Catalyst", () => {
+test("popup unsynced state asks the user to open Catalyst but does not lock the toggle", () => {
   const view = describePopup(null, weekdayMorning.getTime());
   assert.equal(view.status, "unknown");
-  assert.equal(view.toggleLocked, true);
+  assert.equal(view.toggleLocked, false);
   assert.equal(view.hours, "No schedule synced — open Catalyst");
   assert.equal(view.sync, "Not synced — open Catalyst");
   assert.equal(view.openHref, "https://catalyst-study.vercel.app");

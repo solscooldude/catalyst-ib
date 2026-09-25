@@ -397,7 +397,7 @@ export function describePopup(policy, now = Date.now(), receivedAt = null) {
     statusLabel: status === "on" ? "ON" : status === "off" ? "OFF" : "Unknown",
     statusDetail,
     toggleOn: status === "on",
-    toggleLocked: !synced || forced,
+    toggleLocked: forced,
     toggleHint,
     preferredOn: preferred,
     hours:
