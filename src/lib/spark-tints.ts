@@ -136,7 +136,7 @@ export const SPARK_TINTS = [
   {
     id: "twilight",
     name: "Twilight wash",
-    cost: 40,
+    cost: 44,
     collection: "starter" as const,
     kind: "gradient" as const,
     blurb: "Premium two-tone. Costs more than a solid.",

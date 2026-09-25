@@ -14,7 +14,6 @@ const localStorage = {
 };
 
 globalThis.window = { localStorage };
-// @ts-expect-error -- script stub
 globalThis.localStorage = localStorage;
 globalThis.document = { documentElement: { classList: { toggle() {} }, style: {} } };
 

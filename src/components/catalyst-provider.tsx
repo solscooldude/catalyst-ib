@@ -99,6 +99,8 @@ export function CatalystProvider({ children }: { children: React.ReactNode }) {
     store.appearance,
     store.spriteName,
     store.spriteSpecies,
+    store.studyStyle,
+    store.spriteShapeChangeCount,
     store.petQuizComplete,
     store.extraMagical,
     store.dailyGoalMinutes,
