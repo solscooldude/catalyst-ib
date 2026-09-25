@@ -72,6 +72,15 @@ test("blocks YouTube outside lock hours when the user turned Lock on", () => {
   assert.equal(decision.appId, "youtube");
 });
 
+test("lock hours still block even if the popup has not marked policy synced", () => {
+  const decision = decideUrl(
+    "https://www.instagram.com/",
+    { schedule, extensionEnabled: false, nemeses: [], unlockedUntil: {} },
+    weekdayAfternoon.getTime(),
+  );
+  assert.equal(decision.action, "block");
+});
+
 test("lock hours force the extension on even if the user left it off", () => {
   const decision = decideUrl(
     "https://www.instagram.com/",

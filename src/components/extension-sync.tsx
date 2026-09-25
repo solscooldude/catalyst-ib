@@ -1,7 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { POLICY_MESSAGE, PRESENT_MESSAGE } from "@/lib/domain-policy";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  POLICY_MESSAGE,
+  PRESENT_MESSAGE,
+  REQUEST_POLICY_MESSAGE,
+} from "@/lib/domain-policy";
 import { buildExtensionPolicy } from "@/lib/extension-sync";
 import { useCatalyst } from "@/lib/store";
 
@@ -14,13 +18,32 @@ export function useExtensionConnected() {
 export function ExtensionSync({ children }: { children?: React.ReactNode }) {
   const state = useCatalyst();
   const [connected, setConnected] = useState(false);
+  const policyRef = useRef(state.hydrated ? buildExtensionPolicy(state) : null);
+
+  if (state.hydrated) {
+    policyRef.current = buildExtensionPolicy(state);
+  }
 
   useEffect(() => {
+    function publish() {
+      const policy = policyRef.current;
+      if (!policy) return;
+      window.postMessage(
+        { type: POLICY_MESSAGE, policy },
+        window.location.origin,
+      );
+    }
+
     function onMessage(event: MessageEvent) {
       if (event.origin !== window.location.origin) return;
       if (event.source !== window) return;
-      if (event.data?.type === PRESENT_MESSAGE) setConnected(true);
+      const type = event.data?.type;
+      if (type === PRESENT_MESSAGE || type === REQUEST_POLICY_MESSAGE) {
+        setConnected(true);
+        publish();
+      }
     }
+
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, []);
@@ -28,6 +51,7 @@ export function ExtensionSync({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     if (!state.hydrated) return;
     const policy = buildExtensionPolicy(state);
+    policyRef.current = policy;
     function publish() {
       window.postMessage(
         { type: POLICY_MESSAGE, policy },
