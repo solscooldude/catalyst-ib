@@ -1,4 +1,8 @@
-import { friendDisplayName, friendInitials } from "@/lib/friends";
+import {
+  formatFriendId,
+  friendDisplayName,
+  friendInitials,
+} from "@/lib/friends";
 import { cn } from "@/lib/utils";
 
 export function FriendAvatar({
@@ -46,17 +50,21 @@ export function FriendIdentity({
   size?: "sm" | "md";
 }) {
   const label = friendDisplayName({ name, code });
+  const idLine = formatFriendId(code);
   return (
     <div className="flex min-w-0 items-center gap-3">
       <FriendAvatar name={label} avatarUrl={avatarUrl} size={size} />
       <div className="min-w-0">
-        <p className="truncate text-sm text-foreground">
+        <p className="truncate text-sm font-medium text-foreground">
           {you ? `${label} (you)` : label}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
-          {code}
-          {extra ? ` · ${extra}` : ""}
-        </p>
+        {idLine || extra ? (
+          <p className="truncate text-[11px] leading-4 text-muted-foreground">
+            {idLine}
+            {idLine && extra ? " · " : ""}
+            {extra ?? ""}
+          </p>
+        ) : null}
       </div>
     </div>
   );

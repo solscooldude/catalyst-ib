@@ -32,7 +32,7 @@ const SLIDES = [
   {
     kicker: "Sprite",
     title: "Sprite",
-    body: "A short quiz matches you to a sprite. It hatches on the first focus block or a snack, then grows when you study.",
+    body: "A short quiz matches you to a sprite. Feed it three snacks to hatch, then it grows when you study.",
   },
   {
     kicker: "Tokens",

@@ -18,8 +18,6 @@ export function catchSparkToken() {
     ...current,
     tokens: current.tokens + 1,
     careActions: current.careActions + 1,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
   return { ok: true as const, remaining: 2 - used };
 }
@@ -40,8 +38,6 @@ export function awardDodgeBonus() {
     ...current,
     tokens: current.tokens + 1,
     careActions: current.careActions + 1,
-    spriteHatched: true,
-    hatchBurstAt: current.spriteHatched ? current.hatchBurstAt : Date.now(),
   }));
   return { ok: true as const, remaining: 1 - used };
 }
