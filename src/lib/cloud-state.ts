@@ -23,6 +23,11 @@ import {
   normalizeSpriteSpecies,
   type SpriteSpeciesId,
 } from "@/lib/sprite-species";
+import {
+  DEFAULT_STUDY_STYLE,
+  normalizeStudyStyle,
+  type StudyStyleId,
+} from "@/lib/study-style";
 
 export const CLOUD_STATE_VERSION = 1;
 
@@ -53,6 +58,8 @@ export type CloudSnapshot = {
   spriteAsleep: boolean;
   spriteHatched: boolean;
   spriteSpecies: SpriteSpeciesId;
+  studyStyle: StudyStyleId;
+  spriteShapeChangeCount: number;
   extraMagical: boolean;
   petQuizComplete: boolean;
   careStage: CloudCareStage;
@@ -90,6 +97,8 @@ export type CloudSource = {
   spriteAsleep?: boolean;
   spriteHatched?: boolean;
   spriteSpecies?: string;
+  studyStyle?: string;
+  spriteShapeChangeCount?: number;
   extraMagical?: boolean;
   petQuizComplete?: boolean;
   careStage?: string;
@@ -158,6 +167,13 @@ export function extractCloudSnapshot(
     spriteAsleep: Boolean(raw.spriteAsleep),
     spriteHatched: Boolean(raw.spriteHatched),
     spriteSpecies: normalizeSpriteSpecies(raw.spriteSpecies ?? DEFAULT_SPECIES),
+    studyStyle: normalizeStudyStyle(
+      raw.studyStyle ?? raw.spriteSpecies ?? DEFAULT_STUDY_STYLE,
+    ),
+    spriteShapeChangeCount: Math.max(
+      0,
+      Number(raw.spriteShapeChangeCount ?? 0) || 0,
+    ),
     extraMagical: Boolean(raw.extraMagical),
     petQuizComplete: Boolean(raw.petQuizComplete),
     careStage: normalizeCareStage(raw.careStage),
@@ -227,11 +243,28 @@ export function isLocalWorthMigrating(raw: CloudSource | null | undefined) {
   return !isCloudEmpty(snapshot);
 }
 
+function withoutLocalAvatars<T extends { avatarUrl: string | null }>(
+  rows: T[] | undefined,
+) {
+  if (!rows) return rows;
+  return rows.map((row) => ({
+    ...row,
+    avatarUrl:
+      row.avatarUrl && /^https:\/\//i.test(row.avatarUrl) ? row.avatarUrl : null,
+  }));
+}
+
 export function compactCloudSnapshot(snapshot: CloudSnapshot) {
-  const json = JSON.stringify(snapshot);
-  if (json.length <= 7500) return snapshot;
-  return {
+  const stripped = {
     ...snapshot,
+    friends: withoutLocalAvatars(snapshot.friends),
+    incomingRequests: withoutLocalAvatars(snapshot.incomingRequests),
+    outgoingRequests: withoutLocalAvatars(snapshot.outgoingRequests),
+  };
+  const json = JSON.stringify(stripped);
+  if (json.length <= 7500) return stripped;
+  return {
+    ...stripped,
     avatarUrl: null,
     appearance: normalizeAppearance({
       ...snapshot.appearance,
@@ -239,7 +272,7 @@ export function compactCloudSnapshot(snapshot: CloudSnapshot) {
       ownedBackgrounds: snapshot.appearance.ownedBackgrounds.slice(0, 12),
       ownedSparkTints: snapshot.appearance.ownedSparkTints.slice(0, 12),
       ownedGear: snapshot.appearance.ownedGear.slice(0, 16),
-      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 8),
+      ownedAuras: snapshot.appearance.ownedAuras.slice(0, 12),
       ownedTrails: snapshot.appearance.ownedTrails.slice(0, 8),
       ownedFocusThemes: snapshot.appearance.ownedFocusThemes.slice(0, 8),
     }),
